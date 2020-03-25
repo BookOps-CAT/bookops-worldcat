@@ -3,6 +3,8 @@ name = "bookops-worldcat"
 version = "0.1.0"
 description = "BookOps CAT OCLC APIs wrappers, in particular Search and Metadata APIs."
 authors = ["Tomasz Kalata <klingaroo@gmail.com>"]
+licence =  "MIT"
+exclude = ['bookops_worldcat/temp.py', 'bookops_worldcat/temp/*']
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -16,3 +18,25 @@ pytest = "^5.2"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py37']
+include = '\.pyi?$'
+exclude = '''
+(
+    /(
+        \.eggs
+       | \.git
+       | \.hg
+       | \.mypy_cache
+       | \.tox
+       | \.venv
+       | _build
+       | buck-out
+       | build
+       | dist
+    )/
+    | temp.py
+)
+'''
