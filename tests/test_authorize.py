@@ -1,3 +1,6 @@
+import requests
+import requests_mock
+
 from bookops_worldcat import __version__
 from bookops_worldcat.authorize import AuthorizeAccess
 
@@ -16,9 +19,31 @@ def test_mocked_credentials(mock_credentials):
         "oauth_server": "https://oauth.oclc.test.org",
     }
 
-
-class TestAuthorizeAccess:
+    # class TestAuthorizeAccess:
     """Test AuthorizeAccess and obraining token"""
 
-    def test_token_request_url():
-        pass
+
+def test_token_response(mock_credentials, requests_mock):
+    cred = mock_credentials
+    requests_mock.post(
+        "https://oauth.oclc.test.org/token",
+        headers={"user-agent": f"bookops-worldcat/{__version__}"},
+        auth=(cred["key"], cred["secret"]),
+        data={"grant_type": "client_credentials", "scope": cred["scope"]},
+        timeout=(5, 5),
+        text="OK",
+    )
+
+    access = AuthorizeAccess(
+        oauth_server=cred["oauth_server"],
+        grant_type="client_credentials",
+        key=cred["key"],
+        secret=cred["secret"],
+        options={
+            "scope": cred["scope"],
+            "authenticating_institution_id": cred["authenticating_institution_id"],
+            "context_institution_id": cred["context_institution_id"],
+        },
+    )
+
+    # assert access.get_token.json() == mock_post_token_response
