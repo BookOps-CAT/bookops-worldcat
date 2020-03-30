@@ -14,7 +14,8 @@ requests-oauthlib = "^1.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
-pytest-cov = "^2.8.1"
+pytest-cov = "^2.8"
+requests-mock = "^1.7"
 
 [build-system]
 requires = ["poetry>=0.12"]
