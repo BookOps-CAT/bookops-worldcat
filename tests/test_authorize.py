@@ -1,4 +1,5 @@
-import requests
+# import requests
+# import pytest
 
 from bookops_worldcat import __version__
 from bookops_worldcat.authorize import AuthorizeAccess
@@ -35,29 +36,16 @@ class TestAuthorizeAccess:
         assert access.secret == creds["secret"]
         assert access.grant_type == "client_credentials"
         assert access.options == creds["options"]
+        assert access.timeout == (5, 5)
+        assert access.grant_types == ["client_credentials", "refresh_token"]
 
+    def test_get_token_via_credentials(
+        self,
+        mock_access_initiation_via_credentials,
+        mock_access_token_response_json,
+        mock_post_token_response,
+    ):
+        access = mock_access_initiation_via_credentials
 
-# def test_token_response(mock_credentials, requests_mock):
-#     cred = mock_credentials
-#     requests_mock.post(
-#         "https://oauth.oclc.test.org/token",
-#         headers={"user-agent": f"bookops-worldcat/{__version__}"},
-#         auth=(cred["key"], cred["secret"]),
-#         data={"grant_type": "client_credentials", "scope": cred["scope"]},
-#         timeout=(5, 5),
-#         text="OK",
-#     )
-
-#     access = AuthorizeAccess(
-#         oauth_server=cred["oauth_server"],
-#         grant_type="client_credentials",
-#         key=cred["key"],
-#         secret=cred["secret"],
-#         options={
-#             "scope": cred["scope"],
-#             "authenticating_institution_id": cred["authenticating_institution_id"],
-#             "context_institution_id": cred["context_institution_id"],
-#         },
-#     )
-
-# assert access.get_token.json() == mock_post_token_response
+        results = access.get_token()
+        assert results.json() == mock_access_token_response_json

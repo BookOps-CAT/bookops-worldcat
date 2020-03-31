@@ -6,6 +6,20 @@ from bookops_worldcat.authorize import AuthorizeAccess
 
 
 @pytest.fixture()
+def mock_access_token_response_json():
+    return {
+        "access_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
+        "token_type": "bearer",
+        "expires_in": "1199",
+        "principalID": "",
+        "principalIDNS": "",
+        "scopes": "SCOPE HERE",
+        "contextInstitutionId": "00001",
+        "expires_at": "2013-08-23 18:45:29Z",
+    }
+
+
+@pytest.fixture()
 def mock_credentials():
     return {
         "name": "TestCreds",
@@ -34,3 +48,32 @@ def mock_access_initiation_via_credentials(mock_credentials):
         options=cred["options"],
     )
     return access
+
+
+class MockTokenResponseViaCredentials:
+
+    # mock json() method always returns a specific testing dictionary
+    @staticmethod
+    def json():
+        return {
+            "access_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
+            "token_type": "bearer",
+            "expires_in": "1199",
+            "principalID": "",
+            "principalIDNS": "",
+            "scopes": "SCOPE HERE",
+            "contextInstitutionId": "00001",
+            "expires_at": "2013-08-23 18:45:29Z",
+        }
+
+    @staticmethod
+    def url():
+        return "https://oauth.oclc.test.org/token"
+
+
+@pytest.fixture
+def mock_post_token_response(monkeypatch):
+    def mock_post_token(*args, **kwargs):
+        return MockTokenResponseViaCredentials()
+
+    monkeypatch.setattr(requests, "post", mock_post_token)
