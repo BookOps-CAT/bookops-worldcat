@@ -1,7 +1,7 @@
 # import requests
 # import pytest
 
-from bookops_worldcat import __version__
+from bookops_worldcat import __title__, __version__
 from bookops_worldcat.authorize import AuthorizeAccess
 
 
@@ -24,6 +24,31 @@ def test_mocked_credentials(mock_credentials):
 
 class TestAuthorizeAccess:
     """Test AuthorizeAccess and obraining token"""
+
+    def test_get_token_url(
+        self, mock_access_initiation_via_credentials, mock_credentials
+    ):
+        access = mock_access_initiation_via_credentials
+        assert access._get_token_url() == f"{mock_credentials['oauth_server']}/token"
+
+    def test_get_token_headers(self, mock_access_initiation_via_credentials):
+        access = mock_access_initiation_via_credentials
+        assert access._get_post_token_headers() == {
+            "user-agent": f"{__title__}/{__version__}"
+        }
+
+    def test_get_auth(self, mock_access_initiation_via_credentials, mock_credentials):
+        access = mock_access_initiation_via_credentials
+        creds = mock_credentials
+        assert access._get_auth() == (creds["key"], creds["secret"])
+
+    def test_get_data(self, mock_access_initiation_via_credentials, mock_credentials):
+        access = mock_access_initiation_via_credentials
+        creds = mock_credentials
+        assert access._get_data() == {
+            "grant_type": "client_credentials",
+            "scope": creds["options"]["scope"],
+        }
 
     def test_access_initiation_via_credentials(
         self, mock_access_initiation_via_credentials, mock_credentials
