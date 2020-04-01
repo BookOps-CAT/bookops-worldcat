@@ -1,8 +1,8 @@
 # import requests
-# import pytest
+import pytest
 
 from bookops_worldcat import __title__, __version__
-from bookops_worldcat.authorize import AuthorizeAccess
+from bookops_worldcat.authorize import WorldcatAccessToken
 
 
 def test_mocked_credentials(mock_credentials):
@@ -22,8 +22,8 @@ def test_mocked_credentials(mock_credentials):
     }
 
 
-class TestAuthorizeAccess:
-    """Test AuthorizeAccess and obraining token"""
+class TestWorldcatAccessToken:
+    """Test WorldcatAccessToken and obraining token"""
 
     def test_get_token_url(
         self, mock_access_initiation_via_credentials, mock_credentials
@@ -62,7 +62,6 @@ class TestAuthorizeAccess:
         assert access.grant_type == "client_credentials"
         assert access.options == creds["options"]
         assert access.timeout == (5, 5)
-        assert access.grant_types == ["client_credentials", "refresh_token"]
 
     def test_get_token_via_credentials(
         self,
@@ -74,3 +73,119 @@ class TestAuthorizeAccess:
 
         results = access.get_token()
         assert results.json() == mock_access_token_response_json
+
+    def test_access_initiation_via_credentials_invalid_grant_type_argument(
+        self, mock_credentials
+    ):
+        creds = mock_credentials
+        with pytest.raises(ValueError):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                grant_type="invalid_grant",
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+        with pytest.raises(ValueError):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+
+    def test_access_initiation_via_credentials_missing_scope_option(
+        self, mock_credentials
+    ):
+        creds = mock_credentials
+        creds["options"].pop("scope", None)
+        with pytest.raises(KeyError):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                grant_type="client_credentials",
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+
+    def test_access_initiation_via_credentials_missing_authenticating_institution_id_option(
+        self, mock_credentials
+    ):
+        creds = mock_credentials
+        creds["options"].pop("authenticating_institution_id", None)
+        with pytest.raises(KeyError):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                grant_type="client_credentials",
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+
+    def test_access_initiation_via_credentials_missing_context_institution_id_option(
+        self, mock_credentials
+    ):
+        creds = mock_credentials
+        creds["options"].pop("context_institution_id", None)
+        with pytest.raises(KeyError):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                grant_type="client_credentials",
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+
+    def test_access_initiation_via_credentials_missing_oauth_server_argument(
+        self, mock_credentials
+    ):
+        creds = mock_credentials
+        with pytest.raises(ValueError):
+            WorldcatAccessToken(
+                oauth_server=None,
+                grant_type="client_credentials",
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+
+        with pytest.raises(ValueError):
+            WorldcatAccessToken(
+                oauth_server="",
+                grant_type="client_credentials",
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+        with pytest.raises(ValueError):
+            WorldcatAccessToken(
+                grant_type="client_credentials",
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+
+    def test_access_initiation_via_credentials_missing_key_argument(
+        self, mock_credentials
+    ):
+        creds = mock_credentials
+        with pytest.raises(ValueError):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                grant_type="client_credentials",
+                key="",
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+
+    # def test_access_initiation_via_credentials_missing_secret_argument(
+    #     self, mock_credentials
+    # ):
+    #     creds = mock_credentials
+    #     with pytest.raises(ValueError):
+    #         WorldcatAccessToken(
+    #             oauth_server=creds["oauth_server"],
+    #             grant_type="client_credentials",
+    #             key=creds["key"],
+    #             options=creds["options"],
+    #         )

@@ -2,7 +2,7 @@ import pytest
 
 import requests
 
-from bookops_worldcat.authorize import AuthorizeAccess
+from bookops_worldcat.authorize import WorldcatAccessToken
 
 
 @pytest.fixture()
@@ -40,7 +40,7 @@ def mock_credentials():
 @pytest.fixture()
 def mock_access_initiation_via_credentials(mock_credentials):
     cred = mock_credentials
-    access = AuthorizeAccess(
+    access = WorldcatAccessToken(
         oauth_server=cred["oauth_server"],
         grant_type="client_credentials",
         key=cred["key"],
@@ -65,10 +65,6 @@ class MockTokenResponseViaCredentials:
             "contextInstitutionId": "00001",
             "expires_at": "2013-08-23 18:45:29Z",
         }
-
-    @staticmethod
-    def url():
-        return "https://oauth.oclc.test.org/token"
 
 
 @pytest.fixture
