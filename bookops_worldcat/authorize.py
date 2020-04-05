@@ -35,8 +35,7 @@ class WorldcatAccessToken:
           "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
         >>> token.is_expired()
           False
-        >>> # token object retains post request (requests.Request object) information
-        >>> # and behavior
+        >>> # token object retains post request (requests.Request object) functinality
         >>> token.server_response.json()
           {"token_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
           "token_type": "bearer",
@@ -46,8 +45,14 @@ class WorldcatAccessToken:
           "scopes": "SCOPE HERE",
           "contextInstitutionId": "00001",
           "expires_at": "2013-08-23 18:45:29Z"}
-
-
+        >>> token.server_response.request.headers
+        >>> {'user-agent': 'bookops-worldcat/0.1.0',
+             'Accept-Encoding': 'gzip, deflate',
+             'Accept': '*/*',
+             'Connection': 'keep-alive',
+             'Content-Length': '67',
+             'Content-Type': 'application/x-www-form-urlencoded',
+             'Authorization': 'Basic encoded_authorization_here='}
     """
 
     def __init__(
