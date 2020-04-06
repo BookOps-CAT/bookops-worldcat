@@ -25,6 +25,8 @@ class WorldcatSession(requests.Session):
 
 
 class SearchSession(WorldcatSession):
+    """ Worlcat Search API session. Inherits requests.Session methods"""
+
     def __init__(self, token=None):
         WorldcatSession.__init__(self, token)
         self.base_url = "http://www.worldcat.org/webservices/catalog/"
