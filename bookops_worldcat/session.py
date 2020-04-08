@@ -21,7 +21,26 @@ class WorldcatSession(requests.Session):
 
 
 class SearchSession(WorldcatSession):
-    """ Worlcat Search API wrapper session. Inherits requests.Session methods"""
+    """ 
+    Worlcat Search API wrapper session. Inherits requests.Session methods.
+    Requests to Search API endpoint return records encoded as MARC XML.
+    Requires only WSkey for authentication (WSKey Lite pattern).
+
+    Args:
+        credentials: instance of WorldcatAccessToken
+
+    Basic usage:
+
+    >>> session = SearchSession(credentials=key)
+    >>> session.lookup_by_isbn('9781680502404')
+    <Response [200]>
+
+    or using context manager
+
+    >>> with SearchSession(credentails=key) as session:
+    ...     session.lookup_by_isbn('9781680502404')
+    <Response [200]>
+    """
 
     def __init__(self, credentials=None):
         WorldcatSession.__init__(self, credentials)
@@ -33,6 +52,25 @@ class SearchSession(WorldcatSession):
         self.base_url = "http://www.worldcat.org/webservices/catalog/"
         self.headers.update({"Accept": "application/xml"})
         self.payload = {"wskey": self.key}
+
+    def lookup_by_isbn(self, isbn=None):
+        """
+        Args:
+            isbn: str, International Standard Book Number
+        retruns:
+            response: requests.Response obj
+        """
+        if isbn is not None:
+            url = f"{self.base_url}content/isbn/{isbn}"
+
+            # send request
+            try:
+                response = self.get(url, params=self.payload, timeout=self.timeout)
+                return response
+            except requests.exceptions.Timeout:
+                raise
+            except requests.exceptions.ConnectionError:
+                raise
 
 
 class MetadataSession(WorldcatSession):

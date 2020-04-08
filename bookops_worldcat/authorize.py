@@ -37,22 +37,22 @@ class WorldcatAccessToken:
           False
         >>> # token object retains post request (requests.Request object) functinality
         >>> token.server_response.json()
-          {"token_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
-          "token_type": "bearer",
-          "expires_in": "1199",
-          "principalID": "",
-          "principalIDNS": "",
-          "scopes": "SCOPE HERE",
-          "contextInstitutionId": "00001",
-          "expires_at": "2013-08-23 18:45:29Z"}
+        {"token_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
+         "token_type": "bearer",
+         "expires_in": "1199",
+         "principalID": "",
+         "principalIDNS": "",
+         "scopes": "SCOPE HERE",
+         "contextInstitutionId": "00001",
+         "expires_at": "2013-08-23 18:45:29Z"}
         >>> token.server_response.request.headers
-        >>> {'user-agent': 'bookops-worldcat/0.1.0',
-             'Accept-Encoding': 'gzip, deflate',
-             'Accept': '*/*',
-             'Connection': 'keep-alive',
-             'Content-Length': '67',
-             'Content-Type': 'application/x-www-form-urlencoded',
-             'Authorization': 'Basic encoded_authorization_here='}
+        {'user-agent': 'bookops-worldcat/0.1.0',
+         'Accept-Encoding': 'gzip, deflate',
+         'Accept': '*/*',
+         'Connection': 'keep-alive',
+         'Content-Length': '67',
+         'Content-Type': 'application/x-www-form-urlencoded',
+         'Authorization': 'Basic encoded_authorization_here='}
     """
 
     def __init__(
@@ -131,7 +131,7 @@ class WorldcatAccessToken:
         """
         Fetches OCLC access token
         Returns:
-            server_response_in_json : instance of requests.Response
+            server_response: instance of requests.Response
         """
         token_url = self._get_token_url()
         headers = self._get_post_token_headers()

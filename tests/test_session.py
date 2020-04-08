@@ -1,5 +1,5 @@
 import pytest
-
+from requests.exceptions import ConnectionError, Timeout
 
 from bookops_worldcat import __title__, __version__
 from bookops_worldcat.session import WorldcatSession, SearchSession, MetadataSession
@@ -9,6 +9,16 @@ class InvalidToken:
     def __init__(self):
         self.token_str = "fake_token_string"
         self.key = "fake_key"
+
+
+class MockConnectionError:
+    def __init__(self, *args, **kwargs):
+        raise ConnectionError
+
+
+class MockTimeout:
+    def __init__(self, *args, **kwargs):
+        raise Timeout
 
 
 class TestWorldcatSession:
@@ -75,6 +85,29 @@ class TestSearchSession:
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         assert session.payload == {"wskey": key}
+
+    def test_lookup_by_isbn_request(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        results = session.lookup_by_isbn("12345")
+        assert results.status_code == 200
+        assert results.url == f"{session.base_url}content/isbn/12345"
+
+    def test_lookup_by_isbn_connectionerror(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockConnectionError)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ConnectionError):
+            session.lookup_by_isbn("12345")
+
+    def test_lookup_by_isbn_timeout(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockTimeout)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(Timeout):
+            session.lookup_by_isbn("12345")
 
 
 class TestMetadataSession:

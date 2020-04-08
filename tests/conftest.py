@@ -23,7 +23,7 @@ def mock_credentials():
     }
 
 
-class MockResponseObjSuccess:
+class MockAuthServerResponseObjSuccess:
     """Simulates auth server response to successful token request"""
 
     def __init__(self):
@@ -42,7 +42,7 @@ class MockResponseObjSuccess:
         }
 
 
-class MockResponseObjFailure:
+class MockAuthServerResponseObjFailure:
     """Simulates auth server resonse to failed token request"""
 
     def __init__(self):
@@ -55,7 +55,7 @@ class MockResponseObjFailure:
 @pytest.fixture
 def mock_successful_post_token_request(monkeypatch):
     def mock_oauth_server_response(*args, **kwargs):
-        return MockResponseObjSuccess()
+        return MockAuthServerResponseObjSuccess()
 
     monkeypatch.setattr(requests, "post", mock_oauth_server_response)
 
@@ -63,7 +63,7 @@ def mock_successful_post_token_request(monkeypatch):
 @pytest.fixture
 def mock_failed_post_token_request(monkeypatch):
     def mock_oauth_server_response(*args, **kwargs):
-        return MockResponseObjFailure()
+        return MockAuthServerResponseObjFailure()
 
     monkeypatch.setattr(requests, "post", mock_oauth_server_response)
 
@@ -80,3 +80,17 @@ def mock_token_initiation_via_credentials(
         options=cred["options"],
     )
     return token
+
+
+class MockSuccessfulSearchApiLookupIsbnResponse:
+    def __init__(self):
+        self.status_code = 200
+        self.url = "http://www.worldcat.org/webservices/catalog/content/isbn/12345"
+
+
+@pytest.fixture
+def mock_successful_search_api_lookup_isbn_request(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        return MockSuccessfulSearchApiLookupIsbnResponse()
+
+    monkeypatch.setattr(requests.Session, "get", mock_api_response)
