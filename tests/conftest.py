@@ -3,6 +3,7 @@ import pytest
 import requests
 
 from bookops_worldcat.authorize import WorldcatAccessToken
+from requests.exceptions import ConnectionError, Timeout
 
 
 @pytest.fixture
@@ -85,7 +86,6 @@ def mock_token_initiation_via_credentials(
 class MockSuccessfulSearchApiLookupIsbnResponse:
     def __init__(self):
         self.status_code = 200
-        self.url = "http://www.worldcat.org/webservices/catalog/content/isbn/12345"
 
 
 @pytest.fixture

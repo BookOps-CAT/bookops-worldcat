@@ -86,28 +86,217 @@ class TestSearchSession:
         session = SearchSession(credentials=key)
         assert session.payload == {"wskey": key}
 
-    def test_lookup_by_isbn_request(
+    def test_prepare_request_payload(self, mock_credentials):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        kwargs = {"key1": "val1", "key2": "val2", "key3": [], "key4": None}
+        assert session._prepare_request_payload(**kwargs) == {
+            "wskey": key,
+            "key1": "val1",
+            "key2": "val2",
+        }
+
+    def test_lookup_isbn_url(
         self, mock_credentials, mock_successful_search_api_lookup_isbn_request
     ):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
-        results = session.lookup_by_isbn("12345")
-        assert results.status_code == 200
-        assert results.url == f"{session.base_url}content/isbn/12345"
+        assert (
+            session._lookup_isbn_url("12345")
+            == "http://www.worldcat.org/webservices/catalog/content/isbn/12345"
+        )
 
-    def test_lookup_by_isbn_connectionerror(self, monkeypatch, mock_credentials):
+    def test_lookup_isbn_request(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        with SearchSession(credentials=key) as session:
+            results = session.lookup_isbn("12345")
+            assert results.status_code == 200
+
+    def test_lookup_isbn_none(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(TypeError):
+            session.lookup_isbn()
+
+    def test_lookup_isbn_invalid_service_level(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ValueError):
+            session.lookup_isbn("12345", service_level=None)
+
+    def test_lookup_isbn_connectionerror(self, monkeypatch, mock_credentials):
         monkeypatch.setattr("requests.Session.get", MockConnectionError)
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with pytest.raises(ConnectionError):
-            session.lookup_by_isbn("12345")
+            session.lookup_isbn("12345")
 
-    def test_lookup_by_isbn_timeout(self, monkeypatch, mock_credentials):
+    def test_lookup_isbn_timeout(self, monkeypatch, mock_credentials):
         monkeypatch.setattr("requests.Session.get", MockTimeout)
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with pytest.raises(Timeout):
-            session.lookup_by_isbn("12345")
+            session.lookup_isbn("12345")
+
+    def test_lookup_issn_url(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        assert (
+            session._lookup_issn_url("1234-4567")
+            == "http://www.worldcat.org/webservices/catalog/content/issn/1234-4567"
+        )
+
+    def test_lookup_issn_request(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        with SearchSession(credentials=key) as session:
+            results = session.lookup_issn("1234-4567")
+            assert results.status_code == 200
+
+    def test_lookup_issn_none(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(TypeError):
+            session.lookup_issn()
+
+    def test_lookup_issn_invalid_service_level(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ValueError):
+            session.lookup_issn("1234-4567", service_level=None)
+
+    def test_lookup_issn_connectionerror(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockConnectionError)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ConnectionError):
+            session.lookup_issn("1234-4567")
+
+    def test_lookup_issn_timeout(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockTimeout)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(Timeout):
+            session.lookup_isbn("1234-4567")
+
+    def test_lookup_oclc_number_url(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        assert (
+            session._lookup_oclc_number_url("00012345")
+            == "http://www.worldcat.org/webservices/catalog/content/00012345"
+        )
+
+    def test_lookup_oclc_number_request(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        with SearchSession(credentials=key) as session:
+            results = session.lookup_oclc_number("00012345")
+            assert results.status_code == 200
+
+    def test_lookup_oclc_number_none(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(TypeError):
+            session.lookup_oclc_number()
+
+    def test_lookup_oclc_number_with_prefix(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ValueError):
+            session.lookup_oclc_number("ocn00012345")
+
+    def test_lookup_oclc_invalid_service_level(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ValueError):
+            session.lookup_oclc_number("00012345", service_level=None)
+
+    def test_lookup_oclc_number_connectionerror(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockConnectionError)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ConnectionError):
+            session.lookup_oclc_number("00012345")
+
+    def test_lookup_oclc_number_timeout(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockTimeout)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(Timeout):
+            session.lookup_oclc_number("00012345")
+
+    def test_lookup_standard_number_url(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        assert (
+            session._lookup_standard_number_url("00012345")
+            == "http://www.worldcat.org/webservices/catalog/content/sn/00012345"
+        )
+
+    def test_lookup_standard_number_request(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        with SearchSession(credentials=key) as session:
+            results = session.lookup_standard_number("00012345")
+            assert results.status_code == 200
+
+    def test_lookup_standard_number_none(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(TypeError):
+            session.lookup_standard_number()
+
+    def test_lookup_standard_invalid_service_level(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ValueError):
+            session.lookup_oclc_number("00012345", service_level=None)
+
+    def test_lookup_standard_number_connectionerror(
+        self, monkeypatch, mock_credentials
+    ):
+        monkeypatch.setattr("requests.Session.get", MockConnectionError)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ConnectionError):
+            session.lookup_standard_number("00012345")
+
+    def test_lookup_standard_number_timeout(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockTimeout)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(Timeout):
+            session.lookup_standard_number("00012345")
 
 
 class TestMetadataSession:
