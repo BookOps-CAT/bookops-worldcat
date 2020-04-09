@@ -190,7 +190,7 @@ class TestSearchSession:
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with pytest.raises(Timeout):
-            session.lookup_isbn("1234-4567")
+            session.lookup_issn("1234-4567")
 
     def test_lookup_oclc_number_url(
         self, mock_credentials, mock_successful_search_api_lookup_isbn_request
@@ -280,7 +280,7 @@ class TestSearchSession:
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with pytest.raises(ValueError):
-            session.lookup_oclc_number("00012345", service_level=None)
+            session.lookup_standard_number("00012345", service_level=None)
 
     def test_lookup_standard_number_connectionerror(
         self, monkeypatch, mock_credentials
