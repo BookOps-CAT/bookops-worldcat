@@ -88,7 +88,7 @@ class SearchSession(WorldcatSession):
             isbn: str,              International Standard Book Number
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
-        retruns:
+        Retruns:
             response: requests.Response object
         """
 
@@ -120,7 +120,7 @@ class SearchSession(WorldcatSession):
                                     example '0000-0019'
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
-        retruns:
+        Retruns:
             response: requests.Response object
         """
 
@@ -151,7 +151,7 @@ class SearchSession(WorldcatSession):
             oclc_number: str,       OCLC record number without any prefix
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
-        retruns:
+        Retruns:
             response: requests.Response object
         """
 
@@ -183,7 +183,7 @@ class SearchSession(WorldcatSession):
                                     publisher number, UPC, etc.
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
-        retruns:
+        Retruns:
             response: requests.Response object
         """
 
@@ -205,6 +205,91 @@ class SearchSession(WorldcatSession):
             raise
         except requests.exceptions.ConnectionError:
             raise
+
+    def cql_query(
+        self,
+        keyword,
+        keyword_type="keyword",
+        start_record=1,
+        maximum_records=10,
+        sort_keys=None,
+        frbr_grouping="off",
+        service_level="default",
+    ):
+        """
+        Args:
+            keyword: str                query keyword
+            keyword_type: str           type of keywords, supported:
+                                            - isbn
+                                            - issn
+                                            - keyword
+                                            - lccn
+                                            - oclc_number
+                                            - publisher_number
+                                            - standard_number
+            start_record: int           the starting position of the result set
+            maximum_records: int        the maximum number of records to return in a
+                                        single request, top limit is 100
+            sort_keys: list of tuples   specifies how the result is sorted; accepts
+                                        multiple sort_keys; each sort_key consits of
+                                        a tuple (sortKey, order), for example:
+                                        ('relevance', 'ascending'); supported sort_keys:
+                                            - relevance (only descending)
+                                            - Title
+                                            - Author
+                                            - Date
+                                            - Library
+                                            - Count
+                                            - Score
+
+            frbr_grouping: str          turns on or off FRBR grouping;
+                                        options: 'on', 'off'
+            service_level: str          fuller or abreviated records,
+                                        options: 'default', 'full';
+                                        more here:
+                                        https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html 
+        Returns:
+            response: requests.Response object
+        """
+
+        if keyword is None:
+            raise TypeError("Argument keyword cannot be None.")
+        if keyword == "":
+            raise ValueError("Argument keyword cannot be an empty string.")
+        if keyword_type is None:
+            raise TypeError("Argument keyword_type cannot be None.")
+        if keyword_type not in [
+            "isbn",
+            "issn",
+            "keyword",
+            "lccn",
+            "oclc_number",
+            "publisher_number",
+            "standard_number",
+        ]:
+            raise ValueError("Unsupported keyword type.")
+
+        if type(maximum_records) != int:
+            raise TypeError("Argument maximum_records must be an integer")
+
+        if maximum_records == 0 or maximum_records > 100:
+            raise ValueError(
+                "Agrument maxiumum_records accepts integers between 1 and 100."
+            )
+        if frbr_grouping is None:
+            raise TypeError("Argument frbr_grouping cannot be None.")
+        if frbr_grouping not in ["on", "off"]:
+            raise ValueError("Invalid argument frbr_grouping.")
+        if frbr_grouping == "on" and len(sort_keys) > 1:
+            raise ValueError(
+                "Invalid combination of arguments. "
+                "Multiple sort_keys only works if frbr_grouping=off"
+            )
+
+        if service_level is None:
+            raise TypeError("Argument service_level cannot be None.")
+        if service_level == "":
+            raise ValueError("Argument service_level cannot be an empty string.")
 
 
 class MetadataSession(WorldcatSession):
