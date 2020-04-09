@@ -96,6 +96,8 @@ class SearchSession(WorldcatSession):
             raise ValueError("Invalid value of service_level argument passed.")
         if isbn is None:
             raise TypeError("Argument isbn cannot be None.")
+        if isbn == "":
+            raise ValueError("Argument isbn cannot be an empty string.")
 
         url = self._lookup_isbn_url(isbn)
         payload = self._prepare_request_payload(servicelevel=service_level)
@@ -126,6 +128,8 @@ class SearchSession(WorldcatSession):
             raise ValueError("Invalid value of service_level argument passed.")
         if issn is None:
             raise TypeError("Argument issn cannot be None.")
+        if issn == "":
+            raise ValueError("Argument issn cannot be an empty string.")
 
         url = self._lookup_issn_url(issn)
         payload = self._prepare_request_payload(servicelevel=service_level)
@@ -187,6 +191,8 @@ class SearchSession(WorldcatSession):
             raise ValueError("Invalid value of service_level argument passed.")
         if std_number is None:
             raise TypeError("Argument std_number cannot be None.")
+        if std_number == "":
+            raise ValueError("Argument std_number cannot be an empty string.")
 
         url = self._lookup_standard_number_url(std_number)
         payload = self._prepare_request_payload(servicelevel=service_level)

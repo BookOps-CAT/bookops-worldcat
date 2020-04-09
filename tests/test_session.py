@@ -122,6 +122,14 @@ class TestSearchSession:
         with pytest.raises(TypeError):
             session.lookup_isbn()
 
+    def test_lookup_isbn_empty_string(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ValueError):
+            session.lookup_isbn(isbn="")
+
     def test_lookup_isbn_invalid_service_level(
         self, mock_credentials, mock_successful_search_api_lookup_isbn_request
     ):
@@ -168,7 +176,15 @@ class TestSearchSession:
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with pytest.raises(TypeError):
-            session.lookup_issn()
+            session.lookup_issn(issn=None)
+
+    def test_lookup_issn_empty_string(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ValueError):
+            session.lookup_issn(issn="")
 
     def test_lookup_issn_invalid_service_level(
         self, mock_credentials, mock_successful_search_api_lookup_isbn_request
@@ -281,6 +297,14 @@ class TestSearchSession:
         session = SearchSession(credentials=key)
         with pytest.raises(ValueError):
             session.lookup_standard_number("00012345", service_level=None)
+
+    def test_lookup_standard_empty_string(
+        self, mock_credentials, mock_successful_search_api_lookup_isbn_request
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ValueError):
+            session.lookup_standard_number("")
 
     def test_lookup_standard_number_connectionerror(
         self, monkeypatch, mock_credentials
