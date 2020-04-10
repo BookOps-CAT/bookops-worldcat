@@ -1,9 +1,7 @@
 import pytest
-
 import requests
 
 from bookops_worldcat.authorize import WorldcatAccessToken
-from requests.exceptions import ConnectionError, Timeout
 
 
 @pytest.fixture

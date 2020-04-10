@@ -11,9 +11,10 @@ class WorldcatSession(requests.Session):
     def __init__(self, credentials=None):
         requests.Session.__init__(self)
 
-        if not credentials:
-            raise AttributeError(
-                "WorldcatSession requires WorldcatAccessToken object or WSkey."
+        if credentials is None:
+            raise TypeError(
+                "WorldcatSession credential argument requires ' \
+                'WorldcatAccessToken instance or WSkey."
             )
 
         self.timeout = (10, 10)
@@ -55,6 +56,8 @@ class SearchSession(WorldcatSession):
 
         if type(credentials) is not str:
             raise TypeError("OCLC key (WSkey) can be only a string.")
+        if credentials == "":
+            raise ValueError("Argument credentials cannot be an empty string.")
 
         self.key = credentials
         self.base_url = "http://www.worldcat.org/webservices/catalog/"
@@ -92,12 +95,14 @@ class SearchSession(WorldcatSession):
             response: requests.Response object
         """
 
-        if service_level not in ["default", "full"]:
-            raise ValueError("Invalid value of service_level argument passed.")
-        if isbn is None:
+        if type(isbn) is not str:
             raise TypeError("Argument isbn cannot be None.")
         if isbn == "":
             raise ValueError("Argument isbn cannot be an empty string.")
+        if type(service_level) is not str:
+            raise TypeError("Invalid type of argument service_level.")
+        if service_level not in ["default", "full"]:
+            raise ValueError("Invalid value of service_level argument passed.")
 
         url = self._lookup_isbn_url(isbn)
         payload = self._prepare_request_payload(servicelevel=service_level)
@@ -124,12 +129,14 @@ class SearchSession(WorldcatSession):
             response: requests.Response object
         """
 
-        if service_level not in ["default", "full"]:
-            raise ValueError("Invalid value of service_level argument passed.")
-        if issn is None:
+        if type(issn) is not str:
             raise TypeError("Argument issn cannot be None.")
         if issn == "":
             raise ValueError("Argument issn cannot be an empty string.")
+        if type(service_level) is not str:
+            raise TypeError("Invalid type of service_level argument.")
+        if service_level not in ["default", "full"]:
+            raise ValueError("Invalid value of service_level argument passed.")
 
         url = self._lookup_issn_url(issn)
         payload = self._prepare_request_payload(servicelevel=service_level)
@@ -155,12 +162,16 @@ class SearchSession(WorldcatSession):
             response: requests.Response object
         """
 
-        if service_level not in ["default", "full"]:
-            raise ValueError("Invalid value of service_level argument passed.")
-        if oclc_number is None:
-            raise TypeError("Argument std_number cannot be None.")
+        if type(oclc_number) is not str:
+            raise TypeError("Argument oclc_number must be a string.")
+        if oclc_number == "":
+            raise ValueError("Arguemnts oclc_number cannot be empty string.")
         if not oclc_number.isdigit():
             raise ValueError("Argument oclc_number must include only numbers.")
+        if type(service_level) is not str:
+            raise TypeError("Invalid type of argument service_level.")
+        if service_level not in ["default", "full"]:
+            raise ValueError("Invalid value of service_level argument passed.")
 
         url = self._lookup_oclc_number_url(oclc_number)
         payload = self._prepare_request_payload(servicelevel=service_level)
@@ -187,10 +198,12 @@ class SearchSession(WorldcatSession):
             response: requests.Response object
         """
 
+        if type(service_level) is not str:
+            raise TypeError("Argumetn service_level must be a string.")
         if service_level not in ["default", "full"]:
             raise ValueError("Invalid value of service_level argument passed.")
-        if std_number is None:
-            raise TypeError("Argument std_number cannot be None.")
+        if type(std_number) is not str:
+            raise TypeError("Argument std_number must be a string.")
         if std_number == "":
             raise ValueError("Argument std_number cannot be an empty string.")
 
@@ -212,7 +225,7 @@ class SearchSession(WorldcatSession):
         keyword_type="keyword",
         start_record=1,
         maximum_records=10,
-        sort_keys=None,
+        sort_keys=[("relevance", "descending")],
         frbr_grouping="off",
         service_level="default",
     ):
@@ -235,12 +248,12 @@ class SearchSession(WorldcatSession):
                                         a tuple (sortKey, order), for example:
                                         ('relevance', 'ascending'); supported sort_keys:
                                             - relevance (only descending)
-                                            - Title
-                                            - Author
-                                            - Date
-                                            - Library
-                                            - Count
-                                            - Score
+                                            - title
+                                            - author
+                                            - date
+                                            - library
+                                            - count
+                                            - score
 
             frbr_grouping: str          turns on or off FRBR grouping;
                                         options: 'on', 'off'
@@ -252,11 +265,14 @@ class SearchSession(WorldcatSession):
             response: requests.Response object
         """
 
-        if keyword is None:
+        # verify keyword argument
+        if type(keyword) is not str:
             raise TypeError("Argument keyword cannot be None.")
         if keyword == "":
             raise ValueError("Argument keyword cannot be an empty string.")
-        if keyword_type is None:
+
+        # verify keyword_type argument
+        if type(keyword_type) is not str:
             raise TypeError("Argument keyword_type cannot be None.")
         if keyword_type not in [
             "isbn",
@@ -269,27 +285,81 @@ class SearchSession(WorldcatSession):
         ]:
             raise ValueError("Unsupported keyword type.")
 
+        # verify maximum_records argument
         if type(maximum_records) != int:
-            raise TypeError("Argument maximum_records must be an integer")
-
+            raise TypeError("Argument maximum_records must be an integer.")
         if maximum_records == 0 or maximum_records > 100:
             raise ValueError(
                 "Agrument maxiumum_records accepts integers between 1 and 100."
             )
-        if frbr_grouping is None:
+
+        # verify sort_keys argument
+        if type(sort_keys) is not list:
+            raise TypeError(
+                "Argument sort_key must be a list of tuples consisting of two strings."
+            )
+        if sort_keys == []:
+            raise ValueError(
+                "Argument sort_key must be a list of tuples consisting of two strings."
+            )
+        for args in sort_keys:
+            if type(args) is not tuple:
+                raise TypeError(
+                    "Argument sort_key must be a list of tuples consisting of "
+                    "two strings."
+                )
+            for a in args:
+                if type(a) is not str:
+                    raise TypeError(
+                        "Argument sort_key must be a list of tuples consisting of "
+                        "two strings."
+                    )
+                if a == "":
+                    raise ValueError(
+                        "Argument sort_key must be a list of tuples consisting of "
+                        "two not empty strings."
+                    )
+            if len(args) != 2:
+                raise ValueError("Too many arguments passed in sort_keys tuple.")
+            if args[0] not in [
+                "relevance",
+                "title",
+                "author",
+                "date",
+                "library",
+                "count",
+                "score",
+            ]:
+                raise ValueError("Invalid first element of sort_keys argument.")
+            if args[1] not in ["ascending", "descending"]:
+                raise ValueError("Ivalid second element of sort_keys argument.")
+            if args[0] == "relevance" and args[1] != "descending":
+                raise ValueError(
+                    "Key 'relevance' must be sorted as 'descending' "
+                    "in sort_keys argumeent."
+                )
+
+        # verify frbr_grouping argument
+        if type(frbr_grouping) is not str:
             raise TypeError("Argument frbr_grouping cannot be None.")
         if frbr_grouping not in ["on", "off"]:
             raise ValueError("Invalid argument frbr_grouping.")
+
+        # verify frbr_grouping and sort_keys interaction
+        # behavior per OCLC Search API docs
         if frbr_grouping == "on" and len(sort_keys) > 1:
             raise ValueError(
                 "Invalid combination of arguments. "
-                "Multiple sort_keys only works if frbr_grouping=off"
+                "Multiple sort_keys only works if frbr_grouping=off."
             )
 
-        if service_level is None:
-            raise TypeError("Argument service_level cannot be None.")
+        # verify service_level argument
+        if type(service_level) is not str:
+            raise TypeError("Invalid type of argument service_level.")
         if service_level == "":
             raise ValueError("Argument service_level cannot be an empty string.")
+        if service_level not in ["default", "full"]:
+            raise ValueError("Invalid argument service_level.")
 
 
 class MetadataSession(WorldcatSession):
