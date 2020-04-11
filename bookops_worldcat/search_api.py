@@ -2,23 +2,8 @@
 
 import requests
 
-from . import __title__, __version__
 
-
-class WorldcatSession(requests.Session):
-    """Inherits all requests.Session methods"""
-
-    def __init__(self, credentials=None):
-        requests.Session.__init__(self)
-
-        if credentials is None:
-            raise TypeError(
-                "WorldcatSession credential argument requires ' \
-                'WorldcatAccessToken instance or WSkey."
-            )
-
-        self.timeout = (10, 10)
-        self.headers.update({"User-Agent": f"{__title__}/{__version__}"})
+from ._session import WorldcatSession
 
 
 class SearchSession(WorldcatSession):
@@ -283,7 +268,7 @@ class SearchSession(WorldcatSession):
             "publisher_number",
             "standard_number",
         ]:
-            raise ValueError("Unsupported keyword type.")
+            raise ValueError("Unsupported keyword_type argument.")
 
         # verify maximum_records argument
         if type(maximum_records) != int:
@@ -360,20 +345,3 @@ class SearchSession(WorldcatSession):
             raise ValueError("Argument service_level cannot be an empty string.")
         if service_level not in ["default", "full"]:
             raise ValueError("Invalid argument service_level.")
-
-
-class MetadataSession(WorldcatSession):
-    """OCLC Metadata API wrapper session. Inherits requests.Session methods"""
-
-    def __init__(self, credentials=None):
-        WorldcatSession.__init__(self, credentials)
-
-        if type(credentials).__name__ != "WorldcatAccessToken":
-            raise TypeError("Invalid token object passed in the argument.")
-
-        if credentials.token_str is None:
-            raise TypeError(
-                "Missing token_str in WorldcatAccessToken object passes as credentials."
-            )
-
-        self.base_url = "https://worldcat.org/"
