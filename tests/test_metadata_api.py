@@ -3,7 +3,7 @@
 import pytest
 
 
-from bookops_worldcat.metadata_api import MetadataSession
+from bookops_worldcat import MetadataSession
 
 
 class InvalidToken:
