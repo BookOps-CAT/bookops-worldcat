@@ -63,6 +63,8 @@ class SearchSession(WorldcatSession):
         return f"{self.base_url}content/sn/{std_number}"
 
     def _prepare_request_payload(self, **kwargs):
+        # requests library will remove key,value pairs if value is None
+        # is this needed?
         prepped_payload = self.payload.copy()
         for key, value in kwargs.items():
             if value:
@@ -96,7 +98,7 @@ class SearchSession(WorldcatSession):
     def _sru_query_url(self, query):
         return f"{self.base_url}search/sru?query={query}"
 
-    def lookup_isbn(self, isbn=None, service_level="default"):
+    def lookup_isbn(self, isbn=None, service_level="default", hooks=None):
         """
         Service returns a matching record with the highest holdings in Worldcat.
         Records retrieved in the MARCXML format.
@@ -104,6 +106,9 @@ class SearchSession(WorldcatSession):
             isbn: str,              International Standard Book Number
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
+            hooks: dict,            requests library hook system that can be used for
+                                    singal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Retruns:
             response: requests.Response object
         """
@@ -122,14 +127,14 @@ class SearchSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, params=payload, timeout=self.timeout)
+            response = self.get(url, params=payload, hooks=hooks, timeout=self.timeout)
             return response
         except requests.exceptions.Timeout:
             raise
         except requests.exceptions.ConnectionError:
             raise
 
-    def lookup_issn(self, issn=None, service_level="default"):
+    def lookup_issn(self, issn=None, service_level="default", hooks=None):
         """
         Service returns a matching record with the highest holdings in Worldcat.
         Records retrieved in the MARCXML format.
@@ -138,6 +143,10 @@ class SearchSession(WorldcatSession):
                                     example '0000-0019'
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
+            hooks: dict,            requests library hook system that can be used for
+                                    singal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
         Retruns:
             response: requests.Response object
         """
@@ -156,14 +165,14 @@ class SearchSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, params=payload, timeout=self.timeout)
+            response = self.get(url, params=payload, hooks=hooks, timeout=self.timeout)
             return response
         except requests.exceptions.Timeout:
             raise
         except requests.exceptions.ConnectionError:
             raise
 
-    def lookup_oclc_number(self, oclc_number=None, service_level="default"):
+    def lookup_oclc_number(self, oclc_number=None, service_level="default", hooks=None):
         """
         Service returns a matching record with the highest holdings in Worldcat.
         Records retrieved in the MARCXML format.
@@ -171,6 +180,10 @@ class SearchSession(WorldcatSession):
             oclc_number: str,       OCLC record number without any prefix
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
+            hooks: dict,            requests library hook system that can be used for
+                                    singal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
         Retruns:
             response: requests.Response object
         """
@@ -191,14 +204,16 @@ class SearchSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, params=payload, timeout=self.timeout)
+            response = self.get(url, params=payload, hooks=hooks, timeout=self.timeout)
             return response
         except requests.exceptions.Timeout:
             raise
         except requests.exceptions.ConnectionError:
             raise
 
-    def lookup_standard_number(self, std_number=None, service_level="default"):
+    def lookup_standard_number(
+        self, std_number=None, service_level="default", hooks=None
+    ):
         """
         Service returns a matching record with the highest holdings in Worldcat.
         Records retrieved in the MARCXML format.
@@ -207,6 +222,10 @@ class SearchSession(WorldcatSession):
                                     publisher number, UPC, etc.
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
+            hooks: dict,            requests library hook system that can be used for
+                                    singal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
         Retruns:
             response: requests.Response object
         """
@@ -225,7 +244,7 @@ class SearchSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, params=payload, timeout=self.timeout)
+            response = self.get(url, params=payload, hooks=hooks, timeout=self.timeout)
             return response
         except requests.exceptions.Timeout:
             raise
@@ -240,6 +259,7 @@ class SearchSession(WorldcatSession):
         sort_keys=[("relevance", "descending")],
         frbr_grouping="off",
         service_level="default",
+        hooks=None,
     ):
         """
         Args:
@@ -273,6 +293,11 @@ class SearchSession(WorldcatSession):
                                         options: 'default', 'full';
                                         more here:
                                         https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html 
+            hooks: dict,                requests library hook system that can be used for
+                                        singal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
+
         Returns:
             response: requests.Response object
         """
@@ -375,7 +400,7 @@ class SearchSession(WorldcatSession):
 
         # send reques
         try:
-            response = self.get(url, params=payload, timeout=self.timeout)
+            response = self.get(url, params=payload, hooks=hooks, timeout=self.timeout)
             return response
 
         except requests.exceptions.Timeout:
