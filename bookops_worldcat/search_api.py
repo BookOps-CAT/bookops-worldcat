@@ -3,6 +3,7 @@
 import requests
 
 
+from .constant import ORD_MAP, KEY_MAP, SRU_INDICES
 from ._session import WorldcatSession
 
 
@@ -10,7 +11,7 @@ class SearchSession(WorldcatSession):
     """ 
     Worlcat Search API wrapper session. Inherits requests.Session methods.
     Requests to Search API endpoints return records encoded as MARC XML. This webservice
-    has a limit of 50k queries a day as a rolling 24 hours liimit.
+    has a limit of 50k queries a day as a rolling 24 hours limit.
 
     More about WorlcatSearch API here:
         https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html
@@ -49,13 +50,6 @@ class SearchSession(WorldcatSession):
         self.headers.update({"Accept": "application/xml"})
         self.payload = {"wskey": self.key}
 
-    def _prepare_request_payload(self, **kwargs):
-        prepped_payload = self.payload.copy()
-        for key, value in kwargs.items():
-            if value:
-                prepped_payload[key] = value
-        return prepped_payload
-
     def _lookup_isbn_url(self, isbn):
         return f"{self.base_url}content/isbn/{isbn}"
 
@@ -67,6 +61,40 @@ class SearchSession(WorldcatSession):
 
     def _lookup_standard_number_url(self, std_number):
         return f"{self.base_url}content/sn/{std_number}"
+
+    def _prepare_request_payload(self, **kwargs):
+        prepped_payload = self.payload.copy()
+        for key, value in kwargs.items():
+            if value:
+                prepped_payload[key] = value
+        return prepped_payload
+
+    def _prepare_sort_keys(self, sort_keys):
+        mapped_sort = []
+        for key, order in sort_keys:
+            mapped_sort.append(f"{KEY_MAP[key]}{ORD_MAP[order]}")
+        return " ".join(mapped_sort)
+
+    def _prepare_sru_query_str(self, query):
+        # include better error handling of invalid queries in the future
+        # verify query argument
+        if type(query) is not str:
+            raise TypeError("Argument query cannot be None.")
+        if query == "":
+            raise ValueError("Argument query cannot be an empty string.")
+        if "srw." not in query:
+            raise ValueError("Seach query syntax error.")
+        if query.count("&") > 0 or query.count("|") > 0 or query.count("<>") > 0:
+            query = (
+                query.replace("=", "+=+")
+                .replace("&", "+and+")
+                .replace("|", "+OR+")
+                .replace("<>", "+NOT+")
+            )
+        return query
+
+    def _sru_query_url(self, query):
+        return f"{self.base_url}search/sru?query={query}"
 
     def lookup_isbn(self, isbn=None, service_level="default"):
         """
@@ -183,14 +211,14 @@ class SearchSession(WorldcatSession):
             response: requests.Response object
         """
 
-        if type(service_level) is not str:
-            raise TypeError("Argumetn service_level must be a string.")
-        if service_level not in ["default", "full"]:
-            raise ValueError("Invalid value of service_level argument passed.")
         if type(std_number) is not str:
             raise TypeError("Argument std_number must be a string.")
         if std_number == "":
             raise ValueError("Argument std_number cannot be an empty string.")
+        if type(service_level) is not str:
+            raise TypeError("Argumetn service_level must be a string.")
+        if service_level not in ["default", "full"]:
+            raise ValueError("Invalid value of service_level argument passed.")
 
         url = self._lookup_standard_number_url(std_number)
         payload = self._prepare_request_payload(servicelevel=service_level)
@@ -204,10 +232,9 @@ class SearchSession(WorldcatSession):
         except requests.exceptions.ConnectionError:
             raise
 
-    def cql_query(
+    def sru_query(
         self,
-        keyword,
-        keyword_type="keyword",
+        query=None,
         start_record=1,
         maximum_records=10,
         sort_keys=[("relevance", "descending")],
@@ -216,15 +243,16 @@ class SearchSession(WorldcatSession):
     ):
         """
         Args:
-            keyword: str                query keyword
-            keyword_type: str           type of keywords, supported:
-                                            - isbn
-                                            - issn
-                                            - keyword
-                                            - lccn
-                                            - oclc_number
-                                            - publisher_number
-                                            - standard_number
+            query: str                  query string that can include multiple clauses;
+                                        use OCLC indexes found here:
+                                        
+                                        use double quotes, and following operators:
+                                        & = AND, | - OR, <> - NOT; do not use spaces
+                                        between clauses;
+                                        examples:
+                                            srw.bn="9781680502404"
+                                            srw.au="mann"&srw.ti="faustus"
+                                            srw.kw="civil war"&(srw.su="antietam"|srw.su="sharpsburg")
             start_record: int           the starting position of the result set
             maximum_records: int        the maximum number of records to return in a
                                         single request, top limit is 100
@@ -236,8 +264,7 @@ class SearchSession(WorldcatSession):
                                             - title
                                             - author
                                             - date
-                                            - library
-                                            - count
+                                            - library_count
                                             - score
 
             frbr_grouping: str          turns on or off FRBR grouping;
@@ -250,25 +277,11 @@ class SearchSession(WorldcatSession):
             response: requests.Response object
         """
 
-        # verify keyword argument
-        if type(keyword) is not str:
-            raise TypeError("Argument keyword cannot be None.")
-        if keyword == "":
-            raise ValueError("Argument keyword cannot be an empty string.")
-
-        # verify keyword_type argument
-        if type(keyword_type) is not str:
-            raise TypeError("Argument keyword_type cannot be None.")
-        if keyword_type not in [
-            "isbn",
-            "issn",
-            "keyword",
-            "lccn",
-            "oclc_number",
-            "publisher_number",
-            "standard_number",
-        ]:
-            raise ValueError("Unsupported keyword_type argument.")
+        # verify start_record argument
+        if type(start_record) != int:
+            raise TypeError("Argument start_record must be an integer.")
+        if start_record <= 0:
+            raise ValueError("Arguments start_record must be equal or greater than 1.")
 
         # verify maximum_records argument
         if type(maximum_records) != int:
@@ -311,8 +324,7 @@ class SearchSession(WorldcatSession):
                 "title",
                 "author",
                 "date",
-                "library",
-                "count",
+                "library_count",
                 "score",
             ]:
                 raise ValueError("Invalid first element of sort_keys argument.")
@@ -345,3 +357,28 @@ class SearchSession(WorldcatSession):
             raise ValueError("Argument service_level cannot be an empty string.")
         if service_level not in ["default", "full"]:
             raise ValueError("Invalid argument service_level.")
+
+        # prepare payload
+        sort_keys = self._prepare_sort_keys(sort_keys)
+        payload = {
+            "maximumRecords": maximum_records,
+            "startRecord": start_record,
+            "sortKeys": sort_keys,
+            "frbrGrouping": frbr_grouping,
+            "servicelevel": service_level,
+        }
+
+        # prep
+        payload = self._prepare_request_payload(**payload)
+        prepped_query = self._prepare_sru_query_str(query)
+        url = self._sru_query_url(prepped_query)
+
+        # send reques
+        try:
+            response = self.get(url, params=payload, timeout=self.timeout)
+            return response
+
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise

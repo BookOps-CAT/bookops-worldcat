@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError, Timeout
 
 
 from bookops_worldcat import __title__, __version__
-from bookops_worldcat.search_api import SearchSession
+from bookops_worldcat import SearchSession
 
 
 @contextmanager
@@ -293,45 +293,49 @@ class TestSearchSession:
         with pytest.raises(Timeout):
             session.lookup_standard_number("00012345")
 
+    def test_sru_query_url(self, mock_credentials):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        assert (
+            session._sru_query_url('srw.kw="foo"')
+            == 'http://www.worldcat.org/webservices/catalog/search/sru?query=srw.kw="foo"'
+        )
+
     @pytest.mark.parametrize(
-        "example_input,expectation",
+        "query_arg,expectation",
         [
             (None, pytest.raises(TypeError)),
             ("", pytest.raises(ValueError)),
-            ("foo", does_not_raise()),
+            ('srw.kw="foo"', does_not_raise()),
+            ('"foo"', pytest.raises(ValueError)),
             (12345, pytest.raises(TypeError)),
         ],
     )
-    def test_cql_query_keyword(self, mock_credentials, example_input, expectation):
+    def test_sru_query_argument(self, mock_credentials, query_arg, expectation):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with expectation:
-            session.cql_query(keyword=example_input)
+            session.sru_query(query=query_arg)
 
     @pytest.mark.parametrize(
-        "example_input,expectation",
+        "start_arg,expectation",
         [
             (None, pytest.raises(TypeError)),
-            (23, pytest.raises(TypeError)),
-            ("", pytest.raises(ValueError)),
-            ("invalid_type", pytest.raises(ValueError)),
-            ("isbn", does_not_raise()),
-            ("issn", does_not_raise()),
-            ("keyword", does_not_raise()),
-            ("lccn", does_not_raise()),
-            ("oclc_number", does_not_raise()),
-            ("publisher_number", does_not_raise()),
-            ("standard_number", does_not_raise()),
+            ("1", pytest.raises(TypeError)),
+            (0, pytest.raises(ValueError)),
+            (-1, pytest.raises(ValueError)),
+            (1, does_not_raise()),
+            (1234, does_not_raise()),
         ],
     )
-    def test_cql_query_keyword_type(self, mock_credentials, example_input, expectation):
+    def test_start_record_argument(self, mock_credentials, start_arg, expectation):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with expectation:
-            session.cql_query(keyword="foo", keyword_type=example_input)
+            session.sru_query(query='srw.kw="foo"', start_record=start_arg)
 
     @pytest.mark.parametrize(
-        "example_input,expectation",
+        "max_rec,expectation",
         [
             (101, pytest.raises(ValueError)),
             (100, does_not_raise()),
@@ -343,13 +347,11 @@ class TestSearchSession:
             (None, pytest.raises(TypeError)),
         ],
     )
-    def test_cql_query_maximum_records(
-        self, mock_credentials, example_input, expectation
-    ):
+    def test_sru_query_maximum_records(self, mock_credentials, max_rec, expectation):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with expectation:
-            session.cql_query(keyword="foo", maximum_records=example_input)
+            session.sru_query(query='srw.kw="foo"', maximum_records=max_rec)
 
     @pytest.mark.parametrize(
         "sort_arg,expectation",
@@ -361,7 +363,10 @@ class TestSearchSession:
             ([("relevance", "descending")], does_not_raise()),
             ([("relevance", "ascending")], pytest.raises(ValueError)),
             ([tuple(), ("relevance", "descending")], pytest.raises(ValueError)),
-            ([("relevance", "descending"), ("count", "descending")], does_not_raise()),
+            (
+                [("relevance", "descending"), ("library_count", "descending")],
+                does_not_raise(),
+            ),
             ([("relevance", "other_order")], pytest.raises(ValueError)),
             (["relevance", "descending"], pytest.raises(TypeError)),
             ([(None, "descending")], pytest.raises(TypeError)),
@@ -373,18 +378,18 @@ class TestSearchSession:
             ([("title", "ascending")], does_not_raise()),
             ([("author", "descending")], does_not_raise()),
             ([("date", "descending")], does_not_raise()),
-            ([("library", "ascending")], does_not_raise()),
-            ([("count", "descending")], does_not_raise()),
+            ([("library_count", "ascending")], does_not_raise()),
+            ([("library_count", "descending")], does_not_raise()),
             ([("score", "ascending")], does_not_raise()),
         ],
     )
-    def test_cql_query_sort_keys_argument_only(
+    def test_sru_query_sort_keys_argument_only(
         self, mock_credentials, sort_arg, expectation
     ):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with expectation:
-            session.cql_query(keyword="foo", keyword_type="keyword", sort_keys=sort_arg)
+            session.sru_query(query='srw.kw="foo"', sort_keys=sort_arg)
 
     @pytest.mark.parametrize(
         "frbr_arg,expectation",
@@ -395,14 +400,14 @@ class TestSearchSession:
             ("off", does_not_raise()),
         ],
     )
-    def test_cql_query_frbr_grouping_alone(
+    def test_sru_query_frbr_grouping_alone(
         self, mock_credentials, frbr_arg, expectation
     ):
         """rely on correct default value of sort_keys argument"""
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with expectation:
-            session.cql_query(keyword="foo", frbr_grouping=frbr_arg)
+            session.sru_query(query='srw.kw="foo"', frbr_grouping=frbr_arg)
 
     @pytest.mark.parametrize(
         "sort_arg,frbr_arg,expectation",
@@ -415,13 +420,15 @@ class TestSearchSession:
             ([("title", "ascending"), ("date", "descending")], "off", does_not_raise()),
         ],
     )
-    def test_cql_query_sort_keys_and_frbr_grouping_combination(
+    def test_sru_query_sort_keys_and_frbr_grouping_combination(
         self, mock_credentials, sort_arg, frbr_arg, expectation
     ):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with expectation:
-            session.cql_query(keyword="foo", sort_keys=sort_arg, frbr_grouping=frbr_arg)
+            session.sru_query(
+                query='srw.kw="foo"', sort_keys=sort_arg, frbr_grouping=frbr_arg
+            )
 
     @pytest.mark.parametrize(
         "srv_arg,expectation",
@@ -433,10 +440,93 @@ class TestSearchSession:
             ("full", does_not_raise()),
         ],
     )
-    def test_cql_query_service_level_argument(
+    def test_sru_query_service_level_argument(
         self, mock_credentials, srv_arg, expectation
     ):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
         with expectation:
-            session.cql_query(keyword="foo", service_level=srv_arg)
+            session.sru_query(query='srw.kw="foo"', service_level=srv_arg)
+
+    @pytest.mark.parametrize(
+        "sort_arg,returns,expectation",
+        [
+            ([("relevance", "ascending")], "relevance", does_not_raise()),
+            ([("title", "ascending")], "Title", does_not_raise()),
+            ([("author", "ascending")], "Author", does_not_raise()),
+            ([("date", "ascending")], "Date", does_not_raise()),
+            ([("library_count", "ascending")], "LibraryCount", does_not_raise()),
+            ([("score", "ascending")], "Score", does_not_raise()),
+            ([("relevance", "descending")], "relevance,,0", does_not_raise()),
+            (
+                [("score", "descending"), ("library_count", "descending")],
+                "Score,,0 LibraryCount,,0",
+                does_not_raise(),
+            ),
+            (
+                [("title", "ascending"), ("date", "descending")],
+                "Title Date,,0",
+                does_not_raise(),
+            ),
+            (
+                [
+                    ("author", "ascending"),
+                    ("title", "ascending"),
+                    ("date", "descending"),
+                ],
+                "Author Title Date,,0",
+                does_not_raise(),
+            ),
+        ],
+    )
+    def test_prepare_sort_keys(self, mock_credentials, sort_arg, returns, expectation):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with expectation:
+            assert session._prepare_sort_keys(sort_arg) == returns
+
+    @pytest.mark.parametrize(
+        "query_arg,result,expectation",
+        [
+            (None, None, pytest.raises(TypeError)),
+            ("", None, pytest.raises(ValueError)),
+            ('kw="foo"', None, pytest.raises(ValueError)),
+            ('srw.kw="foo"', 'srw.kw="foo"', does_not_raise()),
+            (
+                'srw.ti="foo"&srw.su="bar"',
+                'srw.ti+=+"foo"+and+srw.su+=+"bar"',
+                does_not_raise(),
+            ),
+            (
+                'srw.ti="foo"|srw.ti="bar"',
+                'srw.ti+=+"foo"+OR+srw.ti+=+"bar"',
+                does_not_raise(),
+            ),
+            (
+                'srw.ti="foo"<>srw.au="bar"',
+                'srw.ti+=+"foo"+NOT+srw.au+=+"bar"',
+                does_not_raise(),
+            ),
+        ],
+    )
+    def test_prepare_sru_query_str_exceptions(
+        self, mock_credentials, query_arg, result, expectation
+    ):
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with expectation:
+            assert session._prepare_sru_query_str(query_arg) == result
+
+    def test_sru_query_request_connectionerror(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockConnectionError)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(ConnectionError):
+            session.sru_query(query='srw.kw="foo"')
+
+    def test_sru_query_request_timeout(self, monkeypatch, mock_credentials):
+        monkeypatch.setattr("requests.Session.get", MockTimeout)
+        key = mock_credentials["key"]
+        session = SearchSession(credentials=key)
+        with pytest.raises(Timeout):
+            session.sru_query('srw.bn="00012345"')
