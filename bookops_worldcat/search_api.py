@@ -3,7 +3,7 @@
 import requests
 
 
-from .constant import ORD_MAP, KEY_MAP, SRU_INDICES
+from .constant import ORD_MAP, KEY_MAP
 from ._session import WorldcatSession
 
 
@@ -19,21 +19,21 @@ class SearchSession(WorldcatSession):
     Requires only WSkey for authentication (WSKey Lite pattern). More about WSkey Lite
     can be found here:
         https://www.oclc.org/developer/develop/authentication/wskey-lite.en.html
-    
+
 
     Args:
-        credentials: instance of WorldcatAccessToken
+        credentials: str,   OCLC WSkey
 
     Basic usage:
 
     >>> session = SearchSession(credentials=key)
-    >>> session.lookup_by_isbn('9781680502404')
+    >>> session.lookup_isbn('9781680502404')
     <Response [200]>
 
     or using context manager
 
     >>> with SearchSession(credentails=key) as session:
-    ...     session.lookup_by_isbn('9781680502404')
+    ...     session.lookup_isbn('9781680502404')
     <Response [200]>
     """
 
@@ -265,7 +265,7 @@ class SearchSession(WorldcatSession):
         Args:
             query: str                  query string that can include multiple clauses;
                                         use OCLC indexes found here:
-                                        
+
                                         use double quotes, and following operators:
                                         & = AND, | - OR, <> - NOT; do not use spaces
                                         between clauses;
