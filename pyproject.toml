@@ -15,13 +15,10 @@ requests-oauthlib = "^1.3"
 pytest = "^5.2"
 pytest-cov = "^2.8"
 pytest-mock = "^2.0"
+pytest-recording = "^0.6.0"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
-
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
 
 [tool.black]
 line-length = 88
@@ -44,3 +41,8 @@ exclude = '''
     | temp.py
 )
 '''
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
