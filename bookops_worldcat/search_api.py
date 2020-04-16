@@ -398,7 +398,7 @@ class SearchSession(WorldcatSession):
         prepped_query = self._prepare_sru_query_str(query)
         url = self._sru_query_url(prepped_query)
 
-        # send reques
+        # send request
         try:
             response = self.get(url, params=payload, hooks=hooks, timeout=self.timeout)
             return response
