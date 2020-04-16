@@ -46,7 +46,7 @@ class TestWorldcatAccessToken:
     def test_get_data(self, mock_token_initiation_via_credentials, mock_credentials):
         token = mock_token_initiation_via_credentials
         creds = mock_credentials
-        assert token._get_data() == {
+        assert token._get_payload() == {
             "grant_type": "client_credentials",
             "scope": creds["options"]["scope"],
         }

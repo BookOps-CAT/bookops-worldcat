@@ -109,7 +109,7 @@ class WorldcatAccessToken:
     def _get_auth(self):
         return (self.key, self.secret)
 
-    def _get_data(self):
+    def _get_payload(self):
         return {"grant_type": self.grant_type, "scope": self.options["scope"]}
 
     def _parse_server_response(self, response):
@@ -136,9 +136,9 @@ class WorldcatAccessToken:
         token_url = self._get_token_url()
         headers = self._get_post_token_headers()
         auth = self._get_auth()
-        data = self._get_data()
+        payload = self._get_payload()
         response = requests.post(
-            token_url, auth=auth, headers=headers, data=data, timeout=self.timeout
+            token_url, auth=auth, headers=headers, params=payload, timeout=self.timeout
         )
         return response
 
