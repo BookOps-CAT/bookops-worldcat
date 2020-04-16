@@ -81,14 +81,14 @@ def mock_token_initiation_via_credentials(
     return token
 
 
-class MockSuccessfulSearchApiLookupIsbnResponse:
+class MockSuccessfulSessionResponse:
     def __init__(self):
         self.status_code = 200
 
 
 @pytest.fixture
-def mock_successful_search_api_lookup_isbn_request(monkeypatch):
+def mock_successful_session_request(monkeypatch):
     def mock_api_response(*args, **kwargs):
-        return MockSuccessfulSearchApiLookupIsbnResponse()
+        return MockSuccessfulSessionResponse()
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
