@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import requests
+
 from ._session import WorldcatSession
 
 
@@ -17,4 +19,33 @@ class MetadataSession(WorldcatSession):
                 "Missing token_str in WorldcatAccessToken object passes as credentials."
             )
 
-        self.base_url = "https://worldcat.org/"
+        self.base_url = "https://worldcat.org/bib"
+        self.token = credentials
+        self.headers.update(
+            {
+                "Authorization": f"Bearer {self.token.token_str}",
+                "Accept": 'application/atom+xml;content="application/vnd.oclc.marc21+xml"',
+            }
+        )
+
+    def _get_record_url(self, oclc_number):
+        return f"{self.base_url}/data/{oclc_number}"
+
+    def get_record(self, oclc_number=None):
+        if oclc_number is None:
+            raise TypeError("Argument oclc_number cannot be None.")
+        # alternatively remove oclc prefix?
+        if "o" in oclc_number:
+            raise ValueError("Argument oclc_number must include only digits.")
+
+        url = self._get_record_url(oclc_number)
+
+        # send request
+        try:
+            response = self.get(url, timeout=self.timeout)
+            return response
+
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
