@@ -46,21 +46,21 @@ class SearchSession(WorldcatSession):
             raise ValueError("Argument credentials cannot be an empty string.")
 
         self.key = credentials
-        self.base_url = "http://www.worldcat.org/webservices/catalog/"
+        self.base_url = "http://www.worldcat.org/webservices/catalog"
         self.headers.update({"Accept": "application/xml"})
         self.payload = {"wskey": self.key}
 
     def _lookup_isbn_url(self, isbn):
-        return f"{self.base_url}content/isbn/{isbn}"
+        return f"{self.base_url}/content/isbn/{isbn}"
 
     def _lookup_issn_url(self, issn):
-        return f"{self.base_url}content/issn/{issn}"
+        return f"{self.base_url}/content/issn/{issn}"
 
     def _lookup_oclc_number_url(self, oclc_number):
-        return f"{self.base_url}content/{oclc_number}"
+        return f"{self.base_url}/content/{oclc_number}"
 
     def _lookup_standard_number_url(self, std_number):
-        return f"{self.base_url}content/sn/{std_number}"
+        return f"{self.base_url}/content/sn/{std_number}"
 
     def _prepare_request_payload(self, **kwargs):
         # requests library will remove key,value pairs if value is None
@@ -96,7 +96,7 @@ class SearchSession(WorldcatSession):
         return query
 
     def _sru_query_url(self, query):
-        return f"{self.base_url}search/sru?query={query}"
+        return f"{self.base_url}/search/sru?query={query}"
 
     def lookup_isbn(self, isbn=None, service_level="default", hooks=None):
         """

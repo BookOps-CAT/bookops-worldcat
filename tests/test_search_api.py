@@ -48,7 +48,7 @@ class TestSearchSession:
     def test_oclc_search_api_base_url(self, mock_credentials):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
-        assert session.base_url == "http://www.worldcat.org/webservices/catalog/"
+        assert session.base_url == "http://www.worldcat.org/webservices/catalog"
 
     def test_session_headers(self, mock_credentials):
         key = mock_credentials["key"]
