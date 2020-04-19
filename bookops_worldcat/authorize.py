@@ -104,13 +104,19 @@ class WorldcatAccessToken:
         return f"{self.oauth_server}/token"
 
     def _get_post_token_headers(self):
-        return {"user-agent": f"{__title__}/{__version__}"}
+        return {
+            "user-agent": f"{__title__}/{__version__}",
+            "Accept": "application/json",
+        }
 
     def _get_auth(self):
         return (self.key, self.secret)
 
     def _get_payload(self):
-        return {"grant_type": self.grant_type, "scope": self.options["scope"]}
+        return {
+            "grant_type": self.grant_type,
+            "scope": f"{self.options['scope'][0]}",
+        }
 
     def _parse_server_response(self, response):
         self.server_response = response
@@ -124,6 +130,9 @@ class WorldcatAccessToken:
             self.token_str = None
             self.token_expires_at = None
             self.token_type = None
+
+            # !!! this should be wrapped into exceptions, response not always can be
+            # serialized to json !!!
             self.error_code = response.json()["code"]
             self.error_message = response.json()["message"]
 

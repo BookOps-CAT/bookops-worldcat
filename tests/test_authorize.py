@@ -35,7 +35,8 @@ class TestWorldcatAccessToken:
     def test_get_token_headers(self, mock_token_initiation_via_credentials):
         token = mock_token_initiation_via_credentials
         assert token._get_post_token_headers() == {
-            "user-agent": f"{__title__}/{__version__}"
+            "user-agent": f"{__title__}/{__version__}",
+            "Accept": "application/json",
         }
 
     def test_get_auth(self, mock_token_initiation_via_credentials, mock_credentials):
@@ -43,12 +44,11 @@ class TestWorldcatAccessToken:
         creds = mock_credentials
         assert token._get_auth() == (creds["key"], creds["secret"])
 
-    def test_get_data(self, mock_token_initiation_via_credentials, mock_credentials):
+    def test_get_data(self, mock_token_initiation_via_credentials):
         token = mock_token_initiation_via_credentials
-        creds = mock_credentials
         assert token._get_payload() == {
             "grant_type": "client_credentials",
-            "scope": creds["options"]["scope"],
+            "scope": "scope1",
         }
 
     def test_successful_token_initiation_via_credentials(
