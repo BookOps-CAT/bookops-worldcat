@@ -16,7 +16,7 @@ def mock_credentials():
             "context_institution_id": "00001",
             "principal_id": "00000000-111a-222b-333c-4d444444444d",
             "principal_idns": "urn:oclc:platform:00001",
-            "scope": ["scope1", "scope2"],
+            "scope": ["scope1", "scope2", "wcapi"],
         },
         "oauth_server": "https://oauth.oclc.org.test",
     }

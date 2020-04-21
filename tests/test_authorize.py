@@ -17,7 +17,7 @@ def test_mocked_credentials(mock_credentials):
             "context_institution_id": "00001",
             "principal_id": "00000000-111a-222b-333c-4d444444444d",
             "principal_idns": "urn:oclc:platform:00001",
-            "scope": ["scope1", "scope2"],
+            "scope": ["scope1", "scope2", "wcapi"],
         },
         "oauth_server": "https://oauth.oclc.org.test",
     }
@@ -41,14 +41,15 @@ class TestWorldcatAccessToken:
 
     def test_get_auth(self, mock_token_initiation_via_credentials, mock_credentials):
         token = mock_token_initiation_via_credentials
-        creds = mock_credentials
-        assert token._get_auth() == (creds["key"], creds["secret"])
+        assert token._get_auth() == ("WSkey", "WSsecret")
 
     def test_get_data(self, mock_token_initiation_via_credentials):
         token = mock_token_initiation_via_credentials
         assert token._get_payload() == {
             "grant_type": "client_credentials",
-            "scope": "scope1",
+            "scope": "scope1 scope2",
+            "principalID": "00000000-111a-222b-333c-4d444444444d",
+            "principalIDNS": "urn:oclc:platform:00001",
         }
 
     def test_successful_token_initiation_via_credentials(
@@ -66,9 +67,10 @@ class TestWorldcatAccessToken:
         assert token.key == creds["key"]
         assert token.secret == creds["secret"]
         assert token.grant_type == "client_credentials"
-        assert token.options == creds["options"]
+        assert token.options["scope"] == ["scope1", "scope2"]
+        assert token.options["principal_id"] == "00000000-111a-222b-333c-4d444444444d"
+        assert token.options["principal_idns"] == "urn:oclc:platform:00001"
         assert token.timeout == (5, 5)
-        assert token.institution_id == "123456"
         assert token.token_str == "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
         assert token.token_expires_at == "2013-08-23 18:45:29Z"
         assert token.token_type == "bearer"
@@ -90,7 +92,6 @@ class TestWorldcatAccessToken:
         assert token.grant_type == "client_credentials"
         assert token.options == creds["options"]
         assert token.timeout == (5, 5)
-        assert token.institution_id == "123456"
         assert token.error_code == 401
         assert token.error_message == "some error message"
         assert token.token_str is None
@@ -110,11 +111,11 @@ class TestWorldcatAccessToken:
                 options=creds["options"],
             )
 
-    def test_token_initiation_via_credentials_missing_authenticating_institution_id_option(
+    def test_token_initiation_via_credentials_missing_principal_id_option(
         self, mock_credentials
     ):
         creds = mock_credentials
-        creds["options"].pop("authenticating_institution_id", None)
+        creds["options"].pop("principal_id", None)
         with pytest.raises(KeyError):
             WorldcatAccessToken(
                 oauth_server=creds["oauth_server"],
@@ -127,7 +128,7 @@ class TestWorldcatAccessToken:
         self, mock_credentials
     ):
         creds = mock_credentials
-        creds["options"].pop("context_institution_id", None)
+        creds["options"].pop("principal_idns", None)
         with pytest.raises(KeyError):
             WorldcatAccessToken(
                 oauth_server=creds["oauth_server"],

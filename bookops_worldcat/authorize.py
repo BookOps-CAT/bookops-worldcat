@@ -18,8 +18,8 @@ class WorldcatAccessToken:
         wskey: str,         OCLC API key
         wssecret: str,      OCLC API secret
         option: dict,       valid options:
-                            - authenticating_institution_id
-                            - context_institution_id
+                            - principal_id
+                            - principla_idns
                             - scope
 
     Basic usage:
@@ -29,7 +29,10 @@ class WorldcatAccessToken:
                 grant_type='client_credentials',
                 key='WSkey',
                 secret='WSsecret',
-                options={"scope": ['scope1', 'scope2']}
+                options={
+                    "scope": ['SCOPE1', 'SCOPE2'],
+                    "principal_id": "PRINCIPAL_ID_HERE",
+                    "principal_idns": "PRINCIPAL_IDNS_HERE"}
             )
         >>> token.token_str
           "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
@@ -42,17 +45,17 @@ class WorldcatAccessToken:
          "expires_in": "1199",
          "principalID": "",
          "principalIDNS": "",
-         "scopes": "SCOPE HERE",
+         "scopes": "SCOPE1 SCOPE2",
          "contextInstitutionId": "00001",
          "expires_at": "2013-08-23 18:45:29Z"}
         >>> token.server_response.request.headers
-        {'user-agent': 'bookops-worldcat/0.1.0',
-         'Accept-Encoding': 'gzip, deflate',
-         'Accept': '*/*',
-         'Connection': 'keep-alive',
-         'Content-Length': '67',
-         'Content-Type': 'application/x-www-form-urlencoded',
-         'Authorization': 'Basic encoded_authorization_here='}
+        {"user-agent": "bookops-worldcat/0.1.0",
+         "Accept-Encoding": "gzip, deflate",
+         "Accept": "application/json",
+         "Connection": "keep-alive",
+         "Content-Length": "67",
+         "Content-Type": "application/x-www-form-urlencoded",
+         "Authorization": "Basic encoded_authorization_here="}
     """
 
     def __init__(
@@ -63,7 +66,6 @@ class WorldcatAccessToken:
         self.error_code = None
         self.error_message = None
         self.grant_type = "client_credentials"
-        self.institution_id = None
         self.key = key
         self.oauth_server = oauth_server
         self.options = options
@@ -74,8 +76,8 @@ class WorldcatAccessToken:
         self.token_type = None
         self.server_response = None
         self.valid_options = [
-            "authenticating_institution_id",
-            "context_institution_id",
+            "principal_id",
+            "principal_idns",
             "scope",
         ]
 
@@ -90,12 +92,16 @@ class WorldcatAccessToken:
 
         if (
             "scope" not in options
-            or "authenticating_institution_id" not in options
-            or "context_institution_id" not in options
+            or "principal_id" not in options
+            or "principal_idns" not in options
         ):
             raise KeyError("Missing option required for client credential grant.")
 
-        self.institution_id = options["authenticating_institution_id"]
+        # make sure only valid scopes are passed
+        if "wcapi" in self.options["scope"]:
+            # wcapi uses only WSkey no access token needed but may be bundled
+            # under the authorization
+            self.options["scope"].remove("wcapi")
 
         # post access token request & create token object
         self.create_token()
@@ -113,9 +119,12 @@ class WorldcatAccessToken:
         return (self.key, self.secret)
 
     def _get_payload(self):
+        scope = " ".join(self.options["scope"])
         return {
             "grant_type": self.grant_type,
-            "scope": f"{self.options['scope'][0]}",
+            "scope": f"{scope}",
+            "principalID": self.options["principal_id"],
+            "principalIDNS": self.options["principal_idns"],
         }
 
     def _parse_server_response(self, response):
