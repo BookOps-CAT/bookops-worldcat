@@ -55,8 +55,8 @@ class TestMetadataSession:
             assert session.headers == {
                 "User-Agent": "bookops-worldcat/0.1.0",
                 "Accept-Encoding": "gzip, deflate",
-                "Accept": 'application/atom+xml;content="application/vnd.oclc.marc21+xml"',
                 "Connection": "keep-alive",
+                "Accept": "*/*",
                 "Authorization": "Bearer tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
             }
 
