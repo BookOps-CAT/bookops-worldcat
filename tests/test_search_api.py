@@ -82,7 +82,7 @@ class TestSearchSession:
         )
 
     def test_lookup_isbn_request(
-        self, mock_credentials, mock_successful_session_request
+        self, mock_credentials, mock_successful_session_get_request
     ):
         key = mock_credentials["key"]
         with SearchSession(credentials=key) as session:
@@ -109,7 +109,7 @@ class TestSearchSession:
         keyword,
         level,
         expectation,
-        mock_successful_session_request,
+        mock_successful_session_get_request,
     ):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
@@ -139,7 +139,7 @@ class TestSearchSession:
         )
 
     def test_lookup_issn_request(
-        self, mock_credentials, mock_successful_session_request
+        self, mock_credentials, mock_successful_session_get_request
     ):
         key = mock_credentials["key"]
         with SearchSession(credentials=key) as session:
@@ -183,7 +183,7 @@ class TestSearchSession:
             session.lookup_issn("1234-4567")
 
     def test_lookup_oclc_number_url(
-        self, mock_credentials, mock_successful_session_request
+        self, mock_credentials, mock_successful_session_get_request
     ):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
@@ -193,7 +193,7 @@ class TestSearchSession:
         )
 
     def test_lookup_oclc_number_request(
-        self, mock_credentials, mock_successful_session_request
+        self, mock_credentials, mock_successful_session_get_request
     ):
         key = mock_credentials["key"]
         with SearchSession(credentials=key) as session:
@@ -237,7 +237,7 @@ class TestSearchSession:
             session.lookup_oclc_number("00012345")
 
     def test_lookup_standard_number_url(
-        self, mock_credentials, mock_successful_session_request
+        self, mock_credentials, mock_successful_session_get_request
     ):
         key = mock_credentials["key"]
         session = SearchSession(credentials=key)
@@ -247,7 +247,7 @@ class TestSearchSession:
         )
 
     def test_lookup_standard_number_request(
-        self, mock_credentials, mock_successful_session_request
+        self, mock_credentials, mock_successful_session_get_request
     ):
         key = mock_credentials["key"]
         with SearchSession(credentials=key) as session:
