@@ -121,7 +121,7 @@ class TestMetadataSession:
     def test_get_record_oclc_number_argument_exceptions(
         self,
         mock_token_initiation_via_credentials,
-        mock_successful_session_request,
+        mock_successful_session_get_request,
         oclc_no_arg,
         expectation,
     ):
@@ -131,7 +131,7 @@ class TestMetadataSession:
                 assert session.get_record(oclc_no_arg)
 
     def test_get_record_request(
-        self, mock_token_initiation_via_credentials, mock_successful_session_request
+        self, mock_token_initiation_via_credentials, mock_successful_session_get_request
     ):
         token = mock_token_initiation_via_credentials
         with MetadataSession(credentials=token) as session:
@@ -197,7 +197,7 @@ class TestMetadataSession:
     def test_holdings_get_status(
         self,
         mock_token_initiation_via_credentials,
-        mock_successful_session_request,
+        mock_successful_session_get_request,
         oclc_no_arg,
         res_arg,
         expectation,
@@ -210,7 +210,7 @@ class TestMetadataSession:
                 )
 
     def test_holdings_get_status_request(
-        self, mock_token_initiation_via_credentials, mock_successful_session_request
+        self, mock_token_initiation_via_credentials, mock_successful_session_get_request
     ):
         token = mock_token_initiation_via_credentials
         with MetadataSession(credentials=token) as session:
@@ -234,3 +234,63 @@ class TestMetadataSession:
         session = MetadataSession(credentials=token)
         with pytest.raises(Timeout):
             session.holdings_get_status("211111111")
+
+    def test_holdings_set_url(self, mock_token_initiation_via_credentials):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            assert session._holdings_set_url() == "https://worldcat.org/ih/data"
+
+    def test_holdings_set_request_connectionerror(
+        self, monkeypatch, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        monkeypatch.setattr("requests.Session.post", MockConnectionError)
+        session = MetadataSession(credentials=token)
+        with pytest.raises(ConnectionError):
+            session.holdings_set("211111111")
+
+    def test_holdings_set_request_timeout(
+        self, monkeypatch, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        monkeypatch.setattr("requests.Session.post", MockTimeout)
+        session = MetadataSession(credentials=token)
+        with pytest.raises(Timeout):
+            session.holdings_set("211111111")
+
+    @pytest.mark.parametrize(
+        "oclc_no_arg,res_arg,expectation",
+        [
+            (None, "xml", pytest.raises(TypeError)),
+            (2111111111, "xml", pytest.raises(TypeError)),
+            ("ocn2111111111", "json", pytest.raises(ValueError)),
+            ("2111111111", "other", pytest.raises(ValueError)),
+            ("2111111111", None, does_not_raise()),
+            ("2111111111", "xml", does_not_raise()),
+            ("2111111111", "json", does_not_raise()),
+        ],
+    )
+    def test_holdings_set(
+        self,
+        mock_token_initiation_via_credentials,
+        mock_successful_session_post_request,
+        oclc_no_arg,
+        res_arg,
+        expectation,
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            with expectation:
+                session.holdings_set(
+                    oclc_number=oclc_no_arg, response_format=res_arg,
+                )
+
+    def test_holdings_set_request(
+        self,
+        mock_token_initiation_via_credentials,
+        mock_successful_session_post_request,
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            response = session.holdings_set(oclc_number="211111111")
+            assert response.status_code == 200

@@ -27,6 +27,9 @@ class MetadataSession(WorldcatSession):
     def _get_record_url(self, oclc_number):
         return f"{self.base_url}/bib/data/{oclc_number}"
 
+    def _holdings_set_url(self):
+        return f"{self.base_url}/ih/data"
+
     def _holdings_status_url(self):
         return f"{self.base_url}/ih/checkholdings"
 
@@ -107,7 +110,7 @@ class MetadataSession(WorldcatSession):
             raise
 
     def holdings_get_status(
-        self, oclc_number, response_format=None, hooks=None,
+        self, oclc_number, response_format="json", hooks=None,
     ):
         """
         Retrieves holdings status of record with provided OCLC number. The service
@@ -123,7 +126,7 @@ class MetadataSession(WorldcatSession):
 
         oclc_number = self._verify_oclc_number(oclc_number)
 
-        # set header with a valid respone format
+        # set header with a valid respone format and determine payload
         auth_response_format = self._verify_holdings_response_argument(response_format)
         header = {"Accept": auth_response_format}
         payload = {"oclcNumber": oclc_number}
@@ -133,6 +136,39 @@ class MetadataSession(WorldcatSession):
         # send request
         try:
             response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
+            return response
+
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
+
+    def holdings_set(self, oclc_number, response_format="json", hooks=None):
+        """
+        Sets institution holdings on an individual record.
+
+        Args:
+            oclc_number: str,               OCLC record number without prefix
+            response_format: str,           "json" or "xml"; default json
+
+        Returns:
+            request.Response object
+        """
+
+        oclc_number = self._verify_oclc_number(oclc_number)
+
+        # set header and payload
+        auth_response_format = self._verify_holdings_response_argument(response_format)
+        header = {"Accept": auth_response_format}
+        payload = {"oclcNumber": oclc_number}
+
+        url = self._holdings_set_url()
+
+        # send request
+        try:
+            response = self.post(
                 url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
             )
             return response
