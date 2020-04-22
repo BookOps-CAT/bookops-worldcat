@@ -11,7 +11,7 @@
 bookops-worldcat
 ================
 
-BookOps OCLC APIs wrappers
-Focus on Search API and Metadata API
+| BookOps OCLC APIs wrappers.
+| Focus only on selected functionality of the Worldcat Search and Metadata APIs.
 
 **WORK-IN-PROGRESS**
