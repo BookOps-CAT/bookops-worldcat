@@ -9,6 +9,11 @@ KEY_MAP = {
     "score": "Score",
 }
 
+HOLDINGS_RESPONSE_FORMATS = {
+    "xml": "application/atom+xml",
+    "json": "application/atom+json",
+}
+
 # fmt: off
 # this is not a full list
 # see more at:

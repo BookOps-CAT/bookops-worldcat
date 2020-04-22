@@ -47,7 +47,7 @@ class TestMetadataSession:
     def test_base_url(self, mock_token_initiation_via_credentials):
         token = mock_token_initiation_via_credentials
         session = MetadataSession(credentials=token)
-        assert session.base_url == "https://worldcat.org/bib"
+        assert session.base_url == "https://worldcat.org"
 
     def test_session_header_on_init(self, mock_token_initiation_via_credentials):
         token = mock_token_initiation_via_credentials
@@ -73,6 +73,42 @@ class TestMetadataSession:
         token = mock_token_initiation_via_credentials
         with MetadataSession(credentials=token) as session:
             assert session._get_record_url(oclc_no_arg) == expectation
+
+    @pytest.mark.parametrize(
+        "oclc_nos,buckets,expectation",
+        [
+            ([], 0, [],),
+            (["1", "2", "3"], 1, ["1,2,3"]),
+            ([1, 2, 3], 1, ["1,2,3"]),
+            (["1"], 1, ["1"]),
+            (["1"] * 50, 1, [",".join(["1"] * 50)]),
+            (["1"] * 51, 2, [",".join(["1"] * 50), "1"]),
+            (["1"] * 103, 3, [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"]),
+        ],
+    )
+    def test_split_into_legal_volume(
+        self, mock_token_initiation_via_credentials, oclc_nos, buckets, expectation
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            assert session._split_into_legal_volume(oclc_nos) == expectation
+
+    @pytest.mark.parametrize(
+        "oclc_no_arg,expectation",
+        [
+            (None, pytest.raises(TypeError)),
+            ("ocn123456790", pytest.raises(ValueError)),
+            ("2111111111", does_not_raise()),
+            (2111111111, pytest.raises(TypeError)),
+        ],
+    )
+    def test_verify_oclc_number(
+        self, mock_token_initiation_via_credentials, oclc_no_arg, expectation,
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            with expectation:
+                assert session._verify_oclc_number(oclc_no_arg)
 
     @pytest.mark.parametrize(
         "oclc_no_arg,expectation",
@@ -119,3 +155,82 @@ class TestMetadataSession:
         session = MetadataSession(credentials=token)
         with pytest.raises(Timeout):
             session.get_record("211111111")
+
+    def test_holdings_status_url(self, mock_token_initiation_via_credentials):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            assert (
+                session._holdings_status_url()
+                == "https://worldcat.org/ih/checkholdings"
+            )
+
+    @pytest.mark.parametrize(
+        "res_arg,returns,expectation",
+        [
+            (None, "application/atom+json", does_not_raise()),
+            (2, None, pytest.raises(ValueError)),
+            ("foo", None, pytest.raises(ValueError)),
+            ("xml", "application/atom+xml", does_not_raise()),
+            ("json", "application/atom+json", does_not_raise()),
+        ],
+    )
+    def test_verify_holdings_response_argument(
+        self, mock_token_initiation_via_credentials, res_arg, returns, expectation
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            with expectation:
+                assert session._verify_holdings_response_argument(res_arg) == returns
+
+    @pytest.mark.parametrize(
+        "oclc_no_arg,res_arg,expectation",
+        [
+            (None, "xml", pytest.raises(TypeError)),
+            (2111111111, "xml", pytest.raises(TypeError)),
+            ("ocn2111111111", "json", pytest.raises(ValueError)),
+            ("2111111111", "other", pytest.raises(ValueError)),
+            ("2111111111", None, does_not_raise()),
+            ("2111111111", "xml", does_not_raise()),
+            ("2111111111", "json", does_not_raise()),
+        ],
+    )
+    def test_holdings_get_status(
+        self,
+        mock_token_initiation_via_credentials,
+        mock_successful_session_request,
+        oclc_no_arg,
+        res_arg,
+        expectation,
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            with expectation:
+                session.holdings_get_status(
+                    oclc_number=oclc_no_arg, response_format=res_arg,
+                )
+
+    def test_holdings_get_status_request(
+        self, mock_token_initiation_via_credentials, mock_successful_session_request
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            response = session.holdings_get_status(oclc_number="211111111")
+            assert response.status_code == 200
+
+    def test_holdings_get_status_request_connectionerror(
+        self, monkeypatch, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        monkeypatch.setattr("requests.Session.get", MockConnectionError)
+        session = MetadataSession(credentials=token)
+        with pytest.raises(ConnectionError):
+            session.holdings_get_status("211111111")
+
+    def test_holdings_get_status_request_timeout(
+        self, monkeypatch, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        monkeypatch.setattr("requests.Session.get", MockTimeout)
+        session = MetadataSession(credentials=token)
+        with pytest.raises(Timeout):
+            session.holdings_get_status("211111111")
