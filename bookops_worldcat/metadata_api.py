@@ -282,13 +282,70 @@ class MetadataSession(WorldcatSession):
         oclc_numbers = self._verify_list_of_oclc_numbers(oclc_numbers)
         staged_oclc_numbers = self._split_into_legal_volume(oclc_numbers)
         for batch in staged_oclc_numbers:
-            payload = {"oclcNumbers": oclc_numbers, "cascade": cascade}
+            payload = {"oclcNumbers": batch, "cascade": cascade}
 
             url = self._holdings_set_and_unset_batch_url()
 
             # send request
             try:
                 response = self.post(
+                    url,
+                    headers=header,
+                    params=payload,
+                    hooks=hooks,
+                    timeout=self.timeout,
+                )
+                responses.append(response)
+
+            except requests.exceptions.Timeout:
+                raise
+            except requests.exceptions.ConnectionError:
+                raise
+        return responses
+
+    def holdings_unset_batch(
+        self, oclc_numbers=[], cascade="0", response_format="json", hooks=None
+    ):
+        """
+        Deletes institution's holdings on a batch of records. This method allows
+        batches larger than 50 records by spliting provided OCLC record numbers
+        into chucks of 50 and iterating DELETE requests over them.
+
+        Args:
+            oclc_numbers: list,         list of OCLC numbers as strings without
+                                        any prefix
+            cascade: str,               (mandatory) whether or not to execute operation
+                                        if a local holdings record, or local
+                                        bibliograhic record exists;
+                                        default value: '0'
+                                        options:
+                                         - "0" don't remove holddings if local holding
+                                           record or local bibliographic record exists
+                                         - "1" yes, remove holdigns and delete local
+                                           holdings record or local bibliographic record
+                                           exists
+            response_format: str,        "json" or "xml"; default json
+
+        Returns:
+            responses: list of request.Response object for each batch
+        """
+        responses = []
+
+        # set request header
+        auth_response_format = self._verify_holdings_response_argument(response_format)
+        header = {"Accept": auth_response_format}
+        cascade = self._verify_holdings_cascade_argument(cascade)
+
+        oclc_numbers = self._verify_list_of_oclc_numbers(oclc_numbers)
+        staged_oclc_numbers = self._split_into_legal_volume(oclc_numbers)
+        for batch in staged_oclc_numbers:
+            payload = {"oclcNumbers": batch, "cascade": cascade}
+
+            url = self._holdings_set_and_unset_batch_url()
+
+            # send request
+            try:
+                response = self.delete(
                     url,
                     headers=header,
                     params=payload,
