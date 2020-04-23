@@ -1,9 +1,20 @@
 from datetime import datetime, timedelta
 
 import pytest
+from requests.exceptions import ConnectionError, Timeout
 
 from bookops_worldcat import __title__, __version__
 from bookops_worldcat.authorize import WorldcatAccessToken
+
+
+class MockConnectionError:
+    def __init__(self, *args, **kwargs):
+        raise ConnectionError
+
+
+class MockTimeout:
+    def __init__(self, *args, **kwargs):
+        raise Timeout
 
 
 def test_mocked_credentials(mock_credentials):
@@ -195,3 +206,25 @@ class TestWorldcatAccessToken:
             datetime.utcnow() + timedelta(0, 60), "%Y-%m-%d %H:%M:%SZ"
         )
         assert token.is_expired() is False
+
+    def test_post_token_request_connectionerror(self, monkeypatch, mock_credentials):
+        creds = mock_credentials
+        monkeypatch.setattr("requests.post", MockConnectionError)
+        with pytest.raises(ConnectionError):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
+
+    def test_post_token_request_timeout(self, monkeypatch, mock_credentials):
+        creds = mock_credentials
+        monkeypatch.setattr("requests.post", MockTimeout)
+        with pytest.raises(Timeout):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )

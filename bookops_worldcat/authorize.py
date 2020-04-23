@@ -155,10 +155,19 @@ class WorldcatAccessToken:
         headers = self._get_post_token_headers()
         auth = self._get_auth()
         payload = self._get_payload()
-        response = requests.post(
-            token_url, auth=auth, headers=headers, params=payload, timeout=self.timeout
-        )
-        return response
+        try:
+            response = requests.post(
+                token_url,
+                auth=auth,
+                headers=headers,
+                params=payload,
+                timeout=self.timeout,
+            )
+            return response
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
 
     def create_token(self):
         response = self._post_token_request()
