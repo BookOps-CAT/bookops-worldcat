@@ -3,7 +3,7 @@
 import requests
 
 from ._session import WorldcatSession
-from .constant import HOLDINGS_RESPONSE_FORMATS
+from .constant import HOLDINGS_RESPONSE_FORMATS, HOLDINGS_CASCADE_OPTIONS
 
 
 class MetadataSession(WorldcatSession):
@@ -55,6 +55,25 @@ class MetadataSession(WorldcatSession):
 
         return batches
 
+    def _verify_holdings_cascade_argument(self, cascade):
+        """Verifies cascade argument used in holdings reqests"""
+
+        if type(cascade) is not str:
+            raise TypeError("Argument cascade must be a string.")
+        elif cascade not in HOLDINGS_CASCADE_OPTIONS:
+            raise ValueError("Invalid cascade argument value.")
+        else:
+            return cascade
+
+    def _verify_holdings_response_argument(self, response_format):
+        """Verifies a valid holdings_response_format is used in a request"""
+        if response_format is None:
+            response_format = "json"
+        if response_format not in HOLDINGS_RESPONSE_FORMATS.keys():
+            raise ValueError("Invalid argument response_format.")
+        else:
+            return HOLDINGS_RESPONSE_FORMATS[response_format]
+
     def _verify_oclc_number(self, oclc_number):
         """Verifies a valid looking OCLC number is passed to a request"""
         if oclc_number is None:
@@ -66,15 +85,6 @@ class MetadataSession(WorldcatSession):
             raise ValueError("Argument oclc_number (string) must include only digits.")
         else:
             return oclc_number
-
-    def _verify_holdings_response_argument(self, response_format):
-        """Verifies a valid holdings_response_format is used in a request"""
-        if response_format is None:
-            response_format = "json"
-        if response_format not in HOLDINGS_RESPONSE_FORMATS.keys():
-            raise ValueError("Invalid argument response_format.")
-        else:
-            return HOLDINGS_RESPONSE_FORMATS[response_format]
 
     def get_record(self, oclc_number=None, hooks=None):
         """
@@ -178,12 +188,24 @@ class MetadataSession(WorldcatSession):
         except requests.exceptions.ConnectionError:
             raise
 
-    def holdings_unset(self, oclc_number, response_format="json", hooks=None):
+    def holdings_unset(
+        self, oclc_number, cascade="0", response_format="json", hooks=None
+    ):
         """Deletes intitution's holdings on an individual record.
 
         Args:
-            oclc_number: str,               OCLC record number without prefix
-            response_format: str,           "json" or "xml"; default json
+            oclc_number: str,           OCLC record number without prefix
+            cascade: str,               (mandatory) whether or not to execute operation
+                                        if a local holdings record, or local
+                                        bibliograhic record exists;
+                                        default value: '0'
+                                        options:
+                                         - "0" don't remove holddings if local holding
+                                           record or local bibliographic record exists
+                                         - "1" yes, remove holdigns and delete local
+                                           holdings record or local bibliographic record
+                                           exists
+            response_format: str,        "json" or "xml"; default json
 
         Returns:
             request.Response object
@@ -191,10 +213,12 @@ class MetadataSession(WorldcatSession):
 
         oclc_number = self._verify_oclc_number(oclc_number)
 
+        cascade = self._verify_holdings_cascade_argument(cascade)
+
         # set header and payload
         auth_response_format = self._verify_holdings_response_argument(response_format)
         header = {"Accept": auth_response_format}
-        payload = {"oclcNumber": oclc_number}
+        payload = {"oclcNumber": oclc_number, "cascade": cascade}
 
         url = self._holdings_set_and_unset_url()
 

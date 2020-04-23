@@ -167,6 +167,24 @@ class TestMetadataSession:
     @pytest.mark.parametrize(
         "res_arg,returns,expectation",
         [
+            (None, None, pytest.raises(TypeError)),
+            (2, None, pytest.raises(TypeError)),
+            ("foo", None, pytest.raises(ValueError)),
+            ("0", "0", does_not_raise()),
+            ("1", "1", does_not_raise()),
+        ],
+    )
+    def test_verify_holdings_cascade_argument(
+        self, mock_token_initiation_via_credentials, res_arg, returns, expectation
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            with expectation:
+                assert session._verify_holdings_cascade_argument(res_arg) == returns
+
+    @pytest.mark.parametrize(
+        "res_arg,returns,expectation",
+        [
             (None, "application/atom+json", does_not_raise()),
             (2, None, pytest.raises(ValueError)),
             ("foo", None, pytest.raises(ValueError)),

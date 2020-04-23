@@ -14,6 +14,9 @@ HOLDINGS_RESPONSE_FORMATS = {
     "json": "application/atom+json",
 }
 
+HOLDINGS_CASCADE_OPTIONS = ["0", "1"]
+
+
 # fmt: off
 # this is not a full list
 # see more at:
