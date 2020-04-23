@@ -77,13 +77,13 @@ class TestMetadataSession:
     @pytest.mark.parametrize(
         "oclc_nos,buckets,expectation",
         [
-            ([], 0, [],),
+            ([], 0, []),
             (["1", "2", "3"], 1, ["1,2,3"]),
             ([1, 2, 3], 1, ["1,2,3"]),
             (["1"], 1, ["1"]),
             (["1"] * 50, 1, [",".join(["1"] * 50)]),
             (["1"] * 51, 2, [",".join(["1"] * 50), "1"]),
-            (["1"] * 103, 3, [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"]),
+            (["1"] * 103, 3, [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],),
         ],
     )
     def test_split_into_legal_volume(
@@ -92,6 +92,32 @@ class TestMetadataSession:
         token = mock_token_initiation_via_credentials
         with MetadataSession(credentials=token) as session:
             assert session._split_into_legal_volume(oclc_nos) == expectation
+
+    @pytest.mark.parametrize(
+        "oclc_nos_arg,returns,expectation",
+        [
+            ([], None, pytest.raises(ValueError)),
+            ([None], None, pytest.raises(TypeError)),
+            (["ocm2111111111"], None, pytest.raises(ValueError)),
+            ([2111111111], None, pytest.raises(TypeError)),
+            (["2111111111", None], None, pytest.raises(TypeError)),
+            (
+                ["2111111111", "3111111111"],
+                ["2111111111", "3111111111"],
+                does_not_raise(),
+            ),
+        ],
+    )
+    def test_verify_list_of_oclc_numbers(
+        self, mock_token_initiation_via_credentials, oclc_nos_arg, returns, expectation
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            with expectation:
+                assert (
+                    session._verify_list_of_oclc_numbers(oclc_numbers=oclc_nos_arg)
+                    == returns
+                )
 
     @pytest.mark.parametrize(
         "oclc_no_arg,expectation",
@@ -260,6 +286,16 @@ class TestMetadataSession:
                 session._holdings_set_and_unset_url() == "https://worldcat.org/ih/data"
             )
 
+    def test_holdings_set_and_unset_batch_url(
+        self, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            assert (
+                session._holdings_set_and_unset_batch_url()
+                == "https://worldcat.org/ih/datalist"
+            )
+
     def test_holdings_set_request_connectionerror(
         self, monkeypatch, mock_token_initiation_via_credentials
     ):
@@ -359,3 +395,59 @@ class TestMetadataSession:
                 session.holdings_unset(
                     oclc_number=oclc_no_arg, response_format=res_arg,
                 )
+
+    def test_holdings_set_batch_request_connectionerror(
+        self, monkeypatch, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        monkeypatch.setattr("requests.Session.post", MockConnectionError)
+        session = MetadataSession(credentials=token)
+        with pytest.raises(ConnectionError):
+            session.holdings_set_batch(["211111111"])
+
+    def test_holdings_set_batch_request_timeout(
+        self, monkeypatch, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        monkeypatch.setattr("requests.Session.post", MockTimeout)
+        session = MetadataSession(credentials=token)
+        with pytest.raises(Timeout):
+            session.holdings_set_batch(["211111111"])
+
+    @pytest.mark.parametrize(
+        "oclc_no_arg,res_arg,expectation",
+        [
+            (None, "xml", pytest.raises(TypeError)),
+            ([2111111111], "xml", pytest.raises(TypeError)),
+            (["ocn2111111111"], "json", pytest.raises(ValueError)),
+            (["2111111111"], "other", pytest.raises(ValueError)),
+            (["2111111111"], None, does_not_raise()),
+            (["2111111111"], "xml", does_not_raise()),
+            (["2111111111"], "json", does_not_raise()),
+        ],
+    )
+    def test_holdings_set_batch(
+        self,
+        mock_token_initiation_via_credentials,
+        mock_successful_session_post_request,
+        oclc_no_arg,
+        res_arg,
+        expectation,
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            with expectation:
+                session.holdings_set_batch(
+                    oclc_numbers=oclc_no_arg, response_format=res_arg,
+                )
+
+    def test_holdings_set_batch_request(
+        self,
+        mock_token_initiation_via_credentials,
+        mock_successful_session_post_request,
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            responses = session.holdings_set_batch(oclc_numbers=["211111111"])
+            for r in responses:
+                assert r.status_code == 200
