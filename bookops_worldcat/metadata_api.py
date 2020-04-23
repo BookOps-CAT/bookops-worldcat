@@ -27,7 +27,7 @@ class MetadataSession(WorldcatSession):
     def _get_record_url(self, oclc_number):
         return f"{self.base_url}/bib/data/{oclc_number}"
 
-    def _holdings_set_url(self):
+    def _holdings_set_and_unset_url(self):
         return f"{self.base_url}/ih/data"
 
     def _holdings_status_url(self):
@@ -147,7 +147,7 @@ class MetadataSession(WorldcatSession):
 
     def holdings_set(self, oclc_number, response_format="json", hooks=None):
         """
-        Sets institution holdings on an individual record.
+        Sets institution's holdings on an individual record.
 
         Args:
             oclc_number: str,               OCLC record number without prefix
@@ -164,11 +164,43 @@ class MetadataSession(WorldcatSession):
         header = {"Accept": auth_response_format}
         payload = {"oclcNumber": oclc_number}
 
-        url = self._holdings_set_url()
+        url = self._holdings_set_and_unset_url()
 
         # send request
         try:
             response = self.post(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
+            return response
+
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
+
+    def holdings_unset(self, oclc_number, response_format="json", hooks=None):
+        """Deletes intitution's holdings on an individual record.
+
+        Args:
+            oclc_number: str,               OCLC record number without prefix
+            response_format: str,           "json" or "xml"; default json
+
+        Returns:
+            request.Response object
+        """
+
+        oclc_number = self._verify_oclc_number(oclc_number)
+
+        # set header and payload
+        auth_response_format = self._verify_holdings_response_argument(response_format)
+        header = {"Accept": auth_response_format}
+        payload = {"oclcNumber": oclc_number}
+
+        url = self._holdings_set_and_unset_url()
+
+        # send request
+        try:
+            response = self.delete(
                 url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
             )
             return response

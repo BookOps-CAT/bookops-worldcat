@@ -100,3 +100,11 @@ def mock_successful_session_post_request(monkeypatch):
         return MockSuccessfulSessionResponse()
 
     monkeypatch.setattr(requests.Session, "post", mock_api_response)
+
+
+@pytest.fixture
+def mock_successful_session_delete_request(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        return MockSuccessfulSessionResponse()
+
+    monkeypatch.setattr(requests.Session, "delete", mock_api_response)

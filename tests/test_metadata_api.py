@@ -235,10 +235,12 @@ class TestMetadataSession:
         with pytest.raises(Timeout):
             session.holdings_get_status("211111111")
 
-    def test_holdings_set_url(self, mock_token_initiation_via_credentials):
+    def test_holdings_set_and_unset_url(self, mock_token_initiation_via_credentials):
         token = mock_token_initiation_via_credentials
         with MetadataSession(credentials=token) as session:
-            assert session._holdings_set_url() == "https://worldcat.org/ih/data"
+            assert (
+                session._holdings_set_and_unset_url() == "https://worldcat.org/ih/data"
+            )
 
     def test_holdings_set_request_connectionerror(
         self, monkeypatch, mock_token_initiation_via_credentials
@@ -294,3 +296,48 @@ class TestMetadataSession:
         with MetadataSession(credentials=token) as session:
             response = session.holdings_set(oclc_number="211111111")
             assert response.status_code == 200
+
+    def test_holdings_unset_request_connectionerror(
+        self, monkeypatch, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        monkeypatch.setattr("requests.Session.delete", MockConnectionError)
+        session = MetadataSession(credentials=token)
+        with pytest.raises(ConnectionError):
+            session.holdings_unset("211111111")
+
+    def test_holdings_unset_request_timeout(
+        self, monkeypatch, mock_token_initiation_via_credentials
+    ):
+        token = mock_token_initiation_via_credentials
+        monkeypatch.setattr("requests.Session.delete", MockTimeout)
+        session = MetadataSession(credentials=token)
+        with pytest.raises(Timeout):
+            session.holdings_unset("211111111")
+
+    @pytest.mark.parametrize(
+        "oclc_no_arg,res_arg,expectation",
+        [
+            (None, "xml", pytest.raises(TypeError)),
+            (2111111111, "xml", pytest.raises(TypeError)),
+            ("ocn2111111111", "json", pytest.raises(ValueError)),
+            ("2111111111", "other", pytest.raises(ValueError)),
+            ("2111111111", None, does_not_raise()),
+            ("2111111111", "xml", does_not_raise()),
+            ("2111111111", "json", does_not_raise()),
+        ],
+    )
+    def test_holdings_unset(
+        self,
+        mock_token_initiation_via_credentials,
+        mock_successful_session_delete_request,
+        oclc_no_arg,
+        res_arg,
+        expectation,
+    ):
+        token = mock_token_initiation_via_credentials
+        with MetadataSession(credentials=token) as session:
+            with expectation:
+                session.holdings_unset(
+                    oclc_number=oclc_no_arg, response_format=res_arg,
+                )
