@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Documentation of BookOps-Worldcat library">
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>BookOps-Worldcat Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> BookOps-Worldcat Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#searchsession-search-api">SearchSession (Search API)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#worldcataccesstoken">WorldcatAccessToken</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#metadatasession-metadata-api">MetadataSession (Metadata API)</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="changelog/">Change Log</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="" href="https://github.com/BookOps-CAT/bookops-worldcat/issues">Issue Tracker</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="about/">About</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">BookOps-Worldcat Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="bookops-worldcat">BookOps-Worldcat</h1>
+<p><a href="https://travis-ci.com/BookOps-CAT/bookops-worldcat"><img alt="Build Status" src="https://travis-ci.com/BookOps-CAT/bookops-worldcat.svg?branch=master" /></a> <a href="https://coveralls.io/github/BookOps-CAT/bookops-worldcat?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/BookOps-CAT/bookops-worldcat/badge.svg?branch=master&amp;service=github" /></a> <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a> <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a></p>
+<h2 id="overview">Overview</h2>
+<p>Requires Python 3.7 and up.</p>
+<p>Bookops-Worldcat is a Python wrapper around <a href="https://www.oclc.org/en/home.html">OCLC's</a> <a href="https://www.worldcat.org/">Worldcat</a> <a href="https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html">Search</a> and <a href="https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html">Metadata</a> APIs.  </p>
+<p>Bookops-Worldcat simplifies some of the APIs boilerplate and takes advantage of functinality of the <a href="https://requests.readthedocs.io/en/master/">Requests library</a>. The wrapper supports at the moment only OAuth 2.0 endpoints and flows, specifically it uses Client Credential Grant and Access Token.<br />
+Please note, not all functionalities of Worldcat Search and Metadata APIs are implemented because this tool was build for our organization's specific needs. We are open though to collaboration to expand and improve the package.  </p>
+<p><a href="https://www.oclc.org/developer/develop/web-services.en.html">WorldCat Search API</a> provides developer-level access to WorldCat for bibliographic, holdings and location data. It requires credentials (WSkey) that can be obtain from OCLC. It allows searching and retrieving bibliographic records for books, videos, music, etc. <br />
+BookOps wrapper offers following operations:  </p>
+<ul>
+<li>SRU (query in a form of a CQL Search)</li>
+<li>Read  </li>
+<li>Lookup By ISBN  </li>
+<li>Lookup By ISSN</li>
+<li>Lookup By Standard Number</li>
+</ul>
+<p><a href="https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html">Worldcat Metadata API</a> is a read-write service for WorldCat. It allows to add and update records in WorldCat, mantain holdings, and work with local bibliographic data. Metadata API requires OCLC credentials. BookOps wrapper focuses on following API operations:  </p>
+<ul>
+<li>Bibliographic Resource  <ul>
+<li>Read  </li>
+</ul>
+</li>
+<li>Holdings Resource  <ul>
+<li>Set/Create  </li>
+<li>Unset/Delete  </li>
+<li>Retrieve Status  </li>
+<li>Batch Set - Multiple OCLC Numbers</li>
+<li>Batch Unset - Multiple OCLC Numbers</li>
+</ul>
+</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p>To install use pip:  </p>
+<p><code>pip install bookops-worldcat</code>  </p>
+<h2 id="quickstart">Quickstart</h2>
+<h4 id="searchsession-search-api">SearchSession (Search API)</h4>
+<p>WorldCat Search API requires OCLC's WSkey. See <a href="https://www.oclc.org/developer/develop/authentication.en.html">OCLC authentication docs</a> for more information how to obtain it. Returned records are by default in MARC XML format.</p>
+<p>Basic usage:  </p>
+<pre><code class="python">from bookops_worldcat import SearchSession
+
+session = SearchSession(credentials=&quot;your WSkey&quot;)
+results = session.lookup_oclc_number(&quot;00000000123&quot;)
+print(results.status_code)
+200
+</code></pre>
+
+<p>Using context manager:  </p>
+<pre><code class="python">with SearchSession(credentials=&quot;your WSkey&quot;) as session:
+    results = session.lookup_isbn(&quot;9781680502404&quot;)
+</code></pre>
+
+<p>Advanced CQL query example (keyword search for "civil war" with subject "antietam" or "sharpsburg", results sorted by date from most recent one):  </p>
+<pre><code class="python">with SearchSession(credentials=&quot;your WSkey&quot;) as session:
+    results = session.sru_query(
+        query='srw.kw=&quot;civil war&quot;&amp;(srw.su=&quot;antietam&quot;|srw.su=&quot;sharpsburg&quot;)',
+        maximum_records=50,
+        sort_keys=[(&quot;date&quot;, &quot;descending&quot;)],
+        service_level=&quot;full&quot;)
+</code></pre>
+
+<h4 id="worldcataccesstoken">WorldcatAccessToken</h4>
+<p>WorldCat Metadata API requires an access token for authorization. This library utilizes OAuth 2.0 and Client Credential Grant flow to aquire OCLC's access token. </p>
+<p>Basic usage:</p>
+<pre><code class="python">from bookops_worldcat import WorldcatAccessToken
+
+token = WorldcatAccessToken(
+    oauth_server=&quot;https://oauth.oclc.org&quot;,
+    key=&quot;your_WSKey&quot;,
+    secret=&quot;your_secret&quot;,
+    options={
+        &quot;scope&quot;: [&quot;WorldCatMetadataAPI&quot;],
+        &quot;principal_id&quot;: &quot;your_principal_id&quot;,
+        &quot;principlal_idns&quot;: &quot;your_principal_idns&quot;
+    }
+)
+print(token.token_str)
+&quot;tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW&quot;
+print(token.is_expired())
+False
+</code></pre>
+
+<p>Token object retains underlying Requests object functionality (<code>requests.Request</code>) that can be accessed via <code>.server_response</code> attribute:</p>
+<pre><code class="python">print(token.server_response.status_code)
+200
+print(token.server_response.elapsed):
+0:00:00.650108
+print(token.server_response.json())
+{
+&quot;user-agent&quot;: &quot;bookops-worldcat/0.1.0&quot;,
+&quot;Accept-Encoding&quot;: &quot;gzip, deflate&quot;,
+&quot;Accept&quot;: &quot;application/json&quot;,
+&quot;Connection&quot;: &quot;keep-alive&quot;,
+&quot;Content-Length&quot;: &quot;67&quot;,
+&quot;Content-Type&quot;: &quot;application/x-www-form-urlencoded&quot;,
+&quot;Authorization&quot;: &quot;Basic encoded_authorization_here=&quot;
+}
+</code></pre>
+
+<h4 id="metadatasession-metadata-api">MetadataSession (Metadata API)</h4>
+<p>A wrapper around WorldCat Metadata API. MetadataSession inherits <code>requests.Session</code> methods. The session is authorized using <code>WorldcatAccessToken</code> object. Returned bibliographic records are by default in MARC/XML format (OCLC's native CDF XML and the CDF translation into JSON serializations are not supported at the moment).</p>
+<p>Basic usage:</p>
+<pre><code class="python">from bookops_worldcat import MetadataSession
+
+with MetadataSession(credentials=token) as session:
+    results = session.get_record(&quot;00000000123&quot;)
+</code></pre>
+
+<p>Returned response is a <code>requests.Response</code> object:</p>
+<pre><code class="python">print(results.status_code)
+200
+print(results.url)
+&quot;https://worldcat.org/bib/data/00000000123&quot;
+</code></pre>
+
+<p>To avoid any <code>UnicodeEncodeError</code> it is recommended to access retrieved data with <code>.content</code> attribute of the response object:</p>
+<pre><code class="python">print(response.content)
+</code></pre>
+
+<p>MetadataSession supports also various holdings operations:  </p>
+<ul>
+<li><code>holdings_get_status</code> retrieves holding status of requested record </li>
+<li><code>holdings_set</code> sets holdings on an individual bibliographic record</li>
+<li><code>holdings_unset</code> deletes holdings on an individual bibliographic record</li>
+<li><code>holdings_set_batch</code> allows to set holdings on multiple records; it is not limited by OCLC 50 bibs limit)</li>
+<li><code>holdings_unset_batch</code> allows to delete holdings on multiple records and is not limited to OCLC's 50 records restriction</li>
+</ul>
+<p>example:  </p>
+<pre><code class="python">session.holdings_set(oclc_number=&quot;00000000123&quot;)
+</code></pre>
+
+<p>pass OCLC record number for batch operations as a list of strings:  </p>
+<pre><code class="python">session.holdings_unset_batch(
+    oclc_numbers=[
+        &quot;00000000123&quot;,
+        &quot;00000000124&quot;,
+        &quot;00000000125&quot;,
+        &quot;00000000126&quot;
+    ]
+)
+</code></pre>
+
+<p>MetadataSession requests support <a href="https://requests.readthedocs.io/en/latest/user/advanced/#event-hooks">Requests event hooks</a> that can be passes as an argument:</p>
+<pre><code class="python">def print_url(response, *args, **kwargs):
+    print(response.url)
+
+
+hooks = {'response': print_url}
+
+session.get_record(&quot;00000000123&quot;, hooks=hooks)
+&quot;https://worldcat.org/bib/data/00000000123&quot;
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="changelog/" class="btn btn-neutral float-right" title="Change Log">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+        <span style="margin-left: 15px"><a href="changelog/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.1
+Build Date UTC : 2020-04-24 03:05:50
+-->
