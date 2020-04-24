@@ -8,6 +8,7 @@ exclude = ["bookops_worldcat/temp.py", "bookops_worldcat/temp/*"]
 
 readme = "README.md"
 repository = "https://github.com/BookOps-CAT/bookops-worldcat"
+homepage = "https://bookops-cat.github.io/bookops-worldcat/"
 
 keywords = ["api", "worldcat", "cataloging", "records"]
 
