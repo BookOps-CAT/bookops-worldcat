@@ -2,7 +2,7 @@
 
 # bookops-worldcat  
 
-BookOps Worldcat Search and Metadata APIs wrappers abstracting OCLC's boilerplate.
-Focus is on selected, relevant to our cataloging department functionality of these APIs.
+BookOps Worldcat Search and Metadata APIs wrappers abstracting OCLC's boilerplate.  
+Focus is on selected, relevant to our cataloging department functionality of these APIs.  
 
 **WORK-IN-PROGRESS**
