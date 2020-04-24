@@ -10,7 +10,7 @@ from . import __title__, __version__
 class WorldcatAccessToken:
     """
     Requests OCLC API access token via Client Credentials only.
-    Server response informaiton can be access using .server_response property.
+    Server response information can be access using .server_response property.
     Does not support Explicit Authorization Code and Refresh Token flows.
 
     Args:
@@ -26,7 +26,6 @@ class WorldcatAccessToken:
         >>> from bookops_worldcat import WorldcatAccessToken
         >>> token = WorldcatAccessToken(
                 oauth_server='https://oauth.oclc.org',
-                grant_type='client_credentials',
                 key='WSkey',
                 secret='WSsecret',
                 options={
