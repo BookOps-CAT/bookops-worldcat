@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/BookOps-CAT/bookops-worldcat"
 homepage = "https://bookops-cat.github.io/bookops-worldcat/"
 
-keywords = ["api", "worldcat", "cataloging", "records"]
+keywords = ["api", "worldcat", "cataloging", "bibliographic records", "holdings"]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
