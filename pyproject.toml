@@ -4,7 +4,26 @@ version = "0.1.0"
 description = "BookOps CAT OCLC APIs wrappers, in particular Search and Metadata APIs."
 authors = ["Tomasz Kalata <klingaroo@gmail.com>"]
 license = "MIT"
-exclude = ['bookops_worldcat/temp.py', 'bookops_worldcat/temp/*']
+exclude = ["bookops_worldcat/temp.py", "bookops_worldcat/temp/*"]
+
+readme = "README.md"
+repository = "https://github.com/BookOps-CAT/bookops-worldcat"
+
+keywords = ["api", "worldcat", "cataloging", "records"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Education",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -16,6 +35,8 @@ pytest = "^5.2"
 pytest-cov = "^2.8"
 pytest-mock = "^2.0"
 pytest-recording = "^0.6.0"
+mkdocs = "^1.1"
+black = { version = "^19.10b0", python = "^3.7" }
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
