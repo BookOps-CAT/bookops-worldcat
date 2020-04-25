@@ -34,9 +34,9 @@ class WorldcatAccessToken:
                     "principal_idns": "PRINCIPAL_IDNS_HERE"}
             )
         >>> token.token_str
-          "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
+        "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
         >>> token.is_expired()
-          False
+        False
         >>> # token object retains post request (requests.Request object) functinality
         >>> token.server_response.json()
         {"token_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
@@ -58,10 +58,11 @@ class WorldcatAccessToken:
     """
 
     def __init__(
-        self, oauth_server=None, key=None, secret=None, options=None,
+        self, oauth_server=None, key=None, secret=None, options=None, agent=None
     ):
         """Constructor."""
 
+        self.agent = agent
         self.error_code = None
         self.error_message = None
         self.grant_type = "client_credentials"
@@ -79,6 +80,13 @@ class WorldcatAccessToken:
             "principal_idns",
             "scope",
         ]
+
+        if self.agent is None:
+            # default bookops-worldcat header
+            self.agent = f"{__title__}/{__version__}"
+        else:
+            if type(self.agent) is not str:
+                raise TypeError("Argument agent must be a string.")
 
         if not self.oauth_server:
             raise ValueError("Argument oauth_server cannot be empty.")
@@ -110,7 +118,7 @@ class WorldcatAccessToken:
 
     def _get_post_token_headers(self):
         return {
-            "user-agent": f"{__title__}/{__version__}",
+            "user-agent": self.agent,
             "Accept": "application/json",
         }
 

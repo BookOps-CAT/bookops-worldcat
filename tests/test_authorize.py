@@ -43,12 +43,54 @@ class TestWorldcatAccessToken:
         token = mock_token_initiation_via_credentials
         assert token._get_token_url() == f"{mock_credentials['oauth_server']}/token"
 
-    def test_get_token_headers(self, mock_token_initiation_via_credentials):
+    def test_get_default_token_headers(self, mock_token_initiation_via_credentials):
         token = mock_token_initiation_via_credentials
         assert token._get_post_token_headers() == {
             "user-agent": f"{__title__}/{__version__}",
             "Accept": "application/json",
         }
+
+    def test_custom_user_agent_in_token_request(
+        self, mock_credentials, mock_successful_post_token_request
+    ):
+        creds = mock_credentials
+        token = WorldcatAccessToken(
+            oauth_server=creds["oauth_server"],
+            key=creds["key"],
+            secret=creds["secret"],
+            options=creds["options"],
+            agent="custom_agent",
+        )
+
+        assert token.agent == "custom_agent"
+        assert token._get_post_token_headers() == {
+            "user-agent": "custom_agent",
+            "Accept": "application/json",
+        }
+
+    @pytest.mark.parametrize(
+        "agent_arg,expectation",
+        [
+            (123, pytest.raises(TypeError)),
+            (("agent", "version"), pytest.raises(TypeError)),
+        ],
+    )
+    def test_invalid_custom_user_agent_in_token_request(
+        self,
+        mock_credentials,
+        mock_successful_post_token_request,
+        agent_arg,
+        expectation,
+    ):
+        creds = mock_credentials
+        with expectation:
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+                agent=agent_arg,
+            )
 
     def test_get_auth(self, mock_token_initiation_via_credentials, mock_credentials):
         token = mock_token_initiation_via_credentials
