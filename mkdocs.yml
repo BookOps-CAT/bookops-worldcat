@@ -2,7 +2,8 @@ site_name: BookOps-Worldcat Documentation
 site_description: Documentation of BookOps-Worldcat library
 nav:
   - Home: index.md
-  - Change Log: changelog.md
+  - Changelog: changelog.md
+  - Source Code: https://github.com/BookOps-CAT/bookops-worldcat
   - Issue Tracker: https://github.com/BookOps-CAT/bookops-worldcat/issues
   - About: about.md
 theme: readthedocs
