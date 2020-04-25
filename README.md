@@ -6,7 +6,7 @@
 BookOps Worldcat Search and Metadata APIs wrappers abstracting OCLC's boilerplate.  
 Focus is on selected, relevant to our cataloging department functionality of these APIs.  
 
-### Instalation
+### Installation
 
 Use pip:
 
@@ -85,7 +85,7 @@ Basic usage:
 
 ### Documentation
 
-For full documenation please see https://bookops-cat.github.io/bookops-worldcat/
+For full documentation please see https://bookops-cat.github.io/bookops-worldcat/
 
 ### Changelog
 
