@@ -6,14 +6,14 @@
 BookOps Worldcat Search and Metadata APIs wrappers abstracting OCLC's boilerplate.  
 Focus is on selected, relevant to our cataloging department functionality of these APIs.  
 
-### Installation
+## Installation
 
 Use pip:
 
 `$ pip install bookops-worldcat`
 
 
-### Features
+## Features
 
 This package takes advantage of functionality of a popular [Requests library](https://requests.readthedocs.io/en/master/). Interactions with OCLC's services are build around Requests' sessions. Authorizing a session requires simply passing OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows to call its specifc methods that facilitate communication between your script/client and a particular endpoint of OCLC's service. Much of the hurdles related to making valid requests hides under the hood of this package making it as simple as possible.  
 Please note, not all functionalities of Worldcat Search and Metadata APIs are implemented because this tool was primarily build for our organization's specific needs. We are open to any collaboration to expand and improve this package.  
@@ -83,14 +83,14 @@ Basic usage:
 ```
 
 
-### Documentation
+## Documentation
 
 For full documentation please see https://bookops-cat.github.io/bookops-worldcat/
 
-### Changelog
+## Changelog
 
 Consult the [Changelog page](https://bookops-cat.github.io/bookops-worldcat/changelog/) for fixes and enhancements of each version. 
 
-### Bugs/Requests  
+## Bugs/Requests  
 
 Please use [Github issue tracker](https://github.com/BookOps-CAT/bookops-worldcat/issues) to submit bugs or request features.
