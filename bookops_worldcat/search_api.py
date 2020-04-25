@@ -26,14 +26,16 @@ class SearchSession(WorldcatSession):
 
     Basic usage:
 
+    >>> from bookops_worldcat import SearchSession
     >>> session = SearchSession(credentials=key)
     >>> session.lookup_isbn('9781680502404')
     <Response [200]>
 
-    or using context manager
+    or using context manager:
 
-    >>> with SearchSession(credentails=key) as session:
-    ...     session.lookup_isbn('9781680502404')
+    with SearchSession(credentails=key) as session:
+        result = session.lookup_isbn('9781680502404')
+        print(result)
     <Response [200]>
     """
 
