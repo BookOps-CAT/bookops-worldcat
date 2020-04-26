@@ -4,7 +4,7 @@
 **Early ALPHA version**
 
 A WorldCat Search and Metadata APIs wrapper abstracting OCLC's boilerplate.  
-BookOps-Worldcat simplifies requests to these web services making them more accessible to OCLC member libraries participating in the cooperative.
+BookOps-Worldcat simplifies requests to these web services making them more accessible to OCLC member libraries.
 
 ## Installation
 
