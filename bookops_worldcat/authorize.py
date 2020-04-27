@@ -21,6 +21,8 @@ class WorldcatAccessToken:
                             - principal_id
                             - principla_idns
                             - scope
+        agent: str,         "user-agent" string to be passed to
+                            token request header
 
     Basic usage:
         >>> from bookops_worldcat import WorldcatAccessToken
@@ -31,7 +33,8 @@ class WorldcatAccessToken:
                 options={
                     "scope": ['SCOPE1', 'SCOPE2'],
                     "principal_id": "PRINCIPAL_ID_HERE",
-                    "principal_idns": "PRINCIPAL_IDNS_HERE"}
+                    "principal_idns": "PRINCIPAL_IDNS_HERE"},
+                "agent": "my_app/1.0.0"
             )
         >>> token.token_str
         "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
