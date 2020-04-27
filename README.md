@@ -19,10 +19,10 @@ For full documentation please see https://bookops-cat.github.io/bookops-worldcat
 
 ## Features
 
-This package takes advantage of functionality of a popular [Requests library](https://requests.readthedocs.io/en/master/). Interactions with [OCLC](https://www.oclc.org/en/home.html)'s services are build around Requests' sessions. Authorizing a session requires simply passing OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows calling its specific methods that facilitate communication between your script/client and a particular endpoint of OCLC's service. Much of the hurdles related to making valid requests hides under the hood of this package making it as simple as possible.  
-Please note, not all functionalities of Worldcat Search and Metadata APIs are implemented because this tool was primarily build for our organization's specific needs. We are open to any collaboration to expand and improve this package.  
+This package takes advantage of functionality of a popular [Requests library](https://requests.readthedocs.io/en/master/). Interactions with [OCLC](https://www.oclc.org/en/home.html)'s services are built around Requests' sessions. Authorizing a session simply requires passing OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows the user to call specific methods to facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible.  
+Please note, not all functionalities of Worldcat Search and Metadata APIs are implemented as this tool was built primarily for the BookOps organization's specific needs. We are open to any collaboration to expand and improve this package.  
 
-BookOps-Worldcat supports at the moment requests to following OCLC's web services:  
+At the moment, BookOps-Worldcat supports requests to following OCLC's web services:  
 
 + [Authentication via Client Credential Grant](https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html)
 + [WorldCat Search API](https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html
