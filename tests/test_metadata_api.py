@@ -53,7 +53,7 @@ class TestMetadataSession:
         token = mock_token_initiation_via_credentials
         with MetadataSession(credentials=token) as session:
             assert session.headers == {
-                "User-Agent": "bookops-worldcat/0.1.0",
+                "User-Agent": "bookops-worldcat/0.2.0",
                 "Accept-Encoding": "gzip, deflate",
                 "Connection": "keep-alive",
                 "Accept": "*/*",

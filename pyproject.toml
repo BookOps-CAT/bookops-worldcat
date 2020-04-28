@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bookops-worldcat"
-version = "0.1.0"
-description = "BookOps CAT OCLC APIs wrappers, in particular Search and Metadata APIs."
+version = "0.2.0"
+description = "OCLC WorldCat Search and Metadata APIs wrapper"
 authors = ["Tomasz Kalata <klingaroo@gmail.com>"]
 license = "MIT"
 exclude = ["bookops_worldcat/temp.py", "bookops_worldcat/temp/*"]
