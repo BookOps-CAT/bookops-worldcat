@@ -4,6 +4,7 @@ import pytest
 from requests.exceptions import ConnectionError, Timeout
 
 from bookops_worldcat import __title__, __version__
+from bookops_worldcat.errors import TokenRequestError
 from bookops_worldcat.authorize import WorldcatAccessToken
 
 
@@ -132,24 +133,13 @@ class TestWorldcatAccessToken:
         self, mock_credentials, mock_failed_post_token_request
     ):
         creds = mock_credentials
-        token = WorldcatAccessToken(
-            oauth_server=creds["oauth_server"],
-            key=creds["key"],
-            secret=creds["secret"],
-            options=creds["options"],
-        )
-
-        assert token.oauth_server == creds["oauth_server"]
-        assert token.key == creds["key"]
-        assert token.secret == creds["secret"]
-        assert token.grant_type == "client_credentials"
-        assert token.options == creds["options"]
-        assert token.timeout == (5, 5)
-        assert token.error_code == 401
-        assert token.error_message == "some error message"
-        assert token.token_str is None
-        assert token.token_expires_at is None
-        assert token.token_type is None
+        with pytest.raises(TokenRequestError):
+            WorldcatAccessToken(
+                oauth_server=creds["oauth_server"],
+                key=creds["key"],
+                secret=creds["secret"],
+                options=creds["options"],
+            )
 
     def test_token_initiation_via_credentials_missing_scope_option(
         self, mock_credentials

@@ -5,6 +5,7 @@ from datetime import datetime
 import requests
 
 from . import __title__, __version__
+from .errors import TokenRequestError
 
 
 class WorldcatAccessToken:
@@ -66,8 +67,6 @@ class WorldcatAccessToken:
         """Constructor."""
 
         self.agent = agent
-        self.error_code = None
-        self.error_message = None
         self.grant_type = "client_credentials"
         self.key = key
         self.oauth_server = oauth_server
@@ -143,17 +142,12 @@ class WorldcatAccessToken:
             self.token_str = response.json()["access_token"]
             self.token_expires_at = response.json()["expires_at"]
             self.token_type = response.json()["token_type"]
-            self.error_code = None
-            self.error_message = None
         else:
-            self.token_str = None
-            self.token_expires_at = None
-            self.token_type = None
-
-            # !!! this should be wrapped into exceptions, response not always can be
-            # serialized to json !!!
-            self.error_code = response.json()["code"]
-            self.error_message = response.json()["message"]
+            jres = response.json()
+            raise TokenRequestError(
+                f"Authorization server error code: {jres['code']}, "
+                f"error message: {jres['message']}"
+            )
 
     def _post_token_request(self):
         """
@@ -180,8 +174,11 @@ class WorldcatAccessToken:
             raise
 
     def create_token(self):
-        response = self._post_token_request()
-        self._parse_server_response(response)
+        self.token_str = None
+        self.token_expires_at = None
+        self.token_type = None
+        self.server_response = self._post_token_request()
+        self._parse_server_response(self.server_response)
 
     def is_expired(self):
         if (
