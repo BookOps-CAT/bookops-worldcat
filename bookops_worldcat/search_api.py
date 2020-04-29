@@ -275,7 +275,7 @@ class SearchSession(WorldcatSession):
             sort_keys: list of tuples   specifies how the result is sorted; accepts
                                         multiple sort_keys; each sort_key consits of
                                         a tuple (sortKey, order), for example:
-                                        ('relevance', 'ascending'); supported sort_keys:
+                                        ('relevance', 'descending'); supported sort_keys:
                                             - relevance (only descending)
                                             - title
                                             - author
