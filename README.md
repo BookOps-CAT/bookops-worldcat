@@ -55,7 +55,7 @@ with SearchSession(credentials="your_WSkey") as session:
     results = session.lookup_isbn("9781680502404")
     print(results.text)
 ```
-```
+```xml
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <record xmlns="http://www.loc.gov/MARC21/slim">
     <leader>00000cam a2200000 i 4500</leader>
