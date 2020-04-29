@@ -258,7 +258,7 @@ BookOps wrapper offers following operations:  </p>
 &lt;/searchRetrieveResponse&gt;
 </code></pre>
 
-<p>For more details about syntax of queries see the Advanced Usage&gt;SessionSearch section.</p>
+<p>For more details about syntax of queries see the <a href="https://bookops-cat.github.io/bookops-worldcat/#searchsession-search-api">Advanced Usage&gt;SessionSearch section</a>.</p>
 <h4 id="obtaining-access-token">Obtaining Access Token</h4>
 <p>Worldcat access token can be obtained by passing credential parameters into <code>WorldcatAccessToken</code> object.</p>
 <pre><code class="python">from bookops_worldcat import WorldcatAccessToken
@@ -338,7 +338,7 @@ print(result.text)
 }
 </code></pre>
 
-<p>For holdings operations on batches of records see Advanced Usage&gt;MetadataSession&gt;Updating Holdings</p>
+<p>For holdings operations on batches of records see <a href="https://bookops-cat.github.io/bookops-worldcat/#holdings">Advanced Usage&gt;MetadataSession&gt;Updating Holdings</a></p>
 <h2 id="advanced-usage">Advanced Usage</h2>
 <p><strong>Identifying your application</strong></p>
 <p>BookOps-Worldcat provides a default <code>user-agent</code> value in headers of all requests to OCLC web services: <code>bookops-worldcat/{version}</code>. It is encouraged to update the <code>user-agent</code> value to properly identify your application to OCLC servers as it may be a useful piece of information for OCLC staff troubleshooting any problems. To set a custom "user-agent" in a session simply update its headers attribute:</p>
@@ -580,5 +580,5 @@ print(result.text)
 
 <!--
 MkDocs version : 1.1
-Build Date UTC : 2020-04-29 18:18:56
+Build Date UTC : 2020-04-29 18:22:27
 -->
