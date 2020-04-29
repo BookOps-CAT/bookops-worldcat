@@ -86,15 +86,10 @@ class SearchSession(WorldcatSession):
             raise TypeError("Argument query cannot be None.")
         if query == "":
             raise ValueError("Argument query cannot be an empty string.")
+
         if "srw." not in query:
             raise ValueError("Seach query syntax error.")
-        if query.count("&") > 0 or query.count("|") > 0 or query.count("<>") > 0:
-            query = (
-                query.replace("=", "+=+")
-                .replace("&", "+and+")
-                .replace("|", "+OR+")
-                .replace("<>", "+NOT+")
-            )
+        query = query.replace("(", "%28").replace(")", "%29")
         return query
 
     def _sru_query_url(self, query):
@@ -265,16 +260,15 @@ class SearchSession(WorldcatSession):
     ):
         """
         Args:
-            query: str                  query string that can include multiple clauses;
+            query: str                  SRU/CQL query string;
                                         use OCLC indexes found here:
-
-                                        use double quotes, and following operators:
-                                        & = AND, | - OR, <> - NOT; do not use spaces
-                                        between clauses;
+                                        http://www.worldcat.org/webservices/catalog/search/sru?wskey={your_WSkey}
+                                        or use OCLC's URI Evaluator tool:
+                                        http://worldcat.org/webservices/catalog/evaluator.html
                                         examples:
                                             srw.bn="9781680502404"
-                                            srw.au="mann"&srw.ti="faustus"
-                                            srw.kw="civil war"&(srw.su="antietam"|srw.su="sharpsburg")
+                                            srw.au+all+"mann"+and+srw.ti+=+"faustus"
+                                            srw.kw+=+"civil war"+and+(srw.su+=+"antietam"+or+srw.su+=+"sharpsburg")
             start_record: int           the starting position of the result set
             maximum_records: int        the maximum number of records to return in a
                                         single request, top limit is 100
@@ -387,6 +381,9 @@ class SearchSession(WorldcatSession):
 
         # prepare payload
         sort_keys = self._prepare_sort_keys(sort_keys)
+        # requests lib url encodes "+" if query passed in payload
+        # to quickly solve this problem query is passes as part of the
+        # url; this may be solved differently in the future
         payload = {
             "maximumRecords": maximum_records,
             "startRecord": start_record,
