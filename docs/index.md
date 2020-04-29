@@ -8,19 +8,19 @@ Requires Python 3.7 and up.
 
 Bookops-Worldcat is a Python wrapper around [OCLC's](https://www.oclc.org/en/home.html) [Worldcat](https://www.worldcat.org/) [Search](https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html) and [Metadata](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) APIs.  
 
-Bookops-Worldcat simplifies some of the OCLC's APIs boilerplate and hopefully lowers a threshold to access and utilize these web services by cataloging departments that may not have sufficient programming support. Python language with its gentle learning curve seems a perfect vehicle to facilitate this goal further.
+Bookops-Worldcat simplifies some of the OCLC's APIs boilerplate and hopefully lowers a threshold to access and utilize these web services by cataloging departments that may not have sufficient programming support. Python language with its gentle learning curve seems a perfect vehicle to facilitate this goal.
 
 
-This package takes advantage of functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interaction with OCLC's services is built around Requests' sessions. Authorizing a session requires simply passing OCLC's WSkey (SearchSession) or an access token (MetadataSession). Opening a session allows calling its specific methods that facilitate communication between your script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package making it as simple as possible.  
+This package takes advantage of functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interaction with OCLC's services is built around Requests' sessions. Authorizing a session requires simply passing OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows calling its specific methods that facilitate communication between your script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package making it as simple as possible.  
 Please note, not all functionalities of Worldcat Search and Metadata APIs are implemented because this tool was primarily built for our organization's specific needs. We are open though to any collaboration to expand and improve the package.  
 
 
 **Supported OCLC web services:**
 
-The wrapper supports at the moment only OAuth 2.0 endpoints and flows, specifically it uses Client Credential Grant and Access Token.  
+The wrapper supports at the moment only OAuth 2.0 endpoints and flows, specifically, it uses Client Credential Grant and Access Token.  
 
 
-[WorldCat Search API](https://www.oclc.org/developer/develop/web-services.en.html) provides developer-level access to WorldCat for bibliographic, holdings and location data. It requires credentials (WSkey only) that can be obtained from OCLC. It allows searching and retrieving bibliographic records for books, videos, music, etc.   
+[WorldCat Search API](https://www.oclc.org/developer/develop/web-services.en.html) provides developer-level access to WorldCat for bibliographic, holdings and location data. It requires credentials - WSkey only. It allows searching and retrieving bibliographic records for books, videos, music, etc.  
 BookOps wrapper offers following operations:  
 
 + SRU (query in a form of a CQL Search)  
@@ -29,7 +29,7 @@ BookOps wrapper offers following operations:
 + Lookup By ISSN  
 + Lookup By Standard Number
 
-[Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows adding and updating records in WorldCat, mantain holdings, and work with local bibliographic data. Metadata API requires OCLC credentials. BookOps wrapper focuses on following API operations:  
+[Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows adding and updating records in WorldCat, mantain holdings, and work with local bibliographic data. Access too Metadata API requires OCLC credentials. BookOps wrapper focuses on following API operations:  
 
 + Bibliographic Resource  
     + Read (retrieves a single bibliographic record by OCLC number)  
@@ -50,18 +50,18 @@ To install use pip:
 
 ## Quickstart
 
-Worldcat Search API and Metadata API require OCLC credentials. They can be obtained at the [OCLC Developer Network](https://www.oclc.org/developer/home.en.html) site. 
+Worldcat Search API and Metadata API require OCLC credentials which can be obtained at the [OCLC Developer Network](https://www.oclc.org/developer/home.en.html) site. 
 
 
 #### Searching Worldcat
 
-Search API requires only OCLC WSkey for authorization. Passing the WSkey to `SearchSession` in the credentials argument will attach it to each request issued while the session is open. `SearchSession` includes several simple lookup methods allowing retrival of a matching bibliographic record with the highest holdings.
+Search API requires only OCLC WSkey for authorization. Passing the WSkey string to `SearchSession` in the credentials argument will attach it to each request issued while the session is open. `SearchSession` includes several simple lookup methods allowing retrival of a matching bibliographic record with the highest holdings.
 
 Basic usage:  
 ```python
 >>> from bookops_worldcat import SearchSession
 
->>> session = SearchSession(credentials="your_WSkey")
+>>> session = SearchSession(credentials="my_WSkey")
 >>> result = session.lookup_oclc_number("00000000123")
 >>> print(result.status_code)
 200
@@ -69,15 +69,74 @@ Basic usage:
 
 Using context manager:  
 ```python
-with SearchSession(credentials="your_WSkey") as session:
-    results = session.lookup_isbn(isbn="9781680502404")
+with SearchSession(credentials="my_WSkey") as session:
+    result = session.lookup_isbn(isbn="9781680502404")
+    print(result.text)
+```
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<record xmlns="http://www.loc.gov/MARC21/slim">
+    <leader>00000cam a2200000 i 4500</leader>
+    <controlfield tag="001">1143317889</controlfield>
+    ...
+    <datafield ind1="1" ind2="0" tag="245">
+      <subfield code="a">Blueprint :</subfield>
+      <subfield code="b">the evolutionary origins of a good society /</subfield>
+      <subfield code="c">Nicholas A. Christakis.</subfield>
+    </datafield>
+    ...
+</record>
 ```
 
-`SearchSession` has also more advanced search, `sru_query` that can be used to handle more complex scenarios (example of an author and a date search):
+`SearchSession` allows more complex queries through `sru_query` method:
 
 ```python
-with SearchSession(credentials="your_WSkey") as session:
-  results = session.sru_query(query='srw.au:"Asimov Isaac"&srw.yr="1990"')
+with SearchSession(credentials="my_WSkey") as session:
+  results = session.sru_query(query='srw.au+all+"Asimov Isaac"+and+srw.yr+exact+"1990"')
+  print(results.text)
+```
+```xml
+<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/" xmlns:oclcterms="http://purl.org/oclc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<version>1.1</version>
+<numberOfRecords>782</numberOfRecords>
+<records>
+<record>
+<recordSchema>marcxml</recordSchema>
+<recordPacking>xml</recordPacking>
+<recordData>
+<record xmlns="http://www.loc.gov/MARC21/slim">
+    <leader>00000cam a2200000 a 4500</leader>
+    <controlfield tag="001">21153421</controlfield>
+    ...
+  </record>
+</recordData>
+</record>
+<record>
+<recordSchema>marcxml</recordSchema>
+<recordPacking>xml</recordPacking>
+<recordData>
+<record xmlns="http://www.loc.gov/MARC21/slim">
+    <leader>00000cam a2200000 a 4500</leader>
+    <controlfield tag="001">20561482</controlfield>
+    ...
+  </record>
+</recordData>
+</record>
+</records>
+<nextRecordPosition>11</nextRecordPosition>
+<resultSetIdleTime/>
+<echoedSearchRetrieveRequest xmlns:srw="http://www.loc.gov/zing/srw/">
+<version>1.1</version>
+<query>srw.au all "Asimov Isaac" and srw.yr exact "1990"</query>
+<maximumRecords>10</maximumRecords>
+<recordPacking>xml</recordPacking>
+<startRecord>1</startRecord>
+<sortKeys>relevance,,0</sortKeys>
+<wskey>my_WSkey</wskey>
+<frbrGrouping>off</frbrGrouping>
+<servicelevel>default</servicelevel>
+</echoedSearchRetrieveRequest>
+</searchRetrieveResponse>
 ```
 
 For more details about syntax of queries see the Advanced Usage>SessionSearch section.
@@ -85,28 +144,30 @@ For more details about syntax of queries see the Advanced Usage>SessionSearch se
 
 #### Obtaining Access Token
 
+Worldcat access token can be obtained by passing credential parameters into `WorldcatAccessToken` object.
+
 ```python
 from bookops_worldcat import WorldcatAccessToken
 
 token = WorldcatAccessToken(
     oauth_server="https://oauth.oclc.org",
-    key="your_WSKey",
-    secret="your_secret",
+    key="my_WSKey",
+    secret="my_secret",
     options={
         "scope": ["WorldCatMetadataAPI"],
-        "principal_id": "your_principal_id",
-        "principlal_idns": "your_principal_idns"
-    }
+        "principal_id": "my_principal_id",
+        "principlal_idns": "my_principal_idns"
+    },
+    agent="my_app/version 1.0"
 )
 print(token.token_str)
 "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
 ```
-
-Note, WorldCat Metadata API requires an access token for authorization.  
+Note, WorldCat Metadata API requires an access token for authorization.
 
 #### Getting Records
 
-The `MetadataSession` is authorized using `WorldcatAccessToken` object. This session allows to retrieve full bibliographic records from Worldcat.
+The `MetadataSession` is authorized using `WorldcatAccessToken` object. The session allows retrieving a full bibliographic record from Worldcat by passing its OCLC number in the method's parameter:
 
 Basic usage:
 ```python
@@ -114,6 +175,11 @@ from bookops_worldcat import MetadataSession
 
 with MetadataSession(credentials=token) as session:
     results = session.get_record("00000000123")
+```
+
+or explicit:
+```python
+results = session.get_record(oclc_number="00000000123")
 ```
 
 Returned bibliographic record can be acceessed via `text` or `content` (preferable) argument: 
@@ -147,7 +213,7 @@ print(results.text)
 
 #### Updating Holdings
 
-`MetadataSession` can be used to check or set/unset your library holdings on a master  in Worldcat:
+`MetadataSession` can be used to check or set/unset your library holdings on a master record in Worldcat:
 
 example:  
 ```python
@@ -157,10 +223,16 @@ print(result)
 ```
 
 ```python
-result = session.holdings_get_status("1143317889")
-print(result)
+result = session.holdings_get_status("850939579")
+print(result.text)
 ```
-
+```json
+{
+ "title":"850939579",
+ "content":{"requestedOclcNumber":"850939579","currentOclcNumber":"850939579","institution":"NYP","holdingCurrentlySet":true,"id":"http://worldcat.org/oclc/850939579"},
+ "updated":"2020-04-29T05:27:22.960Z"
+}
+```
 
 For holdings operations on batches of records see Advanced Usage>MetadataSession>Updating Holdings
 
@@ -168,7 +240,7 @@ For holdings operations on batches of records see Advanced Usage>MetadataSession
 
 **Identifying your application**
 
-BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: "bookops-worldcat/[version]". It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers as it may be a useful piece of information for OCLC staff troubleshooting any problems. To set a custom "user-agent" in a session simply update its headers attribute:
+BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers as it may be a useful piece of information for OCLC staff troubleshooting any problems. To set a custom "user-agent" in a session simply update its headers attribute:
 ```python
 session.headers.update({"user-agent": "my-app/version 1.0"})
 ```
@@ -204,62 +276,87 @@ session.get_record("00000000123", hooks=hooks)
 
 #### SearchSession (Search API)
 
-WorldCat Search API requires OCLC's WSkey. See [OCLC authentication docs](https://www.oclc.org/developer/develop/authentication.en.html) for more information how to obtain it. Returned records are by default in MARC XML format. Other formats offered by the API are not currently supported.  
+WorldCat Search API requires only OCLC's WSKey for authentication ([WSKey Lite pattern](https://www.oclc.org/developer/develop/authentication/wskey-lite.en.html)). Returned records are by default in MARC XML format. Other formats offered by the API are not currently supported.  
 
-The SearchSession offers following methods to query WorldCat:
+##### Simple Lookup
+Lookup methods of `SearchSession` always return a single, matching record with highest holdings count in the WorldCat:  
 
-+ simple lookups return a single, matching record with highest holdings count in WorldCat:  
-    + `lookup_isbn` performs ISBN search
-    + `lookup_issn` performs ISSN search
-    + `lookup_oclc_number`  performs OCLC number search
-    + `lookup_standard_number`performs standard number query
-* advanced query `sru_query` that utilize OCLC various indexes, filters, and sortings
++ `lookup_isbn` performs ISBN search
++ `lookup_issn` performs ISSN search
++ `lookup_oclc_number`  performs OCLC number search
++ `lookup_standard_number` performs standard number query
 
 Fullness of retrieved bibliographic records can be specified by passing a `service_level` argument into each of the requests. There are two modes: "default" and "full".
 
 ```python
-with SearchSession(credentials="your WSkey") as session:
-    results = session.lookup_isbn(isbn="9781680502404", service_level='full')
+with SearchSession(credentials="my_WSKey") as session:
+    result = session.lookup_isbn("9781680502404", service_level='full')
 ```
 
-##### sru_query syntax
+Searches for OCLC numbers that have been merged retrieve a master record they have been merged into:
+```python
+with SearchSession(credentials="my_WSKey") as session:
+    result = session.lookup_oclc_number(oclc_number="969362800")
+```
+Do not use any "ocm", "ocn", or other prefixes with OCLC numbers.
 
-`sru_query` offers a flexible way to build a complex query that get translated into SRU/CQL syntax that is accepted by the web service. 
-`sru_query` query attribute syntax supports Boolean operators:
+##### Complex queries
 
-+ `&` - AND
-+ `<>` - NOT
-+ `|` - OR
+`sru_query` method of `SearchSession` offers a flexible way to build complex queries using SRU/CQL syntax.
 
-Use parenthesis to encapsulate logic statements.
+Following OCLC's resouces can be very helpful in learning about query syntax:  
+
++ http://www.worldcat.org/webservices/catalog/search/sru?wskey={my_WSKey}
++ [OCLC Search API documentation](https://www.oclc.org/developer/develop/web-services/worldcat-search-api/bibliographic-resource.en.html)
++ [URI Evaluator](http://worldcat.org/webservices/catalog/evaluator.html)
+
 
 Advanced CQL query example (keyword search for "civil war" phrase with subject "antietam" or "sharpsburg", results sorted by date from most recent one):  
 ```python 
-with SearchSession(credentials="your WSkey") as session:
+with SearchSession(credentials="my_WSKey") as session:
     results = session.sru_query(
-        query='srw.kw="civil war"&(srw.su="antietam"|srw.su="sharpsburg")',
+        query='srw.kw+=+"civil war"+and+(srw.su+=+"antietam"+OR+srw.su+=+"sharpsburg")',
         maximum_records=50,
         sort_keys=[("date", "descending")],
         service_level="full")
 ```
+Note, `sru_query` does not require to URL encode parenthesis in logic statements as it is in the OCLC documentation.
+
+
+Default parameters of the `sru_query` method:  
+
++ `start_record` (default value: `1`): starting position of the result set (can be used to page through the large results)  
++ `maximum_records` ( default: `10`):  maximum value is 100
++ `sort_keys` (default: `[("relevance", "descending")]`): specifies how results are sorted; `sort_keys` must be a list of tuples, where the first tuple element is a key, and the second is a sort type. This allows to combine two or more sort types in the results, for example: `sort_keys=[("author", "ascending"), ("date", "descending")]` will return results sorted by the author in alphabetical order and within each author group results will be sorted by date from the newest to oldest; sort_keys keys:  
+    + relevance
+    + title
+    + author
+    + date
+    + library_count
+    + score
++ `frbr_grouping` (default: `"off"`): options `"on"` and `"off"` turn on or off FRBR grouping
++ `service_level` (default: `"default"`):  options: `"default"` or `"full"`
++ `hooks` (default: `None`): optional event hooks
+
+
 
 #### WorldcatAccessToken
 
-Bookops-Worldcat utilizes OAuth 2.0 and Client Credential Grant flow to aquire Access Token. Please note, your OCLC credentials must allow access to Metadat API in their scopes to be permitted to make requests to the web service.
+Bookops-Worldcat utilizes OAuth 2.0 and Client Credential Grant flow to aquire Access Token. Please note, your OCLC credentials must allow access to Metadata API in their scope to be permitted to make requests to the web service.
 
 Obtaining:
 ```python
 from bookops_worldcat import WorldcatAccessToken
 token = WorldcatAccessToken(
     oauth_server="https://oauth.oclc.org",
-    key="your_WSKey",
-    secret="your_secret",
+    key="my_WSKey",
+    secret="my_secret",
     options={
         "scope": ["WorldCatMetadataAPI"],
-        "principal_id": "your_principal_id",
-        "principlal_idns": "your_principal_idns"
+        "principal_id": "my_principal_id",
+        "principlal_idns": "my_principal_idns"
     },
-    agent="your_app/version"
+    agent="my_app/version 1.0"
 )
 ```
 
@@ -271,6 +368,8 @@ print(token.server_response.status_code)
 print(token.server_response.elapsed):
 0:00:00.650108
 print(token.server_response.json())
+```
+```json
 {
 "user-agent": "bookops-worldcat/0.1.0",
 "Accept-Encoding": "gzip, deflate",
@@ -288,18 +387,24 @@ print(token.is_expired())
 True
 ```
 
+A failed token request raises `TokenRequestError` which provides returned by the server error code and detailed message.
+
 #### MetadataSession
 
 A wrapper around WorldCat Metadata API. MetadataSession inherits `requests.Session` methods.  
 Returned bibliographic records are by default in MARC/XML format (OCLC's native CDF XML and the CDF translation into JSON serializations are not supported at the moment).
 
-##### get_record
+##### get_record Method
+
+`session.get_record()` method with OCLC number as an argument sends a request for a matching full bibliographic record in Worldcat. `get_record` should be a primary method to download records from Worldcat. The Metadata API correctly matches requested OCLC numbers of records that have been merged by returning current master record.
 
 Returned response is a `requests.Response` object with all its features:
 ```python
-print(results.status_code)
+with MetadataSession(credentials=token) as session:
+    result = session.get_record("00000000123")
+    print(result.status_code)
+    print(result.url)
 200
-print(results.url)
 "https://worldcat.org/bib/data/00000000123"
 ```
 To avoid any `UnicodeEncodeError` it is recommended to access retrieved data with `.content` attribute of the response object:
@@ -307,9 +412,9 @@ To avoid any `UnicodeEncodeError` it is recommended to access retrieved data wit
 print(response.content)
 ```
 
-##### holdings
+##### Holdings
 
-MetadataSession supports various holdings operations:  
+MetadataSession supports fallowing holdings operations:  
 
 + `holdings_get_status` retrieves holding status of requested record 
 + `holdings_set` sets holdings on an individual bibliographic record
@@ -322,7 +427,7 @@ By default, responses are returned in `atom+json` format, but `atom+xml` can be 
 result = session.holdings_get_status("1143317889", response_format="xml")
 print(result.text)
 ```
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <entry xmlns="http://www.w3.org/2005/Atom">
   <title type="text">1143317889</title>
@@ -350,3 +455,4 @@ session.holdings_unset_batch(
     ]
 )
 ```
+The web service limits number of records in a batch operation to 50, but `MeatadataSession` permits larger batches by spliting them into chunks of 50 and issuing automaticaly multiple requests. The return object is a list of returned from server results.
