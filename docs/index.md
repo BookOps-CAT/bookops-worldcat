@@ -139,7 +139,7 @@ with SearchSession(credentials="my_WSkey") as session:
 </searchRetrieveResponse>
 ```
 
-For more details about syntax of queries see the Advanced Usage>SessionSearch section.
+For more details about syntax of queries see the [Advanced Usage>SessionSearch section](https://bookops-cat.github.io/bookops-worldcat/#searchsession-search-api).
 
 
 #### Obtaining Access Token
@@ -234,7 +234,7 @@ print(result.text)
 }
 ```
 
-For holdings operations on batches of records see Advanced Usage>MetadataSession>Updating Holdings
+For holdings operations on batches of records see [Advanced Usage>MetadataSession>Updating Holdings](https://bookops-cat.github.io/bookops-worldcat/#holdings)
 
 ## Advanced Usage
 
