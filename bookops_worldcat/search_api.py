@@ -104,7 +104,7 @@ class SearchSession(WorldcatSession):
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
             hooks: dict,            requests library hook system that can be used for
-                                    singal event handling, see more at:
+                                    signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Retruns:
             response: requests.Response object
@@ -141,7 +141,7 @@ class SearchSession(WorldcatSession):
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
             hooks: dict,            requests library hook system that can be used for
-                                    singal event handling, see more at:
+                                    signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Retruns:
@@ -178,7 +178,7 @@ class SearchSession(WorldcatSession):
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
             hooks: dict,            requests library hook system that can be used for
-                                    singal event handling, see more at:
+                                    signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Retruns:
@@ -220,7 +220,7 @@ class SearchSession(WorldcatSession):
             service_level: str,     'default' or 'full', see details here:
                                     https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html
             hooks: dict,            requests library hook system that can be used for
-                                    singal event handling, see more at:
+                                    signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Retruns:
@@ -290,7 +290,7 @@ class SearchSession(WorldcatSession):
                                         more here:
                                         https://www.oclc.org/developer/develop/web-services/worldcat-search-api/service-levels.en.html 
             hooks: dict,                requests library hook system that can be used for
-                                        singal event handling, see more at:
+                                        signal event handling, see more at:
                                         https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
 
