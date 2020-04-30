@@ -8,19 +8,19 @@ Requires Python 3.7 and up.
 
 Bookops-Worldcat is a Python wrapper around [OCLC's](https://www.oclc.org/en/home.html) [Worldcat](https://www.worldcat.org/) [Search](https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html) and [Metadata](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) APIs.  
 
-Bookops-Worldcat simplifies some of the OCLC's APIs boilerplate and hopefully lowers a threshold to access and utilize these web services by cataloging departments that may not have sufficient programming support. Python language with its gentle learning curve seems a perfect vehicle to facilitate this goal.
+The Bookops-Worldcat package simplifies some of OCLC API boilerplate, and hopefully, lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with it's gentle learning curve, has the potential to be a perfect vehicle towards this goal.
 
 
-This package takes advantage of functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interaction with OCLC's services is built around Requests' sessions. Authorizing a session requires simply passing OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows calling its specific methods that facilitate communication between your script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package making it as simple as possible.  
+This package takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interaction with OCLC's services is built around Requests sessions. Authorizing a session simply requires  passing in OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows the user to call specific methods which facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible.  
 Please note, not all functionalities of Worldcat Search and Metadata APIs are implemented because this tool was primarily built for our organization's specific needs. We are open though to any collaboration to expand and improve the package.  
 
 
 **Supported OCLC web services:**
 
-The wrapper supports at the moment only OAuth 2.0 endpoints and flows, specifically, it uses Client Credential Grant and Access Token.  
+At the moment, the wrapper supports only OAuth 2.0 endpoints and flows, specifically, it uses Client Credential Grant and Access Token.  
 
 
-[WorldCat Search API](https://www.oclc.org/developer/develop/web-services.en.html) provides developer-level access to WorldCat for bibliographic, holdings and location data. It requires credentials - WSkey only. It allows searching and retrieving bibliographic records for books, videos, music, etc.  
+[WorldCat Search API](https://www.oclc.org/developer/develop/web-services.en.html) provides developer-level access to WorldCat for bibliographic, holdings and location data. It requires credentials - WSkey only. It allows searching and retrieving bibliographic records for books, videos, music, and other formats.  
 BookOps wrapper offers following operations:  
 
 + SRU (query in a form of a CQL Search)  
@@ -29,7 +29,7 @@ BookOps wrapper offers following operations:
 + Lookup By ISSN  
 + Lookup By Standard Number
 
-[Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows adding and updating records in WorldCat, mantain holdings, and work with local bibliographic data. Access too Metadata API requires OCLC credentials. BookOps wrapper focuses on following API operations:  
+[Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows adding and updating records in WorldCat, mantaining holdings, and working with local bibliographic data. Access to Metadata API requires OCLC credentials. The BookOps wrapper focuses on the following API operations:  
 
 + Bibliographic Resource  
     + Read (retrieves a single bibliographic record by OCLC number)  
@@ -55,7 +55,7 @@ Worldcat Search API and Metadata API require OCLC credentials which can be obtai
 
 #### Searching Worldcat
 
-Search API requires only OCLC WSkey for authorization. Passing the WSkey string to `SearchSession` in the credentials argument will attach it to each request issued while the session is open. `SearchSession` includes several simple lookup methods allowing retrival of a matching bibliographic record with the highest holdings.
+Search API requires only OCLC WSkey for authorization. Passing the WSkey string to `SearchSession` in the credentials argument will attach it to each request issued while the session is open. `SearchSession` includes several simple lookup methods allowing retrieval of a matching bibliographic record with the highest holdings.
 
 Basic usage:  
 ```python
