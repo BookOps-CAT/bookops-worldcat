@@ -12,7 +12,7 @@ The Bookops-Worldcat package simplifies some of OCLC API boilerplate, and ideall
 
 
 This package takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interaction with OCLC's services is built around Requests sessions. Authorizing a session simply requires  passing in OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows the user to call specific methods which facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible to access the functionalities of OCLC APIs.  
-Please note, not all functionalities of Worldcat Search and Metadata APIs are implemented because this tool was primarily built for our organization's specific needs. However, we are open to any collaboration to expand and improve the package.  
+Please note, not all features of Worldcat Search and Metadata APIs are implemented because this tool was primarily built for our organization's specific needs. However, we are open to any collaboration to expand and improve the package.  
 
 
 **Supported OCLC web services:**
