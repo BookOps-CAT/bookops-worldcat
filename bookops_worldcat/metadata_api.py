@@ -106,7 +106,7 @@ class MetadataSession(WorldcatSession):
             oclc_number: str,       OCLC bibliographic record number; do not include
                                     any prefix, only digits.
             hooks: dict,            requests library hook system that can be used for
-                                    singal event handling, see more at:
+                                    signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             response: requests.Response object
@@ -141,6 +141,9 @@ class MetadataSession(WorldcatSession):
         Args:
             oclc_number: str,               OCLC record number without any prefix
             response_format: str,           "json" or "xml"; default json;
+            hooks: dict,            requests library hook system that can be used for
+                                    signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
             request.Response object
@@ -172,8 +175,11 @@ class MetadataSession(WorldcatSession):
         Sets institution's holdings on an individual record.
 
         Args:
-            oclc_number: str,               OCLC record number without prefix
-            response_format: str,           "json" or "xml"; default json
+            oclc_number: str,           OCLC record number without prefix
+            response_format: str,       "json" or "xml"; default json
+            hooks: dict,                requests library hook system that can be
+                                        used for signal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
             request.Response object
@@ -217,7 +223,10 @@ class MetadataSession(WorldcatSession):
                                          - "1" yes, remove holdigns and delete local
                                            holdings record or local bibliographic record
                                            exists
-            response_format: str,        "json" or "xml"; default json
+            response_format: str,       "json" or "xml"; default json
+            hooks: dict,                requests library hook system that can be used
+                                        for signal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
             request.Response object
@@ -268,6 +277,10 @@ class MetadataSession(WorldcatSession):
                                            holdings record or local bibliographic record
                                            exists
             response_format: str,        "json" or "xml"; default json
+            hooks: dict,                requests library hook system that can be used
+                                        for signal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
 
         Returns:
             responses: list of request.Response object for each batch
@@ -325,9 +338,13 @@ class MetadataSession(WorldcatSession):
                                            holdings record or local bibliographic record
                                            exists
             response_format: str,        "json" or "xml"; default json
+            hooks: dict,                requests library hook system that can be used
+                                        for signal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
 
         Returns:
-            responses: list of request.Response object for each batch
+            responses: list of request.Response objects for each batch
         """
         responses = []
 
