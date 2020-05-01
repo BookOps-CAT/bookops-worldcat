@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0
+## 0.2.0 (04/30/2020)
 
 + Expanded and improved documentation
 + Customizable "user-agent" in session's header and token request
