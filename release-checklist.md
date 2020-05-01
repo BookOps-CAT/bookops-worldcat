@@ -1,5 +1,5 @@
 1. Update documentation  
-    a) rebuild & deploy github pages
+    a) rebuild (mkdocs build --clean) & deploy github pages (mkdocs gh-pages)
 2. Run CI & coverage
 3. Create a new github release
 4. Update version.py & pyproject.toml
