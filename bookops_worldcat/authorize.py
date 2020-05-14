@@ -16,8 +16,8 @@ class WorldcatAccessToken:
 
     Args:
         oauth_server: str,  OCLC authorization server
-        wskey: str,         OCLC API key
-        wssecret: str,      OCLC API secret
+        key: str,         OCLC API key
+        secret: str,      OCLC API secret
         option: dict,       valid options:
                             - principal_id
                             - principla_idns
@@ -41,7 +41,7 @@ class WorldcatAccessToken:
         "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
         >>> token.is_expired()
         False
-        >>> # token object retains post request (requests.Request object) functinality
+        >>> # token object retains post request (requests.Request object) functionality
         >>> token.server_response.json()
         {"token_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
          "token_type": "bearer",
