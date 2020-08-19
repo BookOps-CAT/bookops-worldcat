@@ -1,9 +1,9 @@
-from bookops_worldcat import __version__, __title__
+# -*- coding: utf-8 -*-
 
 
 def test_version():
-    assert __version__ == "0.2.0"
+    from bookops_worldcat import __version__
 
 
 def test_title():
-    assert __title__ == "bookops-worldcat"
+    from bookops_worldcat import __title__
