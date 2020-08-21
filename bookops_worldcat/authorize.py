@@ -19,9 +19,9 @@ class WorldcatAccessToken:
     https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html
 
     Args:
-        key: str,                               your WSKey public ClientId
+        key: str,                               your WSKey public client_id
         secret: str,                            your WSKey secret
-        scopes: str or list                      request scopes for the access token
+        scopes: str or list                     request scopes for the access token
         agent: (optional) str,                  "User-agent" parameter to be passed
                                                 in the request header; usage strongly
                                                 encouraged
