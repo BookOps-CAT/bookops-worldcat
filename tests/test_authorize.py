@@ -1,7 +1,14 @@
+# -*- coding: utf-8 -*-
+
+from datetime import datetime, timedelta
+
 import pytest
 
+import requests
 
 from bookops_worldcat.authorize import WorldcatAccessToken
+from bookops_worldcat import __version__, __title__
+from bookops_worldcat.errors import TokenRequestError
 
 
 class TestWorldcatAccessToken:
@@ -15,9 +22,11 @@ class TestWorldcatAccessToken:
             (124, pytest.raises(TypeError), "Argument 'key' must be a string."),
         ],
     )
-    def test_key_exceptions(self, argm, expectation, msg):
+    def test_key_exceptions(
+        self, argm, expectation, msg, mock_successful_post_token_response
+    ):
         with expectation as exp:
-            WorldcatAccessToken(key=argm, secret="my_secret", scope=["scope1"])
+            WorldcatAccessToken(key=argm, secret="my_secret", scopes=["scope1"])
             assert msg in str(exp.value)
 
     @pytest.mark.parametrize(
@@ -28,29 +37,138 @@ class TestWorldcatAccessToken:
             (123, pytest.raises(TypeError), "Argument 'secret' must be a string."),
         ],
     )
-    def test_secret_exceptions(self, argm, expectation, msg):
+    def test_secret_exceptions(
+        self, argm, expectation, msg, mock_successful_post_token_response
+    ):
         with expectation as exp:
-            WorldcatAccessToken(key="my_key", secret=argm, scope=["scope1"])
+            WorldcatAccessToken(key="my_key", secret=argm, scopes=["scope1"])
             assert msg in str(exp.value)
+
+    def test_agent_exceptions(self, mock_successful_post_token_response):
+        with pytest.raises(TypeError) as exp:
+            WorldcatAccessToken(
+                key="my_key", secret="my_secret", scopes="scope1", agent=124
+            )
+            assert "Argument 'agent' must be a string." in str(exp.value)
+
+    def test_agent_default_values(self, mock_successful_post_token_response):
+        token = WorldcatAccessToken(key="my_key", secret="my_secret", scopes="scope1")
+        assert token.agent == f"{__title__}/{__version__}"
 
     @pytest.mark.parametrize(
         "argm,expectation,msg",
         [
             (
-                5,
+                None,
                 pytest.raises(TypeError),
-                "Argument 'timeout' must be a tuple of two ints or floats.",
+                "Argument 'scope' must a string or a list.",
             ),
             (
-                (None, "abc"),
+                123,
                 pytest.raises(TypeError),
-                "Values of 'timeout' tuple must be ints or floats.",
+                "Argument 'scope' must a string or a list.",
             ),
+            (" ", pytest.raises(ValueError), "Argument 'scope' is missing."),
+            (["", ""], pytest.raises(ValueError), "Argument 'scope' is missing."),
         ],
     )
-    def test_timeout_exceptions(self, argm, expectation, msg):
+    def test_scope_exceptions(
+        self, argm, expectation, msg, mock_successful_post_token_response
+    ):
         with expectation as exp:
-            WorldcatAccessToken(
-                key="my_key", secret="my_secret", scope=["scope1"], timeout=argm
-            )
+            WorldcatAccessToken(key="my_key", secret="my_secret", scopes=argm)
             assert msg in str(exp.value)
+
+    @pytest.mark.parametrize(
+        "argm,expectation",
+        [("scope1", "scope1"), (["scope1", "scope2"], "scope1 scope2")],
+    )
+    def test_scope_manipulation(
+        self, argm, expectation, mock_successful_post_token_response
+    ):
+        token = WorldcatAccessToken(key="my_key", secret="my_secret", scopes=argm)
+        assert token.scopes == expectation
+
+    def test_token_url(self, mock_successful_post_token_response):
+        token = WorldcatAccessToken(key="my_key", secret="my_secret", scopes="scope1")
+        assert token._token_url() == "https://oauth.oclc.org/token"
+
+    def test_token_headers(self, mock_successful_post_token_response):
+        token = WorldcatAccessToken(
+            key="my_key", secret="my_secret", scopes="scope1", agent="foo"
+        )
+        assert token._token_headers() == {
+            "User-Agent": "foo",
+            "Accept": "application/json",
+        }
+
+    def test_auth(self, mock_successful_post_token_response):
+        token = WorldcatAccessToken(
+            key="my_key", secret="my_secret", scopes="scope1", agent="foo"
+        )
+        assert token._auth() == ("my_key", "my_secret")
+
+    def test_payload(self, mock_successful_post_token_response):
+        token = WorldcatAccessToken(
+            key="my_key", secret="my_secret", scopes="scope1", agent="foo"
+        )
+        assert token._payload() == {
+            "grant_type": "client_credentials",
+            "scope": "scope1",
+        }
+
+    def test_post_token_request(
+        self, mock_credentials, mock_successful_post_token_response
+    ):
+        creds = mock_credentials
+        token = WorldcatAccessToken(
+            key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
+        )
+        assert token.token_str == "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
+
+    def test_post_token_request_timeout(self, mock_credentials, mock_timeout):
+        creds = mock_credentials
+        with pytest.raises(requests.exceptions.Timeout):
+            WorldcatAccessToken(
+                key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
+            )
+
+    def test_post_token_request_connectionerror(
+        self, mock_credentials, mock_connectionerror
+    ):
+        creds = mock_credentials
+        with pytest.raises(requests.exceptions.ConnectionError):
+            WorldcatAccessToken(
+                key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
+            )
+
+    def test_invalid_post_token_request(
+        self, mock_credentials, mock_failed_post_token_response
+    ):
+        creds = mock_credentials
+        with pytest.raises(TokenRequestError):
+            WorldcatAccessToken(
+                key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
+            )
+
+    def test_is_expired_false(
+        self, mock_credentials, mock_successful_post_token_response
+    ):
+        creds = mock_credentials
+        token = WorldcatAccessToken(
+            key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
+        )
+        assert token.is_expired() is False
+
+    def test_is_expired_true(
+        self, mock_credentials, mock_successful_post_token_response
+    ):
+        creds = mock_credentials
+        token = WorldcatAccessToken(
+            key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
+        )
+        token.token_expires_at = datetime.strftime(
+            datetime.utcnow() - timedelta(0, 1), "%Y-%m-%d %H:%M:%SZ"
+        )
+
+        assert token.is_expired() is True
