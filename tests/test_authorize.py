@@ -81,6 +81,24 @@ class TestWorldcatAccessToken:
 
     @pytest.mark.parametrize(
         "argm,expectation",
+        [
+            (None, (3, 3)),
+            (1, 1),
+            (0.5, 0.5),
+            ((5, 5), (5, 5)),
+            ((0.1, 0.2), (0.1, 0.2)),
+        ],
+    )
+    def test_timeout_argument(
+        self, argm, expectation, mock_successful_post_token_response
+    ):
+        token = WorldcatAccessToken(
+            key="my_key", secret="my_secret", scopes="scope1", timeout=argm
+        )
+        assert token.timeout == expectation
+
+    @pytest.mark.parametrize(
+        "argm,expectation",
         [("scope1", "scope1"), (["scope1", "scope2"], "scope1 scope2")],
     )
     def test_scope_manipulation(
@@ -116,15 +134,6 @@ class TestWorldcatAccessToken:
             "grant_type": "client_credentials",
             "scope": "scope1",
         }
-
-    def test_post_token_request(
-        self, mock_credentials, mock_successful_post_token_response
-    ):
-        creds = mock_credentials
-        token = WorldcatAccessToken(
-            key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
-        )
-        assert token.token_str == "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
 
     def test_post_token_request_timeout(self, mock_credentials, mock_timeout):
         creds = mock_credentials
@@ -172,3 +181,23 @@ class TestWorldcatAccessToken:
         )
 
         assert token.is_expired() is True
+
+    def test_post_token_request(
+        self,
+        mock_credentials,
+        mock_successful_post_token_response,
+        mock_oauth_server_response,
+    ):
+        creds = mock_credentials
+        token = WorldcatAccessToken(
+            key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
+        )
+        assert token.token_str == "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
+        assert token.token_type == "bearer"
+        assert token.grant_type == "client_credentials"
+        assert token.key == creds["key"]
+        assert token.secret == creds["secret"]
+        assert token.oauth_server == "https://oauth.oclc.org"
+        assert token.scopes == "scope1 scope2"
+        assert token.server_response.json() == mock_oauth_server_response.json()
+        assert token.timeout == (3, 3)

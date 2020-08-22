@@ -5,8 +5,6 @@ from datetime import datetime, timedelta
 import pytest
 import requests
 
-from bookops_worldcat.errors import TokenRequestError
-
 
 class MockAuthServerResponseSuccess:
     """Simulates auth server response to successful token request"""
@@ -59,8 +57,13 @@ def mock_credentials():
     return {
         "key": "my_WSkey",
         "secret": "my_WSsecret",
-        "scopes": "scope1",
+        "scopes": ["scope1", "scope2"],
     }
+
+
+@pytest.fixture
+def mock_oauth_server_response(*args, **kwargs):
+    return MockAuthServerResponseSuccess()
 
 
 @pytest.fixture
