@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
+import os
 
 import pytest
 
@@ -201,3 +202,14 @@ class TestWorldcatAccessToken:
         assert token.scopes == "scope1 scope2"
         assert token.server_response.json() == mock_oauth_server_response.json()
         assert token.timeout == (3, 3)
+
+    def test_post_token_request_with_live_service(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        assert token.server_response.status_code == 200
+        assert token.token_str is not None
+        assert token.is_expired() is False

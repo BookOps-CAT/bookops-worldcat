@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
+import json
+import os
 
 import pytest
 import requests
@@ -92,3 +94,17 @@ def mock_timeout(monkeypatch):
 def mock_connectionerror(monkeypatch):
     monkeypatch.setattr("requests.post", MockConnectionError)
     monkeypatch.setattr("requests.get", MockConnectionError)
+
+
+@pytest.fixture
+def live_keys():
+    if os.name == "nt":
+        fh = os.path.join(os.environ["USERPROFILE"], ".oclc/nyp_wc_test.json")
+        with open(fh, "r") as file:
+            data = json.load(file)
+            os.environ["WCKey"] = data["key"]
+            os.environ["WCSecret"] = data["secret"]
+            os.environ["WCScopes"] = " ".join(data["scopes"])
+
+    else:
+        pass
