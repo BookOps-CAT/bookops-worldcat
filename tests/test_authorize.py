@@ -211,5 +211,26 @@ class TestWorldcatAccessToken:
         )
 
         assert token.server_response.status_code == 200
+
+        # test presence of all returned parameters
+        response = token.server_response.json()
+        params = [
+            "access_token",
+            "expires_at",
+            "authenticating_institution_id",
+            "principalID",
+            "context_institution_id",
+            "scopes",
+            "token_type",
+            "expires_in",
+            "principalIDNS",
+        ]
+        for p in params:
+            assert p in response
+
+        # test if any new additions are present
+        assert sorted(params) == sorted(response.keys())
+
+        # test if token looks right
         assert token.token_str is not None
         assert token.is_expired() is False

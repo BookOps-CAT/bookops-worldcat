@@ -107,4 +107,5 @@ def live_keys():
             os.environ["WCScopes"] = " ".join(data["scopes"])
 
     else:
+        # Travis env variables defined in the repository settings
         pass
