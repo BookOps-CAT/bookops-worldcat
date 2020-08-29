@@ -8,7 +8,16 @@ from . import __title__, __version__
 class WorldcatSession(requests.Session):
     """Inherits all requests.Session methods"""
 
-    def __init__(self):
+    def __init__(self, agent=None, timeout=None):
         requests.Session.__init__(self)
 
-        self.headers.update({"User-Agent": f"{__title__}/{__version__}"})
+        if agent is None:
+            self.headers.update({"User-Agent": f"{__title__}/{__version__}"})
+        elif type(agent) is str:
+            self.headers.update({"User-Agent": agent})
+        else:
+            raise TypeError("Argument 'agent' must be a str")
+
+        self.timeout = timeout
+        if not self.timeout:
+            self.timeout = (3, 3)
