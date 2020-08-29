@@ -8,6 +8,9 @@ import pytest
 import requests
 
 
+from bookops_worldcat import WorldcatAccessToken
+
+
 class MockAuthServerResponseSuccess:
     """Simulates auth server response to successful token request"""
 
@@ -109,3 +112,8 @@ def live_keys():
     else:
         # Travis env variables defined in the repository settings
         pass
+
+
+@pytest.fixture
+def mock_token(mock_credentials, mock_successful_post_token_response):
+    return WorldcatAccessToken(**mock_credentials)
