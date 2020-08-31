@@ -66,7 +66,7 @@ class TestMockedMetadataSession:
                 == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345/other-editions"
             )
 
-    def test_url_lhr_controlNumber(self, mock_token):
+    def test_url_lhr_control_number(self, mock_token):
         with MetadataSession(authorization=mock_token) as session:
             assert (
                 session._url_lhr_control_number(control_number="12345")
