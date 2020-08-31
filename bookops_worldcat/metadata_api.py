@@ -3,6 +3,7 @@
 import requests
 
 from ._session import WorldcatSession
+from .utils import verify_oclc_number
 
 
 class MetadataSession(WorldcatSession):
@@ -17,6 +18,8 @@ class MetadataSession(WorldcatSession):
             raise TypeError(
                 "Argument 'authorization' must include 'WorldcatAccessToken' obj."
             )
+
+        self.headers.update({"Authorization": f"Bearer {self.authorization.token_str}"})
 
     def _url_base(self):
         return "https://worldcat.org"
@@ -83,3 +86,30 @@ class MetadataSession(WorldcatSession):
     def _url_bib_holdings_multi_institution_batch_action(self):
         base_url = self._url_base()
         return f"{base_url}/ih/institutionlist"
+
+    def get_brief_bib(self, oclc_number=None, hooks=None):
+        """
+        Retrieve specific brief bibliographic resource.
+
+        Args:
+            oclc_number: int or str,    OCLC bibliographic record number;
+                                        do not include any prefixes, only digits
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            response: requests.Response object
+        """
+
+        oclc_number = verify_oclc_number(oclc_number)
+        header = {"Accept": "application/json"}
+        url = self._url_brief_bib_oclc_number(oclc_number)
+
+        # send request
+        try:
+            response = self.get(url, headers=header, hooks=hooks)
+            return response
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise

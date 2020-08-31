@@ -57,6 +57,11 @@ class MockConnectionError:
         raise requests.exceptions.ConnectionError
 
 
+class MockSuccessfulSessionResponse:
+    def __init__(self):
+        self.status_code = 200
+
+
 @pytest.fixture
 def mock_credentials():
     return {
@@ -91,12 +96,14 @@ def mock_failed_post_token_response(monkeypatch):
 def mock_timeout(monkeypatch):
     monkeypatch.setattr("requests.post", MockTimeout)
     monkeypatch.setattr("requests.get", MockTimeout)
+    monkeypatch.setattr("requests.Session.get", MockTimeout)
 
 
 @pytest.fixture
 def mock_connectionerror(monkeypatch):
     monkeypatch.setattr("requests.post", MockConnectionError)
     monkeypatch.setattr("requests.get", MockConnectionError)
+    monkeypatch.setattr("requests.Session.get", MockConnectionError)
 
 
 @pytest.fixture
@@ -117,3 +124,11 @@ def live_keys():
 @pytest.fixture
 def mock_token(mock_credentials, mock_successful_post_token_response):
     return WorldcatAccessToken(**mock_credentials)
+
+
+@pytest.fixture
+def mock_successful_session_get_request(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        return MockSuccessfulSessionResponse()
+
+    monkeypatch.setattr(requests.Session, "get", mock_api_response)
