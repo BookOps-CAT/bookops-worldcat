@@ -19,3 +19,9 @@ class TokenRequestError(BookopsWorldcatError):
     """
 
     pass
+
+
+class InvalidOclcNumber(BookopsWorldcatError):
+    """
+    Exception raised when an invalid OCLC record number is encountered
+    """

@@ -3,6 +3,7 @@
 import pytest
 
 from bookops_worldcat.utils import *
+from bookops_worldcat.errors import InvalidOclcNumber
 
 
 class TestUtils:
@@ -11,16 +12,25 @@ class TestUtils:
     @pytest.mark.parametrize(
         "argm,expectation,msg",
         [
-            (None, pytest.raises(TypeError), "Argument 'oclc_number' is missing."),
             (
-                12345,
-                pytest.raises(TypeError),
-                "Argument 'oclc_number' must be a string.",
+                None,
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclc_number' is missing.",
             ),
             (
-                "ocm12345",
-                pytest.raises(ValueError),
-                "Argument 'oclc_number' must include only digits.",
+                [12345],
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclc_number' is of invalid type.",
+            ),
+            (
+                [12345.5],
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclc_number' is of invalid type.",
+            ),
+            (
+                "bt12345",
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclc_number' does not look like real OCLC #.",
             ),
         ],
     )
@@ -29,5 +39,16 @@ class TestUtils:
             verify_oclc_number(argm)
             assert msg == str(exp.value)
 
-    def test_verify_oclc_number_success(self):
-        verify_oclc_number("000012345")
+    @pytest.mark.parametrize(
+        "argm,expectation",
+        [
+            ("000012345", 12345),
+            (12345, 12345),
+            ("ocm00012345", 12345),
+            ("ocn00012345", 12345),
+            ("ocn12345", 12345),
+            (" on12345 \n", 12345),
+        ],
+    )
+    def test_verify_oclc_number_success(self, argm, expectation):
+        assert verify_oclc_number(argm) == expectation
