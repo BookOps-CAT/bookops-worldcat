@@ -61,10 +61,23 @@ class TestMockedMetadataSession:
                 == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs"
             )
 
-    def test_url_brief_bib_oclc_number(self, mock_token):
+    @pytest.mark.parametrize(
+        "argm, expectation",
+        [
+            (
+                "12345",
+                "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345",
+            ),
+            (
+                12345,
+                "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345",
+            ),
+        ],
+    )
+    def test_url_brief_bib_oclc_number(self, argm, expectation, mock_token):
         with MetadataSession(authorization=mock_token) as session:
             assert (
-                session._url_brief_bib_oclc_number(oclc_number="12345")
+                session._url_brief_bib_oclc_number(oclc_number=argm)
                 == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345"
             )
 
@@ -156,7 +169,26 @@ class TestMockedMetadataSession:
             with pytest.raises(requests.exceptions.ConnectionError):
                 session.get_brief_bib(12345)
 
+    def test_get_brief_bib_other_editions(
+        self, mock_token, mock_successful_session_get_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            assert session.get_brief_bib_other_editions(12345).status_code == 200
 
+    def test_get_brief_bib_other_editions_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(requests.exceptions.Timeout):
+                session.get_brief_bib_other_editions(12345)
+
+    def test_get_brief_bib_other_editions_connectionerror(
+        self, mock_token, mock_connectionerror
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(requests.exceptions.ConnectionError):
+                session.get_brief_bib_other_editions(12345)
+
+
+@pytest.mark.webtest
 class TestLiveMetadataSession:
     """Runs rudimentary tests against live Metadata API"""
 
@@ -185,6 +217,20 @@ class TestLiveMetadataSession:
 
         with MetadataSession(authorization=token) as session:
             response = session.get_brief_bib(41266045)
+
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == fields
+
+    def test_brief_bib_other_editions(self, live_keys):
+        fields = sorted(["briefRecords", "numberOfRecords"])
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.get_brief_bib_other_editions(41266045)
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields

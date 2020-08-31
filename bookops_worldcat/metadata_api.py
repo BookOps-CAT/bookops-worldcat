@@ -92,8 +92,8 @@ class MetadataSession(WorldcatSession):
         Retrieve specific brief bibliographic resource.
 
         Args:
-            oclc_number: int or str,    OCLC bibliographic record number;
-                                        do not include any prefixes, only digits
+            oclc_number: int or str,    OCLC bibliographic record number; can be an integer,
+                                        or string that can include OCLC # prefix
             hooks: dict,                Requests library hook system that can be
                                         used for singnal event handling, see more at:
                                         https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -101,13 +101,46 @@ class MetadataSession(WorldcatSession):
             response: requests.Response object
         """
 
-        oclc_number = verify_oclc_number(oclc_number)
+        # oclc_number = verify_oclc_number(oclc_number)
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclc_number)
 
         # send request
         try:
             response = self.get(url, headers=header, hooks=hooks)
+            return response
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
+
+    def get_brief_bib_other_editions(
+        self, oclc_number=None, offset=None, limit=None, hooks=None
+    ):
+        """
+        Retrieve other editions related to bibliographic resource with provided
+        OCLC #.
+
+        Args:
+            oclc_number: int or str,    OCLC bibliographic record number; can be an
+                                        integer, or string with or without OCLC # prefix
+            offset: int,                start position of the bib records to return
+                                        (1 based)
+            limit: int,                 maximum number of records to return; maximum 50
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            response: requests.Response object
+        """
+        oclc_number = verify_oclc_number(oclc_number)
+        url = self._url_brief_bib_other_editions(oclc_number)
+        header = {"Accept": "application/json"}
+        payload = {"offset": offset, "limit": limit}
+
+        # send request
+        try:
+            response = self.get(url, headers=header, params=payload, hooks=hooks)
             return response
         except requests.exceptions.Timeout:
             raise
