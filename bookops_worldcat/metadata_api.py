@@ -39,17 +39,17 @@ class MetadataSession(WorldcatSession):
         base_url = self._url_search_base()
         return f"{base_url}/brief-bibs"
 
-    def _url_brief_bib_oclc_number(self, oclc_number):
+    def _url_brief_bib_oclc_number(self, oclcNumber):
         base_url = self._url_search_base()
-        return f"{base_url}/brief-bibs/{oclc_number}"
+        return f"{base_url}/brief-bibs/{oclcNumber}"
 
-    def _url_brief_bib_other_editions(self, oclc_number):
+    def _url_brief_bib_other_editions(self, oclcNumber):
         base_url = self._url_search_base()
-        return f"{base_url}/brief-bibs/{oclc_number}/other-editions"
+        return f"{base_url}/brief-bibs/{oclcNumber}/other-editions"
 
-    def _url_lhr_control_number(self, control_number):
+    def _url_lhr_control_number(self, controlNumber):
         base_url = self._url_search_base()
-        return f"{base_url}/my-holdings/{control_number}"
+        return f"{base_url}/my-holdings/{controlNumber}"
 
     def _url_lhr_search(self):
         base_url = self._url_search_base()
@@ -59,9 +59,9 @@ class MetadataSession(WorldcatSession):
         base_url = self._url_search_base()
         return f"{base_url}/retained-holdings"
 
-    def _url_bib_oclc_number(self, oclc_number):
+    def _url_bib_oclc_number(self, oclcNumber):
         base_url = self._url_base()
-        return f"{base_url}/bib/data/{oclc_number}"
+        return f"{base_url}/bib/data/{oclcNumber}"
 
     def _url_bib_check_oclc_numbers(self):
         base_url = self._url_base()
@@ -87,12 +87,39 @@ class MetadataSession(WorldcatSession):
         base_url = self._url_base()
         return f"{base_url}/ih/institutionlist"
 
-    def get_brief_bib(self, oclc_number=None, hooks=None):
+    def search_shared_print_holdings(self, hooks=None, **params):
+        """
+        Finds member shared print holdings for specified item.
+
+        Args:
+            params: dict,               parameters/limiters as specified in
+                                        Metadata API documentation, see:
+                                            https://developer.api.oclc.org/wc-metadata-v1-1
+                                        example:
+                                        {
+                                            "oclcNumber": 12345,
+                                            "heldInState": "NY",
+                                            "limit": 50
+                                        }
+        """
+        url = self._url_member_shared_print_holdings()
+        header = {"Accept": "application/json"}
+
+        # send request
+        try:
+            response = self.get(url, headers=header, params=params, hooks=hooks)
+            return response
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
+
+    def get_brief_bib(self, oclcNumber=None, hooks=None):
         """
         Retrieve specific brief bibliographic resource.
 
         Args:
-            oclc_number: int or str,    OCLC bibliographic record number; can be
+            oclcNumber: int or str,    OCLC bibliographic record number; can be
                                         an integer, or string that can include
                                         OCLC # prefix
             hooks: dict,                Requests library hook system that can be
@@ -102,9 +129,9 @@ class MetadataSession(WorldcatSession):
             response: requests.Response object
         """
 
-        oclc_number = verify_oclc_number(oclc_number)
+        oclcNumber = verify_oclc_number(oclcNumber)
         header = {"Accept": "application/json"}
-        url = self._url_brief_bib_oclc_number(oclc_number)
+        url = self._url_brief_bib_oclc_number(oclcNumber)
 
         # send request
         try:
@@ -171,13 +198,13 @@ class MetadataSession(WorldcatSession):
         except requests.exceptions.ConnectionError:
             raise
 
-    def search_brief_bib_other_editions(self, oclc_number=None, hooks=None, **params):
+    def search_brief_bib_other_editions(self, oclcNumber=None, hooks=None, **params):
         """
         Retrieve other editions related to bibliographic resource with provided
         OCLC #.
 
         Args:
-            oclc_number: int or str,    OCLC bibliographic record number; can be an
+            oclcNumber: int or str,    OCLC bibliographic record number; can be an
                                         integer, or string with or without OCLC # prefix
             hooks: dict,                Requests library hook system that can be
                                         used for singnal event handling, see more at:
@@ -193,8 +220,8 @@ class MetadataSession(WorldcatSession):
         Returns:
             response: requests.Response object
         """
-        oclc_number = verify_oclc_number(oclc_number)
-        url = self._url_brief_bib_other_editions(oclc_number)
+        oclcNumber = verify_oclc_number(oclcNumber)
+        url = self._url_brief_bib_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
 
         # send request

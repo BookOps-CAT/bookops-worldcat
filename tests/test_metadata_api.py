@@ -77,21 +77,21 @@ class TestMockedMetadataSession:
     def test_url_brief_bib_oclc_number(self, argm, expectation, mock_token):
         with MetadataSession(authorization=mock_token) as session:
             assert (
-                session._url_brief_bib_oclc_number(oclc_number=argm)
+                session._url_brief_bib_oclc_number(oclcNumber=argm)
                 == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345"
             )
 
     def test_url_brief_bib_other_editions(self, mock_token):
         with MetadataSession(authorization=mock_token) as session:
             assert (
-                session._url_brief_bib_other_editions(oclc_number="12345")
+                session._url_brief_bib_other_editions(oclcNumber="12345")
                 == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345/other-editions"
             )
 
     def test_url_lhr_control_number(self, mock_token):
         with MetadataSession(authorization=mock_token) as session:
             assert (
-                session._url_lhr_control_number(control_number="12345")
+                session._url_lhr_control_number(controlNumber="12345")
                 == "https://americas.metadata.api.oclc.org/worldcat/search/v1/my-holdings/12345"
             )
 
@@ -112,7 +112,7 @@ class TestMockedMetadataSession:
     def test_url_bib_oclc_number(self, mock_token):
         with MetadataSession(authorization=mock_token) as session:
             assert (
-                session._url_bib_oclc_number(oclc_number="12345")
+                session._url_bib_oclc_number(oclcNumber="12345")
                 == "https://worldcat.org/bib/data/12345"
             )
 
@@ -200,6 +200,27 @@ class TestMockedMetadataSession:
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(requests.exceptions.ConnectionError):
                 session.search_brief_bibs(12345)
+
+    def test_search_shared_print_holdings(
+        self, mock_token, mock_successful_session_get_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            assert (
+                session.search_shared_print_holdings(oclcNumber=12345).status_code
+                == 200
+            )
+
+    def test_search_shared_print_holdings_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(requests.exceptions.Timeout):
+                session.search_shared_print_holdings("12345")
+
+    def test_search_shared_print_holdings_connectionerror(
+        self, mock_token, mock_connectionerror
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(requests.exceptions.ConnectionError):
+                session.search_shared_print_holdings(12345)
 
 
 @pytest.mark.webtest
