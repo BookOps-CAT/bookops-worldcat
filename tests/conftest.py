@@ -9,6 +9,7 @@ import requests
 
 
 from bookops_worldcat import WorldcatAccessToken
+from bookops_worldcat.errors import TokenRequestError
 
 
 class MockAuthServerResponseSuccess:
@@ -45,6 +46,11 @@ class MockAuthServerResponseFailure:
             "code": 403,
             "message": "Invalid scope(s): invalid (invalid) [Invalid service specified, Not on key]",
         }
+
+
+class MockUnexpectedException:
+    def __init__(self, *args, **kwargs):
+        raise Exception
 
 
 class MockTimeout:
@@ -90,6 +96,13 @@ def mock_failed_post_token_response(monkeypatch):
         return MockAuthServerResponseFailure()
 
     monkeypatch.setattr(requests, "post", mock_oauth_server_response)
+
+
+@pytest.fixture
+def mock_unexpected_error(monkeypatch):
+    monkeypatch.setattr("requests.post", MockUnexpectedException)
+    monkeypatch.setattr("requests.get", MockUnexpectedException)
+    monkeypatch.setattr("requests.Session.get", MockUnexpectedException)
 
 
 @pytest.fixture

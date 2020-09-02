@@ -136,9 +136,9 @@ class TestWorldcatAccessToken:
             "scope": "scope1",
         }
 
-    def test_post_token_request_timeout(self, mock_credentials, mock_timeout):
+    def test_post_token_request_timout(self, mock_credentials, mock_timeout):
         creds = mock_credentials
-        with pytest.raises(requests.exceptions.Timeout):
+        with pytest.raises(TokenRequestError):
             WorldcatAccessToken(
                 key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
             )
@@ -147,7 +147,16 @@ class TestWorldcatAccessToken:
         self, mock_credentials, mock_connectionerror
     ):
         creds = mock_credentials
-        with pytest.raises(requests.exceptions.ConnectionError):
+        with pytest.raises(TokenRequestError):
+            WorldcatAccessToken(
+                key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
+            )
+
+    def test_post_token_request_unexpectederror(
+        self, mock_credentials, mock_unexpected_error
+    ):
+        creds = mock_credentials
+        with pytest.raises(TokenRequestError):
             WorldcatAccessToken(
                 key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
             )
@@ -203,6 +212,7 @@ class TestWorldcatAccessToken:
         assert token.server_response.json() == mock_oauth_server_response.json()
         assert token.timeout == (3, 3)
 
+    @pytest.mark.webtest
     def test_post_token_request_with_live_service(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),

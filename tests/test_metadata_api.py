@@ -6,6 +6,7 @@ import pytest
 import requests
 
 from bookops_worldcat import MetadataSession, WorldcatAccessToken
+from bookops_worldcat.errors import BookopsWorldcatError
 
 
 class TestMockedMetadataSession:
@@ -161,12 +162,17 @@ class TestMockedMetadataSession:
 
     def test_get_brief_bib_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(requests.exceptions.Timeout):
+            with pytest.raises(BookopsWorldcatError):
                 session.get_brief_bib(12345)
 
     def test_get_brief_bib_connectionerror(self, mock_token, mock_connectionerror):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(requests.exceptions.ConnectionError):
+            with pytest.raises(BookopsWorldcatError):
+                session.get_brief_bib(12345)
+
+    def test_get_brief_bib_unexpected_error(self, mock_token, mock_unexpected_error):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(BookopsWorldcatError):
                 session.get_brief_bib(12345)
 
     def test_search_brief_bib_other_editions(
@@ -177,14 +183,21 @@ class TestMockedMetadataSession:
 
     def test_search_brief_bib_other_editions_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(requests.exceptions.Timeout):
+            with pytest.raises(BookopsWorldcatError):
                 session.search_brief_bib_other_editions(12345)
 
     def test_search_brief_bib_other_editions_connectionerror(
         self, mock_token, mock_connectionerror
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(requests.exceptions.ConnectionError):
+            with pytest.raises(BookopsWorldcatError):
+                session.search_brief_bib_other_editions(12345)
+
+    def test_search_brief_bib_other_editions_unexpected_error(
+        self, mock_token, mock_unexpected_error
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(BookopsWorldcatError):
                 session.search_brief_bib_other_editions(12345)
 
     def test_seach_brief_bibs(self, mock_token, mock_successful_session_get_request):
@@ -193,12 +206,19 @@ class TestMockedMetadataSession:
 
     def test_search_brief_bibs_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(requests.exceptions.Timeout):
+            with pytest.raises(BookopsWorldcatError):
                 session.search_brief_bibs("12345")
 
     def test_search_brief_bibs_connectionerror(self, mock_token, mock_connectionerror):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(requests.exceptions.ConnectionError):
+            with pytest.raises(BookopsWorldcatError):
+                session.search_brief_bibs(12345)
+
+    def test_search_brief_bibs_unexpected_error(
+        self, mock_token, mock_unexpected_error
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(BookopsWorldcatError):
                 session.search_brief_bibs(12345)
 
     def test_search_shared_print_holdings(
@@ -212,15 +232,22 @@ class TestMockedMetadataSession:
 
     def test_search_shared_print_holdings_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(requests.exceptions.Timeout):
+            with pytest.raises(BookopsWorldcatError):
                 session.search_shared_print_holdings("12345")
 
     def test_search_shared_print_holdings_connectionerror(
         self, mock_token, mock_connectionerror
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(requests.exceptions.ConnectionError):
+            with pytest.raises(BookopsWorldcatError):
                 session.search_shared_print_holdings(12345)
+
+    def test_search_shared_print_holdings_unexpectederror(
+        self, mock_token, mock_unexpected_error
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(BookopsWorldcatError):
+                session.search_shared_print_holdings("12345")
 
 
 @pytest.mark.webtest

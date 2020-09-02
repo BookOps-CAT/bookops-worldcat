@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 import requests
 
 from ._session import WorldcatSession
+from .errors import BookopsWorldcatError
 from .utils import verify_oclc_number
 
 
@@ -109,10 +112,10 @@ class MetadataSession(WorldcatSession):
         try:
             response = self.get(url, headers=header, params=params, hooks=hooks)
             return response
-        except requests.exceptions.Timeout:
-            raise
-        except requests.exceptions.ConnectionError:
-            raise
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+        except:
+            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def get_brief_bib(self, oclcNumber=None, hooks=None):
         """
@@ -137,16 +140,13 @@ class MetadataSession(WorldcatSession):
         try:
             response = self.get(url, headers=header, hooks=hooks)
             return response
-        except requests.exceptions.Timeout:
-            raise
-        except requests.exceptions.ConnectionError:
-            raise
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+        except:
+            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_brief_bibs(
-        self,
-        q,
-        hooks=None,
-        **params,
+        self, q, hooks=None, **params,
     ):
         """
         Send a GET request for brief bibliographic resources.
@@ -193,10 +193,10 @@ class MetadataSession(WorldcatSession):
         try:
             response = self.get(url, headers=header, params=payload, hooks=hooks)
             return response
-        except requests.exceptions.Timeout:
-            raise
-        except requests.exceptions.ConnectionError:
-            raise
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+        except:
+            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_brief_bib_other_editions(self, oclcNumber=None, hooks=None, **params):
         """
@@ -228,7 +228,7 @@ class MetadataSession(WorldcatSession):
         try:
             response = self.get(url, headers=header, params=params, hooks=hooks)
             return response
-        except requests.exceptions.Timeout:
-            raise
-        except requests.exceptions.ConnectionError:
-            raise
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+        except:
+            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")

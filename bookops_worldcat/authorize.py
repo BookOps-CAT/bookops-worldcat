@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+import sys
 
 import requests
 
@@ -159,10 +160,10 @@ class WorldcatAccessToken:
                 timeout=self.timeout,
             )
             return response
-        except requests.exceptions.Timeout:
-            raise
-        except requests.exceptions.ConnectionError:
-            raise
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise TokenRequestError(f"Trouble connecing: {sys.exc_info()[0]}")
+        except Exception:
+            raise TokenRequestError(f"Unexpected error: {sys.exc_info()[0]}")
 
     def request_token(self):
         """
