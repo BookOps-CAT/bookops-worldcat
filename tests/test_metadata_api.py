@@ -6,7 +6,7 @@ import pytest
 import requests
 
 from bookops_worldcat import MetadataSession, WorldcatAccessToken
-from bookops_worldcat.errors import BookopsWorldcatError
+from bookops_worldcat.errors import BookopsWorldcatError, InvalidOclcNumber
 
 
 class TestMockedMetadataSession:
@@ -160,6 +160,11 @@ class TestMockedMetadataSession:
         with MetadataSession(authorization=mock_token) as session:
             assert session.get_brief_bib(12345).status_code == 200
 
+    def test_get_brief_bib_no_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(InvalidOclcNumber):
+                session.get_brief_bib()
+
     def test_get_brief_bib_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(BookopsWorldcatError):
@@ -204,6 +209,13 @@ class TestMockedMetadataSession:
         with MetadataSession(authorization=mock_token) as session:
             assert session.search_brief_bibs(q="ti:Zendegi").status_code == 200
 
+    @pytest.mark.parametrize("argm", [(None), ("")])
+    def test_search_brief_bibs_missing_query(self, mock_token, argm):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(ValueError) as exc:
+                session.search_brief_bibs(argm)
+                assert "Argument 'q' is requried to construct query." in str(exc.value)
+
     def test_search_brief_bibs_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(BookopsWorldcatError):
@@ -230,24 +242,63 @@ class TestMockedMetadataSession:
                 == 200
             )
 
+    def test_search_shared_print_holdings_missing_arguments(self, mock_token):
+        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(ValueError) as exc:
+                session.search_shared_print_holdings(heldInState="NY", limit=20)
+                assert msg in str(exc.value)
+
     def test_search_shared_print_holdings_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(BookopsWorldcatError):
-                session.search_shared_print_holdings("12345")
+                session.search_shared_print_holdings(oclcNumber="12345")
 
     def test_search_shared_print_holdings_connectionerror(
         self, mock_token, mock_connectionerror
     ):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(BookopsWorldcatError):
-                session.search_shared_print_holdings(12345)
+                session.search_shared_print_holdings(oclcNumber=12345)
 
     def test_search_shared_print_holdings_unexpectederror(
         self, mock_token, mock_unexpected_error
     ):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(BookopsWorldcatError):
-                session.search_shared_print_holdings("12345")
+                session.search_shared_print_holdings(oclcNumber="12345")
+
+    def test_search_general_holdings(
+        self, mock_token, mock_successful_session_get_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            assert session.search_general_holdings(oclcNumber=12345).status_code == 200
+
+    def test_search_general_holdings_missing_arguments(self, mock_token):
+        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(ValueError) as exc:
+                session.search_general_holdings(heldBy="NY", limit=20)
+                assert msg in str(exc.value)
+
+    def test_search_general_holdings_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(BookopsWorldcatError):
+                session.search_general_holdings(oclcNumber="12345")
+
+    def test_search_general_holdings_connectionerror(
+        self, mock_token, mock_connectionerror
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(BookopsWorldcatError):
+                session.search_general_holdings(oclcNumber=12345)
+
+    def test_search_general_holdings_unexpectederror(
+        self, mock_token, mock_unexpected_error
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(BookopsWorldcatError):
+                session.search_general_holdings(oclcNumber="12345")
 
 
 @pytest.mark.webtest
@@ -322,3 +373,17 @@ class TestLiveMetadataSession:
                 response.request.url
                 == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&itemType=book&itemSubType=printbook&catalogSource=dlc&orderedBy=mostWidelyHeld&limit=5"
             )
+
+    def test_search_general_holdings(self, live_keys):
+        fields = sorted(["briefRecords", "numberOfRecords"])
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.search_general_holdings(isbn="9781597801744")
+
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == fields

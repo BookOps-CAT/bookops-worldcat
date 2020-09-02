@@ -90,12 +90,20 @@ class MetadataSession(WorldcatSession):
         base_url = self._url_base()
         return f"{base_url}/ih/institutionlist"
 
-    def search_shared_print_holdings(self, hooks=None, **params):
+    def search_shared_print_holdings(
+        self, oclcNumber=None, isbn=None, issn=None, hooks=None, **params
+    ):
         """
         Finds member shared print holdings for specified item.
 
         Args:
-            params: dict,               parameters/limiters as specified in
+            oclcNumber: int or str,     OCLC bibliographic record number; can be
+                                        an integer, or string that can include
+                                        OCLC # prefix
+            isbn: str,                  ISBN without any dashes,
+                                        example: '978149191646x'
+            issn: str,                  ISSN (hyphenated, example: '0099-1234')
+            params: dict,               other parameters/limiters as specified in
                                         Metadata API documentation, see:
                                             https://developer.api.oclc.org/wc-metadata-v1-1
                                         example:
@@ -105,12 +113,67 @@ class MetadataSession(WorldcatSession):
                                             "limit": 50
                                         }
         """
+        if not any([oclcNumber, isbn, issn]):
+            raise ValueError(
+                "Missing required argument. "
+                "One of the following args are required: oclcNumber, issn, isbn"
+            )
+        if oclcNumber is not None:
+            oclcNumber = verify_oclc_number(oclcNumber)
+
         url = self._url_member_shared_print_holdings()
         header = {"Accept": "application/json"}
+        payload = dict(oclcNumber=oclcNumber, isbn=isbn, issn=issn)
+        payload.update(**params)
 
         # send request
         try:
-            response = self.get(url, headers=header, params=params, hooks=hooks)
+            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            return response
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+        except:
+            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
+
+    def search_general_holdings(
+        self, oclcNumber=None, isbn=None, issn=None, hooks=None, **params
+    ):
+        """
+        Finds member shared print holdings for specified item.
+
+        Args:
+            oclcNumber: int or str,     OCLC bibliographic record number; can be
+                                        an integer, or string that can include
+                                        OCLC # prefix
+            isbn: str,                  ISBN without any dashes,
+                                        example: '978149191646x'
+            issn: str,                  ISSN (hyphenated, example: '0099-1234')
+            params: dict,               other parameters/limiters as specified in
+                                        Metadata API documentation, see:
+                                            https://developer.api.oclc.org/wc-metadata-v1-1
+                                        example:
+                                        {
+                                            "oclcNumber": 12345,
+                                            "heldInState": "NY",
+                                            "limit": 50
+                                        }
+        """
+        if not any([oclcNumber, isbn, issn]):
+            raise ValueError(
+                "Missing required argument. "
+                "One of the following args are required: oclcNumber, issn, isbn"
+            )
+        if oclcNumber:
+            oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_member_general_holdings()
+        header = {"Accept": "application/json"}
+        payload = dict(oclcNumber=oclcNumber, isbn=isbn, issn=issn)
+        payload.update(**params)
+
+        # send request
+        try:
+            response = self.get(url, headers=header, params=payload, hooks=hooks)
             return response
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
@@ -184,6 +247,9 @@ class MetadataSession(WorldcatSession):
                 response: requests.Response object
 
         """
+        if not q:
+            raise ValueError("Argument 'q' is requried to construct query.")
+
         url = self._url_brief_bib_search()
         header = {"Accept": "application/json"}
         payload = dict(q=q)
