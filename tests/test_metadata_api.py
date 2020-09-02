@@ -169,23 +169,37 @@ class TestMockedMetadataSession:
             with pytest.raises(requests.exceptions.ConnectionError):
                 session.get_brief_bib(12345)
 
-    def test_get_brief_bib_other_editions(
+    def test_search_brief_bib_other_editions(
         self, mock_token, mock_successful_session_get_request
     ):
         with MetadataSession(authorization=mock_token) as session:
-            assert session.get_brief_bib_other_editions(12345).status_code == 200
+            assert session.search_brief_bib_other_editions(12345).status_code == 200
 
-    def test_get_brief_bib_other_editions_timout(self, mock_token, mock_timeout):
+    def test_search_brief_bib_other_editions_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(requests.exceptions.Timeout):
-                session.get_brief_bib_other_editions(12345)
+                session.search_brief_bib_other_editions(12345)
 
-    def test_get_brief_bib_other_editions_connectionerror(
+    def test_search_brief_bib_other_editions_connectionerror(
         self, mock_token, mock_connectionerror
     ):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(requests.exceptions.ConnectionError):
-                session.get_brief_bib_other_editions(12345)
+                session.search_brief_bib_other_editions(12345)
+
+    def test_seach_brief_bibs(self, mock_token, mock_successful_session_get_request):
+        with MetadataSession(authorization=mock_token) as session:
+            assert session.search_brief_bibs(q="ti:Zendegi").status_code == 200
+
+    def test_search_brief_bibs_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(requests.exceptions.Timeout):
+                session.search_brief_bibs("12345")
+
+    def test_search_brief_bibs_connectionerror(self, mock_token, mock_connectionerror):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(requests.exceptions.ConnectionError):
+                session.search_brief_bibs(12345)
 
 
 @pytest.mark.webtest
@@ -230,7 +244,33 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.get_brief_bib_other_editions(41266045)
+            response = session.search_brief_bib_other_editions(41266045)
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
+
+    def test_search_brief_bibs(self, live_keys):
+        fields = sorted(["briefRecords", "numberOfRecords"])
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.search_brief_bibs(
+                "ti:zendegi AND au:egan",
+                inLanguage="eng",
+                inCatalogLanguage="eng",
+                itemType="book",
+                itemSubType="printbook",
+                catalogSource="dlc",
+                orderedBy="mostWidelyHeld",
+                limit=5,
+            )
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == fields
+            assert (
+                response.request.url
+                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&itemType=book&itemSubType=printbook&catalogSource=dlc&orderedBy=mostWidelyHeld&limit=5"
+            )

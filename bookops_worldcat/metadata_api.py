@@ -92,8 +92,9 @@ class MetadataSession(WorldcatSession):
         Retrieve specific brief bibliographic resource.
 
         Args:
-            oclc_number: int or str,    OCLC bibliographic record number; can be an integer,
-                                        or string that can include OCLC # prefix
+            oclc_number: int or str,    OCLC bibliographic record number; can be
+                                        an integer, or string that can include
+                                        OCLC # prefix
             hooks: dict,                Requests library hook system that can be
                                         used for singnal event handling, see more at:
                                         https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -101,7 +102,7 @@ class MetadataSession(WorldcatSession):
             response: requests.Response object
         """
 
-        # oclc_number = verify_oclc_number(oclc_number)
+        oclc_number = verify_oclc_number(oclc_number)
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclc_number)
 
@@ -114,9 +115,63 @@ class MetadataSession(WorldcatSession):
         except requests.exceptions.ConnectionError:
             raise
 
-    def get_brief_bib_other_editions(
-        self, oclc_number=None, offset=None, limit=None, hooks=None
+    def search_brief_bibs(
+        self,
+        q,
+        hooks=None,
+        **params,
     ):
+        """
+        Send a GET request for brief bibliographic resources.
+
+        Args:
+            q: str,                     query in the form of a keyword search or
+                                        fielded search;
+                                        examples:
+                                            ti:Zendegi
+                                            ti:"Czarne oceany"
+                                            bn:9781680502404
+                                            kw:python databases
+                                            ti:Zendegi AND au:greg egan
+                                            (au:Okken OR au:Myers) AND su:python
+
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            params: dict,               other parameters/limiters as specified in
+                                        Metadata API documentation, see:
+                                            https://developer.api.oclc.org/wc-metadata-v1-1
+                                        example:
+                                        {
+                                            "datePublished": "2010-2012",
+                                            "itemType": "book",
+                                            "itemSubType": "digital",
+                                            "orderedBy": "mostWidelyHeld",
+                                            "catalogSource": "DLC",
+                                            "inLanguage": "eng",
+                                            "inCatalogLanguage": "eng",
+                                            "limit": 50
+                                        }
+
+            Returns:
+                response: requests.Response object
+
+        """
+        url = self._url_brief_bib_search()
+        header = {"Accept": "application/json"}
+        payload = dict(q=q)
+        payload.update(**params)
+
+        # send request
+        try:
+            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            return response
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
+
+    def search_brief_bib_other_editions(self, oclc_number=None, hooks=None, **params):
         """
         Retrieve other editions related to bibliographic resource with provided
         OCLC #.
@@ -124,23 +179,27 @@ class MetadataSession(WorldcatSession):
         Args:
             oclc_number: int or str,    OCLC bibliographic record number; can be an
                                         integer, or string with or without OCLC # prefix
-            offset: int,                start position of the bib records to return
-                                        (1 based)
-            limit: int,                 maximum number of records to return; maximum 50
             hooks: dict,                Requests library hook system that can be
                                         used for singnal event handling, see more at:
                                         https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            params: dict,               other parameters specified by Metadata API
+                                        documentation, see:
+                                            https://developer.api.oclc.org/wc-metadata-v1-1
+                                        example:
+                                            {
+                                                "offset": 51,
+                                                "limit": 50
+                                            }
         Returns:
             response: requests.Response object
         """
         oclc_number = verify_oclc_number(oclc_number)
         url = self._url_brief_bib_other_editions(oclc_number)
         header = {"Accept": "application/json"}
-        payload = {"offset": offset, "limit": limit}
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(url, headers=header, params=params, hooks=hooks)
             return response
         except requests.exceptions.Timeout:
             raise
