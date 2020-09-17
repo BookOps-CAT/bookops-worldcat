@@ -47,6 +47,7 @@ def parse_error_response(response):
     Parses and formats error responses from OCLC web service
 
     Args:
-        response:
+        response: requests.Response obj
     """
-    pass
+    msg = response.json()
+    return f"Web service returned {response.status_code} error: {msg}; {response.url}"

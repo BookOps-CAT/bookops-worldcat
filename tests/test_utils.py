@@ -6,6 +6,21 @@ from bookops_worldcat.utils import *
 from bookops_worldcat.errors import InvalidOclcNumber
 
 
+class MockServiceErrorResponse:
+    """Simulates error response from the web service"""
+
+    def __init__(self):
+        self.status_code = 400
+        self.url = "https://test.org/some_endpoint"
+
+    def json(self):
+        return {
+            "type": "MISSING_QUERY_PARAMETER",
+            "title": "Validation Failure",
+            "detail": "details here",
+        }
+
+
 class TestUtils:
     """Tests various methods in utils module"""
 
@@ -57,3 +72,10 @@ class TestUtils:
     )
     def test_verify_oclc_number_success(self, argm, expectation):
         assert verify_oclc_number(argm) == expectation
+
+    def test_parse_error_response(self):
+        response = MockServiceErrorResponse()
+        assert (
+            parse_error_response(response)
+            == "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        )
