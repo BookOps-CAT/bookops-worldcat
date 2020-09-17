@@ -9,7 +9,7 @@ import requests
 
 from bookops_worldcat.authorize import WorldcatAccessToken
 from bookops_worldcat import __version__, __title__
-from bookops_worldcat.errors import TokenRequestError
+from bookops_worldcat.errors import WorldcatAuthorizationError
 
 
 class TestWorldcatAccessToken:
@@ -18,9 +18,21 @@ class TestWorldcatAccessToken:
     @pytest.mark.parametrize(
         "argm,expectation, msg",
         [
-            (None, pytest.raises(ValueError), "Argument 'key' is required."),
-            ("", pytest.raises(ValueError), "Argument 'key' is required."),
-            (124, pytest.raises(TypeError), "Argument 'key' must be a string."),
+            (
+                None,
+                pytest.raises(WorldcatAuthorizationError),
+                "Argument 'key' is required.",
+            ),
+            (
+                "",
+                pytest.raises(WorldcatAuthorizationError),
+                "Argument 'key' is required.",
+            ),
+            (
+                124,
+                pytest.raises(WorldcatAuthorizationError),
+                "Argument 'key' must be a string.",
+            ),
         ],
     )
     def test_key_exceptions(
@@ -33,9 +45,21 @@ class TestWorldcatAccessToken:
     @pytest.mark.parametrize(
         "argm,expectation,msg",
         [
-            (None, pytest.raises(ValueError), "Argument 'secret' is required."),
-            ("", pytest.raises(ValueError), "Argument 'secret' is required."),
-            (123, pytest.raises(TypeError), "Argument 'secret' must be a string."),
+            (
+                None,
+                pytest.raises(WorldcatAuthorizationError),
+                "Argument 'secret' is required.",
+            ),
+            (
+                "",
+                pytest.raises(WorldcatAuthorizationError),
+                "Argument 'secret' is required.",
+            ),
+            (
+                123,
+                pytest.raises(WorldcatAuthorizationError),
+                "Argument 'secret' must be a string.",
+            ),
         ],
     )
     def test_secret_exceptions(
@@ -46,7 +70,7 @@ class TestWorldcatAccessToken:
             assert msg in str(exp.value)
 
     def test_agent_exceptions(self, mock_successful_post_token_response):
-        with pytest.raises(TypeError) as exp:
+        with pytest.raises(WorldcatAuthorizationError) as exp:
             WorldcatAccessToken(
                 key="my_key", secret="my_secret", scopes="scope1", agent=124
             )
@@ -61,16 +85,24 @@ class TestWorldcatAccessToken:
         [
             (
                 None,
-                pytest.raises(TypeError),
+                pytest.raises(WorldcatAuthorizationError),
                 "Argument 'scope' must a string or a list.",
             ),
             (
                 123,
-                pytest.raises(TypeError),
+                pytest.raises(WorldcatAuthorizationError),
                 "Argument 'scope' must a string or a list.",
             ),
-            (" ", pytest.raises(ValueError), "Argument 'scope' is missing."),
-            (["", ""], pytest.raises(ValueError), "Argument 'scope' is missing."),
+            (
+                " ",
+                pytest.raises(WorldcatAuthorizationError),
+                "Argument 'scope' is missing.",
+            ),
+            (
+                ["", ""],
+                pytest.raises(WorldcatAuthorizationError),
+                "Argument 'scope' is missing.",
+            ),
         ],
     )
     def test_scope_exceptions(
@@ -138,7 +170,7 @@ class TestWorldcatAccessToken:
 
     def test_post_token_request_timout(self, mock_credentials, mock_timeout):
         creds = mock_credentials
-        with pytest.raises(TokenRequestError):
+        with pytest.raises(WorldcatAuthorizationError):
             WorldcatAccessToken(
                 key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
             )
@@ -147,7 +179,7 @@ class TestWorldcatAccessToken:
         self, mock_credentials, mock_connectionerror
     ):
         creds = mock_credentials
-        with pytest.raises(TokenRequestError):
+        with pytest.raises(WorldcatAuthorizationError):
             WorldcatAccessToken(
                 key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
             )
@@ -156,7 +188,7 @@ class TestWorldcatAccessToken:
         self, mock_credentials, mock_unexpected_error
     ):
         creds = mock_credentials
-        with pytest.raises(TokenRequestError):
+        with pytest.raises(WorldcatAuthorizationError):
             WorldcatAccessToken(
                 key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
             )
@@ -165,7 +197,7 @@ class TestWorldcatAccessToken:
         self, mock_credentials, mock_failed_post_token_response
     ):
         creds = mock_credentials
-        with pytest.raises(TokenRequestError):
+        with pytest.raises(WorldcatAuthorizationError):
             WorldcatAccessToken(
                 key=creds["key"], secret=creds["secret"], scopes=creds["scopes"]
             )

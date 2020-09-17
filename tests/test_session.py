@@ -5,6 +5,7 @@ import pytest
 
 from bookops_worldcat._session import WorldcatSession
 from bookops_worldcat.__version__ import __title__, __version__
+from bookops_worldcat.errors import WorldcatSessionError
 
 
 class TestWorldcatSession:
@@ -19,9 +20,9 @@ class TestWorldcatSession:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            (123, pytest.raises(TypeError)),
-            ({}, pytest.raises(TypeError)),
-            ((), pytest.raises(TypeError)),
+            (123, pytest.raises(WorldcatSessionError)),
+            ({}, pytest.raises(WorldcatSessionError)),
+            ((), pytest.raises(WorldcatSessionError)),
         ],
     )
     def test_invalid_user_agent_arguments(self, argm, expectation):

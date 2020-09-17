@@ -3,6 +3,7 @@
 import requests
 
 from . import __title__, __version__
+from bookops_worldcat.errors import WorldcatSessionError
 
 
 class WorldcatSession(requests.Session):
@@ -16,7 +17,7 @@ class WorldcatSession(requests.Session):
         elif type(agent) is str:
             self.headers.update({"User-Agent": agent})
         else:
-            raise TypeError("Argument 'agent' must be a str")
+            raise WorldcatSessionError("Argument 'agent' must be a str")
 
         self.timeout = timeout
         if not self.timeout:

@@ -6,7 +6,7 @@ import pytest
 import requests
 
 from bookops_worldcat import MetadataSession, WorldcatAccessToken
-from bookops_worldcat.errors import BookopsWorldcatError, InvalidOclcNumber
+from bookops_worldcat.errors import WorldcatSessionError, InvalidOclcNumber
 
 
 class TestMockedMetadataSession:
@@ -23,7 +23,7 @@ class TestMockedMetadataSession:
             )
 
     def test_invalid_credentials(self):
-        with pytest.raises(TypeError) as exc:
+        with pytest.raises(WorldcatSessionError) as exc:
             MetadataSession()
             assert (
                 "Argument 'authorization' must include 'WorldcatAccessToken' obj."
@@ -162,22 +162,22 @@ class TestMockedMetadataSession:
 
     def test_get_brief_bib_no_oclcNumber_passed(self, mock_token):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(InvalidOclcNumber):
+            with pytest.raises(WorldcatSessionError):
                 session.get_brief_bib()
 
     def test_get_brief_bib_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.get_brief_bib(12345)
 
     def test_get_brief_bib_connectionerror(self, mock_token, mock_connectionerror):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.get_brief_bib(12345)
 
     def test_get_brief_bib_unexpected_error(self, mock_token, mock_unexpected_error):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.get_brief_bib(12345)
 
     def test_search_brief_bib_other_editions(
@@ -188,22 +188,29 @@ class TestMockedMetadataSession:
 
     def test_search_brief_bib_other_editions_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_brief_bib_other_editions(12345)
 
     def test_search_brief_bib_other_editions_connectionerror(
         self, mock_token, mock_connectionerror
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_brief_bib_other_editions(12345)
 
     def test_search_brief_bib_other_editions_unexpected_error(
         self, mock_token, mock_unexpected_error
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_brief_bib_other_editions(12345)
+
+    def test_search_brief_bibs_other_editions_invalid_oclc_number(self, mock_token):
+        msg = "Invalid OCLC # was passed as an argument"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.search_brief_bib_other_editions("odn12345")
+                assert msg in str(exc.value)
 
     def test_seach_brief_bibs(self, mock_token, mock_successful_session_get_request):
         with MetadataSession(authorization=mock_token) as session:
@@ -212,25 +219,25 @@ class TestMockedMetadataSession:
     @pytest.mark.parametrize("argm", [(None), ("")])
     def test_search_brief_bibs_missing_query(self, mock_token, argm):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(ValueError) as exc:
+            with pytest.raises(WorldcatSessionError) as exc:
                 session.search_brief_bibs(argm)
                 assert "Argument 'q' is requried to construct query." in str(exc.value)
 
     def test_search_brief_bibs_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_brief_bibs("12345")
 
     def test_search_brief_bibs_connectionerror(self, mock_token, mock_connectionerror):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_brief_bibs(12345)
 
     def test_search_brief_bibs_unexpected_error(
         self, mock_token, mock_unexpected_error
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_brief_bibs(12345)
 
     def test_search_shared_print_holdings(
@@ -245,27 +252,36 @@ class TestMockedMetadataSession:
     def test_search_shared_print_holdings_missing_arguments(self, mock_token):
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(ValueError) as exc:
+            with pytest.raises(WorldcatSessionError) as exc:
                 session.search_shared_print_holdings(heldInState="NY", limit=20)
+                assert msg in str(exc.value)
+
+    def test_search_shared_print_holdings_with_invalid_oclc_number_passsed(
+        self, mock_token
+    ):
+        msg = "Invalid OCLC # was passed as an argument"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.search_shared_print_holdings(oclcNumber="odn12345")
                 assert msg in str(exc.value)
 
     def test_search_shared_print_holdings_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_shared_print_holdings(oclcNumber="12345")
 
     def test_search_shared_print_holdings_connectionerror(
         self, mock_token, mock_connectionerror
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_shared_print_holdings(oclcNumber=12345)
 
     def test_search_shared_print_holdings_unexpectederror(
         self, mock_token, mock_unexpected_error
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_shared_print_holdings(oclcNumber="12345")
 
     def test_search_general_holdings(
@@ -277,27 +293,34 @@ class TestMockedMetadataSession:
     def test_search_general_holdings_missing_arguments(self, mock_token):
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(ValueError) as exc:
+            with pytest.raises(WorldcatSessionError) as exc:
                 session.search_general_holdings(heldBy="NY", limit=20)
+                assert msg in str(exc.value)
+
+    def test_search_general_holdings_invalid_oclc_number(self, mock_token):
+        msg = "Invalid OCLC # was passed as an argument"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.search_general_holdings(oclcNumber="odn12345")
                 assert msg in str(exc.value)
 
     def test_search_general_holdings_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_general_holdings(oclcNumber="12345")
 
     def test_search_general_holdings_connectionerror(
         self, mock_token, mock_connectionerror
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_general_holdings(oclcNumber=12345)
 
     def test_search_general_holdings_unexpectederror(
         self, mock_token, mock_unexpected_error
     ):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(BookopsWorldcatError):
+            with pytest.raises(WorldcatSessionError):
                 session.search_general_holdings(oclcNumber="12345")
 
 

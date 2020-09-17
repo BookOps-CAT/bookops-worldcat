@@ -23,12 +23,17 @@ class TestUtils:
                 "Argument 'oclc_number' is of invalid type.",
             ),
             (
-                [12345.5],
+                12345.5,
                 pytest.raises(InvalidOclcNumber),
                 "Argument 'oclc_number' is of invalid type.",
             ),
             (
                 "bt12345",
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclc_number' does not look like real OCLC #.",
+            ),
+            (
+                "odn12345",
                 pytest.raises(InvalidOclcNumber),
                 "Argument 'oclc_number' does not look like real OCLC #.",
             ),

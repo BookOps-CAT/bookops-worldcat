@@ -13,9 +13,17 @@ class BookopsWorldcatError(Exception):
     pass
 
 
-class TokenRequestError(BookopsWorldcatError):
+class WorldcatAuthorizationError(BookopsWorldcatError):
     """
     Exception raised when WorldCat access token is not obtained
+    """
+
+    pass
+
+
+class WorldcatSessionError(BookopsWorldcatError):
+    """
+    Exception raised during WorlCat session
     """
 
     pass
@@ -25,3 +33,5 @@ class InvalidOclcNumber(BookopsWorldcatError):
     """
     Exception raised when an invalid OCLC record number is encountered
     """
+
+    pass

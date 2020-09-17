@@ -7,7 +7,7 @@ import requests
 
 
 from . import __title__, __version__
-from .errors import TokenRequestError
+from .errors import WorldcatAuthorizationError
 
 
 class WorldcatAccessToken:
@@ -66,7 +66,12 @@ class WorldcatAccessToken:
     """
 
     def __init__(
-        self, key=None, secret=None, scopes=[], agent=None, timeout=None,
+        self,
+        key=None,
+        secret=None,
+        scopes=[],
+        agent=None,
+        timeout=None,
     ):
         """Constructor"""
 
@@ -87,29 +92,31 @@ class WorldcatAccessToken:
             self.agent = f"{__title__}/{__version__}"
         else:
             if type(self.agent) is not str:
-                raise TypeError("Argument 'agent' must be a string.")
+                raise WorldcatAuthorizationError("Argument 'agent' must be a string.")
 
         # asure passed arguments are valid
         if not self.key:
-            raise ValueError("Argument 'key' is required.")
+            raise WorldcatAuthorizationError("Argument 'key' is required.")
         else:
             if type(self.key) is not str:
-                raise TypeError("Argument 'key' must be a string.")
+                raise WorldcatAuthorizationError("Argument 'key' must be a string.")
 
         if not self.secret:
-            raise ValueError("Argument 'secret' is required.")
+            raise WorldcatAuthorizationError("Argument 'secret' is required.")
         else:
             if type(self.secret) is not str:
-                raise TypeError("Argument 'secret' must be a string.")
+                raise WorldcatAuthorizationError("Argument 'secret' must be a string.")
 
         # validate passed scopes
         if type(self.scopes) is list:
             self.scopes = " ".join(self.scopes)
         elif type(self.scopes) is not str:
-            raise TypeError("Argument 'scope' must a string or a list.")
+            raise WorldcatAuthorizationError(
+                "Argument 'scope' must a string or a list."
+            )
         self.scopes = self.scopes.strip()
         if self.scopes == "":
-            raise ValueError("Argument 'scope' is missing.")
+            raise WorldcatAuthorizationError("Argument 'scope' is missing.")
 
         # assign default value for timout
         if not self.timeout:
@@ -137,7 +144,7 @@ class WorldcatAccessToken:
             self.token_expires_at = response.json()["expires_at"]
             self.token_type = response.json()["token_type"]
         else:
-            raise TokenRequestError(response.json())
+            raise WorldcatAuthorizationError(response.json())
 
     def _post_token_request(self):
         """
@@ -161,9 +168,9 @@ class WorldcatAccessToken:
             )
             return response
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise TokenRequestError(f"Trouble connecing: {sys.exc_info()[0]}")
+            raise WorldcatAuthorizationError(f"Trouble connecing: {sys.exc_info()[0]}")
         except Exception:
-            raise TokenRequestError(f"Unexpected error: {sys.exc_info()[0]}")
+            raise WorldcatAuthorizationError(f"Unexpected error: {sys.exc_info()[0]}")
 
     def request_token(self):
         """

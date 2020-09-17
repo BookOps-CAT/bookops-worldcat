@@ -9,7 +9,7 @@ import requests
 
 
 from bookops_worldcat import WorldcatAccessToken
-from bookops_worldcat.errors import TokenRequestError
+from bookops_worldcat.errors import WorldcatAuthorizationError
 
 
 class MockAuthServerResponseSuccess:

@@ -5,8 +5,8 @@ import sys
 import requests
 
 from ._session import WorldcatSession
-from .errors import BookopsWorldcatError
-from .utils import verify_oclc_number
+from .errors import WorldcatSessionError, InvalidOclcNumber
+from .utils import verify_oclc_number, parse_error_response
 
 
 class MetadataSession(WorldcatSession):
@@ -18,7 +18,7 @@ class MetadataSession(WorldcatSession):
         self.authorization = authorization
 
         if type(self.authorization).__name__ != "WorldcatAccessToken":
-            raise TypeError(
+            raise WorldcatSessionError(
                 "Argument 'authorization' must include 'WorldcatAccessToken' obj."
             )
 
@@ -112,14 +112,20 @@ class MetadataSession(WorldcatSession):
                                             "heldInState": "NY",
                                             "limit": 50
                                         }
+        Returns:
+            response: resquests.Response obj
         """
         if not any([oclcNumber, isbn, issn]):
-            raise ValueError(
+            raise WorldcatSessionError(
                 "Missing required argument. "
                 "One of the following args are required: oclcNumber, issn, isbn"
             )
+
         if oclcNumber is not None:
-            oclcNumber = verify_oclc_number(oclcNumber)
+            try:
+                oclcNumber = verify_oclc_number(oclcNumber)
+            except InvalidOclcNumber:
+                raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
         url = self._url_member_shared_print_holdings()
         header = {"Accept": "application/json"}
@@ -131,9 +137,9 @@ class MetadataSession(WorldcatSession):
             response = self.get(url, headers=header, params=payload, hooks=hooks)
             return response
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
         except:
-            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_general_holdings(
         self, oclcNumber=None, isbn=None, issn=None, hooks=None, **params
@@ -159,12 +165,15 @@ class MetadataSession(WorldcatSession):
                                         }
         """
         if not any([oclcNumber, isbn, issn]):
-            raise ValueError(
+            raise WorldcatSessionError(
                 "Missing required argument. "
                 "One of the following args are required: oclcNumber, issn, isbn"
             )
-        if oclcNumber:
-            oclcNumber = verify_oclc_number(oclcNumber)
+        if oclcNumber is not None:
+            try:
+                oclcNumber = verify_oclc_number(oclcNumber)
+            except InvalidOclcNumber:
+                raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
         url = self._url_member_general_holdings()
         header = {"Accept": "application/json"}
@@ -176,9 +185,9 @@ class MetadataSession(WorldcatSession):
             response = self.get(url, headers=header, params=payload, hooks=hooks)
             return response
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
         except:
-            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def get_brief_bib(self, oclcNumber=None, hooks=None):
         """
@@ -195,7 +204,11 @@ class MetadataSession(WorldcatSession):
             response: requests.Response object
         """
 
-        oclcNumber = verify_oclc_number(oclcNumber)
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber:
+            raise WorldcatSessionError("")
+
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclcNumber)
 
@@ -204,12 +217,15 @@ class MetadataSession(WorldcatSession):
             response = self.get(url, headers=header, hooks=hooks)
             return response
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
         except:
-            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_brief_bibs(
-        self, q, hooks=None, **params,
+        self,
+        q,
+        hooks=None,
+        **params,
     ):
         """
         Send a GET request for brief bibliographic resources.
@@ -248,7 +264,7 @@ class MetadataSession(WorldcatSession):
 
         """
         if not q:
-            raise ValueError("Argument 'q' is requried to construct query.")
+            raise WorldcatSessionError("Argument 'q' is requried to construct query.")
 
         url = self._url_brief_bib_search()
         header = {"Accept": "application/json"}
@@ -260,9 +276,9 @@ class MetadataSession(WorldcatSession):
             response = self.get(url, headers=header, params=payload, hooks=hooks)
             return response
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
         except:
-            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_brief_bib_other_editions(self, oclcNumber=None, hooks=None, **params):
         """
@@ -286,7 +302,11 @@ class MetadataSession(WorldcatSession):
         Returns:
             response: requests.Response object
         """
-        oclcNumber = verify_oclc_number(oclcNumber)
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber:
+            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
         url = self._url_brief_bib_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
 
@@ -295,6 +315,6 @@ class MetadataSession(WorldcatSession):
             response = self.get(url, headers=header, params=params, hooks=hooks)
             return response
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise BookopsWorldcatError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
         except:
-            raise BookopsWorldcatError(f"Unexpected request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")

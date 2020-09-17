@@ -18,7 +18,10 @@ def verify_oclc_number(oclc_number):
         oclc_number: int
 
     """
-    if type(oclc_number) is int:
+    if oclc_number is None:
+        raise InvalidOclcNumber("Argument 'oclc_number' is missing.")
+
+    elif type(oclc_number) is int:
         return oclc_number
 
     elif type(oclc_number) is str:
@@ -35,9 +38,15 @@ def verify_oclc_number(oclc_number):
             raise InvalidOclcNumber(
                 "Argument 'oclc_number' does not look like real OCLC #."
             )
-
-    elif oclc_number is None:
-        raise InvalidOclcNumber("Argument 'oclc_number' is missing.")
-
     else:
         raise InvalidOclcNumber("Argument 'oclc_number' is of invalid type.")
+
+
+def parse_error_response(response):
+    """
+    Parses and formats error responses from OCLC web service
+
+    Args:
+        response:
+    """
+    pass
