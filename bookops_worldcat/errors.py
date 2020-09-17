@@ -29,6 +29,14 @@ class WorldcatSessionError(BookopsWorldcatError):
     pass
 
 
+class WorldcatRequestError(WorldcatSessionError):
+    """
+    Exceptions raised on HTTP errors returned by web service
+    """
+
+    pass
+
+
 class InvalidOclcNumber(BookopsWorldcatError):
     """
     Exception raised when an invalid OCLC record number is encountered

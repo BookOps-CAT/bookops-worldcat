@@ -180,6 +180,13 @@ class TestMockedMetadataSession:
             with pytest.raises(WorldcatSessionError):
                 session.get_brief_bib(12345)
 
+    def test_get_brief_bib_400_error_response(self, mock_token, mock_400_response):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.search_brief_bibs(12345)
+                assert msg in str(exc.value)
+
     def test_search_brief_bib_other_editions(
         self, mock_token, mock_successful_session_get_request
     ):
@@ -212,6 +219,15 @@ class TestMockedMetadataSession:
                 session.search_brief_bib_other_editions("odn12345")
                 assert msg in str(exc.value)
 
+    def test_search_brief_bib_other_editions_400_error_response(
+        self, mock_token, mock_400_response
+    ):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.search_brief_bib_other_editions(oclcNumber=12345)
+                assert msg in str(exc.value)
+
     def test_seach_brief_bibs(self, mock_token, mock_successful_session_get_request):
         with MetadataSession(authorization=mock_token) as session:
             assert session.search_brief_bibs(q="ti:Zendegi").status_code == 200
@@ -223,22 +239,29 @@ class TestMockedMetadataSession:
                 session.search_brief_bibs(argm)
                 assert "Argument 'q' is requried to construct query." in str(exc.value)
 
-    def test_search_brief_bibs_timout(self, mock_token, mock_timeout):
+    def test_search_brief_bibs_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
-                session.search_brief_bibs("12345")
+                session.search_brief_bibs("ti:foo")
 
     def test_search_brief_bibs_connectionerror(self, mock_token, mock_connectionerror):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
-                session.search_brief_bibs(12345)
+                session.search_brief_bibs("ti:foo")
 
     def test_search_brief_bibs_unexpected_error(
         self, mock_token, mock_unexpected_error
     ):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
-                session.search_brief_bibs(12345)
+                session.search_brief_bibs("ti:foo")
+
+    def test_search_brief_bibs_400_error_response(self, mock_token, mock_400_response):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.search_brief_bibs("ti:foo")
+                assert msg in str(exc.value)
 
     def test_search_shared_print_holdings(
         self, mock_token, mock_successful_session_get_request
@@ -265,7 +288,7 @@ class TestMockedMetadataSession:
                 session.search_shared_print_holdings(oclcNumber="odn12345")
                 assert msg in str(exc.value)
 
-    def test_search_shared_print_holdings_timout(self, mock_token, mock_timeout):
+    def test_search_shared_print_holdings_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.search_shared_print_holdings(oclcNumber="12345")
@@ -283,6 +306,15 @@ class TestMockedMetadataSession:
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.search_shared_print_holdings(oclcNumber="12345")
+
+    def test_search_shared_print_holdings_400_error_response(
+        self, mock_token, mock_400_response
+    ):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.search_shared_print_holdings(oclcNumber=12345)
+                assert msg in str(exc.value)
 
     def test_search_general_holdings(
         self, mock_token, mock_successful_session_get_request
@@ -323,6 +355,15 @@ class TestMockedMetadataSession:
             with pytest.raises(WorldcatSessionError):
                 session.search_general_holdings(oclcNumber="12345")
 
+    def test_search_general_holdings_400_error_response(
+        self, mock_token, mock_400_response
+    ):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.search_general_holdings(oclcNumber=12345)
+                assert msg in str(exc.value)
+
 
 @pytest.mark.webtest
 class TestLiveMetadataSession:
@@ -356,6 +397,20 @@ class TestLiveMetadataSession:
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
+
+    def test_brief_bib_401_error(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+        token.token_str = "invalid-token"
+        with MetadataSession(authorization=token) as session:
+            session.headers.update({"Authorization": f"Bearer invalid-token"})
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.get_brief_bib(41266045)
+                response_msg = "Web service returned 401 error: {'message': 'Unauthorized'}; https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
+                assert response_msg in str(exc.value)
 
     def test_brief_bib_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])

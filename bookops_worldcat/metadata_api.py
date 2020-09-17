@@ -5,7 +5,7 @@ import sys
 import requests
 
 from ._session import WorldcatSession
-from .errors import WorldcatSessionError, InvalidOclcNumber
+from .errors import WorldcatSessionError, WorldcatRequestError, InvalidOclcNumber
 from .utils import verify_oclc_number, parse_error_response
 
 
@@ -135,7 +135,13 @@ class MetadataSession(WorldcatSession):
         # send request
         try:
             response = self.get(url, headers=header, params=payload, hooks=hooks)
-            return response
+            if response.status_code == requests.codes.ok:
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
         except:
@@ -183,9 +189,15 @@ class MetadataSession(WorldcatSession):
         # send request
         try:
             response = self.get(url, headers=header, params=payload, hooks=hooks)
-            return response
+            if response.status_code == requests.codes.ok:
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
@@ -215,9 +227,15 @@ class MetadataSession(WorldcatSession):
         # send request
         try:
             response = self.get(url, headers=header, hooks=hooks)
-            return response
+            if response.status_code == requests.codes.ok:
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
@@ -274,9 +292,15 @@ class MetadataSession(WorldcatSession):
         # send request
         try:
             response = self.get(url, headers=header, params=payload, hooks=hooks)
-            return response
+            if response.status_code == requests.codes.ok:
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatRequestError(exc)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
@@ -313,8 +337,14 @@ class MetadataSession(WorldcatSession):
         # send request
         try:
             response = self.get(url, headers=header, params=params, hooks=hooks)
-            return response
+            if response.status_code == requests.codes.ok:
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")

@@ -48,6 +48,18 @@ class MockAuthServerResponseFailure:
         }
 
 
+class MockServiceErrorResponse:
+    """Simulates web service error responses"""
+
+    def __init__(self, code, json_response, url):
+        self.status_code = code
+        self.msg = json_response
+        self.url = url
+
+    def json(self):
+        return self.msg
+
+
 class MockUnexpectedException:
     def __init__(self, *args, **kwargs):
         raise Exception
@@ -143,5 +155,19 @@ def mock_token(mock_credentials, mock_successful_post_token_response):
 def mock_successful_session_get_request(monkeypatch):
     def mock_api_response(*args, **kwargs):
         return MockSuccessfulSessionResponse()
+
+    monkeypatch.setattr(requests.Session, "get", mock_api_response)
+
+
+@pytest.fixture
+def mock_400_response(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        msg = {
+            "type": "MISSING_QUERY_PARAMETER",
+            "title": "Validation Failure",
+            "detail": "detail here",
+        }
+        url = "https://test.org/some_endpoint"
+        return MockServiceErrorResponse(code=400, json_response=msg, url=url)
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
