@@ -445,7 +445,7 @@ class TestMockedMetadataSession:
 class TestLiveMetadataSession:
     """Runs rudimentary tests against live Metadata API"""
 
-    def test_brief_bib_print_mat_request(self, live_keys):
+    def test_get_brief_bib_print_mat_request(self, live_keys):
         fields = sorted(
             [
                 "catalogingInfo",
@@ -474,7 +474,7 @@ class TestLiveMetadataSession:
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
 
-    def test_brief_bib_401_error(self, live_keys):
+    def test_get_brief_bib_401_error(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -487,6 +487,22 @@ class TestLiveMetadataSession:
                 session.get_brief_bib(41266045)
                 response_msg = "Web service returned 401 error: {'message': 'Unauthorized'}; https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
                 assert response_msg in str(exc.value)
+
+    def test_get_brief_bib_with_stale_token(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+        with MetadataSession(authorization=token) as session:
+            session.authorization.is_expired() is False
+            session.authorization.token_expires_at = datetime.strftime(
+                datetime.utcnow() - timedelta(0, 1), "%Y-%m-%d %H:%M:%SZ"
+            )
+            assert session.authorization.is_expired() is True
+            response = session.get_brief_bib(oclcNumber=41266045)
+            assert session.authorization.is_expired() is False
+            assert response.status_code == 200
 
     def test_brief_bib_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
