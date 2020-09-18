@@ -5,7 +5,12 @@ import sys
 import requests
 
 from ._session import WorldcatSession
-from .errors import WorldcatSessionError, WorldcatRequestError, InvalidOclcNumber
+from .errors import (
+    WorldcatSessionError,
+    WorldcatRequestError,
+    InvalidOclcNumber,
+    WorldcatAuthorizationError,
+)
 from .utils import verify_oclc_number, parse_error_response
 
 
@@ -22,7 +27,21 @@ class MetadataSession(WorldcatSession):
                 "Argument 'authorization' must include 'WorldcatAccessToken' obj."
             )
 
+        self._update_authorization()
+
+    def _update_authorization(self):
         self.headers.update({"Authorization": f"Bearer {self.authorization.token_str}"})
+
+    def _get_new_access_token(self):
+        """
+        Allows to continue sending request with new access token after
+        the previous one expired
+        """
+        try:
+            self.authorization.request_token()
+            self._update_authorization()
+        except WorldcatAuthorizationError as exc:
+            raise WorldcatSessionError(exc)
 
     def _url_base(self):
         return "https://worldcat.org"
@@ -127,6 +146,10 @@ class MetadataSession(WorldcatSession):
             except InvalidOclcNumber:
                 raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
+
         url = self._url_member_shared_print_holdings()
         header = {"Accept": "application/json"}
         payload = dict(oclcNumber=oclcNumber, isbn=isbn, issn=issn)
@@ -169,6 +192,9 @@ class MetadataSession(WorldcatSession):
                                             "heldInState": "NY",
                                             "limit": 50
                                         }
+
+        Returns:
+            response: requests.Response obj
         """
         if not any([oclcNumber, isbn, issn]):
             raise WorldcatSessionError(
@@ -180,6 +206,10 @@ class MetadataSession(WorldcatSession):
                 oclcNumber = verify_oclc_number(oclcNumber)
             except InvalidOclcNumber:
                 raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
 
         url = self._url_member_general_holdings()
         header = {"Accept": "application/json"}
@@ -219,7 +249,11 @@ class MetadataSession(WorldcatSession):
         try:
             oclcNumber = verify_oclc_number(oclcNumber)
         except InvalidOclcNumber:
-            raise WorldcatSessionError("")
+            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
 
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclcNumber)
@@ -227,6 +261,55 @@ class MetadataSession(WorldcatSession):
         # send request
         try:
             response = self.get(url, headers=header, hooks=hooks)
+            if response.status_code == requests.codes.ok:
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
+        except:
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+
+    def search_brief_bib_other_editions(self, oclcNumber=None, hooks=None, **params):
+        """
+        Retrieve other editions related to bibliographic resource with provided
+        OCLC #.
+
+        Args:
+            oclcNumber: int or str,    OCLC bibliographic record number; can be an
+                                        integer, or string with or without OCLC # prefix
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            params: dict,               other parameters specified by Metadata API
+                                        documentation, see:
+                                            https://developer.api.oclc.org/wc-metadata-v1-1
+                                        example:
+                                            {
+                                                "offset": 51,
+                                                "limit": 50
+                                            }
+        Returns:
+            response: requests.Response object
+        """
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber:
+            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
+
+        url = self._url_brief_bib_other_editions(oclcNumber)
+        header = {"Accept": "application/json"}
+
+        # send request
+        try:
+            response = self.get(url, headers=header, params=params, hooks=hooks)
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -277,12 +360,16 @@ class MetadataSession(WorldcatSession):
                                             "limit": 50
                                         }
 
-            Returns:
-                response: requests.Response object
+        Returns:
+            response: requests.Response object
 
         """
         if not q:
             raise WorldcatSessionError("Argument 'q' is requried to construct query.")
+
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
 
         url = self._url_brief_bib_search()
         header = {"Accept": "application/json"}
@@ -299,51 +386,6 @@ class MetadataSession(WorldcatSession):
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatRequestError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
-
-    def search_brief_bib_other_editions(self, oclcNumber=None, hooks=None, **params):
-        """
-        Retrieve other editions related to bibliographic resource with provided
-        OCLC #.
-
-        Args:
-            oclcNumber: int or str,    OCLC bibliographic record number; can be an
-                                        integer, or string with or without OCLC # prefix
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-            params: dict,               other parameters specified by Metadata API
-                                        documentation, see:
-                                            https://developer.api.oclc.org/wc-metadata-v1-1
-                                        example:
-                                            {
-                                                "offset": 51,
-                                                "limit": 50
-                                            }
-        Returns:
-            response: requests.Response object
-        """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
-
-        url = self._url_brief_bib_other_editions(oclcNumber)
-        header = {"Accept": "application/json"}
-
-        # send request
-        try:
-            response = self.get(url, headers=header, params=params, hooks=hooks)
-            if response.status_code == requests.codes.ok:
-                return response
-            else:
-                error_msg = parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
         except:
