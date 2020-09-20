@@ -15,14 +15,18 @@ class WorldcatAccessToken:
     Requests Worldcat access token. Authenticates and authorizes using Client
     Credentials Grant. Does not support Explicit Authorization Code and Refresh
     Token flows. Token with correctly bonded scopes can then be passed into a session
-    of particular web service to authorize following requests for resources.
+    of particular web service to authorize requests for resources.
     More on OCLC's web services authorization:
     https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html
 
     Args:
         key: str,                               your WSKey public client_id
         secret: str,                            your WSKey secret
-        scopes: str or list                     request scopes for the access token
+        scopes: str or list,                    request scopes for the access token
+        principal_id: str,                      principalID (required for read/write
+                                                endpoints)
+        principal_idns: str,                    principalIDNS (required for read/write
+                                                endpoints)
         agent: (optional) str,                  "User-agent" parameter to be passed
                                                 in the request header; usage strongly
                                                 encouraged
@@ -40,6 +44,8 @@ class WorldcatAccessToken:
                 key="my_WSKey_client_id",
                 secret="my_WSKey_secret",
                 scope="WorldCatMetadataAPI",
+                principal_id="your principalID here",
+                principal_idns="your principalIDNS here",
                 agent="my_app/1.0.0")
         >>> token.token_str
         "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
@@ -70,6 +76,8 @@ class WorldcatAccessToken:
         key=None,
         secret=None,
         scopes=[],
+        principal_id=None,
+        principal_idns=None,
         agent=None,
         timeout=None,
     ):
@@ -79,6 +87,8 @@ class WorldcatAccessToken:
         self.grant_type = "client_credentials"
         self.key = key
         self.oauth_server = "https://oauth.oclc.org"
+        self.principal_id = principal_id
+        self.principal_idns = principal_idns
         self.scopes = scopes
         self.secret = secret
         self.server_response = None
@@ -106,6 +116,15 @@ class WorldcatAccessToken:
         else:
             if type(self.secret) is not str:
                 raise WorldcatAuthorizationError("Argument 'secret' must be a string.")
+
+        if not self.principal_id:
+            raise WorldcatAuthorizationError(
+                "Argument 'principal_id' is required for read/write endpoint of Metadata API."
+            )
+        if not self.principal_idns:
+            raise WorldcatAuthorizationError(
+                "Argument 'principal_idns' is required for read/write endpoint of Metadata API."
+            )
 
         # validate passed scopes
         if type(self.scopes) is list:
@@ -135,7 +154,12 @@ class WorldcatAccessToken:
         return (self.key, self.secret)
 
     def _payload(self):
-        return {"grant_type": self.grant_type, "scope": self.scopes}
+        return {
+            "grant_type": self.grant_type,
+            "scope": self.scopes,
+            "principalID": self.principal_id,
+            "principalIDNS": self.principal_idns,
+        }
 
     def _parse_server_response(self, response):
         self.server_response = response
@@ -167,6 +191,7 @@ class WorldcatAccessToken:
                 timeout=self.timeout,
             )
             return response
+
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             raise WorldcatAuthorizationError(f"Trouble connecing: {sys.exc_info()[0]}")
         except Exception:

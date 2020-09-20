@@ -55,6 +55,7 @@ class MockServiceErrorResponse:
         self.status_code = code
         self.msg = json_response
         self.url = url
+        self.text = f"{json_response}"
 
     def json(self):
         return self.msg
@@ -86,6 +87,8 @@ def mock_credentials():
         "key": "my_WSkey",
         "secret": "my_WSsecret",
         "scopes": ["scope1", "scope2"],
+        "principal_id": "my_principalID",
+        "principal_idns": "my_principalIDNS",
     }
 
 
@@ -140,6 +143,8 @@ def live_keys():
             os.environ["WCKey"] = data["key"]
             os.environ["WCSecret"] = data["secret"]
             os.environ["WCScopes"] = " ".join(data["scopes"])
+            os.environ["WCPrincipalID"] = data["principal_id"]
+            os.environ["WCPrincipalIDNS"] = data["principal_idns"]
 
     else:
         # Travis env variables defined in the repository settings

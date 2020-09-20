@@ -12,6 +12,7 @@ class MockServiceErrorResponse:
     def __init__(self):
         self.status_code = 400
         self.url = "https://test.org/some_endpoint"
+        self.text = "{'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}"
 
     def json(self):
         return {

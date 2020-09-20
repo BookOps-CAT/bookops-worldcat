@@ -4,6 +4,8 @@
 Shared utilities
 """
 
+from json.decoder import JSONDecodeError
+
 from .errors import InvalidOclcNumber
 
 
@@ -49,5 +51,8 @@ def parse_error_response(response):
     Args:
         response: requests.Response obj
     """
-    msg = response.json()
+
+    response.encoding = "utf-8"
+    msg = response.text
+
     return f"Web service returned {response.status_code} error: {msg}; {response.url}"
