@@ -178,8 +178,13 @@ class TestMockedMetadataSession:
 
     def test_get_brief_bib_no_oclcNumber_passed(self, mock_token):
         with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
+            with pytest.raises(TypeError):
                 session.get_brief_bib()
+
+    def test_get_brief_bib_None_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.get_brief_bib(oclcNumber=None)
 
     def test_get_brief_bib_with_stale_token(
         self, mock_token, mock_successful_session_get_request
@@ -213,6 +218,54 @@ class TestMockedMetadataSession:
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError) as exc:
                 session.get_brief_bib(12345)
+                assert msg in str(exc.value)
+
+    def test_get_full_bib(self, mock_token, mock_successful_session_get_request):
+        with MetadataSession(authorization=mock_token) as session:
+            assert session.get_full_bib(12345).status_code == 200
+
+    def test_get_full_bib_no_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(TypeError):
+                session.get_full_bib()
+
+    def test_get_full_bib_None_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.get_full_bib(oclcNumber=None)
+
+    def test_get_full_bib_with_stale_token(
+        self, mock_token, mock_successful_session_get_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            mock_token.token_expires_at = datetime.strftime(
+                datetime.utcnow() - timedelta(0, 1), "%Y-%m-%d %H:%M:%SZ"
+            )
+            assert mock_token.is_expired() is True
+            response = session.get_full_bib(12345)
+            assert mock_token.is_expired() is False
+            assert response.status_code == 200
+
+    def test_get_full_bib_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.get_full_bib(12345)
+
+    def test_get_full_bib_connectionerror(self, mock_token, mock_connectionerror):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.get_full_bib(12345)
+
+    def test_get_full_bib_unexpected_error(self, mock_token, mock_unexpected_error):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.get_full_bib(12345)
+
+    def test_get_full_bib_400_error_response(self, mock_token, mock_400_response):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.get_full_bib(12345)
                 assert msg in str(exc.value)
 
     def test_search_brief_bib_other_editions(
@@ -466,6 +519,8 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -479,6 +534,8 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
         token.token_str = "invalid-token"
         with MetadataSession(authorization=token) as session:
@@ -493,6 +550,8 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
         with MetadataSession(authorization=token) as session:
             session.authorization.is_expired() is False
@@ -504,12 +563,29 @@ class TestLiveMetadataSession:
             assert session.authorization.is_expired() is False
             assert response.status_code == 200
 
+    def test_get_full_bib(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.get_full_bib(41266045)
+
+            assert response.url == "https://worldcat.org/bib/data/41266045"
+            assert response.status_code == 200
+
     def test_brief_bib_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -524,6 +600,8 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -550,6 +628,8 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
