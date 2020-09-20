@@ -109,6 +109,9 @@ class MetadataSession(WorldcatSession):
         base_url = self._url_base()
         return f"{base_url}/ih/institutionlist"
 
+    def _str2list(self, s):
+        return s.split(",")
+
     def get_brief_bib(self, oclcNumber, hooks=None):
         """
         Retrieve specific brief bibliographic resource.
@@ -304,6 +307,64 @@ class MetadataSession(WorldcatSession):
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatRequestError(exc)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
+        except:
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+
+    def search_current_control_numbers(
+        self, controlNumbers, response_format="application/atom+json", hooks=None
+    ):
+        """
+        Retrieve current OCLC control numbers
+
+        Args:
+            conrolNumbers: list or str  list of OCLC control numbers to be checked;
+                                        they can be integers or strings with or
+                                        without OCLC # prefix;
+                                        if str the numbers must be separated by coma
+            response_format: str,       'application/atom+json' (default) or
+                                        'application/atom+xml'
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
+        Returns:
+            response: requests.Response obj
+        """
+
+        # change to list if coma separated string
+        if type(controlNumbers) is str:
+            controlNumbers = self._str2list(controlNumbers)
+
+        if not controlNumbers or type(controlNumbers) is not list:
+            raise WorldcatSessionError(
+                "Argument 'controlNumbers' must be a list of OCLC #."
+            )
+
+        try:
+            vetted_numbers = [str(verify_oclc_number(n)) for n in controlNumbers]
+        except InvalidOclcNumber:
+            raise WorldcatSessionError("One of provided OCLC #s is invalid.")
+
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
+
+        header = {"Accept": response_format}
+        url = self._url_bib_check_oclc_numbers()
+        payload = {"oclcNumbers": ",".join(vetted_numbers)}
+
+        # send request
+        try:
+            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            if response.status_code == 207:  # multi-status response
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
         except:

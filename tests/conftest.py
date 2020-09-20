@@ -81,6 +81,11 @@ class MockSuccessfulSessionResponse:
         self.status_code = 200
 
 
+class MockSuccessfulSessionMultiStatusResponse:
+    def __init__(self):
+        self.status_code = 207
+
+
 @pytest.fixture
 def mock_credentials():
     return {
@@ -160,6 +165,14 @@ def mock_token(mock_credentials, mock_successful_post_token_response):
 def mock_successful_session_get_request(monkeypatch):
     def mock_api_response(*args, **kwargs):
         return MockSuccessfulSessionResponse()
+
+    monkeypatch.setattr(requests.Session, "get", mock_api_response)
+
+
+@pytest.fixture
+def mock_successful_session_get_request_multi_status(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        return MockSuccessfulSessionMultiStatusResponse()
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
 
