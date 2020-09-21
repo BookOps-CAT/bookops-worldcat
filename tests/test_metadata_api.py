@@ -268,6 +268,58 @@ class TestMockedMetadataSession:
                 session.get_full_bib(12345)
                 assert msg in str(exc.value)
 
+    def test_holdings_get_status(self, mock_token, mock_successful_session_get_request):
+        with MetadataSession(authorization=mock_token) as session:
+            assert session.holdings_get_status(12345).status_code == 200
+
+    def test_holdings_get_status_no_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(TypeError):
+                session.holdings_get_status()
+
+    def test_holdings_get_status_None_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_get_status(oclcNumber=None)
+
+    def test_holdings_get_status_with_stale_token(
+        self, mock_token, mock_successful_session_get_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            mock_token.token_expires_at = datetime.strftime(
+                datetime.utcnow() - timedelta(0, 1), "%Y-%m-%d %H:%M:%SZ"
+            )
+            assert mock_token.is_expired() is True
+            response = session.holdings_get_status(12345)
+            assert mock_token.is_expired() is False
+            assert response.status_code == 200
+
+    def test_holdings_get_status_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_get_status(12345)
+
+    def test_holdings_get_status_connectionerror(
+        self, mock_token, mock_connectionerror
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_get_status(12345)
+
+    def test_holdings_get_status_unexpected_error(
+        self, mock_token, mock_unexpected_error
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_get_status(12345)
+
+    def test_holdings_status_400_error_response(self, mock_token, mock_400_response):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.holdings_get_status(12345)
+                assert msg in str(exc.value)
+
     def test_search_brief_bib_other_editions(
         self, mock_token, mock_successful_session_get_request
     ):
@@ -648,6 +700,34 @@ class TestLiveMetadataSession:
 
             assert response.url == "https://worldcat.org/bib/data/41266045"
             assert response.status_code == 200
+
+    def test_holdings_get_status(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.holdings_get_status(982651100)
+
+            assert (
+                response.url
+                == "https://worldcat.org/ih/checkholdings?oclcNumber=982651100"
+            )
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == ["content", "title", "updated"]
+            assert sorted(response.json()["content"].keys()) == sorted(
+                [
+                    "requestedOclcNumber",
+                    "currentOclcNumber",
+                    "institution",
+                    "holdingCurrentlySet",
+                    "id",
+                ]
+            )
 
     def test_brief_bib_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])

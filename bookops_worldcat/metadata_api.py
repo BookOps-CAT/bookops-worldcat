@@ -194,13 +194,93 @@ class MetadataSession(WorldcatSession):
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
+    def holdings_get_status(
+        self,
+        oclcNumber,
+        inst=None,
+        instSymbol=None,
+        response_format="application/atom+json",
+        hooks=None,
+    ):
+        """
+        Retrieves Worlcat holdings status of a record with provided OCLC number.
+        The service automatically recognizes institution based on the issued access
+        token.
+
+        Args:
+            conrolNumbers: list or str  list of OCLC control numbers to be checked;
+                                        they can be integers or strings with or
+                                        without OCLC # prefix;
+            inst: str,                  registry ID of the institution whose holdings
+                                        are being checked
+            instSymbol: str,            optional; OCLC symbol of the institution whose
+                                        holdings are being checked
+            response_format: str,       'application/atom+json' (default) or
+                                        'application/atom+xml'
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
+        Returns:
+            response: requests.Response obj
+        """
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber as exc:
+            raise WorldcatSessionError(exc)
+
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
+
+        url = self._url_bib_holdings_check()
+        header = {"Accept": response_format}
+        payload = {"oclcNumber": oclcNumber, "inst": inst, "instSymbol": instSymbol}
+
+        # send request
+        try:
+            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            if response.status_code == requests.codes.ok:
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
+        except:
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+
+    def holdings_set(
+        self, oclcNumber, response_format="application/atom+json", hooks=None
+    ):
+        """
+        Sets institution's Worldcat holdings on an individual record.
+
+        Args:
+            conrolNumbers: list or str  list of OCLC control numbers to be checked;
+                                        they can be integers or strings with or
+                                        without OCLC # prefix;
+                                        if str the numbers must be separated by comma
+            response_format: str,       'application/atom+json' (default) or
+                                        'application/atom+xml'
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
+        Returns:
+            response: requests.Response obj
+        """
+        pass
+
     def search_brief_bib_other_editions(self, oclcNumber, hooks=None, **params):
         """
         Retrieve other editions related to bibliographic resource with provided
         OCLC #.
 
         Args:
-            oclcNumber: int or str,    OCLC bibliographic record number; can be an
+            oclcNumber: int or str,     OCLC bibliographic record number; can be an
                                         integer, or string with or without OCLC # prefix
             hooks: dict,                Requests library hook system that can be
                                         used for singnal event handling, see more at:
@@ -244,10 +324,7 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_brief_bibs(
-        self,
-        q,
-        hooks=None,
-        **params,
+        self, q, hooks=None, **params,
     ):
         """
         Send a GET request for brief bibliographic resources.
@@ -322,7 +399,7 @@ class MetadataSession(WorldcatSession):
             conrolNumbers: list or str  list of OCLC control numbers to be checked;
                                         they can be integers or strings with or
                                         without OCLC # prefix;
-                                        if str the numbers must be separated by coma
+                                        if str the numbers must be separated by comma
             response_format: str,       'application/atom+json' (default) or
                                         'application/atom+xml'
             hooks: dict,                Requests library hook system that can be
@@ -333,7 +410,7 @@ class MetadataSession(WorldcatSession):
             response: requests.Response obj
         """
 
-        # change to list if coma separated string
+        # change to list if comma separated string
         if type(controlNumbers) is str:
             controlNumbers = self._str2list(controlNumbers)
 
