@@ -320,6 +320,57 @@ class TestMockedMetadataSession:
                 session.holdings_get_status(12345)
                 assert msg in str(exc.value)
 
+    def test_holdings_set(self, mock_token, mock_successful_holdings_action_request):
+        with MetadataSession(authorization=mock_token) as session:
+            assert session.holdings_set(850940548).status_code == 201
+
+    def test_holdings_set_no_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(TypeError):
+                session.holdings_set()
+
+    def test_holdings_set_None_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_set(oclcNumber=None)
+
+    def test_holdings_set_stale_token(
+        self, mock_token, mock_successful_holdings_action_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            mock_token.token_expires_at = datetime.strftime(
+                datetime.utcnow() - timedelta(0, 1), "%Y-%m-%d %H:%M:%SZ"
+            )
+            assert mock_token.is_expired() is True
+            response = session.holdings_set(850940548)
+            assert mock_token.is_expired() is False
+            assert response.status_code == 201
+
+    def test_holdings_set_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_set(850940548)
+
+    def test_holdings_set_connectionerror(self, mock_token, mock_connectionerror):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_set(850940548)
+
+    def test_holdings_set_unexpected_error(self, mock_token, mock_unexpected_error):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_set(850940548)
+
+    def test_holdings_set_409_error_response(self, mock_token, mock_409_response):
+        msg = {
+            "code": {"value": "WS-409", "type": "application"},
+            "message": "Trying to set hold while holding already exists",
+            "detail": None,
+        }
+        with MetadataSession(authorization=mock_token) as session:
+            response = session.holdings_set(850940548)
+            assert response.json() == msg
+
     def test_search_brief_bib_other_editions(
         self, mock_token, mock_successful_session_get_request
     ):
@@ -728,6 +779,54 @@ class TestLiveMetadataSession:
                     "id",
                 ]
             )
+
+    def test_holdings_set_unset(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.holdings_get_status(850940548)
+            holdings = response.json()["content"]["holdingCurrentlySet"]
+            if holdings is True:
+                # response = session.holdings_unset(850940548)
+                pass
+            else:
+                response = session.holdings_set(
+                    850940548, response_format="application/atom+json"
+                )
+                assert (
+                    response.url == "https://worldcat.org/ih/data?oclcNumber=850940548"
+                )
+                assert response.status_code == 201
+                assert sorted(response.json().keys()) == sorted(
+                    ["content", "title", "updated"]
+                )
+                assert (
+                    sorted(response.json()["content"].keys())
+                    == sorted[
+                        "requestedOclcNumber",
+                        "currentOclcNumber",
+                        "institution",
+                        "holdingCurrentlySet",
+                        "id",
+                    ]
+                )
+
+                response = session.holdings_set(850940548)
+                assert response.status_code == 409
+                assert (
+                    response.url == "https://worldcat.org/ih/data?oclcNumber=850940548"
+                )
+                assert response.json() == {
+                    "code": {"value": "WS-409", "type": "application"},
+                    "message": "Trying to set hold while holding already exists",
+                    "detail": None,
+                }
 
     def test_brief_bib_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])

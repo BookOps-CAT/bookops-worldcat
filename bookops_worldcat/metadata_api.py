@@ -253,7 +253,13 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def holdings_set(
-        self, oclcNumber, response_format="application/atom+json", hooks=None
+        self,
+        oclcNumber,
+        inst=None,
+        instSymbol=None,
+        holdingLibraryCode=None,
+        response_format="application/atom+json",
+        hooks=None,
     ):
         """
         Sets institution's Worldcat holdings on an individual record.
@@ -272,7 +278,45 @@ class MetadataSession(WorldcatSession):
         Returns:
             response: requests.Response obj
         """
-        pass
+
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber as exc:
+            raise WorldcatSessionError(exc)
+
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
+
+        url = self._url_bib_holdings_action()
+        header = {"Accept": response_format}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "inst": inst,
+            "instSymbol": instSymbol,
+            "holdingLibraryCode": holdingLibraryCode,
+        }
+
+        # send request
+        try:
+            response = self.post(url, headers=header, params=payload, hooks=hooks)
+            if response.status_code == 201:
+                # the service does not return any meaningful response
+                # when holdings are succesfully set
+                return response
+            elif response.status_code == 409:
+                # holdings already set
+                # it seems resonable to simply ignore this response
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
+        except:
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_brief_bib_other_editions(self, oclcNumber, hooks=None, **params):
         """

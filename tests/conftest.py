@@ -9,7 +9,8 @@ import requests
 
 
 from bookops_worldcat import WorldcatAccessToken
-from bookops_worldcat.errors import WorldcatAuthorizationError
+
+# from bookops_worldcat.errors import WorldcatAuthorizationError
 
 
 class MockAuthServerResponseSuccess:
@@ -76,12 +77,17 @@ class MockConnectionError:
         raise requests.exceptions.ConnectionError
 
 
-class MockSuccessfulSessionResponse:
+class MockSuccessfulHTTP200SessionResponse:
     def __init__(self):
         self.status_code = 200
 
 
-class MockSuccessfulSessionMultiStatusResponse:
+class MockSuccessfulHTTP201SessionResponse:
+    def __init__(self):
+        self.status_code = 201
+
+
+class MockSuccessfulHTTP207SessionResponse:
     def __init__(self):
         self.status_code = 207
 
@@ -123,6 +129,7 @@ def mock_unexpected_error(monkeypatch):
     monkeypatch.setattr("requests.post", MockUnexpectedException)
     monkeypatch.setattr("requests.get", MockUnexpectedException)
     monkeypatch.setattr("requests.Session.get", MockUnexpectedException)
+    monkeypatch.setattr("requests.Session.post", MockUnexpectedException)
 
 
 @pytest.fixture
@@ -130,6 +137,7 @@ def mock_timeout(monkeypatch):
     monkeypatch.setattr("requests.post", MockTimeout)
     monkeypatch.setattr("requests.get", MockTimeout)
     monkeypatch.setattr("requests.Session.get", MockTimeout)
+    monkeypatch.setattr("requests.Session.post", MockTimeout)
 
 
 @pytest.fixture
@@ -137,6 +145,7 @@ def mock_connectionerror(monkeypatch):
     monkeypatch.setattr("requests.post", MockConnectionError)
     monkeypatch.setattr("requests.get", MockConnectionError)
     monkeypatch.setattr("requests.Session.get", MockConnectionError)
+    monkeypatch.setattr("requests.Session.post", MockConnectionError)
 
 
 @pytest.fixture
@@ -164,15 +173,31 @@ def mock_token(mock_credentials, mock_successful_post_token_response):
 @pytest.fixture
 def mock_successful_session_get_request(monkeypatch):
     def mock_api_response(*args, **kwargs):
-        return MockSuccessfulSessionResponse()
+        return MockSuccessfulHTTP200SessionResponse()
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
 
 
 @pytest.fixture
+def mock_successful_session_post_request(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        return MockSuccessfulHTTP200SessionResponse()
+
+    monkeypatch.setattr(requests.Session, "post", mock_api_response)
+
+
+@pytest.fixture
+def mock_successful_holdings_action_request(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        return MockSuccessfulHTTP201SessionResponse()
+
+    monkeypatch.setattr(requests.Session, "post", mock_api_response)
+
+
+@pytest.fixture
 def mock_successful_session_get_request_multi_status(monkeypatch):
     def mock_api_response(*args, **kwargs):
-        return MockSuccessfulSessionMultiStatusResponse()
+        return MockSuccessfulHTTP207SessionResponse()
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
 
@@ -189,3 +214,17 @@ def mock_400_response(monkeypatch):
         return MockServiceErrorResponse(code=400, json_response=msg, url=url)
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
+
+
+@pytest.fixture
+def mock_409_response(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        msg = {
+            "code": {"value": "WS-409", "type": "application"},
+            "message": "Trying to set hold while holding already exists",
+            "detail": None,
+        }
+        url = "https://test.org/some_endpoint"
+        return MockServiceErrorResponse(code=409, json_response=msg, url=url)
+
+    monkeypatch.setattr(requests.Session, "post", mock_api_response)
