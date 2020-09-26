@@ -194,7 +194,7 @@ class MetadataSession(WorldcatSession):
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
-    def holdings_get_status(
+    def holding_get_status(
         self,
         oclcNumber,
         inst=None,
@@ -252,23 +252,31 @@ class MetadataSession(WorldcatSession):
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
-    def holdings_set(
+    def holding_set(
         self,
         oclcNumber,
         inst=None,
         instSymbol=None,
         holdingLibraryCode=None,
+        classificationScheme=None,
         response_format="application/atom+json",
         hooks=None,
     ):
         """
-        Sets institution's Worldcat holdings on an individual record.
+        Sets institution's Worldcat holding on an individual record.
 
         Args:
-            conrolNumbers: list or str  list of OCLC control numbers to be checked;
+            oclcNumbers: list or str  list of OCLC control numbers to be checked;
                                         they can be integers or strings with or
                                         without OCLC # prefix;
                                         if str the numbers must be separated by comma
+            inst: str,                  registry ID of the institution whose holdings
+                                        are being checked
+            instSymbol: str,            optional; OCLC symbol of the institution whose
+                                        holdings are being checked
+            holdingLibraryCode: str,    four letter holding code to et the holing on
+            classificationScheme: str,  whether or not to return group availability
+                                        information
             response_format: str,       'application/atom+json' (default) or
                                         'application/atom+xml'
             hooks: dict,                Requests library hook system that can be
@@ -295,6 +303,7 @@ class MetadataSession(WorldcatSession):
             "inst": inst,
             "instSymbol": instSymbol,
             "holdingLibraryCode": holdingLibraryCode,
+            "classificationScheme": classificationScheme,
         }
 
         # send request
@@ -303,6 +312,88 @@ class MetadataSession(WorldcatSession):
             if response.status_code == 201:
                 # the service does not return any meaningful response
                 # when holdings are succesfully set
+                return response
+            elif response.status_code == 409:
+                # holdings already set
+                # it seems resonable to simply ignore this response
+                return response
+            else:
+                error_msg = parse_error_response(response)
+                raise WorldcatRequestError(error_msg)
+        except WorldcatRequestError as exc:
+            raise WorldcatSessionError(exc)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
+        except:
+            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+
+    def holding_unset(
+        self,
+        oclcNumber,
+        cascade="0",
+        inst=None,
+        instSymbol=None,
+        holdingLibraryCode=None,
+        classificationScheme=None,
+        response_format="application/atom+json",
+        hooks=None,
+    ):
+        """
+        Deletes institution's Worldcat holding on an individual record.
+
+        Args:
+            oclcNumbers: list or str  list of OCLC control numbers to be checked;
+                                        they can be integers or strings with or
+                                        without OCLC # prefix;
+                                        if str the numbers must be separated by comma
+            cascade: int,               0 or 1, default 0;
+                                        0 - don't remove holdings if local holding
+                                        record or local bibliographic records exists;
+                                        1 - remove holding and delete local holdings
+                                        record and local bibliographic record
+            inst: str,                  registry ID of the institution whose holdings
+                                        are being checked
+            instSymbol: str,            optional; OCLC symbol of the institution whose
+                                        holdings are being checked
+            holdingLibraryCode: str,    four letter holding code to et the holing on
+            classificationScheme: str,  whether or not to return group availability
+                                        information
+            response_format: str,       'application/atom+json' (default) or
+                                        'application/atom+xml'
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
+        Returns:
+            response: requests.Response obj
+        """
+
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber as exc:
+            raise WorldcatSessionError(exc)
+
+        # make sure access token is still valid and if not request a new one
+        if self.authorization.is_expired():
+            self._get_new_access_token()
+
+        url = self._url_bib_holdings_action()
+        header = {"Accept": response_format}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "cascade": cascade,
+            "inst": inst,
+            "instSymbol": instSymbol,
+            "holdingLibraryCode": holdingLibraryCode,
+            "classificationScheme": classificationScheme,
+        }
+
+        # send request
+        try:
+            response = self.delete(url, headers=header, params=payload, hooks=hooks)
+            if response.status_code == requests.codes.ok:
+                # the service does not return any meaningful response
+                # when holdings are succesfully deleted
                 return response
             elif response.status_code == 409:
                 # holdings already set
@@ -368,7 +459,10 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_brief_bibs(
-        self, q, hooks=None, **params,
+        self,
+        q,
+        hooks=None,
+        **params,
     ):
         """
         Send a GET request for brief bibliographic resources.

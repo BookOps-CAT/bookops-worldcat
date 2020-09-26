@@ -130,6 +130,7 @@ def mock_unexpected_error(monkeypatch):
     monkeypatch.setattr("requests.get", MockUnexpectedException)
     monkeypatch.setattr("requests.Session.get", MockUnexpectedException)
     monkeypatch.setattr("requests.Session.post", MockUnexpectedException)
+    monkeypatch.setattr("requests.Session.delete", MockUnexpectedException)
 
 
 @pytest.fixture
@@ -138,6 +139,7 @@ def mock_timeout(monkeypatch):
     monkeypatch.setattr("requests.get", MockTimeout)
     monkeypatch.setattr("requests.Session.get", MockTimeout)
     monkeypatch.setattr("requests.Session.post", MockTimeout)
+    monkeypatch.setattr("requests.Session.delete", MockTimeout)
 
 
 @pytest.fixture
@@ -146,6 +148,7 @@ def mock_connectionerror(monkeypatch):
     monkeypatch.setattr("requests.get", MockConnectionError)
     monkeypatch.setattr("requests.Session.get", MockConnectionError)
     monkeypatch.setattr("requests.Session.post", MockConnectionError)
+    monkeypatch.setattr("requests.Session.delete", MockConnectionError)
 
 
 @pytest.fixture
@@ -187,11 +190,19 @@ def mock_successful_session_post_request(monkeypatch):
 
 
 @pytest.fixture
-def mock_successful_holdings_action_request(monkeypatch):
+def mock_successful_holdings_post_request(monkeypatch):
     def mock_api_response(*args, **kwargs):
         return MockSuccessfulHTTP201SessionResponse()
 
     monkeypatch.setattr(requests.Session, "post", mock_api_response)
+
+
+@pytest.fixture
+def mock_successful_holdings_delete_request(monkeypatch):
+    def mock_api_response(*args, **kwargs):
+        return MockSuccessfulHTTP200SessionResponse()
+
+    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
 
 
 @pytest.fixture
@@ -228,3 +239,4 @@ def mock_409_response(monkeypatch):
         return MockServiceErrorResponse(code=409, json_response=msg, url=url)
 
     monkeypatch.setattr(requests.Session, "post", mock_api_response)
+    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
