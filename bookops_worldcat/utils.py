@@ -4,12 +4,14 @@
 Shared utilities
 """
 
-from json.decoder import JSONDecodeError
-
 from .errors import InvalidOclcNumber
 
 
-def verify_oclc_number(oclc_number):
+def str2list(s):
+    return [n.strip() for n in s.split(",")]
+
+
+def verify_oclc_number(oclcNumber):
     """
     Verifies a valid looking OCLC number is passed to a request and
 
@@ -20,28 +22,58 @@ def verify_oclc_number(oclc_number):
         oclc_number: int
 
     """
-    if oclc_number is None:
-        raise InvalidOclcNumber("Argument 'oclc_number' is missing.")
+    if oclcNumber is None:
+        raise InvalidOclcNumber("Argument 'oclcNumber' is missing.")
 
-    elif type(oclc_number) is int:
-        return oclc_number
+    elif type(oclcNumber) is int:
+        return oclcNumber
 
-    elif type(oclc_number) is str:
+    elif type(oclcNumber) is str:
 
         # allow oclc numbers as strings with or without prefixes
-        if "ocm" in oclc_number or "ocn" in oclc_number:
-            oclc_number = oclc_number.strip()[3:]
-        elif "on" in oclc_number:
-            oclc_number = oclc_number.strip()[2:]
+        if "ocm" in oclcNumber or "ocn" in oclcNumber:
+            oclcNumber = oclcNumber.strip()[3:]
+        elif "on" in oclcNumber:
+            oclcNumber = oclcNumber.strip()[2:]
         try:
-            oclc_number = int(oclc_number)
-            return oclc_number
+            oclcNumber = int(oclcNumber)
+            return oclcNumber
         except ValueError:
             raise InvalidOclcNumber(
-                "Argument 'oclc_number' does not look like real OCLC #."
+                "Argument 'oclcNumber' does not look like real OCLC #."
             )
     else:
         raise InvalidOclcNumber("Argument 'oclc_number' is of invalid type.")
+
+
+def verify_oclc_numbers(oclcNumbers):
+    """
+    Parses and verifies list of oclcNumbers
+
+    Args:
+        oclcNumbers: list or str    list of OCLC control numbers for which holdings
+                                    should be set;
+                                    they can be integers or strings with or
+                                    without OCLC # prefix;
+                                    if str the numbers must be separated by comma
+    Returns:
+        vetted_numbers: list,       list of vetted oclcNumbers
+    """
+
+    # change to list if comma separated string
+    if type(oclcNumbers) is str:
+        oclcNumbers = str2list(oclcNumbers)
+
+    if not oclcNumbers or type(oclcNumbers) is not list:
+        raise InvalidOclcNumber(
+            "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #."
+        )
+
+    try:
+        vetted_numbers = [str(verify_oclc_number(n)) for n in oclcNumbers]
+        return vetted_numbers
+    except InvalidOclcNumber:
+        raise InvalidOclcNumber("One of passed OCLC #s is invalid.")
 
 
 def parse_error_response(response):

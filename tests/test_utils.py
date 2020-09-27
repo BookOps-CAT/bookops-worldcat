@@ -26,6 +26,17 @@ class TestUtils:
     """Tests various methods in utils module"""
 
     @pytest.mark.parametrize(
+        "argm,expectation",
+        [
+            ("12345", ["12345"]),
+            ("12345,67890", ["12345", "67890"]),
+            ("12345, 67890", ["12345", "67890"]),
+        ],
+    )
+    def test_str2list(self, argm, expectation):
+        assert str2list(argm) == expectation
+
+    @pytest.mark.parametrize(
         "argm,expectation,msg",
         [
             (
@@ -73,6 +84,51 @@ class TestUtils:
     )
     def test_verify_oclc_number_success(self, argm, expectation):
         assert verify_oclc_number(argm) == expectation
+
+    @pytest.mark.parametrize(
+        "argm,expectation,msg",
+        [
+            (
+                None,
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #.",
+            ),
+            (
+                "",
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #.",
+            ),
+            (
+                [],
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #.",
+            ),
+            (
+                ",,",
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #.",
+            ),
+            (
+                12345.5,
+                pytest.raises(InvalidOclcNumber),
+                "One of passed OCLC #s is invalid.",
+            ),
+            (
+                "bt12345",
+                pytest.raises(InvalidOclcNumber),
+                "One of passed OCLC #s is invalid.",
+            ),
+            (
+                "odn12345",
+                pytest.raises(InvalidOclcNumber),
+                "One of passed OCLC #s is invalid.",
+            ),
+        ],
+    )
+    def test_verify_oclc_numbers_exceptions(self, argm, expectation, msg):
+        with expectation as exp:
+            verify_oclc_numbers(argm)
+            assert msg == str(exp.value)
 
     def test_parse_error_response(self):
         response = MockServiceErrorResponse()
