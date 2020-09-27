@@ -934,14 +934,14 @@ class TestLiveMetadataSession:
                 itemType="book",
                 itemSubType="printbook",
                 catalogSource="dlc",
-                orderedBy="mostWidelyHeld",
+                orderBy="mostWidelyHeld",
                 limit=5,
             )
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
             assert (
                 response.request.url
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&itemType=book&itemSubType=printbook&catalogSource=dlc&orderedBy=mostWidelyHeld&limit=5"
+                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=printbook&orderBy=mostWidelyHeld&limit=5"
             )
 
     def test_search_general_holdings(self, live_keys):

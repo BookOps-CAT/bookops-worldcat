@@ -409,7 +409,9 @@ class MetadataSession(WorldcatSession):
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
-    def search_brief_bib_other_editions(self, oclcNumber, hooks=None, **params):
+    def search_brief_bib_other_editions(
+        self, oclcNumber, offset=None, limit=None, hooks=None
+    ):
         """
         Retrieve other editions related to bibliographic resource with provided
         OCLC #.
@@ -417,17 +419,13 @@ class MetadataSession(WorldcatSession):
         Args:
             oclcNumber: int or str,     OCLC bibliographic record number; can be an
                                         integer, or string with or without OCLC # prefix
+            offset: int,                start position of bibliographic records to
+                                        return; default 1
+            limit: int,                 maximum nuber of records to return;
+                                        maximum 50, default 10
             hooks: dict,                Requests library hook system that can be
                                         used for singnal event handling, see more at:
                                         https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-            params: dict,               other parameters specified by Metadata API
-                                        documentation, see:
-                                            https://developer.api.oclc.org/wc-metadata-v1-1
-                                        example:
-                                            {
-                                                "offset": 51,
-                                                "limit": 50
-                                            }
         Returns:
             response: requests.Response object
         """
@@ -442,10 +440,11 @@ class MetadataSession(WorldcatSession):
 
         url = self._url_brief_bib_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
+        payload = {"offset": offset, "limit": limit}
 
         # send request
         try:
-            response = self.get(url, headers=header, params=params, hooks=hooks)
+            response = self.get(url, headers=header, params=payload, hooks=hooks)
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -461,8 +460,24 @@ class MetadataSession(WorldcatSession):
     def search_brief_bibs(
         self,
         q,
+        deweyNumber=None,
+        datePublished=None,
+        heldBy=None,
+        heldByGroup=None,
+        inLanguage=None,
+        inCatalogLanguage="eng",
+        materialType=None,
+        catalogSource=None,
+        itemType=None,
+        itemSubType=None,
+        retentionCommitments=None,
+        spProgram=None,
+        facets=None,
+        groupRelatedEditions=None,
+        orderBy="mostWidelyHeld",
+        offset=None,
+        limit=None,
         hooks=None,
-        **params,
     ):
         """
         Send a GET request for brief bibliographic resources.
@@ -477,24 +492,57 @@ class MetadataSession(WorldcatSession):
                                             kw:python databases
                                             ti:Zendegi AND au:greg egan
                                             (au:Okken OR au:Myers) AND su:python
-
+            deweyNumber: str,           limits the response to the
+                                        specified dewey classification number(s);
+                                        for multiple values repeat the parameter,
+                                        example:
+                                            '794,180'
+            datePublished: str,         restricts the response to one or
+                                        more dates, or to a range,
+                                        examples:
+                                            '2000'
+                                            '2000-2005'
+                                            '2000,2005'
+            heldBy: str,                institution symbol; restricts to records
+                                        held by indicated institution
+            heldByGroup: str,           restricts to holdings held by group symbol
+            inLanguage: str,            restrics the response to the single
+                                        specified language, example: 'fre'
+            inCataloglanguage: str,     restrics the response to specified
+                                        cataloging language, example: 'eng';
+                                        default 'eng'
+            materialType: str,          restricts responses to specified material type,
+                                        example: 'bks', 'vis'
+            catalogSource: str,         restrict to responses to single OCLC symbol as
+                                        the cataloging source, example: 'DLC'
+            itemType: str,              restricts reponses to single specified OCLC
+                                        top-level facet type, example: 'book'
+            itemSubType: str,           restricts responses to single specified OCLC
+                                        sub facet type, example: 'digital'
+            retentionCommitments: bool, restricts responses to bibliographic records
+                                        with retention commitment; True or False
+            spProgram: str,             restricts responses to bibliographic records
+                                        associated with particular shared print
+                                        program
+            facets: str,                list of facets to restrict responses
+            groupRelatedEditions: str,  whether or not use FRBR grouping,
+                                        options: 'Y' (yes) or 'N' (no)
+            orderBy: str,               results sort key;
+                                        options:
+                                            'recency'
+                                            'bestMatch'
+                                            'creator'
+                                            'publicationDateAsc'
+                                            'publicationDateDesc'
+                                            'mostWidelyHeld'
+                                            'title'
+            offset: int,                start position of bibliographic records to
+                                        return; default 1
+            limit: int,                 maximum nuber of records to return;
+                                        maximum 50, default 10
             hooks: dict,                Requests library hook system that can be
                                         used for singnal event handling, see more at:
                                         https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-            params: dict,               other parameters/limiters as specified in
-                                        Metadata API documentation, see:
-                                            https://developer.api.oclc.org/wc-metadata-v1-1
-                                        example:
-                                        {
-                                            "datePublished": "2010-2012",
-                                            "itemType": "book",
-                                            "itemSubType": "digital",
-                                            "orderedBy": "mostWidelyHeld",
-                                            "catalogSource": "DLC",
-                                            "inLanguage": "eng",
-                                            "inCatalogLanguage": "eng",
-                                            "limit": 50
-                                        }
 
         Returns:
             response: requests.Response object
@@ -509,8 +557,26 @@ class MetadataSession(WorldcatSession):
 
         url = self._url_brief_bib_search()
         header = {"Accept": "application/json"}
-        payload = dict(q=q)
-        payload.update(**params)
+        payload = {
+            "q": q,
+            "deweyNumber": deweyNumber,
+            "datePublished": datePublished,
+            "heldBy": heldBy,
+            "heldByGroup": heldByGroup,
+            "inLanguage": inLanguage,
+            "inCatalogLanguage": inCatalogLanguage,
+            "materialType": materialType,
+            "catalogSource": catalogSource,
+            "itemType": itemType,
+            "itemSubType": itemSubType,
+            "retentionCommitments": retentionCommitments,
+            "spProgram": spProgram,
+            "facets": facets,
+            "groupRelatedEditions": groupRelatedEditions,
+            "orderBy": orderBy,
+            "offset": offset,
+            "limit": limit,
+        }
 
         # send request
         try:
@@ -586,7 +652,21 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_general_holdings(
-        self, oclcNumber=None, isbn=None, issn=None, hooks=None, **params
+        self,
+        oclcNumber=None,
+        isbn=None,
+        issn=None,
+        holdingsAllEditions=None,
+        heldInCountry=None,
+        heldByGroup=None,
+        heldBy=None,
+        lat=None,
+        lon=None,
+        distance=None,
+        unit=None,
+        offset=None,
+        limit=None,
+        hooks=None,
     ):
         """
         Finds member shared print holdings for specified item.
@@ -598,16 +678,23 @@ class MetadataSession(WorldcatSession):
             isbn: str,                  ISBN without any dashes,
                                         example: '978149191646x'
             issn: str,                  ISSN (hyphenated, example: '0099-1234')
-            params: dict,               other parameters/limiters as specified in
-                                        Metadata API documentation, see:
-                                            https://developer.api.oclc.org/wc-metadata-v1-1
-                                        example:
-                                        {
-                                            "oclcNumber": 12345,
-                                            "heldInState": "NY",
-                                            "limit": 50
-                                        }
-
+            holdingsAllEditions: bool,  get holdings for all editions;
+                                        options: True or False
+            heldInCountry: str,         restricts to holdings held by institutions
+                                        in requested country
+            heldByGroup: str,           limits to holdings held by indicated by
+                                        symbol group
+            heldBy: str,                limits to holdings of single institution,
+                                        use institution OCLC symbol
+            lat: float,                 limit to latitude, example: 37.502508
+            lon: float,                 limit to longitute, example: -122.22702
+            distance: int,              distance from latitude and longitude
+            unit: str,                  unit of distance param; options:
+                                            'M' (miles) or 'K' (kilometers)
+            offset: int,                start position of bibliographic records to
+                                        return; default 1
+            limit: int,                 maximum nuber of records to return;
+                                        maximum 50, default 10
         Returns:
             response: requests.Response obj
         """
@@ -628,8 +715,21 @@ class MetadataSession(WorldcatSession):
 
         url = self._url_member_general_holdings()
         header = {"Accept": "application/json"}
-        payload = dict(oclcNumber=oclcNumber, isbn=isbn, issn=issn)
-        payload.update(**params)
+        payload = {
+            "oclcNumber": oclcNumber,
+            "isbn": isbn,
+            "issn": issn,
+            "holdingsAllEditions": holdingsAllEditions,
+            "heldInCountry": heldInCountry,
+            "heldByGroup": heldByGroup,
+            "heldBy": heldBy,
+            "lat": lat,
+            "lon": lon,
+            "distance": distance,
+            "unit": unit,
+            "offset": offset,
+            "limit": limit,
+        }
 
         # send request
         try:
@@ -647,7 +747,15 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_shared_print_holdings(
-        self, oclcNumber=None, isbn=None, issn=None, hooks=None, **params
+        self,
+        oclcNumber=None,
+        isbn=None,
+        issn=None,
+        heldByGroup=None,
+        heldInState=None,
+        offset=None,
+        limit=None,
+        hooks=None,
     ):
         """
         Finds member shared print holdings for specified item.
@@ -659,15 +767,14 @@ class MetadataSession(WorldcatSession):
             isbn: str,                  ISBN without any dashes,
                                         example: '978149191646x'
             issn: str,                  ISSN (hyphenated, example: '0099-1234')
-            params: dict,               other parameters/limiters as specified in
-                                        Metadata API documentation, see:
-                                            https://developer.api.oclc.org/wc-metadata-v1-1
-                                        example:
-                                        {
-                                            "oclcNumber": 12345,
-                                            "heldInState": "NY",
-                                            "limit": 50
-                                        }
+            heldByGroup: str,           restricts to holdings held by group symbol
+            heldInState: str,           restricts to holings held by institutions
+                                        in requested state, example: "NY"
+            offset: int,                start position of bibliographic records to
+                                        return; default 1
+            limit: int,                 maximum nuber of records to return;
+                                        maximum 50, default 10
+            ""
         Returns:
             response: resquests.Response obj
         """
@@ -689,8 +796,15 @@ class MetadataSession(WorldcatSession):
 
         url = self._url_member_shared_print_holdings()
         header = {"Accept": "application/json"}
-        payload = dict(oclcNumber=oclcNumber, isbn=isbn, issn=issn)
-        payload.update(**params)
+        payload = {
+            "oclcNumber": oclcNumber,
+            "isbn": isbn,
+            "issn": issn,
+            "heldByGroup": heldByGroup,
+            "heldInState": heldInState,
+            "offset": offset,
+            "limit": limit,
+        }
 
         # send request
         try:
