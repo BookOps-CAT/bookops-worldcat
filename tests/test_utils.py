@@ -130,6 +130,19 @@ class TestUtils:
             verify_oclc_numbers(argm)
             assert msg == str(exp.value)
 
+    @pytest.mark.parametrize(
+        "argm,expectation",
+        [
+            ("12345", ["12345"]),
+            ("12345,67890", ["12345", "67890"]),
+            ("ocm12345, ocm67890", ["12345", "67890"]),
+            ([12345, 67890], ["12345", "67890"]),
+            (["ocn12345", "on67890"], ["12345", "67890"]),
+        ],
+    )
+    def test_verify_oclc_numbers_parsing(self, argm, expectation):
+        assert verify_oclc_numbers(argm) == expectation
+
     def test_parse_error_response(self):
         response = MockServiceErrorResponse()
         assert (
