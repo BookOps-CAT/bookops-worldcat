@@ -11,7 +11,7 @@ from .errors import (
     InvalidOclcNumber,
     WorldcatAuthorizationError,
 )
-from .utils import verify_oclc_number, parse_error_response
+from .utils import verify_oclc_number, verify_oclc_numbers, parse_error_response
 
 
 class MetadataSession(WorldcatSession):
@@ -42,6 +42,28 @@ class MetadataSession(WorldcatSession):
             self._update_authorization()
         except WorldcatAuthorizationError as exc:
             raise WorldcatSessionError(exc)
+
+    def _split_into_legal_volume(self, oclc_numbers=[]):
+        """
+        OCLC requries that no more than 50 numbers are passed for batch processing
+        """
+        incomplete = True
+        batches = []
+        start = 0
+        end = 50
+        while incomplete:
+            batch = oclc_numbers[start:end]
+            if not batch:
+                incomplete = False
+            elif len(batch) < 50:
+                batches.append(",".join([str(x) for x in batch]))
+                incomplete = False
+            else:
+                batches.append(",".join([str(x) for x in batch]))
+                start += 50
+                end += 50
+
+        return batches
 
     def _url_base(self):
         return "https://worldcat.org"
@@ -108,9 +130,6 @@ class MetadataSession(WorldcatSession):
     def _url_bib_holdings_multi_institution_batch_action(self):
         base_url = self._url_base()
         return f"{base_url}/ih/institutionlist"
-
-    def _str2list(self, s):
-        return s.split(",")
 
     def get_brief_bib(self, oclcNumber, hooks=None):
         """
@@ -208,9 +227,8 @@ class MetadataSession(WorldcatSession):
         token.
 
         Args:
-            conrolNumbers: list or str  list of OCLC control numbers to be checked;
-                                        they can be integers or strings with or
-                                        without OCLC # prefix;
+            oclcNumber: int or str,     OCLC bibliographic record number; can be an
+                                        integer, or string with or without OCLC # prefix
             inst: str,                  registry ID of the institution whose holdings
                                         are being checked
             instSymbol: str,            optional; OCLC symbol of the institution whose
@@ -266,10 +284,8 @@ class MetadataSession(WorldcatSession):
         Sets institution's Worldcat holding on an individual record.
 
         Args:
-            oclcNumbers: list or str  list of OCLC control numbers to be checked;
-                                        they can be integers or strings with or
-                                        without OCLC # prefix;
-                                        if str the numbers must be separated by comma
+            oclcNumber: int or str,     OCLC bibliographic record number; can be an
+                                        integer, or string with or without OCLC # prefix
             inst: str,                  registry ID of the institution whose holdings
                                         are being checked
             instSymbol: str,            optional; OCLC symbol of the institution whose
@@ -342,9 +358,8 @@ class MetadataSession(WorldcatSession):
         Deletes institution's Worldcat holding on an individual record.
 
         Args:
-            oclcNumbers: list or str  list of OCLC control numbers to be checked;
-                                        they can be integers or strings with or
-                                        without OCLC # prefix;
+            oclcNumber: int or str,     OCLC bibliographic record number; can be an
+                                        integer, or string with or without OCLC # prefix
                                         if str the numbers must be separated by comma
             cascade: int,               0 or 1, default 0;
                                         0 - don't remove holdings if local holding
@@ -408,6 +423,77 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+
+    def holdings_set(
+        self,
+        oclcNumbers,
+        inst=None,
+        instSymbol=None,
+        response_format="application/atom+json",
+        hooks=None,
+    ):
+        """
+        Set institution holdings for multiple OClC numbers
+
+        Args:
+            oclcNumbers: list or str    list of OCLC control numbers for which holdings
+                                        should be set;
+                                        they can be integers or strings with or
+                                        without OCLC # prefix;
+                                        if str the numbers must be separated by comma
+            inst: str,                  registry ID of the institution whose holdings
+                                        are being checked
+            instSymbol: str,            optional; OCLC symbol of the institution whose
+                                        holdings are being checked
+            response_format: str,       'application/atom+json' (default) or
+                                        'application/atom+xml'
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            response: requests.Response obj
+        """
+        responses = []
+
+        try:
+            vetted_numbers = verify_oclc_numbers(oclcNumbers)
+        except InvalidOclcNumber as exc:
+            raise WorldcatSessionError(exc)
+
+        url = self._url_bib_holdings_batch_action()
+        header = {"Accept": response_format}
+
+        # split into batches of 50 and issue request for each batch
+        for batch in self._split_into_legal_volume(vetted_numbers):
+            payload = {
+                "oclcNumbers": batch,
+                "inst": inst,
+                "instSymbol": instSymbol,
+            }
+
+            # make sure access token is still valid and if not request a new one
+            if self.authorization.is_expired():
+                self._get_new_access_token()
+
+            # send request
+            try:
+                response = self.post(url, headers=header, params=payload, hooks=hooks)
+
+                if response.status_code == 207:
+                    # the service returns multi-status response
+                    responses.append(response)
+                else:
+                    error_msg = parse_error_response(response)
+                    raise WorldcatRequestError(error_msg)
+            except WorldcatRequestError as exc:
+                raise WorldcatSessionError(exc)
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+                raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
+            except:
+                raise WorldcatSessionError(
+                    f"Unexpected request error: {sys.exc_info()[0]}"
+                )
+        return responses
 
     def search_brief_bib_other_editions(
         self, oclcNumber, offset=None, limit=None, hooks=None
@@ -594,13 +680,13 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_current_control_numbers(
-        self, controlNumbers, response_format="application/atom+json", hooks=None
+        self, oclcNumbers, response_format="application/atom+json", hooks=None
     ):
         """
         Retrieve current OCLC control numbers
 
         Args:
-            conrolNumbers: list or str  list of OCLC control numbers to be checked;
+            oclcNumbers: list or str  list of OCLC control numbers to be checked;
                                         they can be integers or strings with or
                                         without OCLC # prefix;
                                         if str the numbers must be separated by comma
@@ -614,19 +700,10 @@ class MetadataSession(WorldcatSession):
             response: requests.Response obj
         """
 
-        # change to list if comma separated string
-        if type(controlNumbers) is str:
-            controlNumbers = self._str2list(controlNumbers)
-
-        if not controlNumbers or type(controlNumbers) is not list:
-            raise WorldcatSessionError(
-                "Argument 'controlNumbers' must be a list of OCLC #."
-            )
-
         try:
-            vetted_numbers = [str(verify_oclc_number(n)) for n in controlNumbers]
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("One of provided OCLC #s is invalid.")
+            vetted_numbers = verify_oclc_numbers(oclcNumbers)
+        except InvalidOclcNumber as exc:
+            raise WorldcatSessionError(exc)
 
         # make sure access token is still valid and if not request a new one
         if self.authorization.is_expired():

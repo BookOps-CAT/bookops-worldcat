@@ -206,11 +206,12 @@ def mock_successful_holdings_delete_request(monkeypatch):
 
 
 @pytest.fixture
-def mock_successful_session_get_request_multi_status(monkeypatch):
+def mock_successful_multi_status_request(monkeypatch):
     def mock_api_response(*args, **kwargs):
         return MockSuccessfulHTTP207SessionResponse()
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
+    monkeypatch.setattr(requests.Session, "post", mock_api_response)
 
 
 @pytest.fixture

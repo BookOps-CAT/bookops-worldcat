@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 import os
 
@@ -8,6 +9,11 @@ import requests
 
 from bookops_worldcat import MetadataSession, WorldcatAccessToken
 from bookops_worldcat.errors import WorldcatSessionError, InvalidOclcNumber
+
+
+@contextmanager
+def does_not_raise():
+    yield
 
 
 class TestMockedMetadataSession:
@@ -45,6 +51,29 @@ class TestMockedMetadataSession:
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session._get_new_access_token()
+
+    @pytest.mark.parametrize(
+        "oclcNumbers,buckets,expectation",
+        [
+            ([], 0, []),
+            (["1", "2", "3"], 1, ["1,2,3"]),
+            ([1, 2, 3], 1, ["1,2,3"]),
+            (["1"], 1, ["1"]),
+            (["1"] * 50, 1, [",".join(["1"] * 50)]),
+            (["1"] * 51, 2, [",".join(["1"] * 50), "1"]),
+            (
+                ["1"] * 103,
+                3,
+                [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],
+            ),
+        ],
+    )
+    def test_split_into_legal_volume(
+        self, mock_token, oclcNumbers, buckets, expectation
+    ):
+        token = mock_token
+        with MetadataSession(authorization=token) as session:
+            assert session._split_into_legal_volume(oclcNumbers) == expectation
 
     def test_url_base(self, mock_token):
         with MetadataSession(authorization=mock_token) as session:
@@ -435,6 +464,65 @@ class TestMockedMetadataSession:
                 session.holding_unset(850940548)
                 assert msg in str(exc.value)
 
+    @pytest.mark.parametrize(
+        "argm,expectation",
+        [
+            (None, pytest.raises(WorldcatSessionError)),
+            ([], pytest.raises(WorldcatSessionError)),
+            (["bt2111111111"], pytest.raises(WorldcatSessionError)),
+            (["850940548"], does_not_raise()),
+            (["ocn850940548"], does_not_raise()),
+            ("850940548,850940552, 850940554", does_not_raise()),
+            (["850940548", "850940552", "850940554"], does_not_raise()),
+            ([850940548, 850940552, 850940554], does_not_raise()),
+        ],
+    )
+    def test_holdings_set(
+        self, argm, expectation, mock_token, mock_successful_multi_status_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with expectation:
+                session.holdings_set(argm)
+
+    def test_holdings_set_no_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(TypeError):
+                session.holdings_set()
+
+    def test_holdings_set_stale_token(
+        self, mock_token, mock_successful_multi_status_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            mock_token.token_expires_at = datetime.strftime(
+                datetime.utcnow() - timedelta(0, 1), "%Y-%m-%d %H:%M:%SZ"
+            )
+            with does_not_raise():
+                assert mock_token.is_expired() is True
+                session.holdings_set([850940548, 850940552, 850940554])
+            # assert mock_token.is_expired() is False
+
+    def test_holdings_set_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_set([850940548, 850940552, 850940554])
+
+    def test_holdings_set_connectionerror(self, mock_token, mock_connectionerror):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holding_set([850940548, 850940552, 850940554])
+
+    def test_holdings_set_unexpected_error(self, mock_token, mock_unexpected_error):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_set([850940548, 850940552, 850940554])
+
+    def test_holdings_set_400_error_response(self, mock_token, mock_400_response):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.holdings_set([850940548, 850940552, 850940554])
+                assert msg in str(exc.value)
+
     def test_search_brief_bib_other_editions(
         self, mock_token, mock_successful_session_get_request
     ):
@@ -536,23 +624,23 @@ class TestMockedMetadataSession:
                 assert msg in str(exc.value)
 
     def test_seach_current_control_numbers(
-        self, mock_token, mock_successful_session_get_request_multi_status
+        self, mock_token, mock_successful_multi_status_request
     ):
         with MetadataSession(authorization=mock_token) as session:
             assert (
                 session.search_current_control_numbers(
-                    controlNumbers=["12345", "65891"]
+                    oclcNumbers=["12345", "65891"]
                 ).status_code
                 == 207
             )
 
     def test_seach_current_control_numbers_passed_as_str(
-        self, mock_token, mock_successful_session_get_request_multi_status
+        self, mock_token, mock_successful_multi_status_request
     ):
         with MetadataSession(authorization=mock_token) as session:
             assert (
                 session.search_current_control_numbers(
-                    controlNumbers="12345,65891"
+                    oclcNumbers="12345,65891"
                 ).status_code
                 == 207
             )
@@ -567,7 +655,7 @@ class TestMockedMetadataSession:
                 )
 
     def test_search_current_control_numbers_with_stale_token(
-        self, mock_token, mock_successful_session_get_request_multi_status
+        self, mock_token, mock_successful_multi_status_request
     ):
         with MetadataSession(authorization=mock_token) as session:
             mock_token.token_expires_at = datetime.strftime(
@@ -899,6 +987,34 @@ class TestLiveMetadataSession:
                 "message": "Trying to unset hold while holding does not exist",
                 "detail": None,
             }
+
+    def test_holdings_set(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.holdings_set([850940548, 850940552, 850940554])
+            assert type(response) is list
+            assert sorted(response[0].json().keys()) == sorted(
+                ["entries", "extensions"]
+            )
+            assert sorted(response[0].json()["entries"][0]) == sorted(
+                ["title", "content", "updated"]
+            )
+            assert sorted(response[0].json()["entries"][0]["content"]) == sorted(
+                [
+                    "requestedOclcNumber",
+                    "currentOclcNumber",
+                    "institution",
+                    "status",
+                    "detail",
+                ]
+            )
 
     def test_brief_bib_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
