@@ -1056,6 +1056,10 @@ class TestLiveMetadataSession:
             response = session.holdings_set([850940548, 850940552, 850940554])
             assert type(response) is list
             assert response[0].status_code == 207
+            assert (
+                response[0].url
+                == "https://worldcat.org/ih/datalist?oclcNumbers=850940548%2C850940552%2C850940554"
+            )
             assert sorted(response[0].json().keys()) == sorted(
                 ["entries", "extensions"]
             )
@@ -1085,6 +1089,10 @@ class TestLiveMetadataSession:
             response = session.holdings_unset([850940548, 850940552, 850940554])
             assert type(response) is list
             assert response[0].status_code == 207
+            assert (
+                response[0].url
+                == "https://worldcat.org/ih/datalist?oclcNumbers=850940548%2C850940552%2C850940554&cascade=0"
+            )
             assert sorted(response[0].json().keys()) == sorted(
                 ["entries", "extensions"]
             )
