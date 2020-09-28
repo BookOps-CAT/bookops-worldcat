@@ -61,11 +61,7 @@ class TestMockedMetadataSession:
             (["1"], 1, ["1"]),
             (["1"] * 50, 1, [",".join(["1"] * 50)]),
             (["1"] * 51, 2, [",".join(["1"] * 50), "1"]),
-            (
-                ["1"] * 103,
-                3,
-                [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],
-            ),
+            (["1"] * 103, 3, [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],),
         ],
     )
     def test_split_into_legal_volume(
@@ -499,7 +495,7 @@ class TestMockedMetadataSession:
             with does_not_raise():
                 assert mock_token.is_expired() is True
                 session.holdings_set([850940548, 850940552, 850940554])
-            # assert mock_token.is_expired() is False
+                assert mock_token.is_expired() is False
 
     def test_holdings_set_timout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
@@ -521,6 +517,65 @@ class TestMockedMetadataSession:
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError) as exc:
                 session.holdings_set([850940548, 850940552, 850940554])
+                assert msg in str(exc.value)
+
+    @pytest.mark.parametrize(
+        "argm,expectation",
+        [
+            (None, pytest.raises(WorldcatSessionError)),
+            ([], pytest.raises(WorldcatSessionError)),
+            (["bt2111111111"], pytest.raises(WorldcatSessionError)),
+            (["850940548"], does_not_raise()),
+            (["ocn850940548"], does_not_raise()),
+            ("850940548,850940552, 850940554", does_not_raise()),
+            (["850940548", "850940552", "850940554"], does_not_raise()),
+            ([850940548, 850940552, 850940554], does_not_raise()),
+        ],
+    )
+    def test_holdings_unset(
+        self, argm, expectation, mock_token, mock_successful_multi_status_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            with expectation:
+                session.holdings_unset(argm)
+
+    def test_holdings_unset_no_oclcNumber_passed(self, mock_token):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(TypeError):
+                session.holdings_unset()
+
+    def test_holdings_unset_stale_token(
+        self, mock_token, mock_successful_multi_status_request
+    ):
+        with MetadataSession(authorization=mock_token) as session:
+            mock_token.token_expires_at = datetime.strftime(
+                datetime.utcnow() - timedelta(0, 1), "%Y-%m-%d %H:%M:%SZ"
+            )
+            with does_not_raise():
+                assert mock_token.is_expired() is True
+                session.holdings_unset([850940548, 850940552, 850940554])
+                assert mock_token.is_expired() is False
+
+    def test_holdings_uset_timout(self, mock_token, mock_timeout):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_unset([850940548, 850940552, 850940554])
+
+    def test_holdings_unset_connectionerror(self, mock_token, mock_connectionerror):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holding_unset([850940548, 850940552, 850940554])
+
+    def test_holdings_unset_unexpected_error(self, mock_token, mock_unexpected_error):
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError):
+                session.holdings_unset([850940548, 850940552, 850940554])
+
+    def test_holdings_unset_400_error_response(self, mock_token, mock_400_response):
+        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
+        with MetadataSession(authorization=mock_token) as session:
+            with pytest.raises(WorldcatSessionError) as exc:
+                session.holdings_unset([850940548, 850940552, 850940554])
                 assert msg in str(exc.value)
 
     def test_search_brief_bib_other_editions(
@@ -1000,6 +1055,36 @@ class TestLiveMetadataSession:
         with MetadataSession(authorization=token) as session:
             response = session.holdings_set([850940548, 850940552, 850940554])
             assert type(response) is list
+            assert response[0].status_code == 207
+            assert sorted(response[0].json().keys()) == sorted(
+                ["entries", "extensions"]
+            )
+            assert sorted(response[0].json()["entries"][0]) == sorted(
+                ["title", "content", "updated"]
+            )
+            assert sorted(response[0].json()["entries"][0]["content"]) == sorted(
+                [
+                    "requestedOclcNumber",
+                    "currentOclcNumber",
+                    "institution",
+                    "status",
+                    "detail",
+                ]
+            )
+
+    def test_holdings_unset(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.holdings_unset([850940548, 850940552, 850940554])
+            assert type(response) is list
+            assert response[0].status_code == 207
             assert sorted(response[0].json().keys()) == sorted(
                 ["entries", "extensions"]
             )

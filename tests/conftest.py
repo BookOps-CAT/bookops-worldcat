@@ -212,6 +212,7 @@ def mock_successful_multi_status_request(monkeypatch):
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
     monkeypatch.setattr(requests.Session, "post", mock_api_response)
+    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
 
 
 @pytest.fixture

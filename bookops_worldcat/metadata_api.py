@@ -495,6 +495,84 @@ class MetadataSession(WorldcatSession):
                 )
         return responses
 
+    def holdings_unset(
+        self,
+        oclcNumbers,
+        cascade="0",
+        inst=None,
+        instSymbol=None,
+        response_format="application/atom+json",
+        hooks=None,
+    ):
+        """
+        Set institution holdings for multiple OClC numbers
+
+        Args:
+            oclcNumbers: list or str    list of OCLC control numbers for which holdings
+                                        should be set;
+                                        they can be integers or strings with or
+                                        without OCLC # prefix;
+                                        if str the numbers must be separated by comma
+            cascade: int,               0 or 1, default 0;
+                                        0 - don't remove holdings if local holding
+                                        record or local bibliographic records exists;
+                                        1 - remove holding and delete local holdings
+                                        record and local bibliographic record
+            inst: str,                  registry ID of the institution whose holdings
+                                        are being checked
+            instSymbol: str,            optional; OCLC symbol of the institution whose
+                                        holdings are being checked
+            response_format: str,       'application/atom+json' (default) or
+                                        'application/atom+xml'
+            hooks: dict,                Requests library hook system that can be
+                                        used for singnal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            response: requests.Response obj
+        """
+        responses = []
+
+        try:
+            vetted_numbers = verify_oclc_numbers(oclcNumbers)
+        except InvalidOclcNumber as exc:
+            raise WorldcatSessionError(exc)
+
+        url = self._url_bib_holdings_batch_action()
+        header = {"Accept": response_format}
+
+        # split into batches of 50 and issue request for each batch
+        for batch in self._split_into_legal_volume(vetted_numbers):
+            payload = {
+                "oclcNumbers": batch,
+                "cascade": cascade,
+                "inst": inst,
+                "instSymbol": instSymbol,
+            }
+
+            # make sure access token is still valid and if not request a new one
+            if self.authorization.is_expired():
+                self._get_new_access_token()
+
+            # send request
+            try:
+                response = self.delete(url, headers=header, params=payload, hooks=hooks)
+
+                if response.status_code == 207:
+                    # the service returns multi-status response
+                    responses.append(response)
+                else:
+                    error_msg = parse_error_response(response)
+                    raise WorldcatRequestError(error_msg)
+            except WorldcatRequestError as exc:
+                raise WorldcatSessionError(exc)
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+                raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
+            except:
+                raise WorldcatSessionError(
+                    f"Unexpected request error: {sys.exc_info()[0]}"
+                )
+        return responses
+
     def search_brief_bib_other_editions(
         self, oclcNumber, offset=None, limit=None, hooks=None
     ):
