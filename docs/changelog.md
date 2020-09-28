@@ -2,7 +2,7 @@
 
 ## 0.2.1 (9/28/2020)
 
-+ added functionality for docs versioning
++ added functionality for docs versioning with mike
 
 ## 0.2.0 (04/30/2020)
 
