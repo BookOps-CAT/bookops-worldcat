@@ -144,44 +144,51 @@
 <p><a href="https://travis-ci.com/BookOps-CAT/bookops-worldcat"><img alt="Build Status" src="https://travis-ci.com/BookOps-CAT/bookops-worldcat.svg?branch=master" /></a> <a href="https://coveralls.io/github/BookOps-CAT/bookops-worldcat?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/BookOps-CAT/bookops-worldcat/badge.svg?branch=master&amp;service=github" /></a> <a href="https://badge.fury.io/py/bookops-worldcat"><img alt="PyPI version" src="https://badge.fury.io/py/bookops-worldcat.svg" /></a> <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/bookops-worldcat" /> <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a> <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a></p>
 <h2 id="overview">Overview</h2>
 <p>Requires Python 3.7 and up.</p>
-<p>Bookops-Worldcat is a Python wrapper around <a href="https://www.oclc.org/en/home.html">OCLC's</a> <a href="https://www.worldcat.org/">Worldcat</a> <a href="https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html">Search</a> and <a href="https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html">Metadata</a> APIs.  </p>
+<p>Bookops-Worldcat is a Python wrapper around <a href="https://www.oclc.org/en/home.html">OCLC's</a> <a href="https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html">Worldcat Metadata</a> API which supports changes to the API introduced in May 2020 (Metadata API 1.1 release).</p>
 <p>The Bookops-Worldcat package simplifies some of OCLC API boilerplate, and ideally lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with it's gentle learning curve, has the potential to be a perfect vehicle towards this goal.</p>
-<p>This package takes advantage of the functionality of the popular <a href="https://requests.readthedocs.io/en/master/">Requests library</a>. Interaction with OCLC's services is built around Requests sessions. Authorizing a session simply requires  passing in OCLC's WSkey (<code>SearchSession</code>) or an access token (<code>MetadataSession</code>). Opening a session allows the user to call specific methods which facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible to access the functionalities of OCLC APIs.<br />
-Please note, not all features of Worldcat Search and Metadata APIs are implemented because this tool was primarily built for our organization's specific needs. However, we are open to any collaboration to expand and improve the package.  </p>
+<p>This package takes advantage of the functionality of the popular <a href="https://requests.readthedocs.io/en/master/">Requests library</a>. Interaction with OCLC's services is built around Requests sessions. Authorizing a session simply requires passing an access token into <code>MetadataSession</code>. Opening a session allows the user to call specific methods which facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible to access the functionalities of OCLC APIs.
+Please note, not all features of the Metadata API are implemented because this tool was primarily built for our organization's specific needs. However, we are open to any collaboration to expand and improve the package.</p>
 <p><strong>Supported OCLC web services:</strong></p>
-<p>At the moment, the wrapper supports only OAuth 2.0 endpoints and flows, specifically, it uses Client Credential Grant and Access Token.  </p>
-<p><a href="https://www.oclc.org/developer/develop/web-services.en.html">WorldCat Search API</a> provides developer-level access to WorldCat for bibliographic, holdings and location data. It requires credentials - WSkey only. It allows searching and retrieving bibliographic records for books, videos, music, and other formats.<br />
-BookOps wrapper offers following operations:  </p>
+<p>At the moment, the wrapper supports only OAuth 2.0 endpoints and flows, specifically, it uses Client Credential Grant and Access Token.</p>
+<p><a href="https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html">Worldcat Metadata API v1.1</a> is a read-write service for WorldCat. It allows adding and updating records in WorldCat, mantaining holdings, and working with local bibliographic data. Access to Metadata API requires OCLC credentials. The BookOps wrapper focuses on the following API operations:</p>
 <ul>
-<li>SRU (query in a form of a CQL Search)  </li>
-<li>Read (retrieves a single bibliographic record by OCLC number)  </li>
-<li>Lookup By ISBN</li>
-<li>Lookup By ISSN  </li>
-<li>Lookup By Standard Number</li>
-</ul>
-<p><a href="https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html">Worldcat Metadata API</a> is a read-write service for WorldCat. It allows adding and updating records in WorldCat, mantaining holdings, and working with local bibliographic data. Access to Metadata API requires OCLC credentials. The BookOps wrapper focuses on the following API operations:  </p>
-<ul>
-<li>Bibliographic Resource  <ul>
-<li>Read (retrieves a single bibliographic record by OCLC number)  </li>
+<li>WorldCat Metadata API - Search Endpoints<ul>
+<li>Member Shared Print Holdings (find member shared print holdings for a known item)</li>
+<li>Member General Holdings (get summary of holdings for a known item)</li>
+<li>Bibliographic Resources<ul>
+<li>Search Brief Bibs (search brief bibliographic resources)</li>
+<li>Get Brief Bib (retrieve a specific brief bibliographic resource)</li>
+<li>Search Other Editions (retrieve other editions related to a particular bibliographic resource)</li>
 </ul>
 </li>
-<li>Holdings Resource  <ul>
-<li>Set/Create  (to update holdings)</li>
-<li>Unset/Delete  (to delete holdings)</li>
-<li>Retrieve Status  (to retrieve holdings status)</li>
-<li>Batch Set - Multiple OCLC Numbers</li>
-<li>Batch Unset - Multiple OCLC Numbers</li>
+</ul>
+</li>
+<li>Worldcat Metadata API - Read/Write Endpoints<ul>
+<li>Bibliographic Records<ul>
+<li>Read Full Bibliographic Record (get a specific full bibliographic record)</li>
+<li>Check Control Numbers (retrieve current OCLC control numbers for provided items)
++</li>
+</ul>
+</li>
+<li>Institution Holdings<ul>
+<li>Set Individual Holding</li>
+<li>Unset Individual Holding</li>
+<li>Retrieve Holding Status</li>
+<li>Set Batch Holdings</li>
+<li>Unset Batch Holdings</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 <h2 id="installation">Installation</h2>
-<p>To install use pip:  </p>
-<p><code>$ pip install bookops-worldcat</code>  </p>
+<p>To install use pip:</p>
+<p><code>$ pip install bookops-worldcat</code></p>
 <h2 id="quickstart">Quickstart</h2>
-<p>Worldcat Search API and Metadata API require OCLC credentials which can be obtained at the <a href="https://www.oclc.org/developer/home.en.html">OCLC Developer Network</a> site. </p>
+<p>Worldcat Metadata API requires OCLC credentials which can be obtained at the <a href="https://www.oclc.org/developer/home.en.html">OCLC Developer Network</a> site.</p>
 <h4 id="searching-worldcat">Searching Worldcat</h4>
 <p>Search API requires only OCLC WSkey for authorization. Passing the WSkey string to <code>SearchSession</code> in the credentials argument will attach it to each request issued while the session is open. <code>SearchSession</code> includes several simple lookup methods allowing retrieval of a matching bibliographic record with the highest holdings.</p>
-<p>Basic usage:  </p>
+<p>Basic usage:</p>
 <pre><code class="python">&gt;&gt;&gt; from bookops_worldcat import SearchSession
 
 &gt;&gt;&gt; session = SearchSession(credentials=&quot;my_WSkey&quot;)
@@ -190,7 +197,7 @@ BookOps wrapper offers following operations:  </p>
 200
 </code></pre>
 
-<p>Using context manager:  </p>
+<p>Using context manager:</p>
 <pre><code class="python">with SearchSession(credentials=&quot;my_WSkey&quot;) as session:
     result = session.lookup_isbn(isbn=&quot;9781680502404&quot;)
     print(result.text)
@@ -283,7 +290,7 @@ print(token.token_str)
 <h4 id="getting-records">Getting Records</h4>
 <p>The <code>MetadataSession</code> is authorized using <code>WorldcatAccessToken</code> object. The session allows retrieving a full bibliographic record from Worldcat by passing its OCLC number in the method's parameter:</p>
 <p>Basic usage:</p>
-<pre><code class="python">from bookops_worldcat import MetadataSession  
+<pre><code class="python">from bookops_worldcat import MetadataSession
 
 with MetadataSession(credentials=token) as session:
     results = session.get_record(&quot;00000000123&quot;)
@@ -293,7 +300,7 @@ with MetadataSession(credentials=token) as session:
 <pre><code class="python">results = session.get_record(oclc_number=&quot;00000000123&quot;)
 </code></pre>
 
-<p>Returned bibliographic record can be acceessed via <code>text</code> or <code>content</code> (preferable) argument: </p>
+<p>Returned bibliographic record can be acceessed via <code>text</code> or <code>content</code> (preferable) argument:</p>
 <pre><code class="python">print(results.text)
 &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;entry xmlns=&quot;http://www.w3.org/2005/Atom&quot;&gt;
@@ -322,7 +329,7 @@ with MetadataSession(credentials=token) as session:
 
 <h4 id="updating-holdings">Updating Holdings</h4>
 <p><code>MetadataSession</code> can be used to check or set/unset your library holdings on a master record in Worldcat:</p>
-<p>example:  </p>
+<p>example:</p>
 <pre><code class="python">result = session.holdings_set(oclc_number=&quot;00000000123&quot;)
 print(result)
 &lt;Response [201]&gt;
@@ -360,7 +367,7 @@ print(result.text)
 </code></pre>
 
 <p><strong>Event hooks</strong></p>
-<p><code>SearchSession</code> and <code>MetadataSession</code> methods support <a href="https://requests.readthedocs.io/en/latest/user/advanced/#event-hooks">Requests event hooks</a> which can be passes as an argument:  </p>
+<p><code>SearchSession</code> and <code>MetadataSession</code> methods support <a href="https://requests.readthedocs.io/en/latest/user/advanced/#event-hooks">Requests event hooks</a> which can be passed as an argument:</p>
 <pre><code class="python">def print_url(response, *args, **kwargs):
     print(response.url)
 
@@ -371,9 +378,9 @@ session.get_record(&quot;00000000123&quot;, hooks=hooks)
 </code></pre>
 
 <h4 id="searchsession-search-api">SearchSession (Search API)</h4>
-<p>WorldCat Search API requires only OCLC's WSKey for authentication (<a href="https://www.oclc.org/developer/develop/authentication/wskey-lite.en.html">WSKey Lite pattern</a>). Returned records are by default in MARC XML format. Other formats offered by the API are not currently supported.  </p>
+<p>WorldCat Search API requires only OCLC's WSKey for authentication (<a href="https://www.oclc.org/developer/develop/authentication/wskey-lite.en.html">WSKey Lite pattern</a>). Returned records are by default in MARC XML format. Other formats offered by the API are not currently supported.</p>
 <h5 id="simple-lookup">Simple Lookup</h5>
-<p>Lookup methods of <code>SearchSession</code> always return a single, matching record with highest holdings count in the WorldCat:  </p>
+<p>Lookup methods of <code>SearchSession</code> always return a single, matching record with highest holdings count in the WorldCat:</p>
 <ul>
 <li><code>lookup_isbn</code> performs ISBN search</li>
 <li><code>lookup_issn</code> performs ISSN search</li>
@@ -393,13 +400,13 @@ session.get_record(&quot;00000000123&quot;, hooks=hooks)
 <p>Do not use any "ocm", "ocn", or other prefixes with OCLC numbers.</p>
 <h5 id="complex-queries">Complex queries</h5>
 <p><code>sru_query</code> method of <code>SearchSession</code> offers a flexible way to build complex queries using SRU/CQL syntax.</p>
-<p>Following OCLC's resouces can be very helpful in learning about query syntax:  </p>
+<p>Following OCLC's resouces can be very helpful in learning about query syntax:</p>
 <ul>
 <li>http://www.worldcat.org/webservices/catalog/search/sru?wskey={my_WSKey}</li>
 <li><a href="https://www.oclc.org/developer/develop/web-services/worldcat-search-api/bibliographic-resource.en.html">OCLC Search API documentation</a></li>
 <li><a href="http://worldcat.org/webservices/catalog/evaluator.html">URI Evaluator</a></li>
 </ul>
-<p>Advanced CQL query example (keyword search for "civil war" phrase with subject "antietam" or "sharpsburg", results sorted by date from most recent one):  </p>
+<p>Advanced CQL query example (keyword search for "civil war" phrase with subject "antietam" or "sharpsburg", results sorted by date from most recent one):</p>
 <pre><code class="python">with SearchSession(credentials=&quot;my_WSKey&quot;) as session:
     results = session.sru_query(
         query='srw.kw+=+&quot;civil war&quot;+and+(srw.su+=+&quot;antietam&quot;+OR+srw.su+=+&quot;sharpsburg&quot;)',
@@ -409,11 +416,11 @@ session.get_record(&quot;00000000123&quot;, hooks=hooks)
 </code></pre>
 
 <p>Note, <code>sru_query</code> does not require to URL encode parenthesis in logic statements as it is in the OCLC documentation.</p>
-<p>Default parameters of the <code>sru_query</code> method:  </p>
+<p>Default parameters of the <code>sru_query</code> method:</p>
 <ul>
-<li><code>start_record</code> (default value: <code>1</code>): starting position of the result set (can be used to page through the large results)  </li>
+<li><code>start_record</code> (default value: <code>1</code>): starting position of the result set (can be used to page through the large results)</li>
 <li><code>maximum_records</code> ( default: <code>10</code>):  maximum value is 100</li>
-<li><code>sort_keys</code> (default: <code>[("relevance", "descending")]</code>): specifies how results are sorted; <code>sort_keys</code> must be a list of tuples, where the first tuple element is a key, and the second is a sort type. This allows to combine two or more sort types in the results, for example: <code>sort_keys=[("author", "ascending"), ("date", "descending")]</code> will return results sorted by the author in alphabetical order and within each author group results will be sorted by date from the newest to oldest; sort_keys keys:  <ul>
+<li><code>sort_keys</code> (default: <code>[("relevance", "descending")]</code>): specifies how results are sorted; <code>sort_keys</code> must be a list of tuples, where the first tuple element is a key, and the second is a sort type. This allows to combine two or more sort types in the results, for example: <code>sort_keys=[("author", "ascending"), ("date", "descending")]</code> will return results sorted by the author in alphabetical order and within each author group results will be sorted by date from the newest to oldest; sort_keys keys:<ul>
 <li>relevance</li>
 <li>title</li>
 <li>author</li>
@@ -469,7 +476,7 @@ True
 
 <p>A failed token request raises <code>TokenRequestError</code> which provides returned by the server error code and detailed message.</p>
 <h4 id="metadatasession">MetadataSession</h4>
-<p>A wrapper around WorldCat Metadata API. MetadataSession inherits <code>requests.Session</code> methods.<br />
+<p>A wrapper around WorldCat Metadata API. MetadataSession inherits <code>requests.Session</code> methods.
 Returned bibliographic records are by default in MARC/XML format (OCLC's native CDF XML and the CDF translation into JSON serializations are not supported at the moment).</p>
 <h5 id="get_record-method">get_record Method</h5>
 <p><code>session.get_record()</code> method with OCLC number as an argument sends a request for a matching full bibliographic record in Worldcat. <code>get_record</code> should be a primary method to download records from Worldcat. The Metadata API correctly matches requested OCLC numbers of records that have been merged by returning current master record.</p>
@@ -487,9 +494,9 @@ Returned bibliographic records are by default in MARC/XML format (OCLC's native 
 </code></pre>
 
 <h5 id="holdings">Holdings</h5>
-<p>MetadataSession supports fallowing holdings operations:  </p>
+<p>MetadataSession supports fallowing holdings operations:</p>
 <ul>
-<li><code>holdings_get_status</code> retrieves holding status of requested record </li>
+<li><code>holdings_get_status</code> retrieves holding status of requested record</li>
 <li><code>holdings_set</code> sets holdings on an individual bibliographic record</li>
 <li><code>holdings_unset</code> deletes holdings on an individual bibliographic record</li>
 <li><code>holdings_set_batch</code> allows to set holdings on multiple records; it is not limited by OCLC 50 bibs limit)</li>
@@ -516,7 +523,7 @@ print(result.text)
 &lt;/entry&gt;
 </code></pre>
 
-<p>Pass OCLC record numbers for batch operations as a list of strings:  </p>
+<p>Pass OCLC record numbers for batch operations as a list of strings:</p>
 <pre><code class="python">session.holdings_unset_batch(
     oclc_numbers=[
         &quot;00000000123&quot;,
@@ -582,5 +589,5 @@ print(result.text)
 
 <!--
 MkDocs version : 1.1
-Build Date UTC : 2020-09-28 20:16:21
+Build Date UTC : 2020-09-28 21:26:44
 -->
