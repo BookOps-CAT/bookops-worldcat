@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """
-overload.exceptions
+bookops_worldcat exceptions
 ~~~~~~~~~~~~~~~~~~~
-This module contains the set of Overload's exceptions.
+This module contains the set of bookops_worldcat exceptions.
 """
 
 
@@ -13,9 +13,33 @@ class BookopsWorldcatError(Exception):
     pass
 
 
-class TokenRequestError(BookopsWorldcatError):
+class WorldcatAuthorizationError(BookopsWorldcatError):
     """
     Exception raised when WorldCat access token is not obtained
+    """
+
+    pass
+
+
+class WorldcatSessionError(BookopsWorldcatError):
+    """
+    Exception raised during WorlCat session
+    """
+
+    pass
+
+
+class WorldcatRequestError(WorldcatSessionError):
+    """
+    Exceptions raised on HTTP errors returned by web service
+    """
+
+    pass
+
+
+class InvalidOclcNumber(BookopsWorldcatError):
+    """
+    Exception raised when an invalid OCLC record number is encountered
     """
 
     pass

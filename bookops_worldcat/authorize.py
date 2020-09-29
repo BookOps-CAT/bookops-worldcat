@@ -1,139 +1,164 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+import sys
 
 import requests
 
+
 from . import __title__, __version__
-from .errors import TokenRequestError
+from .errors import WorldcatAuthorizationError
 
 
 class WorldcatAccessToken:
     """
-    Requests OCLC API access token via Client Credentials only.
-    Server response information can be access using .server_response property.
-    Does not support Explicit Authorization Code and Refresh Token flows.
+    Requests Worldcat access token. Authenticates and authorizes using Client
+    Credentials Grant. Does not support Explicit Authorization Code and Refresh
+    Token flows. Token with correctly bonded scopes can then be passed into a session
+    of particular web service to authorize requests for resources.
+    More on OCLC's web services authorization:
+    https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html
 
     Args:
-        oauth_server: str,  OCLC authorization server
-        wskey: str,         OCLC API key
-        wssecret: str,      OCLC API secret
-        option: dict,       valid options:
-                            - principal_id
-                            - principla_idns
-                            - scope
-        agent: str,         "user-agent" string to be passed to
-                            token request header
+        key: str,                               your WSKey public client_id
+        secret: str,                            your WSKey secret
+        scopes: str or list,                    request scopes for the access token
+        principal_id: str,                      principalID (required for read/write
+                                                endpoints)
+        principal_idns: str,                    principalIDNS (required for read/write
+                                                endpoints)
+        agent: (optional) str,                  "User-agent" parameter to be passed
+                                                in the request header; usage strongly
+                                                encouraged
+        timeout: (optional) float or tuple,     how long to wait for server to send
+                                                data before giving up; default value
+                                                is 3 seconds
+
+    Returns:
+        token, class
+
 
     Basic usage:
         >>> from bookops_worldcat import WorldcatAccessToken
         >>> token = WorldcatAccessToken(
-                oauth_server='https://oauth.oclc.org',
-                key='WSkey',
-                secret='WSsecret',
-                options={
-                    "scope": ['SCOPE1', 'SCOPE2'],
-                    "principal_id": "PRINCIPAL_ID_HERE",
-                    "principal_idns": "PRINCIPAL_IDNS_HERE"},
-                "agent": "my_app/1.0.0"
-            )
+                key="my_WSKey_client_id",
+                secret="my_WSKey_secret",
+                scope="WorldCatMetadataAPI",
+                principal_id="your principalID here",
+                principal_idns="your principalIDNS here",
+                agent="my_app/1.0.0")
         >>> token.token_str
         "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
         >>> token.is_expired()
         False
-        >>> # token object retains post request (requests.Request object) functinality
         >>> token.server_response.json()
         {"token_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
          "token_type": "bearer",
          "expires_in": "1199",
          "principalID": "",
          "principalIDNS": "",
-         "scopes": "SCOPE1 SCOPE2",
+         "scopes": "WorldCatMetadataAPI",
          "contextInstitutionId": "00001",
-         "expires_at": "2013-08-23 18:45:29Z"}
+         "expires_at": "2020-08-23 18:45:29Z"}
         >>> token.server_response.request.headers
-        {"user-agent": "bookops-worldcat/0.1.0",
+        {"User-Agent": "my_app/1.0.0",
          "Accept-Encoding": "gzip, deflate",
          "Accept": "application/json",
          "Connection": "keep-alive",
          "Content-Length": "67",
          "Content-Type": "application/x-www-form-urlencoded",
          "Authorization": "Basic encoded_authorization_here="}
+
     """
 
     def __init__(
-        self, oauth_server=None, key=None, secret=None, options=None, agent=None
+        self,
+        key=None,
+        secret=None,
+        scopes=[],
+        principal_id=None,
+        principal_idns=None,
+        agent=None,
+        timeout=None,
     ):
-        """Constructor."""
+        """Constructor"""
 
         self.agent = agent
         self.grant_type = "client_credentials"
         self.key = key
-        self.oauth_server = oauth_server
-        self.options = options
+        self.oauth_server = "https://oauth.oclc.org"
+        self.principal_id = principal_id
+        self.principal_idns = principal_idns
+        self.scopes = scopes
         self.secret = secret
-        self.timeout = (5, 5)
+        self.server_response = None
+        self.timeout = timeout
         self.token_expires_at = None
         self.token_str = None
         self.token_type = None
-        self.server_response = None
-        self.valid_options = [
-            "principal_id",
-            "principal_idns",
-            "scope",
-        ]
 
+        # default bookops-worldcat request header
         if self.agent is None:
-            # default bookops-worldcat header
             self.agent = f"{__title__}/{__version__}"
         else:
             if type(self.agent) is not str:
-                raise TypeError("Argument agent must be a string.")
+                raise WorldcatAuthorizationError("Argument 'agent' must be a string.")
 
-        if not self.oauth_server:
-            raise ValueError("Argument oauth_server cannot be empty.")
-
+        # asure passed arguments are valid
         if not self.key:
-            raise ValueError("Missing key argument.")
+            raise WorldcatAuthorizationError("Argument 'key' is required.")
+        else:
+            if type(self.key) is not str:
+                raise WorldcatAuthorizationError("Argument 'key' must be a string.")
 
         if not self.secret:
-            raise ValueError("Missing secret argument.")
+            raise WorldcatAuthorizationError("Argument 'secret' is required.")
+        else:
+            if type(self.secret) is not str:
+                raise WorldcatAuthorizationError("Argument 'secret' must be a string.")
 
-        if (
-            "scope" not in options
-            or "principal_id" not in options
-            or "principal_idns" not in options
-        ):
-            raise KeyError("Missing option required for client credential grant.")
+        if not self.principal_id:
+            raise WorldcatAuthorizationError(
+                "Argument 'principal_id' is required for read/write endpoint of Metadata API."
+            )
+        if not self.principal_idns:
+            raise WorldcatAuthorizationError(
+                "Argument 'principal_idns' is required for read/write endpoint of Metadata API."
+            )
 
-        # make sure only valid scopes are passed
-        if "wcapi" in self.options["scope"]:
-            # wcapi uses only WSkey no access token needed but may be bundled
-            # under the authorization
-            self.options["scope"].remove("wcapi")
+        # validate passed scopes
+        if type(self.scopes) is list:
+            self.scopes = " ".join(self.scopes)
+        elif type(self.scopes) is not str:
+            raise WorldcatAuthorizationError(
+                "Argument 'scope' must a string or a list."
+            )
+        self.scopes = self.scopes.strip()
+        if self.scopes == "":
+            raise WorldcatAuthorizationError("Argument 'scope' is missing.")
 
-        # post access token request & create token object
-        self.create_token()
+        # assign default value for timout
+        if not self.timeout:
+            self.timeout = (3, 3)
 
-    def _get_token_url(self):
+        # initiate request
+        self.request_token()
+
+    def _token_url(self):
         return f"{self.oauth_server}/token"
 
-    def _get_post_token_headers(self):
-        return {
-            "user-agent": self.agent,
-            "Accept": "application/json",
-        }
+    def _token_headers(self):
+        return {"User-Agent": self.agent, "Accept": "application/json"}
 
-    def _get_auth(self):
+    def _auth(self):
         return (self.key, self.secret)
 
-    def _get_payload(self):
-        scope = " ".join(self.options["scope"])
+    def _payload(self):
         return {
             "grant_type": self.grant_type,
-            "scope": f"{scope}",
-            "principalID": self.options["principal_id"],
-            "principalIDNS": self.options["principal_idns"],
+            "scope": self.scopes,
+            "principalID": self.principal_id,
+            "principalIDNS": self.principal_idns,
         }
 
     def _parse_server_response(self, response):
@@ -143,22 +168,20 @@ class WorldcatAccessToken:
             self.token_expires_at = response.json()["expires_at"]
             self.token_type = response.json()["token_type"]
         else:
-            jres = response.json()
-            raise TokenRequestError(
-                f"Authorization server error code: {jres['code']}, "
-                f"error message: {jres['message']}"
-            )
+            raise WorldcatAuthorizationError(response.json())
 
     def _post_token_request(self):
         """
-        Fetches OCLC access token
+        Fetches Worldcat access token for specified scope (web service)
+
         Returns:
             server_response: instance of requests.Response
         """
-        token_url = self._get_token_url()
-        headers = self._get_post_token_headers()
-        auth = self._get_auth()
-        payload = self._get_payload()
+
+        token_url = self._token_url()
+        headers = self._token_headers()
+        auth = self._auth()
+        payload = self._payload()
         try:
             response = requests.post(
                 token_url,
@@ -168,17 +191,18 @@ class WorldcatAccessToken:
                 timeout=self.timeout,
             )
             return response
-        except requests.exceptions.Timeout:
-            raise
-        except requests.exceptions.ConnectionError:
-            raise
 
-    def create_token(self):
-        self.token_str = None
-        self.token_expires_at = None
-        self.token_type = None
-        self.server_response = self._post_token_request()
-        self._parse_server_response(self.server_response)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise WorldcatAuthorizationError(f"Trouble connecing: {sys.exc_info()[0]}")
+        except Exception:
+            raise WorldcatAuthorizationError(f"Unexpected error: {sys.exc_info()[0]}")
+
+    def request_token(self):
+        """
+        Initiates access token request and parses the response if successful.
+        """
+        response = self._post_token_request()
+        self._parse_server_response(response)
 
     def is_expired(self):
         if (

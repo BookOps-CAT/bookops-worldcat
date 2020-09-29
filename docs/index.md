@@ -261,7 +261,7 @@ token = WorldcatAccessToken(
 
 **Event hooks**
 
-`SearchSession` and `MetadataSession` methods support [Requests event hooks](https://requests.readthedocs.io/en/latest/user/advanced/#event-hooks) which can be passes as an argument:  
+`SearchSession` and `MetadataSession` methods support [Requests event hooks](https://requests.readthedocs.io/en/latest/user/advanced/#event-hooks) which can be passed as an argument:  
 
 ```python
 def print_url(response, *args, **kwargs):
