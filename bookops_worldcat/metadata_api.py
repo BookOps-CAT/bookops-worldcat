@@ -692,7 +692,8 @@ class MetadataSession(WorldcatSession):
                                         program
             facets: str,                list of facets to restrict responses
             groupRelatedEditions: str,  whether or not use FRBR grouping,
-                                        options: 'Y' (yes) or 'N' (no)
+                                        options: 'Y' (yes) or 'N' (no);
+                                        server's default 'N'
             orderBy: str,               results sort key;
                                         options:
                                             'recency'
