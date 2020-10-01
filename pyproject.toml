@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bookops-worldcat"
-version = "0.2.0"
+version = "0.3.0"
 description = "OCLC WorldCat Search and Metadata APIs wrapper"
 authors = ["Tomasz Kalata <klingaroo@gmail.com>"]
 license = "MIT"
@@ -31,12 +31,14 @@ python = "^3.7"
 requests = "^2.23"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^6.0.1"
 pytest-cov = "^2.8"
-pytest-mock = "^2.0"
+pytest-mock = "^3.0"
 pytest-recording = "^0.6.0"
 mkdocs = "^1.1"
-black = { version = "^19.10b0", python = "^3.7" }
+black = { version = "^20.8b1", python = "^3.7" }
+
+mike = "^0.5.3"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
@@ -66,4 +68,3 @@ exclude = '''
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
-

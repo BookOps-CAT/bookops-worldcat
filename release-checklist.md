@@ -1,6 +1,9 @@
 1. Update documentation  
     a) update Changelog: version, date, descriptions of changes
-    b) rebuild (mkdocs build --clean) & deploy github pages (mkdocs gh-deploy)
+    b) rebuild docs using mike:
+        - mike --rebase (optional, to fetch remote version of docs to your local branch)
+        - mike deploy [version] [alias] --push
+        - mike set-default [version]
 2. Verify poetry.lock & requirements are up-to-date  
     a) poetry update / poetry update [package1] [ package2]  
     b) poetry install
