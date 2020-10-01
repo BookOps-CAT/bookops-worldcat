@@ -173,7 +173,7 @@ class MetadataSession(WorldcatSession):
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
-    def get_full_bib(self, oclcNumber, hooks=None):
+    def get_full_bib(self, oclcNumber, response_format=None, hooks=None):
         """
         Send a GET request for a full bibliographic resource.
 
@@ -194,9 +194,11 @@ class MetadataSession(WorldcatSession):
             self._get_new_access_token()
 
         url = self._url_bib_oclc_number(oclcNumber)
-        header = {
-            "Accept": 'application/atom+xml;content="application/vnd.oclc.marc21+xml"'
-        }
+        if not response_format:
+            response_format = (
+                'application/atom+xml;content="application/vnd.oclc.marc21+xml"'
+            )
+        header = {"Accept": response_format}
 
         # send request
         try:
