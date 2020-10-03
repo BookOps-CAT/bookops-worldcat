@@ -29,13 +29,15 @@ class TestMockedMetadataSession:
                 == "Bearer tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
             )
 
-    def test_invalid_credentials(self):
-        with pytest.raises(WorldcatSessionError) as exc:
+    def test_missing_authorization(self):
+        msg = "Argument 'authorization' must include 'WorldcatAccessToken' obj."
+        with pytest.raises(TypeError):
             MetadataSession()
-            assert (
-                "Argument 'authorization' must include 'WorldcatAccessToken' obj."
-                in str(exc.value)
-            )
+
+    def test_invalid_authorizaiton(self):
+        with pytest.raises(WorldcatSessionError) as exc:
+            MetadataSession(authorization="my_token")
+            assert msg in str(exc.value)
 
     def test_get_new_access_token(self, mock_token):
         assert mock_token.is_expired() is False
@@ -61,7 +63,11 @@ class TestMockedMetadataSession:
             (["1"], 1, ["1"]),
             (["1"] * 50, 1, [",".join(["1"] * 50)]),
             (["1"] * 51, 2, [",".join(["1"] * 50), "1"]),
-            (["1"] * 103, 3, [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],),
+            (
+                ["1"] * 103,
+                3,
+                [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],
+            ),
         ],
     )
     def test_split_into_legal_volume(

@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""
+Base session class to allow extention of functionality to Worldcat Search API
+and others.
+"""
+
 import requests
 
 from . import __title__, __version__
@@ -7,7 +12,7 @@ from bookops_worldcat.errors import WorldcatSessionError
 
 
 class WorldcatSession(requests.Session):
-    """Inherits all requests.Session methods"""
+    """Base class, inherits all requests.Session methods"""
 
     def __init__(self, agent=None, timeout=None):
         requests.Session.__init__(self)

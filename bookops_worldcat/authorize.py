@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
+"""
+This module provides means to authenticate and obtain a WorldCat access token.
+"""
+
 from datetime import datetime
 import sys
+from typing import List, Union, Tuple
 
 import requests
 
@@ -12,33 +17,27 @@ from .errors import WorldcatAuthorizationError
 
 class WorldcatAccessToken:
     """
-    Requests Worldcat access token. Authenticates and authorizes using Client
-    Credentials Grant. Does not support Explicit Authorization Code and Refresh
-    Token flows. Token with correctly bonded scopes can then be passed into a session
-    of particular web service to authorize requests for resources.
+    Requests Worldcat access token.
+    Authenticates and authorizes using Client Credentials Grant. Does not support
+    Explicit Authorization Code and Refresh Token flows. Token with correctly
+    bonded scopes can then be passed into a session of particular web service
+    to authorize requests for resources.
     More on OCLC's web services authorization:
     https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html
 
     Args:
-        key: str,                               your WSKey public client_id
-        secret: str,                            your WSKey secret
-        scopes: str or list,                    request scopes for the access token
-        principal_id: str,                      principalID (required for read/write
-                                                endpoints)
-        principal_idns: str,                    principalIDNS (required for read/write
-                                                endpoints)
-        agent: (optional) str,                  "User-agent" parameter to be passed
-                                                in the request header; usage strongly
-                                                encouraged
-        timeout: (optional) float or tuple,     how long to wait for server to send
-                                                data before giving up; default value
-                                                is 3 seconds
-
-    Returns:
-        token, class
+        key:                    your WSKey public client_id
+        secret:                 your WSKey secret
+        scopes:                 request scopes for the access token
+        principal_id:           principalID (required for read/write endpoints)
+        principal_idns:         principalIDNS (required for read/write endpoints)
+        agent:                  "User-agent" parameter to be passed in the request
+                                header; usage strongly encouraged
+        timeout:                how long to wait for server to send data before
+                                giving up; default value is 3 seconds
 
 
-    Basic usage:
+    Examples:
         >>> from bookops_worldcat import WorldcatAccessToken
         >>> token = WorldcatAccessToken(
                 key="my_WSKey_client_id",
@@ -73,13 +72,13 @@ class WorldcatAccessToken:
 
     def __init__(
         self,
-        key=None,
-        secret=None,
-        scopes=[],
-        principal_id=None,
-        principal_idns=None,
-        agent=None,
-        timeout=None,
+        key: str,
+        secret: str,
+        scopes: Union[str, List],
+        principal_id: str,
+        principal_idns: str,
+        agent: str = None,
+        timeout: Union[float, Tuple] = None,
     ):
         """Constructor"""
 
@@ -142,7 +141,7 @@ class WorldcatAccessToken:
             self.timeout = (3, 3)
 
         # initiate request
-        self.request_token()
+        self._request_token()
 
     def _token_url(self):
         return f"{self.oauth_server}/token"
@@ -197,7 +196,7 @@ class WorldcatAccessToken:
         except Exception:
             raise WorldcatAuthorizationError(f"Unexpected error: {sys.exc_info()[0]}")
 
-    def request_token(self):
+    def _request_token(self):
         """
         Initiates access token request and parses the response if successful.
         """
@@ -205,6 +204,16 @@ class WorldcatAccessToken:
         self._parse_server_response(response)
 
     def is_expired(self):
+        """
+        Checks if the access token is expired.
+
+        Returns:
+            bool
+
+        Example:
+        >>> token.is_expired()
+        False
+        """
         if (
             datetime.strptime(self.token_expires_at, "%Y-%m-%d %H:%M:%SZ")
             < datetime.utcnow()
