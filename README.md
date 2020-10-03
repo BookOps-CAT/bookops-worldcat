@@ -7,7 +7,7 @@
 BookOps-Worldcat provides a Python interface for the WorldCat Metadata API.
 This wrapper simplifies requests to OCLC web services making them ideally more accessible to OCLC member libraries.
 
-Due to major changes introduced by OCLC in May 2020, the version 0.3.0 of the wrapper dropped functionality related to WorldCat Search API. New search endopoints of the Metadata API supported in the 0.3.0 version should fill that gap. While WorldCat Metadata API is our primary focus, we plan in the future to expand wrapper's functionality to other related OCLC web services, including the now dropped Search API.\
+Due to major changes introduced by OCLC in May 2020, the version 0.3.0 of the wrapper dropped functionality related to WorldCat Search API. New search endopoints of the Metadata API supported in the 0.3.0 version should fill that gap. While WorldCat Metadata API is our primary focus, we plan in the future to expand wrapper's functionality to other related OCLC web services, including the now dropped Search API.  
 
 ## Installation
 
@@ -99,32 +99,53 @@ with MetadataSession(authorization=token) as session:
     print(results.text)
 ```
 ```xml
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<record xmlns="http://www.loc.gov/MARC21/slim">
-    <leader>00000cam a2200000 i 4500</leader>
-    <controlfield tag="001">1143317889</controlfield>
-    <controlfield tag="008">200305t20202019nyuabf   b    001 0 eng c</controlfield>
-    <datafield ind1=" " ind2=" " tag="010">
-      <subfield code="a">  2018957420</subfield>
+<?xml version="1.0" encoding="UTF-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom">
+  <content type="application/xml">
+    <response xmlns="http://worldcat.org/rb" mimeType="application/vnd.oclc.marc21+xml">
+      <record xmlns="http://www.loc.gov/MARC21/slim">
+        <leader>00000cam a2200000 i 4500</leader>
+        <controlfield tag="001">on1143317889</controlfield>
+        <controlfield tag="003">OCoLC</controlfield>
+        <controlfield tag="005">20200328101446.1</controlfield>
+        <controlfield tag="008">200305t20202019nyuabf   b    001 0 eng c</controlfield>
+        <datafield tag="010" ind1=" " ind2=" ">
+          <subfield code="a">  2018957420</subfield>
     </datafield>
-    <datafield ind1=" " ind2=" " tag="020">
-      <subfield code="a">9780316230049</subfield>
-      <subfield code="q">(pbk.)</subfield>
+        <datafield tag="040" ind1=" " ind2=" ">
+          <subfield code="a">NYP</subfield>
+          <subfield code="b">eng</subfield>
+          <subfield code="e">rda</subfield>
+          <subfield code="c">NYP</subfield>
+<!--...-->
+        <datafield tag="020" ind1=" " ind2=" ">
+          <subfield code="a">9780316230049</subfield>
+          <subfield code="q">(pbk.)</subfield>
+<!--...-->
+        <datafield tag="100" ind1="1" ind2=" ">
+          <subfield code="a">Christakis, Nicholas A.,</subfield>
+          <subfield code="e">author.</subfield>
     </datafield>
-    <datafield ind1=" " ind2=" " tag="020">
-      <subfield code="a">0316230049</subfield>
+        <datafield tag="245" ind1="1" ind2="0">
+          <subfield code="a">Blueprint :</subfield>
+          <subfield code="b">the evolutionary origins of a good society /</subfield>
+          <subfield code="c">Nicholas A. Christakis.</subfield>
     </datafield>
-    <datafield ind1="1" ind2=" " tag="100">
-      <subfield code="a">Christakis, Nicholas A.,</subfield>
-      <subfield code="e">author.</subfield>
+        <datafield tag="250" ind1=" " ind2=" ">
+          <subfield code="a">First Little, Brown Spark trade paperback edition.</subfield>
     </datafield>
-    <datafield ind1="1" ind2="0" tag="245">
-      <subfield code="a">Blueprint :</subfield>
-      <subfield code="b">the evolutionary origins of a good society /</subfield>
-      <subfield code="c">Nicholas A. Christakis.</subfield>
+        <datafield tag="264" ind1=" " ind2="1">
+          <subfield code="a">New York, NY :</subfield>
+          <subfield code="b">Little, Brown Spark,</subfield>
+          <subfield code="c">2020</subfield>
     </datafield>
-      ...
-</record>
+<!--...-->
+  </record>
+    </response>
+  </content>
+  <id>http://worldcat.org/oclc/1143317889</id>
+  <link href="http://worldcat.org/oclc/1143317889"></link>
+</entry>
 ```
 
 ## Changelog
@@ -143,4 +164,3 @@ Please use [Github issue tracker](https://github.com/BookOps-CAT/bookops-worldca
   + support for holdings batch actions for multiple institutions
   + record validation endpoints
   + methods to create and update bibliographic records
-
