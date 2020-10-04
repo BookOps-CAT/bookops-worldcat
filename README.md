@@ -21,9 +21,8 @@ For full documentation please see https://bookops-cat.github.io/bookops-worldcat
 
 ## Features
 
-This package takes advantage of functionality of a popular [Requests library](https://requests.readthedocs.io/en/master/). Interactions with [OCLC](https://www.oclc.org/en/home.html)'s services are built around Requests' sessions. Authorizing a web service session simply requires passing an access token to `MetadataSession`. Opening a session allows the user to call specific methods to facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible.
-Please note, not all endpoints of the Metadata API are implemented at the moment as this tool was built primarily for the specific needs of BookOps.\
-We are open to any collaboration to expand and improve this package.
+This package takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interactions with [OCLC](https://www.oclc.org/en/home.html)'s services are built around 'Requests' sessions. Authorizing a web service session simply requires passing an access token to `MetadataSession`. Opening a session allows the user to call specific methods to facilitate communication between the user's script/client and particular endpoint of OCLC API service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible.
+Please note, not all endpoints of the Metadata API are implemented at the moment.  This tool was primarily built for the specific needs of BookOps but we are open to collaboration to expand and improve this package.
 
 At the moment, BookOps-Worldcat supports requests to following OCLC's web services:
 
@@ -35,16 +34,16 @@ At the moment, BookOps-Worldcat supports requests to following OCLC's web servic
       + searching bibliographic resources:
         + search brief bibs
         + retrieve specific brief bib
-        + retrieve other editions related to a particular bibliographic resource
+        + retrieve other editions related to a specific bibliographic resource
     + [Metadata API](https://developer.api.oclc.org/wc-metadata)
       + bibliographic records
         + retrieve full bib
         + find current OCLC number
       + holdings
         + set institution holding for a single resource
-        + unset intitution holding for a single resource
+        + unset institution holding for a single resource
         + retrieve holding status of a single resource
-        + set intitution holdings for a batch of resources
+        + set institution holdings for a batch of resources
         + unset institution holdings for a batch of resouces
 
 
