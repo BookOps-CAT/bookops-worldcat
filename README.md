@@ -7,7 +7,7 @@
 BookOps-Worldcat provides a Python interface for the WorldCat Metadata API.
 This wrapper simplifies requests to OCLC web services making them ideally more accessible to OCLC member libraries.
 
-Due to major changes introduced by OCLC in May 2020, the version 0.3.0 of the wrapper dropped functionality related to WorldCat Search API. New search endopoints of the Metadata API supported in the 0.3.0 version should fill that gap. While WorldCat Metadata API is our primary focus, we plan in the future to expand wrapper's functionality to other related OCLC web services, including the now dropped Search API.  
+Due to major changes introduced by OCLC in May 2020, version 0.3.0 of the wrapper dropped functionality related to WorldCat Search API. The new search endpoints of the Metadata API which are supported in the 0.3.0 version should fill that gap. While the WorldCat Metadata API is our primary focus, in the future, we plan to expand the wrapper's functionality to other related OCLC web services, including dropped Search API.
 
 ## Installation
 
