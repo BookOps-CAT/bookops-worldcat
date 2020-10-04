@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """
-bookops_worldcat exceptions
-~~~~~~~~~~~~~~~~~~~
 This module contains the set of bookops_worldcat exceptions.
 """
 
