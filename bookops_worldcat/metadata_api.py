@@ -1,23 +1,42 @@
 # -*- coding: utf-8 -*-
 
+"""
+This module provides MetadataSession class for requests to WorldCat Metadata API.
+"""
+
 import sys
+from typing import Dict, List, Tuple, Type, Union
 
 import requests
 
 from ._session import WorldcatSession
+from .authorize import WorldcatAccessToken
 from .errors import (
     WorldcatSessionError,
     WorldcatRequestError,
     InvalidOclcNumber,
     WorldcatAuthorizationError,
 )
-from .utils import verify_oclc_number, verify_oclc_numbers, parse_error_response
+from .utils import verify_oclc_number, verify_oclc_numbers, _parse_error_response
 
 
 class MetadataSession(WorldcatSession):
-    """OCLC Metadata API wrapper session. Inherits requests.Session methods"""
+    """OCLC Metadata API wrapper session. Inherits `requests.Session` methods"""
 
-    def __init__(self, authorization=None, agent=None, timeout=None):
+    def __init__(
+        self,
+        authorization: Type[WorldcatAccessToken],
+        agent: str = None,
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float]] = None,
+    ):
+        """
+        Args:
+            authorization:          WorlcatAccessToken object
+            agent:                  "User-agent" parameter to be passed in the request
+                                    header; usage strongly encouraged
+            timeout:                how long to wait for server to send data before
+                                    giving up; default value is 3 seconds
+        """
         WorldcatSession.__init__(self, agent=agent, timeout=timeout)
 
         self.authorization = authorization
@@ -38,7 +57,7 @@ class MetadataSession(WorldcatSession):
         the previous one expired
         """
         try:
-            self.authorization.request_token()
+            self.authorization._request_token()
             self._update_authorization()
         except WorldcatAuthorizationError as exc:
             raise WorldcatSessionError(exc)
@@ -131,19 +150,19 @@ class MetadataSession(WorldcatSession):
         base_url = self._url_base()
         return f"{base_url}/ih/institutionlist"
 
-    def get_brief_bib(self, oclcNumber, hooks=None):
+    def get_brief_bib(self, oclcNumber: Union[int, str], hooks: Dict = None):
         """
         Retrieve specific brief bibliographic resource.
 
         Args:
-            oclcNumber: int or str,    OCLC bibliographic record number; can be
-                                        an integer, or string that can include
-                                        OCLC # prefix
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer, or string that can include
+                                    OCLC # prefix
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            response: requests.Response object
+            `requests.Response` object
         """
 
         try:
@@ -164,7 +183,7 @@ class MetadataSession(WorldcatSession):
             if response.status_code == requests.codes.ok:
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
@@ -173,16 +192,23 @@ class MetadataSession(WorldcatSession):
         except:
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
-    def get_full_bib(self, oclcNumber, hooks=None):
+    def get_full_bib(
+        self,
+        oclcNumber: Union[int, str],
+        response_format: str = None,
+        hooks: Dict = None,
+    ):
         """
         Send a GET request for a full bibliographic resource.
 
         Args:
-            oclcNumber: int or str,     OCLC bibliographic record number; can be an
-                                        integer, or string with or without OCLC # prefix
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
         """
         try:
             oclcNumber = verify_oclc_number(oclcNumber)
@@ -194,9 +220,11 @@ class MetadataSession(WorldcatSession):
             self._get_new_access_token()
 
         url = self._url_bib_oclc_number(oclcNumber)
-        header = {
-            "Accept": 'application/atom+xml;content="application/vnd.oclc.marc21+xml"'
-        }
+        if not response_format:
+            response_format = (
+                'application/atom+xml;content="application/vnd.oclc.marc21+xml"'
+            )
+        header = {"Accept": response_format}
 
         # send request
         try:
@@ -204,7 +232,7 @@ class MetadataSession(WorldcatSession):
             if response.status_code == requests.codes.ok:
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
@@ -215,11 +243,11 @@ class MetadataSession(WorldcatSession):
 
     def holding_get_status(
         self,
-        oclcNumber,
-        inst=None,
-        instSymbol=None,
-        response_format="application/atom+json",
-        hooks=None,
+        oclcNumber: Union[int, str],
+        inst: str = None,
+        instSymbol: str = None,
+        response_format: str = "application/atom+json",
+        hooks: Dict = None,
     ):
         """
         Retrieves Worlcat holdings status of a record with provided OCLC number.
@@ -227,20 +255,20 @@ class MetadataSession(WorldcatSession):
         token.
 
         Args:
-            oclcNumber: int or str,     OCLC bibliographic record number; can be an
-                                        integer, or string with or without OCLC # prefix
-            inst: str,                  registry ID of the institution whose holdings
-                                        are being checked
-            instSymbol: str,            optional; OCLC symbol of the institution whose
-                                        holdings are being checked
-            response_format: str,       'application/atom+json' (default) or
-                                        'application/atom+xml'
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            inst:                   registry ID of the institution whose holdings
+                                    are being checked
+            instSymbol:             optional; OCLC symbol of the institution whose
+                                    holdings are being checked
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
-            response: requests.Response obj
+            `requests.Response` object
         """
         try:
             oclcNumber = verify_oclc_number(oclcNumber)
@@ -261,7 +289,7 @@ class MetadataSession(WorldcatSession):
             if response.status_code == requests.codes.ok:
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
@@ -272,35 +300,35 @@ class MetadataSession(WorldcatSession):
 
     def holding_set(
         self,
-        oclcNumber,
-        inst=None,
-        instSymbol=None,
-        holdingLibraryCode=None,
-        classificationScheme=None,
-        response_format="application/atom+json",
-        hooks=None,
+        oclcNumber: Union[int, str],
+        inst: str = None,
+        instSymbol: str = None,
+        holdingLibraryCode: str = None,
+        classificationScheme: str = None,
+        response_format: str = "application/atom+json",
+        hooks: Dict = None,
     ):
         """
         Sets institution's Worldcat holding on an individual record.
 
         Args:
-            oclcNumber: int or str,     OCLC bibliographic record number; can be an
-                                        integer, or string with or without OCLC # prefix
-            inst: str,                  registry ID of the institution whose holdings
-                                        are being checked
-            instSymbol: str,            optional; OCLC symbol of the institution whose
-                                        holdings are being checked
-            holdingLibraryCode: str,    four letter holding code to et the holing on
-            classificationScheme: str,  whether or not to return group availability
-                                        information
-            response_format: str,       'application/atom+json' (default) or
-                                        'application/atom+xml'
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            inst:                   registry ID of the institution whose holdings
+                                    are being checked
+            instSymbol:             optional; OCLC symbol of the institution whose
+                                    holdings are being checked
+            holdingLibraryCode:     four letter holding code to et the holing on
+            classificationScheme:   whether or not to return group availability
+                                    information
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
-            response: requests.Response obj
+            `requests.Response` object
         """
 
         try:
@@ -334,7 +362,7 @@ class MetadataSession(WorldcatSession):
                 # it seems resonable to simply ignore this response
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
@@ -345,42 +373,42 @@ class MetadataSession(WorldcatSession):
 
     def holding_unset(
         self,
-        oclcNumber,
-        cascade="0",
-        inst=None,
-        instSymbol=None,
-        holdingLibraryCode=None,
-        classificationScheme=None,
-        response_format="application/atom+json",
-        hooks=None,
+        oclcNumber: Union[int, str],
+        cascade: Union[int, str] = "0",
+        inst: str = None,
+        instSymbol: str = None,
+        holdingLibraryCode: str = None,
+        classificationScheme: str = None,
+        response_format: str = "application/atom+json",
+        hooks: Dict = None,
     ):
         """
         Deletes institution's Worldcat holding on an individual record.
 
         Args:
-            oclcNumber: int or str,     OCLC bibliographic record number; can be an
-                                        integer, or string with or without OCLC # prefix
-                                        if str the numbers must be separated by comma
-            cascade: int,               0 or 1, default 0;
-                                        0 - don't remove holdings if local holding
-                                        record or local bibliographic records exists;
-                                        1 - remove holding and delete local holdings
-                                        record and local bibliographic record
-            inst: str,                  registry ID of the institution whose holdings
-                                        are being checked
-            instSymbol: str,            optional; OCLC symbol of the institution whose
-                                        holdings are being checked
-            holdingLibraryCode: str,    four letter holding code to et the holing on
-            classificationScheme: str,  whether or not to return group availability
-                                        information
-            response_format: str,       'application/atom+json' (default) or
-                                        'application/atom+xml'
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+                                    if str the numbers must be separated by comma
+            cascade:                0 or 1, default 0;
+                                    0 - don't remove holdings if local holding
+                                    record or local bibliographic records exists;
+                                    1 - remove holding and delete local holdings
+                                    record and local bibliographic record
+            inst:                   registry ID of the institution whose holdings
+                                    are being checked
+            instSymbol:             optional; OCLC symbol of the institution whose
+                                    holdings are being checked
+            holdingLibraryCode:     four letter holding code to et the holing on
+            classificationScheme:   whether or not to return group availability
+                                    information
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
-            response: requests.Response obj
+            `requests.Response` object
         """
 
         try:
@@ -415,7 +443,7 @@ class MetadataSession(WorldcatSession):
                 # it seems resonable to simply ignore this response
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
@@ -426,32 +454,32 @@ class MetadataSession(WorldcatSession):
 
     def holdings_set(
         self,
-        oclcNumbers,
-        inst=None,
-        instSymbol=None,
-        response_format="application/atom+json",
-        hooks=None,
+        oclcNumbers: Union[str, List],
+        inst: str = None,
+        instSymbol: str = None,
+        response_format: str = "application/atom+json",
+        hooks: Dict = None,
     ):
         """
         Set institution holdings for multiple OClC numbers
 
         Args:
-            oclcNumbers: list or str    list of OCLC control numbers for which holdings
-                                        should be set;
-                                        they can be integers or strings with or
-                                        without OCLC # prefix;
-                                        if str the numbers must be separated by comma
-            inst: str,                  registry ID of the institution whose holdings
-                                        are being checked
-            instSymbol: str,            optional; OCLC symbol of the institution whose
-                                        holdings are being checked
-            response_format: str,       'application/atom+json' (default) or
-                                        'application/atom+xml'
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumbers:            list of OCLC control numbers for which holdings
+                                    should be set;
+                                    they can be integers or strings with or
+                                    without OCLC # prefix;
+                                    if str the numbers must be separated by comma
+            inst:                   registry ID of the institution whose holdings
+                                    are being checked
+            instSymbol:             optional; OCLC symbol of the institution whose
+                                    holdings are being checked
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            response: requests.Response obj
+            `requests.Response` object
         """
         responses = []
 
@@ -483,7 +511,7 @@ class MetadataSession(WorldcatSession):
                     # the service returns multi-status response
                     responses.append(response)
                 else:
-                    error_msg = parse_error_response(response)
+                    error_msg = _parse_error_response(response)
                     raise WorldcatRequestError(error_msg)
             except WorldcatRequestError as exc:
                 raise WorldcatSessionError(exc)
@@ -497,38 +525,38 @@ class MetadataSession(WorldcatSession):
 
     def holdings_unset(
         self,
-        oclcNumbers,
-        cascade="0",
-        inst=None,
-        instSymbol=None,
-        response_format="application/atom+json",
-        hooks=None,
+        oclcNumbers: Union[str, List],
+        cascade: Union[int, str] = "0",
+        inst: str = None,
+        instSymbol: str = None,
+        response_format: str = "application/atom+json",
+        hooks: Dict = None,
     ):
         """
         Set institution holdings for multiple OClC numbers
 
         Args:
-            oclcNumbers: list or str    list of OCLC control numbers for which holdings
-                                        should be set;
-                                        they can be integers or strings with or
-                                        without OCLC # prefix;
-                                        if str the numbers must be separated by comma
-            cascade: int,               0 or 1, default 0;
-                                        0 - don't remove holdings if local holding
-                                        record or local bibliographic records exists;
-                                        1 - remove holding and delete local holdings
-                                        record and local bibliographic record
-            inst: str,                  registry ID of the institution whose holdings
-                                        are being checked
-            instSymbol: str,            optional; OCLC symbol of the institution whose
-                                        holdings are being checked
-            response_format: str,       'application/atom+json' (default) or
-                                        'application/atom+xml'
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumbers:            list of OCLC control numbers for which holdings
+                                    should be set;
+                                    they can be integers or strings with or
+                                    without OCLC # prefix;
+                                    if str the numbers must be separated by comma
+            cascade:                0 or 1, default 0;
+                                    0 - don't remove holdings if local holding
+                                    record or local bibliographic records exists;
+                                    1 - remove holding and delete local holdings
+                                    record and local bibliographic record
+            inst:                   registry ID of the institution whose holdings
+                                    are being checked
+            instSymbol:             optional; OCLC symbol of the institution whose
+                                    holdings are being checked
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            response: requests.Response obj
+            `requests.Response` object
         """
         responses = []
 
@@ -561,7 +589,7 @@ class MetadataSession(WorldcatSession):
                     # the service returns multi-status response
                     responses.append(response)
                 else:
-                    error_msg = parse_error_response(response)
+                    error_msg = _parse_error_response(response)
                     raise WorldcatRequestError(error_msg)
             except WorldcatRequestError as exc:
                 raise WorldcatSessionError(exc)
@@ -574,24 +602,28 @@ class MetadataSession(WorldcatSession):
         return responses
 
     def search_brief_bib_other_editions(
-        self, oclcNumber, offset=None, limit=None, hooks=None
+        self,
+        oclcNumber: Union[int, str],
+        offset: int = None,
+        limit: int = None,
+        hooks: Dict = None,
     ):
         """
         Retrieve other editions related to bibliographic resource with provided
         OCLC #.
 
         Args:
-            oclcNumber: int or str,     OCLC bibliographic record number; can be an
-                                        integer, or string with or without OCLC # prefix
-            offset: int,                start position of bibliographic records to
-                                        return; default 1
-            limit: int,                 maximum nuber of records to return;
-                                        maximum 50, default 10
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            offset:                 start position of bibliographic records to
+                                    return; default 1
+            limit:                  maximum nuber of records to return;
+                                    maximum 50, default 10
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            response: requests.Response object
+            `requests.Response` object
         """
         try:
             oclcNumber = verify_oclc_number(oclcNumber)
@@ -612,7 +644,7 @@ class MetadataSession(WorldcatSession):
             if response.status_code == requests.codes.ok:
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
@@ -623,93 +655,94 @@ class MetadataSession(WorldcatSession):
 
     def search_brief_bibs(
         self,
-        q,
-        deweyNumber=None,
-        datePublished=None,
-        heldBy=None,
-        heldByGroup=None,
-        inLanguage=None,
-        inCatalogLanguage="eng",
-        materialType=None,
-        catalogSource=None,
-        itemType=None,
-        itemSubType=None,
-        retentionCommitments=None,
-        spProgram=None,
-        facets=None,
-        groupRelatedEditions=None,
-        orderBy="mostWidelyHeld",
-        offset=None,
-        limit=None,
-        hooks=None,
+        q: str,
+        deweyNumber: str = None,
+        datePublished: str = None,
+        heldBy: str = None,
+        heldByGroup: str = None,
+        inLanguage: str = None,
+        inCatalogLanguage: str = "eng",
+        materialType: str = None,
+        catalogSource: str = None,
+        itemType: str = None,
+        itemSubType: str = None,
+        retentionCommitments: bool = None,
+        spProgram: str = None,
+        facets: str = None,
+        groupRelatedEditions: str = None,
+        orderBy: str = "mostWidelyHeld",
+        offset: int = None,
+        limit: int = None,
+        hooks: Dict = None,
     ):
         """
         Send a GET request for brief bibliographic resources.
 
         Args:
-            q: str,                     query in the form of a keyword search or
-                                        fielded search;
-                                        examples:
-                                            ti:Zendegi
-                                            ti:"Czarne oceany"
-                                            bn:9781680502404
-                                            kw:python databases
-                                            ti:Zendegi AND au:greg egan
-                                            (au:Okken OR au:Myers) AND su:python
-            deweyNumber: str,           limits the response to the
-                                        specified dewey classification number(s);
-                                        for multiple values repeat the parameter,
-                                        example:
-                                            '794,180'
-            datePublished: str,         restricts the response to one or
-                                        more dates, or to a range,
-                                        examples:
-                                            '2000'
-                                            '2000-2005'
-                                            '2000,2005'
-            heldBy: str,                institution symbol; restricts to records
-                                        held by indicated institution
-            heldByGroup: str,           restricts to holdings held by group symbol
-            inLanguage: str,            restrics the response to the single
-                                        specified language, example: 'fre'
-            inCataloglanguage: str,     restrics the response to specified
-                                        cataloging language, example: 'eng';
-                                        default 'eng'
-            materialType: str,          restricts responses to specified material type,
-                                        example: 'bks', 'vis'
-            catalogSource: str,         restrict to responses to single OCLC symbol as
-                                        the cataloging source, example: 'DLC'
-            itemType: str,              restricts reponses to single specified OCLC
-                                        top-level facet type, example: 'book'
-            itemSubType: str,           restricts responses to single specified OCLC
-                                        sub facet type, example: 'digital'
-            retentionCommitments: bool, restricts responses to bibliographic records
-                                        with retention commitment; True or False
-            spProgram: str,             restricts responses to bibliographic records
-                                        associated with particular shared print
-                                        program
-            facets: str,                list of facets to restrict responses
-            groupRelatedEditions: str,  whether or not use FRBR grouping,
-                                        options: 'Y' (yes) or 'N' (no)
-            orderBy: str,               results sort key;
-                                        options:
-                                            'recency'
-                                            'bestMatch'
-                                            'creator'
-                                            'publicationDateAsc'
-                                            'publicationDateDesc'
-                                            'mostWidelyHeld'
-                                            'title'
-            offset: int,                start position of bibliographic records to
-                                        return; default 1
-            limit: int,                 maximum nuber of records to return;
-                                        maximum 50, default 10
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            q:                      query in the form of a keyword search or
+                                    fielded search;
+                                    examples:
+                                        ti:Zendegi
+                                        ti:"Czarne oceany"
+                                        bn:9781680502404
+                                        kw:python databases
+                                        ti:Zendegi AND au:greg egan
+                                        (au:Okken OR au:Myers) AND su:python
+            deweyNumber:            limits the response to the
+                                    specified dewey classification number(s);
+                                    for multiple values repeat the parameter,
+                                    example:
+                                        '794,180'
+            datePublished:          restricts the response to one or
+                                    more dates, or to a range,
+                                    examples:
+                                        '2000'
+                                        '2000-2005'
+                                        '2000,2005'
+            heldBy:                 institution symbol; restricts to records
+                                    held by indicated institution
+            heldByGroup:            restricts to holdings held by group symbol
+            inLanguage:             restrics the response to the single
+                                    specified language, example: 'fre'
+            inCataloglanguage:      restrics the response to specified
+                                    cataloging language, example: 'eng';
+                                    default 'eng'
+            materialType:           restricts responses to specified material type,
+                                    example: 'bks', 'vis'
+            catalogSource:          restrict to responses to single OCLC symbol as
+                                    the cataloging source, example: 'DLC'
+            itemType:               restricts reponses to single specified OCLC
+                                    top-level facet type, example: 'book'
+            itemSubType:            restricts responses to single specified OCLC
+                                    sub facet type, example: 'digital'
+            retentionCommitments:   restricts responses to bibliographic records
+                                    with retention commitment; True or False
+            spProgram:              restricts responses to bibliographic records
+                                    associated with particular shared print
+                                    program
+            facets:                 list of facets to restrict responses
+            groupRelatedEditions:   whether or not use FRBR grouping,
+                                    options: 'Y' (yes) or 'N' (no);
+                                    server's default 'N'
+            orderBy:                results sort key;
+                                    options:
+                                        'recency'
+                                        'bestMatch'
+                                        'creator'
+                                        'publicationDateAsc'
+                                        'publicationDateDesc'
+                                        'mostWidelyHeld'
+                                        'title'
+            offset:                 start position of bibliographic records to
+                                    return; default 1
+            limit:                  maximum nuber of records to return;
+                                    maximum 50, default 10
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
-            response: requests.Response object
+            `requests.Response` object
 
         """
         if not q:
@@ -748,7 +781,7 @@ class MetadataSession(WorldcatSession):
             if response.status_code == requests.codes.ok:
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatRequestError(exc)
@@ -758,24 +791,27 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
 
     def search_current_control_numbers(
-        self, oclcNumbers, response_format="application/atom+json", hooks=None
+        self,
+        oclcNumbers: Union[int, str],
+        response_format: str = "application/atom+json",
+        hooks: Dict = None,
     ):
         """
         Retrieve current OCLC control numbers
 
         Args:
-            oclcNumbers: list or str  list of OCLC control numbers to be checked;
-                                        they can be integers or strings with or
-                                        without OCLC # prefix;
-                                        if str the numbers must be separated by comma
-            response_format: str,       'application/atom+json' (default) or
-                                        'application/atom+xml'
-            hooks: dict,                Requests library hook system that can be
-                                        used for singnal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumbers:            list of OCLC control numbers to be checked;
+                                    they can be integers or strings with or
+                                    without OCLC # prefix;
+                                    if str the numbers must be separated by comma
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for singnal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
-            response: requests.Response obj
+            `requests.Response` object
         """
 
         try:
@@ -797,7 +833,7 @@ class MetadataSession(WorldcatSession):
             if response.status_code == 207:  # multi-status response
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
@@ -808,50 +844,50 @@ class MetadataSession(WorldcatSession):
 
     def search_general_holdings(
         self,
-        oclcNumber=None,
-        isbn=None,
-        issn=None,
-        holdingsAllEditions=None,
-        heldInCountry=None,
-        heldByGroup=None,
-        heldBy=None,
-        lat=None,
-        lon=None,
-        distance=None,
-        unit=None,
-        offset=None,
-        limit=None,
-        hooks=None,
+        oclcNumber: Union[int, str] = None,
+        isbn: str = None,
+        issn: str = None,
+        holdingsAllEditions: bool = None,
+        heldInCountry: str = None,
+        heldByGroup: str = None,
+        heldBy: str = None,
+        lat: float = None,
+        lon: float = None,
+        distance: int = None,
+        unit: str = None,
+        offset: int = None,
+        limit: int = None,
+        hooks: Dict = None,
     ):
         """
-        Finds member shared print holdings for specified item.
+        Given a known item gets summary of holdings.
 
         Args:
-            oclcNumber: int or str,     OCLC bibliographic record number; can be
-                                        an integer, or string that can include
-                                        OCLC # prefix
-            isbn: str,                  ISBN without any dashes,
-                                        example: '978149191646x'
-            issn: str,                  ISSN (hyphenated, example: '0099-1234')
-            holdingsAllEditions: bool,  get holdings for all editions;
-                                        options: True or False
-            heldInCountry: str,         restricts to holdings held by institutions
-                                        in requested country
-            heldByGroup: str,           limits to holdings held by indicated by
-                                        symbol group
-            heldBy: str,                limits to holdings of single institution,
-                                        use institution OCLC symbol
-            lat: float,                 limit to latitude, example: 37.502508
-            lon: float,                 limit to longitute, example: -122.22702
-            distance: int,              distance from latitude and longitude
-            unit: str,                  unit of distance param; options:
-                                            'M' (miles) or 'K' (kilometers)
-            offset: int,                start position of bibliographic records to
-                                        return; default 1
-            limit: int,                 maximum nuber of records to return;
-                                        maximum 50, default 10
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer, or string that can include
+                                    OCLC # prefix
+            isbn:                   ISBN without any dashes,
+                                    example: '978149191646x'
+            issn:                   ISSN (hyphenated, example: '0099-1234')
+            holdingsAllEditions:    get holdings for all editions;
+                                    options: True or False
+            heldInCountry:          restricts to holdings held by institutions
+                                    in requested country
+            heldByGroup:            limits to holdings held by indicated by
+                                    symbol group
+            heldBy:                 limits to holdings of single institution,
+                                    use institution OCLC symbol
+            lat:                    limit to latitude, example: 37.502508
+            lon:                    limit to longitute, example: -122.22702
+            distance:               distance from latitude and longitude
+            unit:                   unit of distance param; options:
+                                    'M' (miles) or 'K' (kilometers)
+            offset:                 start position of bibliographic records to
+                                    return; default 1
+            limit:                  maximum nuber of records to return;
+                                    maximum 50, default 10
         Returns:
-            response: requests.Response obj
+            `requests.Response` object
         """
         if not any([oclcNumber, isbn, issn]):
             raise WorldcatSessionError(
@@ -892,7 +928,7 @@ class MetadataSession(WorldcatSession):
             if response.status_code == requests.codes.ok:
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
@@ -903,35 +939,35 @@ class MetadataSession(WorldcatSession):
 
     def search_shared_print_holdings(
         self,
-        oclcNumber=None,
-        isbn=None,
-        issn=None,
-        heldByGroup=None,
-        heldInState=None,
-        offset=None,
-        limit=None,
-        hooks=None,
+        oclcNumber: Union[int, str] = None,
+        isbn: str = None,
+        issn: str = None,
+        heldByGroup: str = None,
+        heldInState: str = None,
+        offset: int = None,
+        limit: int = None,
+        hooks: Dict = None,
     ):
         """
         Finds member shared print holdings for specified item.
 
         Args:
-            oclcNumber: int or str,     OCLC bibliographic record number; can be
-                                        an integer, or string that can include
-                                        OCLC # prefix
-            isbn: str,                  ISBN without any dashes,
-                                        example: '978149191646x'
-            issn: str,                  ISSN (hyphenated, example: '0099-1234')
-            heldByGroup: str,           restricts to holdings held by group symbol
-            heldInState: str,           restricts to holings held by institutions
-                                        in requested state, example: "NY"
-            offset: int,                start position of bibliographic records to
-                                        return; default 1
-            limit: int,                 maximum nuber of records to return;
-                                        maximum 50, default 10
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer, or string that can include
+                                    OCLC # prefix
+            isbn:                   ISBN without any dashes,
+                                    example: '978149191646x'
+            issn:                   ISSN (hyphenated, example: '0099-1234')
+            heldByGroup:            restricts to holdings held by group symbol
+            heldInState:            restricts to holings held by institutions
+                                    in requested state, example: "NY"
+            offset:                 start position of bibliographic records to
+                                    return; default 1
+            limit:                  maximum nuber of records to return;
+                                    maximum 50, default 10
             ""
         Returns:
-            response: resquests.Response obj
+            `resquests.Response` object
         """
         if not any([oclcNumber, isbn, issn]):
             raise WorldcatSessionError(
@@ -967,7 +1003,7 @@ class MetadataSession(WorldcatSession):
             if response.status_code == requests.codes.ok:
                 return response
             else:
-                error_msg = parse_error_response(response)
+                error_msg = _parse_error_response(response)
                 raise WorldcatRequestError(error_msg)
         except WorldcatRequestError as exc:
             raise WorldcatSessionError(exc)
