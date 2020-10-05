@@ -25,7 +25,7 @@
 ## 0.2.0 (04/30/2020)
 
 + Expanded and improved documentation
-+ Customizable "user-agent" in session's header and token request
-+ SRU/CQL query sytanx aligned with OCLC's specifications
++ Customizable "user-agent" in session header and token request
++ SRU/CQL query syntax aligned with OCLC specifications
 + `TokenRequestError` exception added on failed access token request
 + fixed hooks info in docstrings in `SearchSession` and `MetadataSession`
