@@ -6,7 +6,11 @@ nav:
   - Source Code: https://github.com/BookOps-CAT/bookops-worldcat
   - Issue Tracker: https://github.com/BookOps-CAT/bookops-worldcat/issues
   - About: about.md
+  - API: mkapi/api/bookops_worldcat
 theme: readthedocs
+plugins:
+  - search
+  - mkapi
 extra_css:
   - css\version-select.css
 extra_javascript:
