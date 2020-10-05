@@ -239,18 +239,6 @@ test = ["coverage", "flake8 (>=3.0)"]
 
 [[package]]
 category = "dev"
-description = "An Auto API Documentation tool."
-name = "mkapi"
-optional = false
-python-versions = ">=3.7"
-version = "1.0.13"
-
-[package.dependencies]
-jinja2 = "*"
-markdown = "*"
-
-[[package]]
-category = "dev"
 description = "Project documentation with Markdown."
 name = "mkdocs"
 optional = false
@@ -615,7 +603,8 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "3bff34299d1fc6159fa73c1b2eb0c3edf817395f1ada53fe0d78d681a82dfddd"
+content-hash = "0da335a52624530fbc699b2e1a41023a4dd3161036a1c092de939b6373613bdf"
+lock-version = "1.0"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -759,10 +748,6 @@ markupsafe = [
 mike = [
     {file = "mike-0.5.3-py3-none-any.whl", hash = "sha256:d65e1c57528341ae6f609c9cda34065e3007756644f2b4f26f066726273bebf7"},
     {file = "mike-0.5.3.tar.gz", hash = "sha256:eef9c6b146f20a18ff7e0512838fd57d4dc2f389d1c012fa2285c9642794aa85"},
-]
-mkapi = [
-    {file = "mkapi-1.0.13-py3-none-any.whl", hash = "sha256:1e4cd05d51556f2cb82eb04e8b1400ef2e620e0c20e905a6db1c464904d3a847"},
-    {file = "mkapi-1.0.13.tar.gz", hash = "sha256:f696a29d15f162a57d7c2242a18f95eefb7d9d45a76ecbf7217cd4b68e7dfe24"},
 ]
 mkdocs = [
     {file = "mkdocs-1.1.2-py3-none-any.whl", hash = "sha256:096f52ff52c02c7e90332d2e53da862fde5c062086e1b5356a6e392d5d60f5e9"},
