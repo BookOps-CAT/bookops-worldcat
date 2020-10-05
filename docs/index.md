@@ -8,7 +8,7 @@ Requires Python 3.7 and up.
 
 Bookops-Worldcat is a Python wrapper around [OCLC's](https://www.oclc.org/en/home.html) [Worldcat](https://www.worldcat.org/) [Search](https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html) and [Metadata](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) APIs.  
 
-The Bookops-Worldcat package simplifies some of the OCLC API boilerplate, and ideally lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with it's gentle learning curve, has the potential to be a perfect vehicle towards this goal.
+The Bookops-Worldcat package simplifies some of the OCLC API boilerplate, and ideally lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with its gentle learning curve, has the potential to be a perfect vehicle towards this goal.
 
 
 This package takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interaction with OCLC's services is built around Requests sessions. Authorizing a session simply requires  passing in OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows the user to call specific methods which facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible to access the functionalities of OCLC APIs.  
@@ -327,7 +327,7 @@ Default parameters of the `sru_query` method:
 
 + `start_record` (default value: `1`): starting position of the result set (can be used to page through the large results)  
 + `maximum_records` ( default: `10`):  maximum value is 100
-+ `sort_keys` (default: `[("relevance", "descending")]`): specifies how results are sorted; `sort_keys` must be a list of tuples, where the first tuple element is a key, and the second is a sort type. This allows to combine two or more sort types in the results, for example: `sort_keys=[("author", "ascending"), ("date", "descending")]` will return results sorted by the author in alphabetical order and within each author group results will be sorted by date from the newest to oldest; sort_keys keys:  
++ `sort_keys` (default: `[("relevance", "descending")]`): specifies how results are sorted; `sort_keys` must be a list of tuples, where the first tuple element is a key, and the second is a sort type. This allows two or more sort types to be combined in the results, for example: `sort_keys=[("author", "ascending"), ("date", "descending")]` will return results sorted by the author in alphabetical order and within each author group results will be sorted by date from the newest to oldest; sort_keys keys:  
     + relevance
     + title
     + author
@@ -342,7 +342,7 @@ Default parameters of the `sru_query` method:
 
 #### WorldcatAccessToken
 
-Bookops-Worldcat utilizes OAuth 2.0 and Client Credential Grant flow to aquire Access Token. Please note, your OCLC credentials must allow access to Metadata API in their scope to be permitted to make requests to the web service.
+Bookops-Worldcat utilizes OAuth 2.0 and Client Credential Grant flow to acquire Access Token. Please note, your OCLC credentials must allow access to the Metadata API in their scope to be permitted to make requests to the web service.
 
 Obtaining:
 ```python
@@ -381,7 +381,7 @@ print(token.server_response.json())
 }
 ```
 
-Checking if token is expired can be done by calling `is_expired` method on it:
+Checking if token is expired can be done by calling the `is_expired` method:
 ```python
 print(token.is_expired())
 True
@@ -396,9 +396,9 @@ Returned bibliographic records are by default in MARC/XML format (OCLC's native 
 
 ##### get_record Method
 
-`session.get_record()` method with OCLC number as an argument sends a request for a matching full bibliographic record in Worldcat. `get_record` should be a primary method to download records from Worldcat. The Metadata API correctly matches requested OCLC numbers of records that have been merged by returning current master record.
+`session.get_record()` method with OCLC number as an argument sends a request for a matching full bibliographic record in Worldcat. `get_record` should be a primary method to download records from Worldcat. The Metadata API correctly matches the requested OCLC numbers of records that have been merged into another record by returning the current master record.
 
-Returned response is a `requests.Response` object with all its features:
+Returned response is a `requests.Response` object with all of its features:
 ```python
 with MetadataSession(credentials=token) as session:
     result = session.get_record("00000000123")
@@ -414,13 +414,13 @@ print(response.content)
 
 ##### Holdings
 
-MetadataSession supports fallowing holdings operations:  
+MetadataSession supports the following holdings operations:  
 
-+ `holdings_get_status` retrieves holding status of requested record 
++ `holdings_get_status` retrieves holding status of a requested record 
 + `holdings_set` sets holdings on an individual bibliographic record
 + `holdings_unset` deletes holdings on an individual bibliographic record
-+ `holdings_set_batch` allows to set holdings on multiple records; it is not limited by OCLC 50 bibs limit)
-+ `holdings_unset_batch` allows to delete holdings on multiple records and is not limited to OCLC's 50 records restriction
++ `holdings_set_batch` allows holdings to be set on multiple records, and is not limited by OCLC's 50 bib record limit
++ `holdings_unset_batch` allows holdings to be deleted on multiple records, and is not limited to OCLC's 50 bib record restriction
 
 By default, responses are returned in `atom+json` format, but `atom+xml` can be specified:
 ```python
@@ -455,4 +455,4 @@ session.holdings_unset_batch(
     ]
 )
 ```
-The web service limits number of records in a batch operation to 50, but `MeatadataSession` permits larger batches by spliting them into chunks of 50 and issuing automaticaly multiple requests. The return object is a list of returned from server results.
+The web service limits number of records in a batch operation to 50, but `MeatadataSession` permits larger batches by splitting the batch into chunks of 50 and automatically issuing multiple requests. The return object is a list of returned from server results.
