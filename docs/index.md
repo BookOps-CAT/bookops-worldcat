@@ -29,7 +29,7 @@ At the moment, the wrapper supports only [OAuth 2.0 endpoints and flows](https:/
     + Brief bibliographic resources:
         + Search brief bibliographic resources (`/brief-bibs`)
         + Retrieve specific brief bibliographic resource (`/brief-bibs/{oclcNumber}`)
-        + Retrieve other editions releated to a particular bibliographic resource (`/brief-bibs/{oclcNumber}/other-edtions`)
+        + Retrieve other editions related to a particular bibliographic resource (`/brief-bibs/{oclcNumber}/other-edtions`)
 + Full bibliographic resources
     + Retrieve full bibliographic record (`/bib-data`)
     + Get current OCLC number (`/bib/checkcontrolnumber`)
@@ -52,7 +52,7 @@ Worldcat Metadata API requires OCLC credentials which can be obtained at the [OC
 
 #### Obtaining Access Token
 
-Worldcat access token can be obtained by passing credential parameters into `WorldcatAccessToken` object.
+The Worldcat access token can be obtained by passing credential parameters into the `WorldcatAccessToken` object.
 
 ```python
 >>> from bookops_worldcat import WorldcatAccessToken
@@ -78,7 +78,7 @@ Created `token` object can be directly passed into `MetadataSession` to authoriz
 
 #### Searching Brief Bibliographic Records Using Metadata API
 
-The `MetadataSession` is authenticated using `WorldcatAccessToken` object. The session allows searching brief records as well as retrieving full bibs in the MARX XML format.
+The `MetadataSession` is authenticated using the `WorldcatAccessToken` object. The session allows searching brief records as well as retrieving full bibs in the MARX XML format.
 
 Basic usage:
 ```python
@@ -136,7 +136,7 @@ Returned brief bibliographic records are in the JSON format that can be parsed v
 
 #### Retrieving Full Bibliographic Records
 
-To retrieve a full bibliographic record from the WorldCat use `.get_full_bib` method. The server returns records in MARC XML format by default.
+To retrieve a full bibliographic record from WorldCat use the `.get_full_bib` method. The server returns records in MARC XML format by default.
 
 ```python
 from bookops_worldcat import MetadataSession
@@ -230,8 +230,8 @@ For holdings operations on batches of records see [Advanced Usage>MetadataSessio
 
 **Identifying your application**
 
-BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers. This will provide a useful piece of information for OCLC staff if they need to troubleshooting problems that may arise.
-To set a custom "user-agent" in a session simply pass is as an argument when initiating session:
+BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers. This will provide a useful piece of information for OCLC staff if they need to assist with troubleshooting problems that may arise.
+To set a custom "user-agent" in a session simply pass is as an argument when initiating the session:
 ```python
 session = MetadataSession(authorization=token, agent="my_client_name")
 ```
@@ -241,7 +241,7 @@ session = MetadataSession(authorization=token, agent="my_client_name")
 session.headers.update({"user-agent": "my-app/version 1.0"})
 ```
 
-The `user-agent` header can be set for a access token request as well. To do that simply pass it as the `agent` parameter when initiating `WorldcatAccessToken` object:
+The `user-agent` header can be set for an access token request as well. To do that simply pass it as the `agent` parameter when initiating `WorldcatAccessToken` object:
 ```python
 token = WorldcatAccessToken(
     key="my_WSKey",
@@ -303,7 +303,7 @@ print(token.server_response.json())
 }
 ```
 
-Checking if the token is expired can be done by calling the `is_expired` method:
+Checking if the token has expired can be done by calling the `is_expired` method:
 ```python
 print(token.is_expired())
 True
@@ -314,11 +314,11 @@ A failed token request raises `WorldcatAuthorizationError` which provides a retu
 #### MetadataSession
 
 A wrapper around WorldCat Metadata API. MetadataSession inherits `requests.Session` methods.
-Returned bibliographic records are by default in MARC/XML format, but it's possible to receive OCLC's native CDF XML and the CDF translation into JSON serializations by supplying appropriate values in the `response_format` argument to the `get_full_bib` method.
+Returned bibliographic records are by default in MARC/XML format, but it is possible to receive OCLC's native CDF XML and the CDF translation into JSON serializations by supplying appropriate values in the `response_format` argument to the `get_full_bib` method.
 
 **OCLC numbers in methods' arguments**
 
-`MetadataSession` accepts OCLC numbers in methods' arguments as integers or strings with or without a prefix ("ocm", "ocn", "on"). Following are all acceptable:
+`MetadataSession` accepts OCLC numbers in methods' arguments as integers or strings with or without a prefix ("ocm", "ocn", "on"). The following are all acceptable:
 ```python
 session.get_brief_bib(oclcNumber="ocm00012345")
 session.get_brief_bib(oclcNumber="00012345")
@@ -328,22 +328,22 @@ session.search_current_control_numbers(oclcNumbers=["ocm00012345", "00012346", 1
 
 ##### Search Functionality
 
-MetdataSession support following search funcionality:
+MetadataSession supports the following search functionality:
 
 + `get_brief_bib` retrieves a specific brief bibliographic resource
-+ `search_brief_bib_other_editions` retrieves other editions related to a bibliographic resource specified with OCLC #
++ `search_brief_bib_other_editions` retrieves other editions related to a bibliographic resource specified with an OCLC #
 + `search_brief_bibs` retrieves brief resouces for a keyword or a fielded query
 + `search_current_control_numbers` retrieves current OCLC control numbers
 + `search_general_holdings` retrieves a summary of holdings for a specified item
 + `search_shared_print_holdings` finds member library holdings with a commitment to retain (Shared Print)
 
 
-The server responses are by default returned in JSON format.
+The server responses are returned in JSON format by default.
 
 **Obtaining brief record**
 
 ```python
-with MedataSession(authorization=token) as session:
+with MetadataSession(authorization=token) as session:
     result = session.get_brief_bib(850940548)
     print(results.json())
 ```
@@ -365,7 +365,7 @@ with MedataSession(authorization=token) as session:
 
 **Quering WorldCat**
 
-Metadata API provides quite robust methods to query WorlCat. In addtion to a flexible query string that supports keyword and fielded searches, it is possbile to set further limits using various elements such as type of item, language, publishing date, etc. It's possible to specify order of returned records using `orderBy` argument. The results are returned as brief records in JSON format.
+Metadata API provides quite robust methods to query WorldCat. In addition to a flexible query string that supports keyword and fielded searches, it is possibile to set further limits using various elements such as type of item, language, publishing date, etc. It is possible to specify the order of returned records by using the `orderBy` argument. Results are returned as brief records in JSON format.
 
 The query syntax is case-insensitive and allows keyword and phrase search (use quotation marks), boolean operators (AND, OR, NOT), wildcards (# - single character, ? - any number of additional characters), and truncation (use \* character).
 
@@ -392,7 +392,7 @@ More about the query syntax can be found in [OCLC documentation](https://www.ocl
 
 ##### Obtaining Full Bibliographic Records
 
-`session.get_full_bib()` method with OCLC number as an argument sends a request for a matching full bibliographic record in WorldCat. The Metadata API correctly matches requested OCLC numbers of records that have been merged by returning current master record. By default `get_full_bib` returns records in MARC XML format.
+`session.get_full_bib()` method with OCLC number as an argument sends a request for a matching full bibliographic record in WorldCat. The Metadata API correctly matches requested OCLC numbers of records that have been merged together by returning the current master record. By default `get_full_bib` returns records in MARC XML format.
 
 Returned response is a `requests.Response` object with all its features:
 ```python
@@ -410,7 +410,7 @@ print(response.content)
 
 ##### Retrieving Current OCLC Number
 
-`MetadatSession.search_current_control_numbers` method allows retrieval of a current control number of the master record in WorldCat. Occasionally, records identified as duplicates in WorldCat are merged and in that case a local control number may not refer correctly to a OCLC's master record. Returned responses are in JSON format by default, but it's possible to pass `'application/atom+xml'` in the `response_format` argument to have the response serialized into xml.
+`MetadataSession.search_current_control_numbers` method allows retrieval of a current control number of the master record in WorldCat. Occasionally, records identified as duplicates in WorldCat have been merged.  In that case a local control number may not correctly refer to an OCLC master record. Returned responses are in JSON format by default, but it's possible to pass `'application/atom+xml'` in the `response_format` argument to have the response serialized into xml.
 
 `search_current_control_numbers` method accepts control numbers as a list or a comma separated string:
 ```python
@@ -462,7 +462,7 @@ The OCLC web service limits the number of records in a batch operation to 50, bu
 ```python
 results = session.holdings_unset(oclcNumbers=[123, 124, 125, 126])
 
-# print resutls of each batch of 50s
+# print results of each batch of 50s
 for r in results:
     print(r.json())
 ```
@@ -504,3 +504,4 @@ with MetadataSession(authorization=token) as session:
     response = session.get_full_bib(oclcNumber=first_bib_number)
     print(response.content)
 ```
+
