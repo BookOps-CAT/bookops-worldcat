@@ -55,7 +55,7 @@ Worldcat Search API and Metadata API require OCLC credentials which can be obtai
 
 #### Searching Worldcat
 
-Search API requires only OCLC WSkey for authorization. Passing the WSkey string to `SearchSession` in the credentials argument will attach it to each request issued while the session is open. `SearchSession` includes several simple lookup methods for retrieval of the matching bibliographic record with the highest number of holdings.
+Search API requires only OCLC WSkey for authorization. Passing the WSkey string to `SearchSession` in the credentials argument will attach it to each request issued while the session is open. `SearchSession` includes several simple lookup methods for the retrieval of the matching bibliographic record with the highest number of holdings.
 
 Basic usage:  
 ```python
@@ -240,7 +240,7 @@ For holdings operations on batches of records see [Advanced Usage>MetadataSessio
 
 **Identifying your application**
 
-BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers. This will provide a useful piece of information for OCLC staff if there is a need to troubleshooting problems. To set a custom "user-agent" in a session simply update its headers attribute:
+BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers. This will provide a useful piece of information for OCLC staff if they need to troubleshoot problems that may arise. To set a custom "user-agent" in a session simply update its headers attribute:
 ```python
 session.headers.update({"user-agent": "my-app/version 1.0"})
 ```
@@ -279,7 +279,7 @@ session.get_record("00000000123", hooks=hooks)
 WorldCat Search API requires only OCLC's WSKey for authentication ([WSKey Lite pattern](https://www.oclc.org/developer/develop/authentication/wskey-lite.en.html)). Returned records are by default in MARC XML format. Other formats offered by the API are not currently supported.  
 
 ##### Simple Lookup
-Lookup methods of `SearchSession` always return a single, matching record with the the highest holdings count in the WorldCat:  
+Lookup methods of `SearchSession` always return a single, matching record with the greatest number of holdings in WorldCat:  
 
 + `lookup_isbn` performs ISBN search
 + `lookup_issn` performs ISSN search
@@ -293,7 +293,7 @@ with SearchSession(credentials="my_WSKey") as session:
     result = session.lookup_isbn("9781680502404", service_level='full')
 ```
 
-Searches for OCLC numbers that have been merged retrieve a master record they have been merged into:
+Searches for OCLC numbers that have been merged with another record, retrieve the master record they have been merged into:
 ```python
 with SearchSession(credentials="my_WSKey") as session:
     result = session.lookup_oclc_number(oclc_number="969362800")
@@ -327,7 +327,7 @@ Default parameters of the `sru_query` method:
 
 + `start_record` (default value: `1`): starting position of the result set (can be used to page through the large results)  
 + `maximum_records` ( default: `10`):  maximum value is 100
-+ `sort_keys` (default: `[("relevance", "descending")]`): specifies how results are sorted; `sort_keys` must be a list of tuples, where the first tuple element is a key, and the second is a sort type. This allows two or more sort types to be combined in the results, for example: `sort_keys=[("author", "ascending"), ("date", "descending")]` will return results sorted by the author in alphabetical order and within each author group results will be sorted by date from the newest to oldest; sort_keys keys:  
++ `sort_keys` (default: `[("relevance", "descending")]`): specifies how results are sorted; `sort_keys` must be a list of tuples, where the first tuple element is a key, and the second is a sort type. This allows two or more sort types to be combined in the results. For example: `sort_keys=[("author", "ascending"), ("date", "descending")]` will return results sorted by the author in alphabetical order, and within each author group, results will be sorted by date from newest to oldest; sort_keys keys:  
     + relevance
     + title
     + author
@@ -360,7 +360,7 @@ token = WorldcatAccessToken(
 )
 ```
 
-Token object retains underlying Requests object functionality (`requests.Request`) that can be accessed via `.server_response` attribute:
+Token object retains underlying Requests object functionality (`requests.Request`) that can be accessed via the `.server_response` attribute:
 
 ```python
 print(token.server_response.status_code)
@@ -381,13 +381,13 @@ print(token.server_response.json())
 }
 ```
 
-Checking if token is expired can be done by calling the `is_expired` method:
+Checking if the token is expired can be done by calling the `is_expired` method:
 ```python
 print(token.is_expired())
 True
 ```
 
-A failed token request raises `TokenRequestError` which provides returned by the server error code and detailed message.
+A failed token request raises `TokenRequestError` which provides a returned by the server error code and detailed message.
 
 #### MetadataSession
 
@@ -419,8 +419,8 @@ MetadataSession supports the following holdings operations:
 + `holdings_get_status` retrieves holding status of a requested record 
 + `holdings_set` sets holdings on an individual bibliographic record
 + `holdings_unset` deletes holdings on an individual bibliographic record
-+ `holdings_set_batch` allows holdings to be set on multiple records, and is not limited by OCLC's 50 bib record limit
-+ `holdings_unset_batch` allows holdings to be deleted on multiple records, and is not limited to OCLC's 50 bib record restriction
++ `holdings_set_batch` allows holdings to be set on multiple records and is not limited by OCLC's 50 bib record limit
++ `holdings_unset_batch` allows holdings to be deleted on multiple records and is not limited to OCLC's 50 bib record restriction
 
 By default, responses are returned in `atom+json` format, but `atom+xml` can be specified:
 ```python
@@ -455,4 +455,4 @@ session.holdings_unset_batch(
     ]
 )
 ```
-The web service limits number of records in a batch operation to 50, but `MeatadataSession` permits larger batches by splitting the batch into chunks of 50 and automatically issuing multiple requests. The return object is a list of returned from server results.
+The web service limits the number of records in a batch operation to 50, but `MetadataSession` permits larger batches by splitting the batch into chunks of 50 and automatically issuing multiple requests. The return object is a list of returned from server results.
