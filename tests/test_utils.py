@@ -2,16 +2,12 @@
 
 import pytest
 
-<<<<<<< HEAD
-from bookops_worldcat.utils import *
-=======
 from bookops_worldcat.utils import (
     _str2list,
     _parse_error_response,
     verify_oclc_number,
     verify_oclc_numbers,
 )
->>>>>>> 6a9b36d3c1c098afa9f695b1d95b1698bffe571e
 from bookops_worldcat.errors import InvalidOclcNumber
 
 
@@ -43,11 +39,7 @@ class TestUtils:
         ],
     )
     def test_str2list(self, argm, expectation):
-<<<<<<< HEAD
-        assert str2list(argm) == expectation
-=======
         assert _str2list(argm) == expectation
->>>>>>> 6a9b36d3c1c098afa9f695b1d95b1698bffe571e
 
     @pytest.mark.parametrize(
         "argm,expectation,msg",
@@ -159,10 +151,6 @@ class TestUtils:
     def test_parse_error_response(self):
         response = MockServiceErrorResponse()
         assert (
-<<<<<<< HEAD
-            parse_error_response(response)
-=======
             _parse_error_response(response)
->>>>>>> 6a9b36d3c1c098afa9f695b1d95b1698bffe571e
             == "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
         )
