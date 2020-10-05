@@ -8,20 +8,20 @@ Requires Python 3.7 and up.
 
 Bookops-Worldcat is a Python wrapper around [OCLC's](https://www.oclc.org/en/home.html) [Worldcat](https://www.worldcat.org/) [Metadata](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) API which supports changes relased in the version 1.1 (May 2020) of the web service. The package features methods that utilize [search functionality](https://developer.api.oclc.org/wc-metadata-v1-1) of the API as well as [read-write endpoints](https://developer.api.oclc.org/wc-metadata).
 
-The Bookops-Worldcat package simplifies some of OCLC API boilerplate, and ideally lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with it's gentle learning curve, has the potential to be a perfect vehicle towards this goal.
+The Bookops-Worldcat package simplifies some of the OCLC API boilerplate, and ideally lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with its gentle learning curve, has the potential to be a perfect vehicle towards this goal.
 
 
 This package takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interaction with OCLC's services is built around Requests sessions. `MetadataSession` inherits all `requests.Session` properties. Returned server responses are `requests.Response` objects with [all of their properties and methods](https://requests.readthedocs.io/en/master/user/quickstart/#response-content).
 
-Authorizing a session simply requires passing an access token into `MetadataSession`. Opening a session allows the user to call specific methods which facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible to access the functionalities of OCLC APIs.  
-Please note, not all features of the Metadata API are implemented because this tool was primarily built for our organization's specific needs. However, we are open to any collaboration to expand and improve the package.  
+Authorizing a session simply requires passing an access token into `MetadataSession`. Opening a session allows the user to call specific methods which facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible to access the functionalities of OCLC APIs.
+Please note, not all features of the Metadata API are implemented because this tool was primarily built for our organization's specific needs. However, we are open to any collaboration to expand and improve the package.
 
 
 **Supported OCLC web services:**
 
-At the moment, the wrapper supports only [OAuth 2.0 endpoints and flows](https://www.oclc.org/developer/develop/authentication/oauth.en.html), specifically, it uses [Client Credential Grant](https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html) and [Access Token](https://www.oclc.org/developer/develop/authentication/access-tokens.en.html) for authorization.
+At the moment, the wrapper supports only [OAuth 2.0 endpoints and flows](https://www.oclc.org/developer/develop/authentication/oauth.en.html). The specific protocols are [Client Credential Grant](https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html) and [Access Token](https://www.oclc.org/developer/develop/authentication/access-tokens.en.html) for authorization.
 
-[Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows adding and updating records in WorldCat, mantaining holdings, and working with local bibliographic data. Access to Metadata API requires OCLC credentials. The BookOps wrapper focuses on the following API operations:  
+[Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows adding and updating records in WorldCat, maintaining holdings, and working with local bibliographic data. Access to Metadata API requires OCLC credentials. The BookOps wrapper focuses on the following API operations:
 
 + Search functionality
     + Find member shared print holdings (`/bibs-retained-holdings`)
@@ -30,10 +30,10 @@ At the moment, the wrapper supports only [OAuth 2.0 endpoints and flows](https:/
         + Search brief bibliographic resources (`/brief-bibs`)
         + Retrieve specific brief bibliographic resource (`/brief-bibs/{oclcNumber}`)
         + Retrieve other editions releated to a particular bibliographic resource (`/brief-bibs/{oclcNumber}/other-edtions`)
-+ Full bibliographic resources  
++ Full bibliographic resources
     + Retrieve full bibliographic record (`/bib-data`)
     + Get current OCLC number (`/bib/checkcontrolnumber`)
-+ Holdings  
++ Holdings
     + Set and unset institution holding  (`/ih/data`)
     + Retrieve status of institution holdings (`/ih/checkholdings`)
     + Set and unset institution holdings for a batch or records (`/ih/datalist`)
@@ -41,14 +41,14 @@ At the moment, the wrapper supports only [OAuth 2.0 endpoints and flows](https:/
 
 ## Installation
 
-To install use pip:  
+To install use pip:
 
-`$ pip install bookops-worldcat`  
+`$ pip install bookops-worldcat`
 
 
 ## Quickstart
 
-Worldcat Metadata API requires OCLC credentials which can be obtained at the [OCLC Developer Network](https://www.oclc.org/developer/home.en.html) site. 
+Worldcat Metadata API requires OCLC credentials which can be obtained at the [OCLC Developer Network](https://www.oclc.org/developer/home.en.html) site.
 
 #### Obtaining Access Token
 
@@ -136,7 +136,7 @@ Returned brief bibliographic records are in the JSON format that can be parsed v
 
 #### Retrieving Full Bibliographic Records
 
-To retrieve a full bibliographic record from the WorldCat use `.get_full_bib` method. The server returns records in MARC XML format by default. 
+To retrieve a full bibliographic record from the WorldCat use `.get_full_bib` method. The server returns records in MARC XML format by default.
 
 ```python
 from bookops_worldcat import MetadataSession
@@ -199,7 +199,7 @@ with MetadataSession(authorization=token) as session:
 
 `MetadataSession` can be used to check or set/unset your library holdings on a master record in Worldcat:
 
-example:  
+example:
 ```python
 result = session.holding_set(oclc_number="850939579")
 print(result)
@@ -230,7 +230,7 @@ For holdings operations on batches of records see [Advanced Usage>MetadataSessio
 
 **Identifying your application**
 
-BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers as it may be a useful piece of information for OCLC staff troubleshooting any problems.  
+BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers. This will provide a useful piece of information for OCLC staff if they need to troubleshooting problems that may arise.
 To set a custom "user-agent" in a session simply pass is as an argument when initiating session:
 ```python
 session = MetadataSession(authorization=token, agent="my_client_name")
@@ -255,7 +255,7 @@ token = WorldcatAccessToken(
 
 **Event hooks**
 
-`MetadataSession` methods support [Requests event hooks](https://requests.readthedocs.io/en/latest/user/advanced/#event-hooks) which can be passed as an argument:  
+`MetadataSession` methods support [Requests event hooks](https://requests.readthedocs.io/en/latest/user/advanced/#event-hooks) which can be passed as an argument:
 
 ```python
 def print_url(response, *args, **kwargs):
@@ -267,7 +267,7 @@ session.get_brief_bib(850939579, hooks=hooks)
 
 #### WorldcatAccessToken
 
-Bookops-Worldcat utilizes OAuth 2.0 and Client Credential Grant flow to aquire Access Token. Please note, your OCLC credentials must allow access to Metadata API in their scope to be permitted to make requests to the web service.
+Bookops-Worldcat utilizes OAuth 2.0 and Client Credential Grant flow to acquire Access Token. Please note, your OCLC credentials must allow access to the Metadata API in their scope to be permitted to make requests to the web service.
 
 Obtaining:
 ```python
@@ -282,7 +282,7 @@ token = WorldcatAccessToken(
 )
 ```
 
-Token object retains underlying Requests object functionality (`requests.Request`) that can be accessed via `.server_response` attribute:
+Token object retains underlying Requests object functionality (`requests.Request`) that can be accessed via the `.server_response` attribute:
 
 ```python
 print(token.server_response.status_code)
@@ -303,18 +303,18 @@ print(token.server_response.json())
 }
 ```
 
-Checking if token is expired can be done by calling `is_expired` method on it:
+Checking if the token is expired can be done by calling the `is_expired` method:
 ```python
 print(token.is_expired())
 True
 ```
 
-A failed token request raises `WorldcatAuthorizationError` which provides returned by the server error code and detailed message.
+A failed token request raises `WorldcatAuthorizationError` which provides a returned by the server error code and detailed message.
 
 #### MetadataSession
 
-A wrapper around WorldCat Metadata API. MetadataSession inherits `requests.Session` methods.  
-Returned bibliographic records are by default in MARC/XML format, but it's possible to receive OCLC's native CDF XML and the CDF translation into JSON serializations by supplying appropriate values in the `response_format` argument to the `get_full_bib` method. 
+A wrapper around WorldCat Metadata API. MetadataSession inherits `requests.Session` methods.
+Returned bibliographic records are by default in MARC/XML format, but it's possible to receive OCLC's native CDF XML and the CDF translation into JSON serializations by supplying appropriate values in the `response_format` argument to the `get_full_bib` method.
 
 **OCLC numbers in methods' arguments**
 
@@ -367,7 +367,7 @@ with MedataSession(authorization=token) as session:
 
 Metadata API provides quite robust methods to query WorlCat. In addtion to a flexible query string that supports keyword and fielded searches, it is possbile to set further limits using various elements such as type of item, language, publishing date, etc. It's possible to specify order of returned records using `orderBy` argument. The results are returned as brief records in JSON format.
 
-The query syntax is case-insensitive and allows keyword and phrase search (use quotation marks), boolean operators (AND, OR, NOT), wildcards (# - single character, ? - any number of additional characters), and truncation (use \* character). 
+The query syntax is case-insensitive and allows keyword and phrase search (use quotation marks), boolean operators (AND, OR, NOT), wildcards (# - single character, ? - any number of additional characters), and truncation (use \* character).
 
 
 keyword search with item type, language, and publishing date limiters:
@@ -420,13 +420,13 @@ session.search_current_control_numbers(oclcNumbers=[12345, 12346, 12347], respon
 
 ##### Holdings
 
-`MetadataSession` supports following holdings operations:  
+`MetadataSession` supports the following holdings operations:
 
-+ `holding_get_status` retrieves holding status of requested record 
++ `holding_get_status` retrieves holding status of a requested record
 + `holding_set` sets holding on an individual bibliographic record
 + `holding_unset` deletes holding on an individual bibliographic record
-+ `holdings_set` allows to set holdings on multiple records; it is not limited by OCLC 50 bibs limit)
-+ `holdings_unset` allows to delete holdings on multiple records and is not limited to OCLC's 50 records restriction
++ `holdings_set` allows holdings to be set on multiple records, and is not limited by OCLC's 50 bib record limit
++ `holdings_unset` allows holdings to be deleted on multiple records, and is not limited to OCLC's 50 bib record restriction
 
 By default, responses are returned in `atom+json` format, but `atom+xml` can be specified:
 ```python
@@ -450,14 +450,14 @@ print(result.text)
 </entry>
 ```
 
-Pass OCLC record numbers for batch operations as a list of strings or integers or comma separated string with or without a prefix:  
+Pass OCLC record numbers for batch operations as a list of strings or integers or comma separated string with or without a prefix:
 ```python
 session.holdings_set(
     oclcNumbers="00000000123,00000000124,00000000125,00000000126")
 
 session.holdings_unset(oclcNumbers=[123, 124, 125, 126])
 ```
-The OCLC web service limits number of records in a batch operation to 50, but `MeatadataSession` permits larger batches by spliting them into chunks of 50 and issuing automaticaly multiple requests. The return object is a list of returned from server responses.
+The OCLC web service limits the number of records in a batch operation to 50, but `MetadataSession` permits larger batches by splitting the batch into chunks of 50 and automatically issuing multiple requests. The return object is a list of returned from server responses.
 
 ```python
 results = session.holdings_unset(oclcNumbers=[123, 124, 125, 126])
