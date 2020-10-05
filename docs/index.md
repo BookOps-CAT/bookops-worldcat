@@ -8,7 +8,7 @@ Requires Python 3.7 and up.
 
 Bookops-Worldcat is a Python wrapper around [OCLC's](https://www.oclc.org/en/home.html) [Worldcat](https://www.worldcat.org/) [Search](https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html) and [Metadata](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) APIs.  
 
-The Bookops-Worldcat package simplifies some of OCLC API boilerplate, and ideally lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with it's gentle learning curve, has the potential to be a perfect vehicle towards this goal.
+The Bookops-Worldcat package simplifies some of the OCLC API boilerplate, and ideally lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with it's gentle learning curve, has the potential to be a perfect vehicle towards this goal.
 
 
 This package takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/). Interaction with OCLC's services is built around Requests sessions. Authorizing a session simply requires  passing in OCLC's WSkey (`SearchSession`) or an access token (`MetadataSession`). Opening a session allows the user to call specific methods which facilitate communication between the user's script/client and a particular endpoint of OCLC's service. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible to access the functionalities of OCLC APIs.  
@@ -17,7 +17,7 @@ Please note, not all features of Worldcat Search and Metadata APIs are implement
 
 **Supported OCLC web services:**
 
-At the moment, the wrapper supports only OAuth 2.0 endpoints and flows, specifically, it uses Client Credential Grant and Access Token.  
+At the moment, the wrapper supports only OAuth 2.0 endpoints and flows. The specific protocols are Client Credential Grant and Access Token.  
 
 
 [WorldCat Search API](https://www.oclc.org/developer/develop/web-services.en.html) provides developer-level access to WorldCat for bibliographic, holdings and location data. It requires credentials - WSkey only. It allows searching and retrieving bibliographic records for books, videos, music, and other formats.  
@@ -29,7 +29,7 @@ BookOps wrapper offers following operations:
 + Lookup By ISSN  
 + Lookup By Standard Number
 
-[Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows adding and updating records in WorldCat, mantaining holdings, and working with local bibliographic data. Access to Metadata API requires OCLC credentials. The BookOps wrapper focuses on the following API operations:  
+[Worldcat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows adding and updating records in WorldCat, maintaining holdings, and working with local bibliographic data. Access to Metadata API requires OCLC credentials. The BookOps wrapper focuses on the following API operations:  
 
 + Bibliographic Resource  
     + Read (retrieves a single bibliographic record by OCLC number)  
@@ -55,7 +55,7 @@ Worldcat Search API and Metadata API require OCLC credentials which can be obtai
 
 #### Searching Worldcat
 
-Search API requires only OCLC WSkey for authorization. Passing the WSkey string to `SearchSession` in the credentials argument will attach it to each request issued while the session is open. `SearchSession` includes several simple lookup methods allowing retrieval of a matching bibliographic record with the highest holdings.
+Search API requires only OCLC WSkey for authorization. Passing the WSkey string to `SearchSession` in the credentials argument will attach it to each request issued while the session is open. `SearchSession` includes several simple lookup methods for retrieval of the matching bibliographic record with the highest number of holdings.
 
 Basic usage:  
 ```python
@@ -88,7 +88,7 @@ with SearchSession(credentials="my_WSkey") as session:
 </record>
 ```
 
-`SearchSession` allows more complex queries through `sru_query` method:
+`SearchSession` allows more complex queries with the `sru_query` method:
 
 ```python
 with SearchSession(credentials="my_WSkey") as session:
@@ -167,7 +167,7 @@ Note, WorldCat Metadata API requires an access token for authorization.
 
 #### Getting Records
 
-The `MetadataSession` is authorized using `WorldcatAccessToken` object. The session allows retrieving a full bibliographic record from Worldcat by passing its OCLC number in the method's parameter:
+The `MetadataSession` is authorized using the `WorldcatAccessToken` object. The session allows retrieval of a full bibliographic record from Worldcat by passing its OCLC number in the method's parameter:
 
 Basic usage:
 ```python
@@ -182,7 +182,7 @@ or explicit:
 results = session.get_record(oclc_number="00000000123")
 ```
 
-Returned bibliographic record can be acceessed via `text` or `content` (preferable) argument: 
+The returned bibliographic record can be accessed via `text` or `content` (preferable) argument: 
 
 ```python
 print(results.text)
@@ -240,7 +240,7 @@ For holdings operations on batches of records see [Advanced Usage>MetadataSessio
 
 **Identifying your application**
 
-BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers as it may be a useful piece of information for OCLC staff troubleshooting any problems. To set a custom "user-agent" in a session simply update its headers attribute:
+BookOps-Worldcat provides a default `user-agent` value in headers of all requests to OCLC web services: `bookops-worldcat/{version}`. It is encouraged to update the `user-agent` value to properly identify your application to OCLC servers. This will provide a useful piece of information for OCLC staff if there is a need to troubleshooting problems. To set a custom "user-agent" in a session simply update its headers attribute:
 ```python
 session.headers.update({"user-agent": "my-app/version 1.0"})
 ```
@@ -279,7 +279,7 @@ session.get_record("00000000123", hooks=hooks)
 WorldCat Search API requires only OCLC's WSKey for authentication ([WSKey Lite pattern](https://www.oclc.org/developer/develop/authentication/wskey-lite.en.html)). Returned records are by default in MARC XML format. Other formats offered by the API are not currently supported.  
 
 ##### Simple Lookup
-Lookup methods of `SearchSession` always return a single, matching record with highest holdings count in the WorldCat:  
+Lookup methods of `SearchSession` always return a single, matching record with the the highest holdings count in the WorldCat:  
 
 + `lookup_isbn` performs ISBN search
 + `lookup_issn` performs ISSN search
@@ -304,7 +304,7 @@ Do not use any "ocm", "ocn", or other prefixes with OCLC numbers.
 
 `sru_query` method of `SearchSession` offers a flexible way to build complex queries using SRU/CQL syntax.
 
-Following OCLC's resouces can be very helpful in learning about query syntax:  
+Following OCLC's resources can be very helpful in learning about query syntax:  
 
 + http://www.worldcat.org/webservices/catalog/search/sru?wskey={my_WSKey}
 + [OCLC Search API documentation](https://www.oclc.org/developer/develop/web-services/worldcat-search-api/bibliographic-resource.en.html)
