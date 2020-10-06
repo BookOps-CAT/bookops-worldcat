@@ -192,7 +192,7 @@ class WorldcatAccessToken:
             return response
 
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatAuthorizationError(f"Trouble connecing: {sys.exc_info()[0]}")
+            raise WorldcatAuthorizationError(f"Trouble connecting: {sys.exc_info()[0]}")
         except Exception:
             raise WorldcatAuthorizationError(f"Unexpected error: {sys.exc_info()[0]}")
 
