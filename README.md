@@ -149,7 +149,7 @@ with MetadataSession(authorization=token) as session:
 
 ## Changelog
 
-Consult the [Changelog page](https://bookops-cat.github.io/bookops-worldcat/changelog/) for fixes and enhancements of each version.
+Consult the [Changelog page](https://bookops-cat.github.io/bookops-worldcat/0.3/changelog/) for fixes and enhancements of each version.
 
 ## Bugs/Requests
 
