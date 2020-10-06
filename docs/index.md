@@ -479,7 +479,7 @@ token = WorldcatAccessToken(
     secret="my_secret",
     scopes=["WorldCatMetadataAPI"],
     principal_id="my_principal_id",
-    principlal_idns="my_principal_idns",
+    principal_idns="my_principal_idns",
     agent="my_app/version 1.0"
 )
 
