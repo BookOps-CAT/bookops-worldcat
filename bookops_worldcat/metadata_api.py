@@ -860,7 +860,7 @@ class MetadataSession(WorldcatSession):
         hooks: Dict = None,
     ):
         """
-        Finds member shared print holdings for specified item.
+        Given a known item gets summary of holdings.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be
