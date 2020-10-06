@@ -6,7 +6,7 @@
 
 Requires Python 3.7 and up.
 
-Bookops-Worldcat is a Python wrapper around [OCLC's](https://www.oclc.org/en/home.html) [Worldcat](https://www.worldcat.org/) [Metadata](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) API which supports changes relased in the version 1.1 (May 2020) of the web service. The package features methods that utilize [search functionality](https://developer.api.oclc.org/wc-metadata-v1-1) of the API as well as [read-write endpoints](https://developer.api.oclc.org/wc-metadata).
+Bookops-Worldcat is a Python wrapper around [OCLC's](https://www.oclc.org/en/home.html) [Worldcat](https://www.worldcat.org/) [Metadata](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) API which supports changes released in the version 1.1 (May 2020) of the web service. The package features methods that utilize [search functionality](https://developer.api.oclc.org/wc-metadata-v1-1) of the API as well as [read-write endpoints](https://developer.api.oclc.org/wc-metadata).
 
 The Bookops-Worldcat package simplifies some of the OCLC API boilerplate, and ideally lowers the technological threshold for cataloging departments that may not have sufficient programming support to access and utilize those web services. Python language, with its gentle learning curve, has the potential to be a perfect vehicle towards this goal.
 
@@ -78,7 +78,7 @@ Created `token` object can be directly passed into `MetadataSession` to authoriz
 
 #### Searching Brief Bibliographic Records Using Metadata API
 
-The `MetadataSession` is authenticated using the `WorldcatAccessToken` object. The session allows searching brief records as well as retrieving full bibs in the MARX XML format.
+The `MetadataSession` is authenticated using the `WorldcatAccessToken` object. The session allows searching brief records as well as retrieving full bibs in the MARC XML format.
 
 Basic usage:
 ```python
