@@ -461,7 +461,7 @@ class MetadataSession(WorldcatSession):
         hooks: Dict = None,
     ):
         """
-        Set institution holdings for multiple OClC numbers
+        Set institution holdings for multiple OCLC numbers
 
         Args:
             oclcNumbers:            list of OCLC control numbers for which holdings
@@ -533,7 +533,7 @@ class MetadataSession(WorldcatSession):
         hooks: Dict = None,
     ):
         """
-        Set institution holdings for multiple OClC numbers
+        Set institution holdings for multiple OCLC numbers
 
         Args:
             oclcNumbers:            list of OCLC control numbers for which holdings
