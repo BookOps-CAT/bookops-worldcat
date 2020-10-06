@@ -159,7 +159,7 @@ class MetadataSession(WorldcatSession):
                                     an integer, or string that can include
                                     OCLC # prefix
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -205,7 +205,7 @@ class MetadataSession(WorldcatSession):
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer, or string with or without OCLC # prefix
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -264,7 +264,7 @@ class MetadataSession(WorldcatSession):
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -318,13 +318,13 @@ class MetadataSession(WorldcatSession):
                                     are being checked
             instSymbol:             optional; OCLC symbol of the institution whose
                                     holdings are being checked
-            holdingLibraryCode:     four letter holding code to et the holing on
+            holdingLibraryCode:     four letter holding code to set the holing on
             classificationScheme:   whether or not to return group availability
                                     information
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -398,13 +398,13 @@ class MetadataSession(WorldcatSession):
                                     are being checked
             instSymbol:             optional; OCLC symbol of the institution whose
                                     holdings are being checked
-            holdingLibraryCode:     four letter holding code to et the holing on
+            holdingLibraryCode:     four letter holding code to set the holing on
             classificationScheme:   whether or not to return group availability
                                     information
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -476,7 +476,7 @@ class MetadataSession(WorldcatSession):
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -553,7 +553,7 @@ class MetadataSession(WorldcatSession):
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -620,7 +620,7 @@ class MetadataSession(WorldcatSession):
             limit:                  maximum nuber of records to return;
                                     maximum 50, default 10
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -738,7 +738,7 @@ class MetadataSession(WorldcatSession):
             limit:                  maximum nuber of records to return;
                                     maximum 50, default 10
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -807,7 +807,7 @@ class MetadataSession(WorldcatSession):
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -967,7 +967,7 @@ class MetadataSession(WorldcatSession):
                                     maximum 50, default 10
             ""
         Returns:
-            `resquests.Response` object
+            `requests.Response` object
         """
         if not any([oclcNumber, isbn, issn]):
             raise WorldcatSessionError(
