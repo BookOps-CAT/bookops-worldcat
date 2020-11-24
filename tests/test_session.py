@@ -31,5 +31,9 @@ class TestWorldcatSession:
             assert "Argument 'agent' must be a str" in str(expectation.value)
 
     def test_default_timeout(self):
-        with WorldcatSession() as session:
+        with WorldcatSession(timeout=None) as session:
             assert session.timeout == (3, 3)
+
+    def test_custom_timeout(self):
+        with WorldcatSession(timeout=1) as session:
+            assert session.timeout == 1

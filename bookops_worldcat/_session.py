@@ -24,6 +24,7 @@ class WorldcatSession(requests.Session):
         else:
             raise WorldcatSessionError("Argument 'agent' must be a str")
 
-        self.timeout = timeout
-        if not self.timeout:
+        if timeout is None:
             self.timeout = (3, 3)
+        else:
+            self.timeout = timeout
