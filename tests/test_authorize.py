@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta
+import datetime
 import os
 
 import pytest
@@ -271,6 +271,11 @@ class TestWorldcatAccessToken:
         )
         assert token._auth() == ("my_key", "my_secret")
 
+    def test_hasten_expiration_time(self, mock_token):
+        utc_stamp = "2020-01-01 17:19:59Z"
+        token = mock_token
+        assert token._hasten_expiration_time(utc_stamp) == "2020-01-01 17:19:58Z"
+
     def test_payload(self, mock_successful_post_token_response):
         token = WorldcatAccessToken(
             key="my_key",
@@ -338,7 +343,7 @@ class TestWorldcatAccessToken:
             )
 
     def test_is_expired_false(
-        self, mock_credentials, mock_successful_post_token_response
+        self, mock_utcnow, mock_credentials, mock_successful_post_token_response
     ):
         creds = mock_credentials
         token = WorldcatAccessToken(
@@ -351,7 +356,7 @@ class TestWorldcatAccessToken:
         assert token.is_expired() is False
 
     def test_is_expired_true(
-        self, mock_credentials, mock_successful_post_token_response
+        self, mock_utcnow, mock_credentials, mock_successful_post_token_response
     ):
         creds = mock_credentials
         token = WorldcatAccessToken(
@@ -361,8 +366,9 @@ class TestWorldcatAccessToken:
             principal_id=creds["principal_id"],
             principal_idns=creds["principal_idns"],
         )
-        token.token_expires_at = datetime.strftime(
-            datetime.utcnow() - timedelta(0, 1), "%Y-%m-%d %H:%M:%SZ"
+        token.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
         )
 
         assert token.is_expired() is True

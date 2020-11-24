@@ -4,9 +4,9 @@
 This module provides means to authenticate and obtain a WorldCat access token.
 """
 
-from datetime import datetime
+import datetime
 import sys
-from typing import List, Union, Tuple
+from typing import Dict, List, Tuple, Type, Union
 
 import requests
 
@@ -143,16 +143,40 @@ class WorldcatAccessToken:
         # initiate request
         self._request_token()
 
-    def _token_url(self):
-        return f"{self.oauth_server}/token"
-
-    def _token_headers(self):
-        return {"User-Agent": self.agent, "Accept": "application/json"}
-
-    def _auth(self):
+    def _auth(self) -> Tuple[str, str]:
         return (self.key, self.secret)
 
-    def _payload(self):
+    def _hasten_expiration_time(self, utc_stamp_str: str) -> str:
+        """
+        Resets expiration time one second earlier to account
+        for any delays between expiration check and request for
+        new token in session setting.
+
+        Args:
+            utcstamp:               utc timestamp string
+
+        Returns:
+            utcstamp
+        """
+        utcstamp = datetime.datetime.strptime(
+            utc_stamp_str, "%Y-%m-%d %H:%M:%SZ"
+        ) - datetime.timedelta(seconds=1)
+        return datetime.datetime.strftime(utcstamp, "%Y-%m-%d %H:%M:%SZ")
+
+    def _parse_server_response(self, response: Type[requests.models.Response]):
+        """Parses authorization server response"""
+        self.server_response = response
+        if response.status_code == requests.codes.ok:
+            self.token_str = response.json()["access_token"]
+            self.token_expires_at = self._hasten_expiration_time(
+                response.json()["expires_at"]
+            )
+            self.token_type = response.json()["token_type"]
+        else:
+            raise WorldcatAuthorizationError(response.json())
+
+    def _payload(self) -> Dict:
+        """Preps requests params"""
         return {
             "grant_type": self.grant_type,
             "scope": self.scopes,
@@ -160,21 +184,12 @@ class WorldcatAccessToken:
             "principalIDNS": self.principal_idns,
         }
 
-    def _parse_server_response(self, response):
-        self.server_response = response
-        if response.status_code == requests.codes.ok:
-            self.token_str = response.json()["access_token"]
-            self.token_expires_at = response.json()["expires_at"]
-            self.token_type = response.json()["token_type"]
-        else:
-            raise WorldcatAuthorizationError(response.json())
-
-    def _post_token_request(self):
+    def _post_token_request(self) -> Type[requests.models.Response]:
         """
         Fetches Worldcat access token for specified scope (web service)
 
         Returns:
-            server_response: instance of requests.Response
+            requests.models.Response
         """
 
         token_url = self._token_url()
@@ -203,7 +218,13 @@ class WorldcatAccessToken:
         response = self._post_token_request()
         self._parse_server_response(response)
 
-    def is_expired(self):
+    def _token_headers(self) -> Dict:
+        return {"User-Agent": self.agent, "Accept": "application/json"}
+
+    def _token_url(self) -> str:
+        return f"{self.oauth_server}/token"
+
+    def is_expired(self) -> bool:
         """
         Checks if the access token is expired.
 
@@ -215,8 +236,8 @@ class WorldcatAccessToken:
         False
         """
         if (
-            datetime.strptime(self.token_expires_at, "%Y-%m-%d %H:%M:%SZ")
-            < datetime.utcnow()
+            datetime.datetime.strptime(self.token_expires_at, "%Y-%m-%d %H:%M:%SZ")
+            < datetime.datetime.utcnow()
         ):
             return True
         else:

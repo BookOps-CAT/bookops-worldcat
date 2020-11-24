@@ -43,7 +43,7 @@ class MetadataSession(WorldcatSession):
 
         if type(self.authorization).__name__ != "WorldcatAccessToken":
             raise WorldcatSessionError(
-                "Argument 'authorization' must include 'WorldcatAccessToken' obj."
+                "Argument 'authorization' must include 'WorldcatAccessToken' object."
             )
 
         self._update_authorization()
@@ -179,7 +179,7 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, hooks=hooks)
+            response = self.get(url, headers=header, hooks=hooks, timeout=self.timeout)
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -228,7 +228,7 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, hooks=hooks)
+            response = self.get(url, headers=header, hooks=hooks, timeout=self.timeout)
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -285,7 +285,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
