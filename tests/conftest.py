@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta
+import datetime
 import json
 import os
 
@@ -10,7 +10,16 @@ import requests
 
 from bookops_worldcat import WorldcatAccessToken
 
-# from bookops_worldcat.errors import WorldcatAuthorizationError
+
+class FakeUtcNow(datetime.datetime):
+    @classmethod
+    def utcnow(cls):
+        return cls(2020, 1, 1, 17, 0, 0, 0)
+
+
+@pytest.fixture
+def mock_utcnow(monkeypatch):
+    monkeypatch.setattr(datetime, "datetime", FakeUtcNow)
 
 
 class MockAuthServerResponseSuccess:
@@ -20,8 +29,9 @@ class MockAuthServerResponseSuccess:
         self.status_code = 200
 
     def json(self):
-        expires_at = datetime.strftime(
-            datetime.utcnow() + timedelta(0, 1199), "%Y-%m-%d %H:%M:%SZ"
+        expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() + datetime.timedelta(0, 1199),
+            "%Y-%m-%d %H:%M:%SZ",
         )
 
         return {
@@ -104,12 +114,12 @@ def mock_credentials():
 
 
 @pytest.fixture
-def mock_oauth_server_response(*args, **kwargs):
+def mock_oauth_server_response(mock_utcnow, *args, **kwargs):
     return MockAuthServerResponseSuccess()
 
 
 @pytest.fixture
-def mock_successful_post_token_response(monkeypatch):
+def mock_successful_post_token_response(mock_utcnow, monkeypatch):
     def mock_oauth_server_response(*args, **kwargs):
         return MockAuthServerResponseSuccess()
 
@@ -221,12 +231,14 @@ def mock_400_response(monkeypatch):
         msg = {
             "type": "MISSING_QUERY_PARAMETER",
             "title": "Validation Failure",
-            "detail": "detail here",
+            "detail": "details here",
         }
         url = "https://test.org/some_endpoint"
         return MockServiceErrorResponse(code=400, json_response=msg, url=url)
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
+    monkeypatch.setattr(requests.Session, "post", mock_api_response)
+    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
 
 
 @pytest.fixture
