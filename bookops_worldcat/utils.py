@@ -78,7 +78,7 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List]) -> List:
     """
 
     # change to list if comma separated string
-    if type(oclcNumbers) is str:
+    if type(oclcNumbers) is str and oclcNumbers != "":
         oclcNumbers = _str2list(oclcNumbers)
 
     if not oclcNumbers or type(oclcNumbers) is not list:

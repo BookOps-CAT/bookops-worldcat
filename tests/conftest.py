@@ -231,12 +231,14 @@ def mock_400_response(monkeypatch):
         msg = {
             "type": "MISSING_QUERY_PARAMETER",
             "title": "Validation Failure",
-            "detail": "detail here",
+            "detail": "details here",
         }
         url = "https://test.org/some_endpoint"
         return MockServiceErrorResponse(code=400, json_response=msg, url=url)
 
     monkeypatch.setattr(requests.Session, "get", mock_api_response)
+    monkeypatch.setattr(requests.Session, "post", mock_api_response)
+    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
 
 
 @pytest.fixture
