@@ -18,7 +18,7 @@ def _parse_error_response(response):
     """
 
     response.encoding = "utf-8"
-    msg = response.text
+    msg = response.text.strip()
 
     return f"Web service returned {response.status_code} error: {msg}; {response.url}"
 

@@ -950,12 +950,13 @@ class TestLiveMetadataSession:
             principal_idns=os.getenv("WCPrincipalIDNS"),
         )
         token.token_str = "invalid-token"
+        err_msg = 'Web service returned 401 error: {"message":"Unauthorized"}; https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045'
         with MetadataSession(authorization=token) as session:
             session.headers.update({"Authorization": f"Bearer invalid-token"})
             with pytest.raises(WorldcatSessionError) as exc:
                 session.get_brief_bib(41266045)
-                response_msg = "Web service returned 401 error: {'message': 'Unauthorized'}; https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
-            assert response_msg in str(exc.value)
+
+            assert err_msg in str(exc.value)
 
     def test_get_brief_bib_with_stale_token(self, live_keys):
         token = WorldcatAccessToken(
@@ -973,7 +974,6 @@ class TestLiveMetadataSession:
             )
             assert session.authorization.is_expired() is True
             response = session.get_brief_bib(oclcNumber=41266045)
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
             assert session.authorization.is_expired() is False
             assert response.status_code == 200
 
