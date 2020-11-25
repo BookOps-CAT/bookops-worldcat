@@ -313,8 +313,10 @@ A failed token request raises `WorldcatAuthorizationError` which provides a retu
 
 #### MetadataSession
 
-A wrapper around WorldCat Metadata API. MetadataSession inherits `requests.Session` methods.
-Returned bibliographic records are by default in MARC/XML format, but it is possible to receive OCLC's native CDF XML and the CDF translation into JSON serializations by supplying appropriate values in the `response_format` argument to the `get_full_bib` method.
+A wrapper around WorldCat Metadata API. `MetadataSession` inherits `requests.Session` methods.
+Returned full bibliographic records are by default in MARC/XML format, but it is possible to receive OCLC's native CDF XML and the CDF translation into JSON serializations by supplying appropriate values in the `response_format` argument to the `get_full_bib` method. Search endpoints of the Metadata API return responses serialized into JSON format only.
+All `MetadataSession` issued requests have a build-in access token auto-refresh feature. While a session is open, before any request is sent, a current token is checked for expiration and if needed a new access token is automatically obtained. 
+
 
 **OCLC numbers in methods' arguments**
 
