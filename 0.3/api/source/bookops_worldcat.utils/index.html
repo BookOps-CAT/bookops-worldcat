@@ -149,7 +149,7 @@ def _parse_error_response(response):
     &quot;&quot;&quot;
 
     response.encoding = &quot;utf-8&quot;
-    msg = response.text
+    msg = response.text.strip()
 
     return f&quot;Web service returned {response.status_code} error: {msg}; {response.url}&quot;
 
@@ -211,7 +211,7 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List]) -&gt; List:
     &quot;&quot;&quot;
 
     # change to list if comma separated string
-    if type(oclcNumbers) is str:
+    if type(oclcNumbers) is str and oclcNumbers != &quot;&quot;:
         oclcNumbers = _str2list(oclcNumbers)
 
     if not oclcNumbers or type(oclcNumbers) is not list:
@@ -223,7 +223,8 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List]) -&gt; List:
         vetted_numbers = [str(verify_oclc_number(n)) for n in oclcNumbers]
         return vetted_numbers
     except InvalidOclcNumber:
-        raise InvalidOclcNumber(&quot;One of passed OCLC #s is invalid.&quot;)</code></pre>
+        raise InvalidOclcNumber(&quot;One of passed OCLC #s is invalid.&quot;)
+</code></pre>
 </div>
 </div>
               

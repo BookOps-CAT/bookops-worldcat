@@ -305,7 +305,7 @@
 
 <li><code class="mkapi-item-name">verify</code>
 
-<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">SSL Verification default.</span></li>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Only set this to <code>False</code> for testing.</span></li>
 
 
 </ul></div>
@@ -363,11 +363,11 @@ token.<a class="mkapi-src-link" href="../source/bookops_worldcat.metadata_api/#b
 
 <li class="method"><code class="mkapi-item-name"><a href="#bookops_worldcat.metadata_api.MetadataSession.holdings_set">holdings_set</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">oclcNumbers</code>, <code class="mkapi-object-signature">inst</code>, <code class="mkapi-object-signature">instSymbol</code>, <code class="mkapi-object-signature">response_format</code>, <code class="mkapi-object-signature">hooks</code><code class="mkapi-object-parenthesis">)</code>
 
-<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Set institution holdings for multiple OClC numbers<a class="mkapi-src-link" href="../source/bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holdings_set" title="Source for bookops_worldcat.metadata_api.MetadataSession.holdings_set">&lt;/&gt;</a></span></li>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Set institution holdings for multiple OCLC numbers<a class="mkapi-src-link" href="../source/bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holdings_set" title="Source for bookops_worldcat.metadata_api.MetadataSession.holdings_set">&lt;/&gt;</a></span></li>
 
 <li class="method"><code class="mkapi-item-name"><a href="#bookops_worldcat.metadata_api.MetadataSession.holdings_unset">holdings_unset</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">oclcNumbers</code>, <code class="mkapi-object-signature">cascade</code>, <code class="mkapi-object-signature">inst</code>, <code class="mkapi-object-signature">instSymbol</code>, <code class="mkapi-object-signature">response_format</code>, <code class="mkapi-object-signature">hooks</code><code class="mkapi-object-parenthesis">)</code>
 
-<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Set institution holdings for multiple OClC numbers<a class="mkapi-src-link" href="../source/bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holdings_unset" title="Source for bookops_worldcat.metadata_api.MetadataSession.holdings_unset">&lt;/&gt;</a></span></li>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Set institution holdings for multiple OCLC numbers<a class="mkapi-src-link" href="../source/bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holdings_unset" title="Source for bookops_worldcat.metadata_api.MetadataSession.holdings_unset">&lt;/&gt;</a></span></li>
 
 <li class="method"><code class="mkapi-item-name"><a href="#requests.sessions.Session.merge_environment_settings">merge_environment_settings</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">url</code>, <code class="mkapi-object-signature">proxies</code>, <code class="mkapi-object-signature">stream</code>, <code class="mkapi-object-signature">verify</code>, <code class="mkapi-object-signature">cert</code><code class="mkapi-object-parenthesis">)</code>
 
@@ -663,7 +663,12 @@ Returns :class:<code>Response &lt;Response&gt;</code> object.</p>
     content. Defaults to <code>False</code>.
 :param verify: (optional) Either a boolean, in which case it controls whether we verify
     the server's TLS certificate, or a string, in which case it must be a path
-    to a CA bundle to use. Defaults to <code>True</code>.
+    to a CA bundle to use. Defaults to <code>True</code>. When set to
+    <code>False</code>, requests will accept any TLS certificate presented by
+    the server, and will ignore hostname mismatches and/or expired
+    certificates, which will make your application vulnerable to
+    man-in-the-middle (MitM) attacks. Setting verify to <code>False</code>
+    may be useful during local development or testing.
 :param cert: (optional) if String, path to ssl client cert file (.pem).
     If Tuple, ('cert', 'key') pair.
 :rtype: requests.Response</p></div>
@@ -974,7 +979,7 @@ OCLC # prefix</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1020,7 +1025,7 @@ integer, or string with or without OCLC # prefix</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1082,7 +1087,7 @@ holdings are being checked</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1136,7 +1141,7 @@ holdings are being checked</span></li>
 
 <li><code class="mkapi-item-name">holdingLibraryCode</code>
 <span class="mkapi-item-type">(str, optional)</span>
-<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">four letter holding code to et the holing on</span></li>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">four letter holding code to set the holing on</span></li>
 
 <li><code class="mkapi-item-name">classificationScheme</code>
 <span class="mkapi-item-type">(str, optional)</span>
@@ -1151,7 +1156,7 @@ information</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1214,7 +1219,7 @@ holdings are being checked</span></li>
 
 <li><code class="mkapi-item-name">holdingLibraryCode</code>
 <span class="mkapi-item-type">(str, optional)</span>
-<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">four letter holding code to et the holing on</span></li>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">four letter holding code to set the holing on</span></li>
 
 <li><code class="mkapi-item-name">classificationScheme</code>
 <span class="mkapi-item-type">(str, optional)</span>
@@ -1229,7 +1234,7 @@ information</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1259,7 +1264,7 @@ https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 </div>
 <div class="mkapi-docstring">
 <div class="mkapi-section">
-      <div class="mkapi-section-body"><p>Set institution holdings for multiple OClC numbers</p></div>
+      <div class="mkapi-section-body"><p>Set institution holdings for multiple OCLC numbers</p></div>
     </div>
   <div class="mkapi-section parameters">
       <div class="mkapi-section-name parameters">
@@ -1292,7 +1297,7 @@ holdings are being checked</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1322,7 +1327,7 @@ https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 </div>
 <div class="mkapi-docstring">
 <div class="mkapi-section">
-      <div class="mkapi-section-body"><p>Set institution holdings for multiple OClC numbers</p></div>
+      <div class="mkapi-section-body"><p>Set institution holdings for multiple OCLC numbers</p></div>
     </div>
   <div class="mkapi-section parameters">
       <div class="mkapi-section-name parameters">
@@ -1363,7 +1368,7 @@ holdings are being checked</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1419,7 +1424,7 @@ maximum 50, default 10</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1566,7 +1571,7 @@ maximum 50, default 10</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 <li><code class="mkapi-item-name">inCataloglanguage</code>
@@ -1624,7 +1629,7 @@ if str the numbers must be separated by comma</span></li>
 <li><code class="mkapi-item-name">hooks</code>
 <span class="mkapi-item-type">(dict, optional)</span>
 <span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Requests library hook system that can be
-used for singnal event handling, see more at:
+used for signal event handling, see more at:
 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span></li>
 
 
@@ -1801,7 +1806,7 @@ maximum 50, default 10</span></li>
       <div class="mkapi-section-name returns">
           <span class="mkapi-section-name-body returns">Returns</span> 
         </div>
-      <div class="mkapi-section-body returns"><p><code>resquests.Response</code> object</p></div>
+      <div class="mkapi-section-body returns"><p><code>requests.Response</code> object</p></div>
     </div>
   </div>
 

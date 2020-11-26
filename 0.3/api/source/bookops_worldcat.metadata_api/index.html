@@ -175,7 +175,7 @@ class MetadataSession(WorldcatSession):
 
         if type(self.authorization).__name__ != &quot;WorldcatAccessToken&quot;:
             raise WorldcatSessionError(
-                &quot;Argument 'authorization' must include 'WorldcatAccessToken' obj.&quot;
+                &quot;Argument 'authorization' must include 'WorldcatAccessToken' object.&quot;
             )
 
         self._update_authorization()
@@ -292,7 +292,7 @@ class MetadataSession(WorldcatSession):
                                     an integer, or string that can include
                                     OCLC # prefix
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -312,7 +312,7 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, hooks=hooks)
+            response = self.get(url, headers=header, hooks=hooks, timeout=self.timeout)
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -339,7 +339,7 @@ class MetadataSession(WorldcatSession):
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer, or string with or without OCLC # prefix
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -362,7 +362,7 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, hooks=hooks)
+            response = self.get(url, headers=header, hooks=hooks, timeout=self.timeout)
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -399,7 +399,7 @@ class MetadataSession(WorldcatSession):
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -420,7 +420,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -454,13 +456,13 @@ class MetadataSession(WorldcatSession):
                                     are being checked
             instSymbol:             optional; OCLC symbol of the institution whose
                                     holdings are being checked
-            holdingLibraryCode:     four letter holding code to et the holing on
+            holdingLibraryCode:     four letter holding code to set the holing on
             classificationScheme:   whether or not to return group availability
                                     information
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -488,7 +490,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.post(url, headers=header, params=payload, hooks=hooks)
+            response = self.post(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == 201:
                 # the service does not return any meaningful response
                 # when holdings are succesfully set
@@ -535,13 +539,13 @@ class MetadataSession(WorldcatSession):
                                     are being checked
             instSymbol:             optional; OCLC symbol of the institution whose
                                     holdings are being checked
-            holdingLibraryCode:     four letter holding code to et the holing on
+            holdingLibraryCode:     four letter holding code to set the holing on
             classificationScheme:   whether or not to return group availability
                                     information
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -570,7 +574,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.delete(url, headers=header, params=payload, hooks=hooks)
+            response = self.delete(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 # the service does not return any meaningful response
                 # when holdings are succesfully deleted
@@ -599,7 +605,7 @@ class MetadataSession(WorldcatSession):
         hooks: Dict = None,
     ):
         &quot;&quot;&quot;
-        Set institution holdings for multiple OClC numbers
+        Set institution holdings for multiple OCLC numbers
 
         Args:
             oclcNumbers:            list of OCLC control numbers for which holdings
@@ -614,7 +620,7 @@ class MetadataSession(WorldcatSession):
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -643,7 +649,13 @@ class MetadataSession(WorldcatSession):
 
             # send request
             try:
-                response = self.post(url, headers=header, params=payload, hooks=hooks)
+                response = self.post(
+                    url,
+                    headers=header,
+                    params=payload,
+                    hooks=hooks,
+                    timeout=self.timeout,
+                )
 
                 if response.status_code == 207:
                     # the service returns multi-status response
@@ -672,7 +684,7 @@ class MetadataSession(WorldcatSession):
         hooks: Dict = None,
     ):
         &quot;&quot;&quot;
-        Set institution holdings for multiple OClC numbers
+        Set institution holdings for multiple OCLC numbers
 
         Args:
             oclcNumbers:            list of OCLC control numbers for which holdings
@@ -692,7 +704,7 @@ class MetadataSession(WorldcatSession):
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -722,7 +734,13 @@ class MetadataSession(WorldcatSession):
 
             # send request
             try:
-                response = self.delete(url, headers=header, params=payload, hooks=hooks)
+                response = self.delete(
+                    url,
+                    headers=header,
+                    params=payload,
+                    hooks=hooks,
+                    timeout=self.timeout,
+                )
 
                 if response.status_code == 207:
                     # the service returns multi-status response
@@ -760,7 +778,7 @@ class MetadataSession(WorldcatSession):
             limit:                  maximum nuber of records to return;
                                     maximum 50, default 10
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
@@ -780,7 +798,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -879,7 +899,7 @@ class MetadataSession(WorldcatSession):
             limit:                  maximum nuber of records to return;
                                     maximum 50, default 10
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -918,7 +938,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -949,7 +971,7 @@ class MetadataSession(WorldcatSession):
             response_format:        'application/atom+json' (default) or
                                     'application/atom+xml'
             hooks:                  Requests library hook system that can be
-                                    used for singnal event handling, see more at:
+                                    used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
 
         Returns:
@@ -971,7 +993,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == 207:  # multi-status response
                 return response
             else:
@@ -1067,7 +1091,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -1111,7 +1137,7 @@ class MetadataSession(WorldcatSession):
                                     maximum 50, default 10
             &quot;&quot;
         Returns:
-            `resquests.Response` object
+            `requests.Response` object
         &quot;&quot;&quot;
         if not any([oclcNumber, isbn, issn]):
             raise WorldcatSessionError(
@@ -1143,7 +1169,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -1154,7 +1182,8 @@ class MetadataSession(WorldcatSession):
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             raise WorldcatSessionError(f&quot;Request error: {sys.exc_info()[0]}&quot;)
         except:
-            raise WorldcatSessionError(f&quot;Unexpected request error: {sys.exc_info()[0]}&quot;)</code></pre>
+            raise WorldcatSessionError(f&quot;Unexpected request error: {sys.exc_info()[0]}&quot;)
+</code></pre>
 </div>
 </div>
               
