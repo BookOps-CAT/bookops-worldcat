@@ -1,9 +1,13 @@
 # Changelog
 
+## 0.3.2 (11/25/2020)
++ Bug fixes:
+    + MetadataSession timeout paramerter correctly passed into every session request
+
+
 ## 0.3.1 (11/24/2020)
 
 + Bug fixes:
-    + MetadataSession timeout param correctly passed into requests
     + Fixed auto refreshing of the access token when expired
     + testing: fixed testing for error messages on exceptions & testing of stale tokens
 
