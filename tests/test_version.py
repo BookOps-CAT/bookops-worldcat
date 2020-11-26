@@ -10,7 +10,7 @@ from bookops_worldcat.__version__ import (
 
 
 def test_version():
-    assert __version__ == "0.3.0"
+    assert __version__ == "0.3.2"
 
 
 def test_title():
