@@ -233,7 +233,7 @@ class TestMockedMetadataSession:
             assert session.authorization.is_expired() is False
             assert response.status_code == 200
 
-    def test_get_brief_bib_timout(self, mock_token, mock_timeout):
+    def test_get_brief_bib_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.get_brief_bib(12345)
@@ -283,7 +283,7 @@ class TestMockedMetadataSession:
             assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
             assert response.status_code == 200
 
-    def test_get_full_bib_timout(self, mock_token, mock_timeout):
+    def test_get_full_bib_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.get_full_bib(12345)
@@ -333,7 +333,7 @@ class TestMockedMetadataSession:
             assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
             assert response.status_code == 200
 
-    def test_holding_get_status_timout(self, mock_token, mock_timeout):
+    def test_holding_get_status_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.holding_get_status(12345)
@@ -385,7 +385,7 @@ class TestMockedMetadataSession:
             assert session.authorization.is_expired() is False
             assert response.status_code == 201
 
-    def test_holding_set_timout(self, mock_token, mock_timeout):
+    def test_holding_set_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.holding_set(850940548)
@@ -445,7 +445,7 @@ class TestMockedMetadataSession:
             assert session.authorization.is_expired() is False
             assert response.status_code == 200
 
-    def test_holding_unset_timout(self, mock_token, mock_timeout):
+    def test_holding_unset_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.holding_unset(850940548)
@@ -517,7 +517,7 @@ class TestMockedMetadataSession:
                 assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
                 assert session.authorization.is_expired() is False
 
-    def test_holdings_set_timout(self, mock_token, mock_timeout):
+    def test_holdings_set_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.holdings_set([850940548, 850940552, 850940554])
@@ -578,7 +578,7 @@ class TestMockedMetadataSession:
                 assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
                 assert session.authorization.is_expired() is False
 
-    def test_holdings_uset_timout(self, mock_token, mock_timeout):
+    def test_holdings_uset_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.holdings_unset([850940548, 850940552, 850940554])
@@ -620,7 +620,7 @@ class TestMockedMetadataSession:
             assert session.authorization.is_expired() is False
             assert response.status_code == 200
 
-    def test_search_brief_bib_other_editions_timout(self, mock_token, mock_timeout):
+    def test_search_brief_bib_other_editions_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.search_brief_bib_other_editions(12345)
@@ -810,7 +810,7 @@ class TestMockedMetadataSession:
             assert session.authorization.is_expired() is False
             assert response.status_code == 200
 
-    def test_search_general_holdings_timout(self, mock_token, mock_timeout):
+    def test_search_general_holdings_timeout(self, mock_token, mock_timeout):
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError):
                 session.search_general_holdings(oclcNumber="12345")
