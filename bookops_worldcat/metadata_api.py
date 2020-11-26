@@ -354,7 +354,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.post(url, headers=header, params=payload, hooks=hooks)
+            response = self.post(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == 201:
                 # the service does not return any meaningful response
                 # when holdings are succesfully set
@@ -435,7 +437,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.delete(url, headers=header, params=payload, hooks=hooks)
+            response = self.delete(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 # the service does not return any meaningful response
                 # when holdings are succesfully deleted
@@ -507,7 +511,13 @@ class MetadataSession(WorldcatSession):
 
             # send request
             try:
-                response = self.post(url, headers=header, params=payload, hooks=hooks)
+                response = self.post(
+                    url,
+                    headers=header,
+                    params=payload,
+                    hooks=hooks,
+                    timeout=self.timeout,
+                )
 
                 if response.status_code == 207:
                     # the service returns multi-status response
@@ -585,7 +595,13 @@ class MetadataSession(WorldcatSession):
 
             # send request
             try:
-                response = self.delete(url, headers=header, params=payload, hooks=hooks)
+                response = self.delete(
+                    url,
+                    headers=header,
+                    params=payload,
+                    hooks=hooks,
+                    timeout=self.timeout,
+                )
 
                 if response.status_code == 207:
                     # the service returns multi-status response
@@ -642,7 +658,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -779,7 +797,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -831,7 +851,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == 207:  # multi-status response
                 return response
             else:
@@ -926,7 +948,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
@@ -1001,7 +1025,9 @@ class MetadataSession(WorldcatSession):
 
         # send request
         try:
-            response = self.get(url, headers=header, params=payload, hooks=hooks)
+            response = self.get(
+                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
+            )
             if response.status_code == requests.codes.ok:
                 return response
             else:
