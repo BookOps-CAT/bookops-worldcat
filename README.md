@@ -163,6 +163,3 @@ Please use [Github issue tracker](https://github.com/BookOps-CAT/bookops-worldca
   + support for holdings batch actions for multiple institutions
   + record validation endpoints
   + methods to create and update bibliographic records
-
-## Resources
-+ [Discord](https://discord.gg/nsrPS27vdv)
