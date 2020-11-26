@@ -29,7 +29,7 @@ At the moment, the wrapper supports only [OAuth 2.0 endpoints and flows](https:/
     + Brief bibliographic resources:
         + Search brief bibliographic resources (`/brief-bibs`)
         + Retrieve specific brief bibliographic resource (`/brief-bibs/{oclcNumber}`)
-        + Retrieve other editions related to a particular bibliographic resource (`/brief-bibs/{oclcNumber}/other-edtions`)
+        + Retrieve other editions related to a particular bibliographic resource (`/brief-bibs/{oclcNumber}/other-editions`)
 + Full bibliographic resources
     + Retrieve full bibliographic record (`/bib-data`)
     + Get current OCLC number (`/bib/checkcontrolnumber`)
