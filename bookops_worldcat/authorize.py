@@ -6,9 +6,10 @@ This module provides means to authenticate and obtain a WorldCat access token.
 
 import datetime
 import sys
-from typing import Dict, List, Tuple, Type, Union
+from typing import Dict, List, Tuple, Union
 
 import requests
+from requests import Response
 
 
 from . import __title__, __version__
@@ -74,12 +75,12 @@ class WorldcatAccessToken:
         self,
         key: str,
         secret: str,
-        scopes: Union[str, List],
+        scopes: Union[str, List[str]],
         principal_id: str,
         principal_idns: str,
         agent: str = None,
-        timeout: Union[float, Tuple] = None,
-    ):
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float]] = None,
+    ) -> None:
         """Constructor"""
 
         self.agent = agent
@@ -163,7 +164,7 @@ class WorldcatAccessToken:
         ) - datetime.timedelta(seconds=1)
         return datetime.datetime.strftime(utcstamp, "%Y-%m-%d %H:%M:%SZ")
 
-    def _parse_server_response(self, response: Type[requests.models.Response]):
+    def _parse_server_response(self, response: Response) -> None:
         """Parses authorization server response"""
         self.server_response = response
         if response.status_code == requests.codes.ok:
@@ -175,7 +176,7 @@ class WorldcatAccessToken:
         else:
             raise WorldcatAuthorizationError(response.json())
 
-    def _payload(self) -> Dict:
+    def _payload(self) -> Dict[str, str]:
         """Preps requests params"""
         return {
             "grant_type": self.grant_type,
@@ -184,7 +185,7 @@ class WorldcatAccessToken:
             "principalIDNS": self.principal_idns,
         }
 
-    def _post_token_request(self) -> Type[requests.models.Response]:
+    def _post_token_request(self) -> Response:
         """
         Fetches Worldcat access token for specified scope (web service)
 
@@ -218,7 +219,7 @@ class WorldcatAccessToken:
         response = self._post_token_request()
         self._parse_server_response(response)
 
-    def _token_headers(self) -> Dict:
+    def _token_headers(self) -> Dict[str, str]:
         return {"User-Agent": self.agent, "Accept": "application/json"}
 
     def _token_url(self) -> str:

@@ -6,10 +6,12 @@ Shared utilities module.
 
 from typing import List, Union
 
+from requests import Response
+
 from .errors import InvalidOclcNumber
 
 
-def _parse_error_response(response):
+def _parse_error_response(response: Response) -> str:
     """
     Parses and formats error responses from OCLC web service
 
@@ -23,7 +25,7 @@ def _parse_error_response(response):
     return f"Web service returned {response.status_code} error: {msg}; {response.url}"
 
 
-def _str2list(s: str) -> List:
+def _str2list(s: str) -> List[str]:
     """Converts str into list - use for list of OCLC numbers"""
     return [n.strip() for n in s.split(",")]
 
@@ -63,7 +65,7 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> int:
         raise InvalidOclcNumber("Argument 'oclc_number' is of invalid type.")
 
 
-def verify_oclc_numbers(oclcNumbers: Union[str, List]) -> List:
+def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[str]:
     """
     Parses and verifies list of oclcNumbers
 
