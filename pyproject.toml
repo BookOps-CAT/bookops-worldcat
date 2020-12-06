@@ -40,6 +40,7 @@ black = { version = "^20.8b1", python = "^3.7" }
 
 mike = "^0.5.3"
 mkapi = "^1.0.13"
+mypy = "^0.790"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
