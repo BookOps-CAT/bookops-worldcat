@@ -5,7 +5,7 @@ This module provides MetadataSession class for requests to WorldCat Metadata API
 """
 
 import sys
-from typing import Callable, Dict, List, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import requests
 from requests import Response
@@ -27,8 +27,10 @@ class MetadataSession(WorldcatSession):
     def __init__(
         self,
         authorization: WorldcatAccessToken,
-        agent: str = None,
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float]] = None,
+        agent: Optional[str] = None,
+        timeout: Optional[
+            Union[int, float, Tuple[int, int], Tuple[float, float]]
+        ] = None,
     ) -> None:
         """
         Args:
@@ -850,7 +852,7 @@ class MetadataSession(WorldcatSession):
 
         header = {"Accept": response_format}
         url = self._url_bib_check_oclc_numbers()
-        payload = {"oclcNumbers": ",".join(vetted_numbers)}
+        payload = {"oclcNumbers": ",".join([str(o) for o in vetted_numbers])}
 
         # send request
         try:

@@ -5,11 +5,11 @@ Base session class to allow extention of functionality to Worldcat Search API
 and others.
 """
 
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 import requests
 
-from . import __title__, __version__
+from . import __title__, __version__  # type: ignore
 from bookops_worldcat.errors import WorldcatSessionError
 
 
@@ -18,8 +18,10 @@ class WorldcatSession(requests.Session):
 
     def __init__(
         self,
-        agent: str = None,
-        timeout: Union[int, float, Tuple[float, float], Tuple[int, int]] = None,
+        agent: Optional[str] = None,
+        timeout: Optional[
+            Union[int, float, Tuple[int, int], Tuple[float, float]]
+        ] = None,
     ) -> None:
         requests.Session.__init__(self)
 
