@@ -5,7 +5,6 @@ import os
 
 import pytest
 
-import requests
 
 from bookops_worldcat.authorize import WorldcatAccessToken
 from bookops_worldcat import __version__, __title__
@@ -396,6 +395,13 @@ class TestWorldcatAccessToken:
         assert token.scopes == "scope1 scope2"
         assert token.server_response.json() == mock_oauth_server_response.json()
         assert token.timeout == (3, 3)
+
+    def test_cred_in_env_variables(self, live_keys):
+        assert os.getenv("WCKey") is not None
+        assert os.getenv("WCSecret") is not None
+        assert os.getenv("WCScopes") == "WorldCatMetadataAPI"
+        assert os.getenv("WCPrincipalID") is not None
+        assert os.getenv("WCPrincipalIDNS") is not None
 
     @pytest.mark.webtest
     def test_post_token_request_with_live_service(self, live_keys):
