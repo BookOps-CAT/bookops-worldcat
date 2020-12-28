@@ -46,8 +46,8 @@ def prep_oclc_number_str(oclcNumber: str) -> int:
         oclcNumber = oclcNumber.strip()[2:]
 
     try:
-        oclcNumber = int(oclcNumber)
-        return oclcNumber
+        oclcNumberInt = int(oclcNumber)
+        return oclcNumberInt
     except ValueError:
         raise InvalidOclcNumber("Argument 'oclcNumber' does not look like real OCLC #.")
 
@@ -67,17 +67,16 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> int:
         raise InvalidOclcNumber("Argument 'oclcNumber' is missing.")
 
     elif type(oclcNumber) is int:
-        return oclcNumber
+        return oclcNumber  # type: ignore
 
     elif type(oclcNumber) is str:
-        oclcNumber = prep_oclc_number_str(oclcNumber)
-        return oclcNumber
+        return prep_oclc_number_str(oclcNumber)  # type: ignore
 
     else:
         raise InvalidOclcNumber("Argument 'oclc_number' is of invalid type.")
 
 
-def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[int]:
+def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[str]:
     """
     Parses and verifies list of oclcNumbers
 
@@ -101,7 +100,7 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[
         )
 
     try:
-        vetted_numbers = [verify_oclc_number(n) for n in oclcNumbers]
+        vetted_numbers = [str(verify_oclc_number(n)) for n in oclcNumbers]
         return vetted_numbers
     except InvalidOclcNumber:
         raise InvalidOclcNumber("One of passed OCLC #s is invalid.")

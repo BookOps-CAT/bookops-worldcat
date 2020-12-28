@@ -852,7 +852,7 @@ class MetadataSession(WorldcatSession):
 
         header = {"Accept": response_format}
         url = self._url_bib_check_oclc_numbers()
-        payload = {"oclcNumbers": ",".join([str(o) for o in vetted_numbers])}
+        payload = {"oclcNumbers": ",".join(vetted_numbers)}
 
         # send request
         try:
