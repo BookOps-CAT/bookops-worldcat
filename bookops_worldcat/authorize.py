@@ -166,20 +166,17 @@ class WorldcatAccessToken:
         ) - datetime.timedelta(seconds=1)
         return datetime.datetime.strftime(utcstamp, "%Y-%m-%d %H:%M:%SZ")
 
-    def _parse_server_response(self, response: Optional[Response]) -> None:
+    def _parse_server_response(self, response: Response) -> None:
         """Parses authorization server response"""
-        if response is not None:
-            self.server_response = response  # type: ignore
-            if response.status_code == requests.codes.ok:
-                self.token_str = response.json()["access_token"]
-                self.token_expires_at = self._hasten_expiration_time(  # type: ignore
-                    response.json()["expires_at"]
-                )
-                self.token_type = response.json()["token_type"]
-            else:
-                raise WorldcatAuthorizationError(response.json())
+        self.server_response = response  # type: ignore
+        if response.status_code == requests.codes.ok:
+            self.token_str = response.json()["access_token"]
+            self.token_expires_at = self._hasten_expiration_time(  # type: ignore
+                response.json()["expires_at"]
+            )
+            self.token_type = response.json()["token_type"]
         else:
-            raise WorldcatAuthorizationError("Server did not return any response.")
+            raise WorldcatAuthorizationError(response.json())
 
     def _payload(self) -> Dict[str, str]:
         """Preps requests params"""
