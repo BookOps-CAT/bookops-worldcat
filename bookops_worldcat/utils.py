@@ -30,9 +30,31 @@ def _str2list(s: str) -> List[str]:
     return [n.strip() for n in s.split(",")]
 
 
+def prep_oclc_number_str(oclcNumber: str) -> int:
+    """
+    Checks for OCLC prefixes and removes them.
+
+    Args:
+        oclcNumber:                OCLC record as string
+
+    Returns:
+        oclcNumber as int
+    """
+    if "ocm" in oclcNumber or "ocn" in oclcNumber:
+        oclcNumber = oclcNumber.strip()[3:]
+    elif "on" in oclcNumber:
+        oclcNumber = oclcNumber.strip()[2:]
+
+    try:
+        oclcNumber = int(oclcNumber)
+        return oclcNumber
+    except ValueError:
+        raise InvalidOclcNumber("Argument 'oclcNumber' does not look like real OCLC #.")
+
+
 def verify_oclc_number(oclcNumber: Union[int, str]) -> int:
     """
-    Verifies a valid looking OCLC number is passed to a request and
+    Verifies a valid looking OCLC number is passed and normalize it as integer.
 
     Args:
         oclcNumber:                OCLC record number
@@ -48,24 +70,14 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> int:
         return oclcNumber
 
     elif type(oclcNumber) is str:
+        oclcNumber = prep_oclc_number_str(oclcNumber)
+        return oclcNumber
 
-        # allow oclc numbers as strings with or without prefixes
-        if "ocm" in oclcNumber or "ocn" in oclcNumber:
-            oclcNumber = oclcNumber.strip()[3:]
-        elif "on" in oclcNumber:
-            oclcNumber = oclcNumber.strip()[2:]
-        try:
-            oclcNumber = int(oclcNumber)
-            return oclcNumber
-        except ValueError:
-            raise InvalidOclcNumber(
-                "Argument 'oclcNumber' does not look like real OCLC #."
-            )
     else:
         raise InvalidOclcNumber("Argument 'oclc_number' is of invalid type.")
 
 
-def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[str]:
+def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[int]:
     """
     Parses and verifies list of oclcNumbers
 
@@ -89,7 +101,7 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[
         )
 
     try:
-        vetted_numbers = [str(verify_oclc_number(n)) for n in oclcNumbers]
+        vetted_numbers = [verify_oclc_number(n) for n in oclcNumbers]
         return vetted_numbers
     except InvalidOclcNumber:
         raise InvalidOclcNumber("One of passed OCLC #s is invalid.")
