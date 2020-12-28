@@ -169,7 +169,7 @@ def live_keys():
             data = json.load(file)
             os.environ["WCKey"] = data["key"]
             os.environ["WCSecret"] = data["secret"]
-            os.environ["WCScopes"] = " ".join(data["scopes"])
+            os.environ["WCScopes"] = data["scopes"]
             os.environ["WCPrincipalID"] = data["principal_id"]
             os.environ["WCPrincipalIDNS"] = data["principal_idns"]
 
