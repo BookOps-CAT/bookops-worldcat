@@ -6,13 +6,13 @@ This module provides means to authenticate and obtain a WorldCat access token.
 
 import datetime
 import sys
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import requests
 from requests import Response
 
 
-from . import __title__, __version__
+from . import __title__, __version__  # type: ignore
 from .errors import WorldcatAuthorizationError
 
 
@@ -78,8 +78,10 @@ class WorldcatAccessToken:
         scopes: Union[str, List[str]],
         principal_id: str,
         principal_idns: str,
-        agent: str = None,
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float]] = None,
+        agent: Optional[str] = None,
+        timeout: Optional[
+            Union[int, float, Tuple[int, int], Tuple[float, float]]
+        ] = None,
     ) -> None:
         """Constructor"""
 
@@ -133,7 +135,7 @@ class WorldcatAccessToken:
             raise WorldcatAuthorizationError(
                 "Argument 'scope' must a string or a list."
             )
-        self.scopes = self.scopes.strip()
+        self.scopes = self.scopes.strip()  # type: ignore
         if self.scopes == "":
             raise WorldcatAuthorizationError("Argument 'scope' is missing.")
 
@@ -164,23 +166,26 @@ class WorldcatAccessToken:
         ) - datetime.timedelta(seconds=1)
         return datetime.datetime.strftime(utcstamp, "%Y-%m-%d %H:%M:%SZ")
 
-    def _parse_server_response(self, response: Response) -> None:
+    def _parse_server_response(self, response: Optional[Response]) -> None:
         """Parses authorization server response"""
-        self.server_response = response
-        if response.status_code == requests.codes.ok:
-            self.token_str = response.json()["access_token"]
-            self.token_expires_at = self._hasten_expiration_time(
-                response.json()["expires_at"]
-            )
-            self.token_type = response.json()["token_type"]
+        if response is not None:
+            self.server_response = response  # type: ignore
+            if response.status_code == requests.codes.ok:
+                self.token_str = response.json()["access_token"]
+                self.token_expires_at = self._hasten_expiration_time(  # type: ignore
+                    response.json()["expires_at"]
+                )
+                self.token_type = response.json()["token_type"]
+            else:
+                raise WorldcatAuthorizationError(response.json())
         else:
-            raise WorldcatAuthorizationError(response.json())
+            raise WorldcatAuthorizationError("Server did not return any response.")
 
     def _payload(self) -> Dict[str, str]:
         """Preps requests params"""
         return {
             "grant_type": self.grant_type,
-            "scope": self.scopes,
+            "scope": self.scopes,  # type: ignore
             "principalID": self.principal_id,
             "principalIDNS": self.principal_idns,
         }
@@ -220,7 +225,7 @@ class WorldcatAccessToken:
         self._parse_server_response(response)
 
     def _token_headers(self) -> Dict[str, str]:
-        return {"User-Agent": self.agent, "Accept": "application/json"}
+        return {"User-Agent": self.agent, "Accept": "application/json"}  # type: ignore
 
     def _token_url(self) -> str:
         return f"{self.oauth_server}/token"
@@ -236,10 +241,15 @@ class WorldcatAccessToken:
         >>> token.is_expired()
         False
         """
-        if (
-            datetime.datetime.strptime(self.token_expires_at, "%Y-%m-%d %H:%M:%SZ")
-            < datetime.datetime.utcnow()
-        ):
-            return True
-        else:
-            return False
+        try:
+            if (
+                datetime.datetime.strptime(self.token_expires_at, "%Y-%m-%d %H:%M:%SZ")  # type: ignore
+                < datetime.datetime.utcnow()
+            ):
+                return True
+            else:
+                return False
+        except TypeError:
+            raise
+        except ValueError:
+            raise

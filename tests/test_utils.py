@@ -33,7 +33,7 @@ class TestUtils:
 
     @pytest.mark.parametrize(
         "argm,expectation",
-        [("ocm00012345", 12345), ("ocn00012346", 12346), ("on000012347", 12347)],
+        [("ocm00012345", "12345"), ("ocn00012346", "12346"), ("on000012347", "12347")],
     )
     def test_prep_oclc_number_str(self, argm, expectation):
         assert prep_oclc_number_str(argm) == expectation
@@ -94,12 +94,12 @@ class TestUtils:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            ("000012345", 12345),
-            (12345, 12345),
-            ("ocm00012345", 12345),
-            ("ocn00012345", 12345),
-            ("ocn12345", 12345),
-            (" on12345 \n", 12345),
+            ("000012345", "12345"),
+            (12345, "12345"),
+            ("ocm00012345", "12345"),
+            ("ocn00012345", "12345"),
+            ("ocn12345", "12345"),
+            (" on12345 \n", "12345"),
         ],
     )
     def test_verify_oclc_number_success(self, argm, expectation):

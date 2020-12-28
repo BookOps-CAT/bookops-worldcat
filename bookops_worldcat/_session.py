@@ -35,4 +35,4 @@ class WorldcatSession(requests.Session):
         if timeout is None:
             self.timeout = (5, 5)
         else:
-            self.timeout = timeout
+            self.timeout = timeout  # type: ignore

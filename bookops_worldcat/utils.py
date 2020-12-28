@@ -30,7 +30,7 @@ def _str2list(s: str) -> List[str]:
     return [n.strip() for n in s.split(",")]
 
 
-def prep_oclc_number_str(oclcNumber: str) -> int:
+def prep_oclc_number_str(oclcNumber: str) -> str:
     """
     Checks for OCLC prefixes and removes them.
 
@@ -46,13 +46,13 @@ def prep_oclc_number_str(oclcNumber: str) -> int:
         oclcNumber = oclcNumber.strip()[2:]
 
     try:
-        oclcNumberInt = int(oclcNumber)
-        return oclcNumberInt
+        oclcNumber = str(int(oclcNumber))
+        return oclcNumber
     except ValueError:
         raise InvalidOclcNumber("Argument 'oclcNumber' does not look like real OCLC #.")
 
 
-def verify_oclc_number(oclcNumber: Union[int, str]) -> int:
+def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
     """
     Verifies a valid looking OCLC number is passed and normalize it as integer.
 
@@ -67,7 +67,7 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> int:
         raise InvalidOclcNumber("Argument 'oclcNumber' is missing.")
 
     elif type(oclcNumber) is int:
-        return oclcNumber  # type: ignore
+        return str(oclcNumber)
 
     elif type(oclcNumber) is str:
         return prep_oclc_number_str(oclcNumber)  # type: ignore
@@ -92,7 +92,7 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[
 
     # change to list if comma separated string
     if type(oclcNumbers) is str and oclcNumbers != "":
-        oclcNumbers = _str2list(oclcNumbers)
+        oclcNumbers = _str2list(oclcNumbers)  # type: ignore
 
     if not oclcNumbers or type(oclcNumbers) is not list:
         raise InvalidOclcNumber(

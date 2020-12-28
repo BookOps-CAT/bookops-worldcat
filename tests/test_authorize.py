@@ -372,6 +372,25 @@ class TestWorldcatAccessToken:
 
         assert token.is_expired() is True
 
+    @pytest.mark.parametrize(
+        "arg,expectation",
+        [(None, pytest.raises(TypeError)), ("20-01-01", pytest.raises(ValueError))],
+    )
+    def test_is_expired_exception(
+        self, arg, expectation, mock_credentials, mock_successful_post_token_response
+    ):
+        creds = mock_credentials
+        token = WorldcatAccessToken(
+            key=creds["key"],
+            secret=creds["secret"],
+            scopes=creds["scopes"],
+            principal_id=creds["principal_id"],
+            principal_idns=creds["principal_idns"],
+        )
+        token.token_expires_at = arg
+        with expectation:
+            token.is_expired()
+
     def test_post_token_request(
         self,
         mock_credentials,
