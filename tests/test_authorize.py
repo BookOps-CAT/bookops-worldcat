@@ -5,7 +5,6 @@ import os
 
 import pytest
 
-import requests
 
 from bookops_worldcat.authorize import WorldcatAccessToken
 from bookops_worldcat import __version__, __title__
@@ -373,6 +372,25 @@ class TestWorldcatAccessToken:
 
         assert token.is_expired() is True
 
+    @pytest.mark.parametrize(
+        "arg,expectation",
+        [(None, pytest.raises(TypeError)), ("20-01-01", pytest.raises(ValueError))],
+    )
+    def test_is_expired_exception(
+        self, arg, expectation, mock_credentials, mock_successful_post_token_response
+    ):
+        creds = mock_credentials
+        token = WorldcatAccessToken(
+            key=creds["key"],
+            secret=creds["secret"],
+            scopes=creds["scopes"],
+            principal_id=creds["principal_id"],
+            principal_idns=creds["principal_idns"],
+        )
+        token.token_expires_at = arg
+        with expectation:
+            token.is_expired()
+
     def test_post_token_request(
         self,
         mock_credentials,
@@ -396,6 +414,13 @@ class TestWorldcatAccessToken:
         assert token.scopes == "scope1 scope2"
         assert token.server_response.json() == mock_oauth_server_response.json()
         assert token.timeout == (3, 3)
+
+    def test_cred_in_env_variables(self, live_keys):
+        assert os.getenv("WCKey") is not None
+        assert os.getenv("WCSecret") is not None
+        assert os.getenv("WCScopes") == "WorldCatMetadataAPI"
+        assert os.getenv("WCPrincipalID") is not None
+        assert os.getenv("WCPrincipalIDNS") is not None
 
     @pytest.mark.webtest
     def test_post_token_request_with_live_service(self, live_keys):

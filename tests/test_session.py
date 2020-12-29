@@ -32,7 +32,7 @@ class TestWorldcatSession:
 
     def test_default_timeout(self):
         with WorldcatSession(timeout=None) as session:
-            assert session.timeout == (3, 3)
+            assert session.timeout == (5, 5)
 
     def test_custom_timeout(self):
         with WorldcatSession(timeout=1) as session:

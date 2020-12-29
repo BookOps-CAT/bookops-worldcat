@@ -5,6 +5,7 @@ import pytest
 from bookops_worldcat.utils import (
     _str2list,
     _parse_error_response,
+    prep_oclc_number_str,
     verify_oclc_number,
     verify_oclc_numbers,
 )
@@ -29,6 +30,20 @@ class MockServiceErrorResponse:
 
 class TestUtils:
     """Tests various methods in utils module"""
+
+    @pytest.mark.parametrize(
+        "argm,expectation",
+        [("ocm00012345", "12345"), ("ocn00012346", "12346"), ("on000012347", "12347")],
+    )
+    def test_prep_oclc_number_str(self, argm, expectation):
+        assert prep_oclc_number_str(argm) == expectation
+
+    def test_prep_oclc_number_str_exception(self):
+        err_msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
+            prep_oclc_number_str("ODN00012345")
+
+        assert err_msg in str(exc.value)
 
     @pytest.mark.parametrize(
         "argm,expectation",
@@ -79,12 +94,12 @@ class TestUtils:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            ("000012345", 12345),
-            (12345, 12345),
-            ("ocm00012345", 12345),
-            ("ocn00012345", 12345),
-            ("ocn12345", 12345),
-            (" on12345 \n", 12345),
+            ("000012345", "12345"),
+            (12345, "12345"),
+            ("ocm00012345", "12345"),
+            ("ocn00012345", "12345"),
+            ("ocn12345", "12345"),
+            (" on12345 \n", "12345"),
         ],
     )
     def test_verify_oclc_number_success(self, argm, expectation):
@@ -140,7 +155,7 @@ class TestUtils:
         [
             ("12345", ["12345"]),
             ("12345,67890", ["12345", "67890"]),
-            ("ocm12345, ocm67890", ["12345", "67890"]),
+            ("ocm0012345, ocm67890", ["12345", "67890"]),
             ([12345, 67890], ["12345", "67890"]),
             (["ocn12345", "on67890"], ["12345", "67890"]),
         ],

@@ -6,10 +6,12 @@ Shared utilities module.
 
 from typing import List, Union
 
+from requests import Response
+
 from .errors import InvalidOclcNumber
 
 
-def _parse_error_response(response):
+def _parse_error_response(response: Response) -> str:
     """
     Parses and formats error responses from OCLC web service
 
@@ -23,14 +25,36 @@ def _parse_error_response(response):
     return f"Web service returned {response.status_code} error: {msg}; {response.url}"
 
 
-def _str2list(s: str) -> List:
+def _str2list(s: str) -> List[str]:
     """Converts str into list - use for list of OCLC numbers"""
     return [n.strip() for n in s.split(",")]
 
 
-def verify_oclc_number(oclcNumber: Union[int, str]) -> int:
+def prep_oclc_number_str(oclcNumber: str) -> str:
     """
-    Verifies a valid looking OCLC number is passed to a request and
+    Checks for OCLC prefixes and removes them.
+
+    Args:
+        oclcNumber:                OCLC record as string
+
+    Returns:
+        oclcNumber as int
+    """
+    if "ocm" in oclcNumber or "ocn" in oclcNumber:
+        oclcNumber = oclcNumber.strip()[3:]
+    elif "on" in oclcNumber:
+        oclcNumber = oclcNumber.strip()[2:]
+
+    try:
+        oclcNumber = str(int(oclcNumber))
+        return oclcNumber
+    except ValueError:
+        raise InvalidOclcNumber("Argument 'oclcNumber' does not look like real OCLC #.")
+
+
+def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
+    """
+    Verifies a valid looking OCLC number is passed and normalize it as integer.
 
     Args:
         oclcNumber:                OCLC record number
@@ -43,27 +67,16 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> int:
         raise InvalidOclcNumber("Argument 'oclcNumber' is missing.")
 
     elif type(oclcNumber) is int:
-        return oclcNumber
+        return str(oclcNumber)
 
     elif type(oclcNumber) is str:
+        return prep_oclc_number_str(oclcNumber)  # type: ignore
 
-        # allow oclc numbers as strings with or without prefixes
-        if "ocm" in oclcNumber or "ocn" in oclcNumber:
-            oclcNumber = oclcNumber.strip()[3:]
-        elif "on" in oclcNumber:
-            oclcNumber = oclcNumber.strip()[2:]
-        try:
-            oclcNumber = int(oclcNumber)
-            return oclcNumber
-        except ValueError:
-            raise InvalidOclcNumber(
-                "Argument 'oclcNumber' does not look like real OCLC #."
-            )
     else:
         raise InvalidOclcNumber("Argument 'oclc_number' is of invalid type.")
 
 
-def verify_oclc_numbers(oclcNumbers: Union[str, List]) -> List:
+def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[str]:
     """
     Parses and verifies list of oclcNumbers
 
@@ -79,7 +92,7 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List]) -> List:
 
     # change to list if comma separated string
     if type(oclcNumbers) is str and oclcNumbers != "":
-        oclcNumbers = _str2list(oclcNumbers)
+        oclcNumbers = _str2list(oclcNumbers)  # type: ignore
 
     if not oclcNumbers or type(oclcNumbers) is not list:
         raise InvalidOclcNumber(
