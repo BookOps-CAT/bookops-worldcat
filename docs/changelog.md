@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.3 (12/28/2020)
++ Type hints added
++ Default timeout in the MetadataSesssion extended to 5 seconds
+
++ Dependencies:
+    + pytest bump to 6.1.2
+    + mypy 0.7.8
+
 ## 0.3.2 (11/25/2020)
 + Bug fixes:
     + MetadataSession timeout paramerter correctly passed into every session request
