@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.4 (3/22/2021)
++ Dependencies update
+    + certifi to 2020.12.5
+    + chardet to 4.0.0
+    + requests to 2.25.1
+    + urllib3 to 1.26.4
+
 ## 0.3.3 (12/28/2020)
 + Type hints added
 + Default timeout in the MetadataSesssion extended to 5 seconds
