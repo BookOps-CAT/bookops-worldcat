@@ -237,7 +237,8 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -&gt; Li
         vetted_numbers = [str(verify_oclc_number(n)) for n in oclcNumbers]
         return vetted_numbers
     except InvalidOclcNumber:
-        raise InvalidOclcNumber(&quot;One of passed OCLC #s is invalid.&quot;)</code></pre>
+        raise InvalidOclcNumber(&quot;One of passed OCLC #s is invalid.&quot;)
+</code></pre>
 </div>
 </div>
               

@@ -305,7 +305,7 @@
 
 <li><code class="mkapi-item-name">verify</code>
 
-<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">SSL Verification default.</span></li>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Only set this to <code>False</code> for testing.</span></li>
 
 
 </ul></div>
@@ -663,7 +663,12 @@ Returns :class:<code>Response &lt;Response&gt;</code> object.</p>
     content. Defaults to <code>False</code>.
 :param verify: (optional) Either a boolean, in which case it controls whether we verify
     the server's TLS certificate, or a string, in which case it must be a path
-    to a CA bundle to use. Defaults to <code>True</code>.
+    to a CA bundle to use. Defaults to <code>True</code>. When set to
+    <code>False</code>, requests will accept any TLS certificate presented by
+    the server, and will ignore hostname mismatches and/or expired
+    certificates, which will make your application vulnerable to
+    man-in-the-middle (MitM) attacks. Setting verify to <code>False</code>
+    may be useful during local development or testing.
 :param cert: (optional) if String, path to ssl client cert file (.pem).
     If Tuple, ('cert', 'key') pair.
 :rtype: requests.Response</p></div>

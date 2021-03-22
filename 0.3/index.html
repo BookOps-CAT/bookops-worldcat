@@ -202,7 +202,7 @@ Please note, not all features of the Metadata API are implemented because this t
 <p>Worldcat Metadata API requires OCLC credentials which can be obtained at the <a href="https://www.oclc.org/developer/home.en.html">OCLC Developer Network</a> site.</p>
 <h4 id="obtaining-access-token">Obtaining Access Token</h4>
 <p>The Worldcat access token can be obtained by passing credential parameters into the <code>WorldcatAccessToken</code> object.</p>
-<pre><code class="python">&gt;&gt;&gt; from bookops_worldcat import WorldcatAccessToken
+<pre><code class="language-python">&gt;&gt;&gt; from bookops_worldcat import WorldcatAccessToken
 &gt;&gt;&gt; token = WorldcatAccessToken(
     key=&quot;my_WSKey&quot;,
     secret=&quot;my_secret&quot;,
@@ -215,24 +215,21 @@ Please note, not all features of the Metadata API are implemented because this t
 &gt;&gt;&gt; print(token.is_expired())
 False
 </code></pre>
-
 <p>Created <code>token</code> object can be directly passed into <code>MetadataSession</code> to authorize requests to the Metadata API web service:</p>
-<pre><code class="Python">&gt;&gt;&gt; from bookops_worldcat import MetadataSession
+<pre><code class="language-Python">&gt;&gt;&gt; from bookops_worldcat import MetadataSession
 &gt;&gt;&gt; session = MetadataSession(authorization=token)
 </code></pre>
-
 <h4 id="searching-brief-bibliographic-records-using-metadata-api">Searching Brief Bibliographic Records Using Metadata API</h4>
 <p>The <code>MetadataSession</code> is authenticated using the <code>WorldcatAccessToken</code> object. The session allows searching brief records as well as retrieving full bibs in the MARC XML format.</p>
 <p>Basic usage:</p>
-<pre><code class="python">from bookops_worldcat import MetadataSession
+<pre><code class="language-python">from bookops_worldcat import MetadataSession
 
 with MetadataSession(authorization=token) as session:
     results = session.search_brief_bibs(q=&quot;ti:zendegi AND au:greg egan&quot;)
     print(results.json())
 </code></pre>
-
 <p>Returned brief bibliographic records are in the JSON format that can be parsed via <code>.json()</code> method.</p>
-<pre><code class="json">{
+<pre><code class="language-json">{
     &quot;numberOfRecords&quot;: 24,
     &quot;briefRecords&quot;: [
         {
@@ -273,17 +270,15 @@ with MetadataSession(authorization=token) as session:
     ]
 }
 </code></pre>
-
 <h4 id="retrieving-full-bibliographic-records">Retrieving Full Bibliographic Records</h4>
 <p>To retrieve a full bibliographic record from WorldCat use the <code>.get_full_bib</code> method. The server returns records in MARC XML format by default.</p>
-<pre><code class="python">from bookops_worldcat import MetadataSession
+<pre><code class="language-python">from bookops_worldcat import MetadataSession
 
 with MetadataSession(authorization=token) as session:
     results = session.get_full_bib(oclcNumber=430840771)
     print(results.text)
 </code></pre>
-
-<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;entry xmlns=&quot;http://www.w3.org/2005/Atom&quot;&gt;
   &lt;content type=&quot;application/xml&quot;&gt;
     &lt;response xmlns=&quot;http://worldcat.org/rb&quot; mimeType=&quot;application/vnd.oclc.marc21+xml&quot;&gt;
@@ -331,20 +326,17 @@ with MetadataSession(authorization=token) as session:
   &lt;link href=&quot;http://worldcat.org/oclc/1143317889&quot;&gt;&lt;/link&gt;
 &lt;/entry&gt;
 </code></pre>
-
 <h4 id="updating-holdings">Updating Holdings</h4>
 <p><code>MetadataSession</code> can be used to check or set/unset your library holdings on a master record in Worldcat:</p>
 <p>example:</p>
-<pre><code class="python">result = session.holding_set(oclc_number=&quot;850939579&quot;)
+<pre><code class="language-python">result = session.holding_set(oclc_number=&quot;850939579&quot;)
 print(result)
 &lt;Response [201]&gt;
 </code></pre>
-
-<pre><code class="python">result = session.holding_get_status(&quot;850939579&quot;)
+<pre><code class="language-python">result = session.holding_get_status(&quot;850939579&quot;)
 print(result.json())
 </code></pre>
-
-<pre><code class="json">{
+<pre><code class="language-json">{
   &quot;title&quot;: &quot;850939579&quot;,
   &quot;content&quot;: {
     &quot;requestedOclcNumber&quot;: &quot;850939579&quot;,
@@ -356,21 +348,18 @@ print(result.json())
   &quot;updated&quot;: &quot;2020-10-01T04:10:13.017Z&quot;
 }
 </code></pre>
-
 <p>For holdings operations on batches of records see <a href="https://bookops-cat.github.io/bookops-worldcat/#holdings">Advanced Usage&gt;MetadataSession&gt;Updating Holdings</a></p>
 <h2 id="advanced-usage">Advanced Usage</h2>
 <p><strong>Identifying your application</strong></p>
 <p>BookOps-Worldcat provides a default <code>user-agent</code> value in headers of all requests to OCLC web services: <code>bookops-worldcat/{version}</code>. It is encouraged to update the <code>user-agent</code> value to properly identify your application to OCLC servers. This will provide a useful piece of information for OCLC staff if they need to assist with troubleshooting problems that may arise.
 To set a custom "user-agent" in a session simply pass is as an argument when initiating the session:</p>
-<pre><code class="python">session = MetadataSession(authorization=token, agent=&quot;my_client_name&quot;)
+<pre><code class="language-python">session = MetadataSession(authorization=token, agent=&quot;my_client_name&quot;)
 </code></pre>
-
 <p>... or simply update its headers attribute:</p>
-<pre><code class="python">session.headers.update({&quot;user-agent&quot;: &quot;my-app/version 1.0&quot;})
+<pre><code class="language-python">session.headers.update({&quot;user-agent&quot;: &quot;my-app/version 1.0&quot;})
 </code></pre>
-
 <p>The <code>user-agent</code> header can be set for an access token request as well. To do that simply pass it as the <code>agent</code> parameter when initiating <code>WorldcatAccessToken</code> object:</p>
-<pre><code class="python">token = WorldcatAccessToken(
+<pre><code class="language-python">token = WorldcatAccessToken(
     key=&quot;my_WSKey&quot;,
     secret=&quot;my_secret&quot;,
     scopes=[&quot;WorldCatMetadataAPI&quot;],
@@ -379,20 +368,18 @@ To set a custom "user-agent" in a session simply pass is as an argument when ini
     agent=&quot;my_app/1.0.0&quot;
 )
 </code></pre>
-
 <p><strong>Event hooks</strong></p>
 <p><code>MetadataSession</code> methods support <a href="https://requests.readthedocs.io/en/latest/user/advanced/#event-hooks">Requests event hooks</a> which can be passed as an argument:</p>
-<pre><code class="python">def print_url(response, *args, **kwargs):
+<pre><code class="language-python">def print_url(response, *args, **kwargs):
     print(response.url)
 
 hooks = {'response': print_url}
 session.get_brief_bib(850939579, hooks=hooks)
 </code></pre>
-
 <h4 id="worldcataccesstoken">WorldcatAccessToken</h4>
 <p>Bookops-Worldcat utilizes OAuth 2.0 and Client Credential Grant flow to acquire Access Token. Please note, your OCLC credentials must allow access to the Metadata API in their scope to be permitted to make requests to the web service.</p>
 <p>Obtaining:</p>
-<pre><code class="python">from bookops_worldcat import WorldcatAccessToken
+<pre><code class="language-python">from bookops_worldcat import WorldcatAccessToken
 token = WorldcatAccessToken(
     key=&quot;my_WSKey&quot;,
     secret=&quot;my_secret&quot;,
@@ -402,16 +389,14 @@ token = WorldcatAccessToken(
     agent=&quot;my_app/version 1.0&quot;
 )
 </code></pre>
-
 <p>Token object retains underlying Requests object functionality (<code>requests.Request</code>) that can be accessed via the <code>.server_response</code> attribute:</p>
-<pre><code class="python">print(token.server_response.status_code)
+<pre><code class="language-python">print(token.server_response.status_code)
 200
 print(token.server_response.elapsed):
 0:00:00.650108
 print(token.server_response.json())
 </code></pre>
-
-<pre><code class="json">{
+<pre><code class="language-json">{
 &quot;user-agent&quot;: &quot;bookops-worldcat/0.1.0&quot;,
 &quot;Accept-Encoding&quot;: &quot;gzip, deflate&quot;,
 &quot;Accept&quot;: &quot;application/json&quot;,
@@ -421,12 +406,10 @@ print(token.server_response.json())
 &quot;Authorization&quot;: &quot;Basic encoded_authorization_here=&quot;
 }
 </code></pre>
-
 <p>Checking if the token has expired can be done by calling the <code>is_expired</code> method:</p>
-<pre><code class="python">print(token.is_expired())
+<pre><code class="language-python">print(token.is_expired())
 True
 </code></pre>
-
 <p>A failed token request raises <code>WorldcatAuthorizationError</code> which provides a returned by the server error code and detailed message.</p>
 <h4 id="metadatasession">MetadataSession</h4>
 <p>A wrapper around WorldCat Metadata API. <code>MetadataSession</code> inherits <code>requests.Session</code> methods.
@@ -434,12 +417,11 @@ Returned full bibliographic records are by default in MARC/XML format, but it is
 All <code>MetadataSession</code> issued requests have a build-in access token auto-refresh feature. While a session is open, before any request is sent, a current token is checked for expiration and if needed a new access token is automatically obtained. </p>
 <p><strong>OCLC numbers in methods' arguments</strong></p>
 <p><code>MetadataSession</code> accepts OCLC numbers in methods' arguments as integers or strings with or without a prefix ("ocm", "ocn", "on"). The following are all acceptable:</p>
-<pre><code class="python">session.get_brief_bib(oclcNumber=&quot;ocm00012345&quot;)
+<pre><code class="language-python">session.get_brief_bib(oclcNumber=&quot;ocm00012345&quot;)
 session.get_brief_bib(oclcNumber=&quot;00012345&quot;)
 session.get_brief_bib(oclcNumber=12345)
 session.search_current_control_numbers(oclcNumbers=[&quot;ocm00012345&quot;, &quot;00012346&quot;, 12347])
 </code></pre>
-
 <h5 id="search-functionality">Search Functionality</h5>
 <p>MetadataSession supports the following search functionality:</p>
 <ul>
@@ -452,12 +434,11 @@ session.search_current_control_numbers(oclcNumbers=[&quot;ocm00012345&quot;, &qu
 </ul>
 <p>The server responses are returned in JSON format by default.</p>
 <p><strong>Obtaining brief record</strong></p>
-<pre><code class="python">with MetadataSession(authorization=token) as session:
+<pre><code class="language-python">with MetadataSession(authorization=token) as session:
     result = session.get_brief_bib(850940548)
     print(results.json())
 </code></pre>
-
-<pre><code class="json">{
+<pre><code class="language-json">{
     &quot;oclcNumber&quot;: &quot;850940548&quot;,
     &quot;title&quot;: &quot;Record Builder Added This Test Record On 06/26/2013 13:07:06.&quot;,
     &quot;creator&quot;: &quot;OCLC RecordBuilder.&quot;,
@@ -471,12 +452,11 @@ session.search_current_control_numbers(oclcNumbers=[&quot;ocm00012345&quot;, &qu
     }
 }
 </code></pre>
-
 <p><strong>Quering WorldCat</strong></p>
 <p>Metadata API provides quite robust methods to query WorldCat. In addition to a flexible query string that supports keyword and fielded searches, it is possibile to set further limits using various elements such as type of item, language, publishing date, etc. It is possible to specify the order of returned records by using the <code>orderBy</code> argument. Results are returned as brief records in JSON format.</p>
 <p>The query syntax is case-insensitive and allows keyword and phrase search (use quotation marks), boolean operators (AND, OR, NOT), wildcards (# - single character, ? - any number of additional characters), and truncation (use * character).</p>
 <p>keyword search with item type, language, and publishing date limiters:</p>
-<pre><code class="python">session.search_brief_bibs(
+<pre><code class="language-python">session.search_brief_bibs(
     q=&quot;czarne oceany dukaj&quot;,
     itemType=&quot;book&quot;,
     inLanguage=&quot;pol&quot;,
@@ -484,35 +464,30 @@ session.search_current_control_numbers(oclcNumbers=[&quot;ocm00012345&quot;, &qu
     orderBy=&quot;publicationDateDesc&quot;
 )
 </code></pre>
-
 <p>fielded query:</p>
-<pre><code class="python">session.search_brief_bibs(
+<pre><code class="language-python">session.search_brief_bibs(
     q='ti=&quot;czarne oceany&quot; AND au:jacek dukaj AND ge=&quot;science fiction&quot;')
 </code></pre>
-
 <p>More about the query syntax can be found in <a href="https://www.oclc.org/developer/develop/worldshare-platform/architecture/query-syntax.en.html">OCLC documentation</a></p>
 <h5 id="obtaining-full-bibliographic-records">Obtaining Full Bibliographic Records</h5>
 <p><code>session.get_full_bib()</code> method with OCLC number as an argument sends a request for a matching full bibliographic record in WorldCat. The Metadata API correctly matches requested OCLC numbers of records that have been merged together by returning the current master record. By default <code>get_full_bib</code> returns records in MARC XML format.</p>
 <p>Returned response is a <code>requests.Response</code> object with all its features:</p>
-<pre><code class="python">with MetadataSession(authorization=token) as session:
+<pre><code class="language-python">with MetadataSession(authorization=token) as session:
     result = session.get_full_bib(&quot;00000000123&quot;)
     print(result.status_code)
     print(result.url)
 200
 &quot;https://worldcat.org/bib/data/00000000123&quot;
 </code></pre>
-
 <p>To avoid any <code>UnicodeEncodeError</code> it is recommended to access retrieved data with <code>.content</code> attribute of the response object:</p>
-<pre><code class="python">print(response.content)
+<pre><code class="language-python">print(response.content)
 </code></pre>
-
 <h5 id="retrieving-current-oclc-number">Retrieving Current OCLC Number</h5>
 <p><code>MetadataSession.search_current_control_numbers</code> method allows retrieval of a current control number of the master record in WorldCat. Occasionally, records identified as duplicates in WorldCat have been merged.  In that case a local control number may not correctly refer to an OCLC master record. Returned responses are in JSON format by default, but it's possible to pass <code>'application/atom+xml'</code> in the <code>response_format</code> argument to have the response serialized into xml.</p>
 <p><code>search_current_control_numbers</code> method accepts control numbers as a list or a comma separated string:</p>
-<pre><code class="python">session.search_current_control_numbers(oclcNumbers=&quot;00012345,00012346,00012347&quot;)
+<pre><code class="language-python">session.search_current_control_numbers(oclcNumbers=&quot;00012345,00012346,00012347&quot;)
 session.search_current_control_numbers(oclcNumbers=[12345, 12346, 12347], response_format=&quot;application/atom+xml&quot;)
 </code></pre>
-
 <h5 id="holdings">Holdings</h5>
 <p><code>MetadataSession</code> supports the following holdings operations:</p>
 <ul>
@@ -523,11 +498,10 @@ session.search_current_control_numbers(oclcNumbers=[12345, 12346, 12347], respon
 <li><code>holdings_unset</code> allows holdings to be deleted on multiple records, and is not limited to OCLC's 50 bib record restriction</li>
 </ul>
 <p>By default, responses are returned in <code>atom+json</code> format, but <code>atom+xml</code> can be specified:</p>
-<pre><code class="python">result = session.holding_get_status(oclcNumber=&quot;ocn123456789&quot;, response_format=&quot;application/atom+xml&quot;)
+<pre><code class="language-python">result = session.holding_get_status(oclcNumber=&quot;ocn123456789&quot;, response_format=&quot;application/atom+xml&quot;)
 print(result.text)
 </code></pre>
-
-<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;entry xmlns=&quot;http://www.w3.org/2005/Atom&quot;&gt;
   &lt;title type=&quot;text&quot;&gt;1143317889&lt;/title&gt;
   &lt;updated&gt;2020-04-25T05:21:10.233Z&lt;/updated&gt;
@@ -542,25 +516,22 @@ print(result.text)
   &lt;/content&gt;
 &lt;/entry&gt;
 </code></pre>
-
 <p>Pass OCLC record numbers for batch operations as a list of strings or integers or comma separated string with or without a prefix:</p>
-<pre><code class="python">session.holdings_set(
+<pre><code class="language-python">session.holdings_set(
     oclcNumbers=&quot;00000000123,00000000124,00000000125,00000000126&quot;)
 
 session.holdings_unset(oclcNumbers=[123, 124, 125, 126])
 </code></pre>
-
 <p>The OCLC web service limits the number of records in a batch operation to 50, but <code>MetadataSession</code> permits larger batches by splitting the batch into chunks of 50 and automatically issuing multiple requests. The return object is a list of returned from server responses.</p>
-<pre><code class="python">results = session.holdings_unset(oclcNumbers=[123, 124, 125, 126])
+<pre><code class="language-python">results = session.holdings_unset(oclcNumbers=[123, 124, 125, 126])
 
 # print results of each batch of 50s
 for r in results:
     print(r.json())
 </code></pre>
-
 <h2 id="examples">Examples</h2>
 <p>Complex search query:</p>
-<pre><code class="python">from bookops_worldcat import WorldcatAccessToken, MetadataSession
+<pre><code class="language-python">from bookops_worldcat import WorldcatAccessToken, MetadataSession
 
 # obtain access token
 token = WorldcatAccessToken(
@@ -648,5 +619,5 @@ with MetadataSession(authorization=token) as session:
 
 <!--
 MkDocs version : 1.1.2
-Build Date UTC : 2020-12-31 20:22:50.400118+00:00
+Build Date UTC : 2021-03-22 17:08:39.160285+00:00
 -->

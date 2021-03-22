@@ -1188,7 +1188,8 @@ class MetadataSession(WorldcatSession):
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             raise WorldcatSessionError(f&quot;Request error: {sys.exc_info()[0]}&quot;)
         except:
-            raise WorldcatSessionError(f&quot;Unexpected request error: {sys.exc_info()[0]}&quot;)</code></pre>
+            raise WorldcatSessionError(f&quot;Unexpected request error: {sys.exc_info()[0]}&quot;)
+</code></pre>
 </div>
 </div>
               
