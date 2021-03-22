@@ -65,11 +65,7 @@ class TestMockedMetadataSession:
             (["1"], 1, ["1"]),
             (["1"] * 50, 1, [",".join(["1"] * 50)]),
             (["1"] * 51, 2, [",".join(["1"] * 50), "1"]),
-            (
-                ["1"] * 103,
-                3,
-                [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],
-            ),
+            (["1"] * 103, 3, [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],),
         ],
     )
     def test_split_into_legal_volume(
@@ -918,9 +914,11 @@ class TestLiveMetadataSession:
                 "date",
                 "edition",
                 "generalFormat",
+                "isbns",
                 "language",
                 "mergedOclcNumbers",
                 "oclcNumber",
+                "publicationPlace",
                 "publisher",
                 "specificFormat",
                 "title",
@@ -1174,16 +1172,17 @@ class TestLiveMetadataSession:
                 inLanguage="eng",
                 inCatalogLanguage="eng",
                 itemType="book",
-                itemSubType="printbook",
+                # itemSubType="printbook",
                 catalogSource="dlc",
                 orderBy="mostWidelyHeld",
                 limit=5,
             )
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
+            # removed temp &itemSubType=printbook due to OCLC error/issue
             assert (
                 response.request.url
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=printbook&orderBy=mostWidelyHeld&limit=5"
+                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&orderBy=mostWidelyHeld&limit=5"
             )
 
     def test_search_general_holdings(self, live_keys):
