@@ -65,7 +65,11 @@ class TestMockedMetadataSession:
             (["1"], 1, ["1"]),
             (["1"] * 50, 1, [",".join(["1"] * 50)]),
             (["1"] * 51, 2, [",".join(["1"] * 50), "1"]),
-            (["1"] * 103, 3, [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],),
+            (
+                ["1"] * 103,
+                3,
+                [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],
+            ),
         ],
     )
     def test_split_into_legal_volume(
@@ -1223,10 +1227,13 @@ class TestLiveMetadataSession:
             assert sorted(jres["entries"][0].keys()) == ["content", "title", "updated"]
             assert sorted(jres["entries"][0]["content"].keys()) == sorted(
                 [
-                    "requestedOclcNumber",
                     "currentOclcNumber",
-                    "institution",
-                    "status",
+                    "detail",
+                    "found",
                     "id",
+                    "institution",
+                    "merged",
+                    "requestedOclcNumber",
+                    "status",
                 ]
             )
