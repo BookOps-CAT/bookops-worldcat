@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.5 (6/2/2021)
++ Dependencies update
+    + urllib3 from 1.26.4 to 1.26.5
+
 ## 0.3.4 (3/22/2021)
 + Dependencies update
     + certifi to 2020.12.5
