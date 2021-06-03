@@ -265,7 +265,7 @@ class WorldcatAccessToken:
             self.scopes = &quot; &quot;.join(self.scopes)
         elif type(self.scopes) is not str:
             raise WorldcatAuthorizationError(
-                &quot;Argument 'scope' must a string or a list.&quot;
+                &quot;Argument 'scopes' must a string or a list.&quot;
             )
         self.scopes = self.scopes.strip()  # type: ignore
         if self.scopes == &quot;&quot;:
