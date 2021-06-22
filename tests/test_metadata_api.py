@@ -786,7 +786,7 @@ class TestMockedMetadataSession:
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
         with MetadataSession(authorization=mock_token) as session:
             with pytest.raises(WorldcatSessionError) as exc:
-                session.search_general_holdings(heldBy="NY", limit=20)
+                session.search_general_holdings(holdingsAllEditions=True, limit=20)
             assert msg in str(exc.value)
 
     def test_search_general_holdings_invalid_oclc_number(self, mock_token):
