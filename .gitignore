@@ -128,3 +128,4 @@ dmypy.json
 temp.py
 temp/
 1.0/
+venv-activate.sh
