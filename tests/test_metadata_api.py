@@ -1022,6 +1022,7 @@ class TestLiveMetadataSession:
                 ]
             )
 
+    @pytest.mark.holdings
     def test_holding_set_unset(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
@@ -1078,6 +1079,7 @@ class TestLiveMetadataSession:
                 "detail": None,
             }
 
+    @pytest.mark.holdings
     def test_holdings_set(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
@@ -1111,6 +1113,7 @@ class TestLiveMetadataSession:
                 ]
             )
 
+    @pytest.mark.holdings
     def test_holdings_unset(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
