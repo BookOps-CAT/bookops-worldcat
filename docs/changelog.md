@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.0 (6/22/2021)
++ Changes to `MetadataSession.search_brief_bibs` method due to /brief-bibs endpoint changes:
+    + removed deprecated argument `heldBy`
+    + added `groupVariantRecord` and `preferredLanuage` argument
+    + modified `groupRelatedEditions` to allow boolean arguments
++ Changes to `MetadataSession.search_general_holdings` method due to API changes:
+    + added following arguements: `holdingsAllVariantRecords`, `preferredLanguage`
+    + removed deprecated `heldBy` argument
++ Changes to `MetadataSession.search_brief_bib_other_editions`:
+    + added `deweyNumber`, `datePublished`, `heldByGroup`, `heldBySymbol`, 
+    `heldByInstitutionId`, `inLanguage`, `inCatalogLanguage`, `materialType`, 
+    `catalogSource`, `itemType`, `itemSubType`, `retentionCommitments`, 
+    `spProgram`, `topic`, `subtopic`, `audience`, `content`, `openAccess`, 
+    `peerReviewed`, `facets`, `groupVariantRecords`, `preferredLanguage`, 
+    and `orderBy`. 
+
 ## 0.3.5 (6/2/2021)
 + Dependencies update
     + urllib3 from 1.26.4 to 1.26.5
