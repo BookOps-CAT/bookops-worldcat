@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bookops-worldcat"
-version = "0.3.5"
+version = "0.4.0"
 description = "OCLC WorldCat Metadata APIs wrapper"
 authors = ["Tomasz Kalata <klingaroo@gmail.com>"]
 license = "MIT"
