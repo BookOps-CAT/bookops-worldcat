@@ -4,9 +4,9 @@
 
 This recipe shows how to query Worldcat for specific full bibliographic records and save the results to a file in MARC21 format.
 
-Conversion from the response to MARC format is handled by pymarc library (see more at https://pypi.org/project/pymarc/), specifically its `parse_xml_to_array` and `as_marc` methods.
+A conversion from the response to the MARC format is handled by the pymarc library (see more at [https://pypi.org/project/pymarc/](https://pypi.org/project/pymarc/)), specifically its `parse_xml_to_array` and `as_marc` methods.
 
-The code below requires an access token ([`WorldcatAccessToken` object](https://bookops-cat.github.io/bookops-worldcat/0.3/#worldcataccesstoken)) to be passed to the MetadataSession for authorization.
+The code below requires an access token ([`WorldcatAccessToken` object](https://bookops-cat.github.io/bookops-worldcat/0.4/#worldcataccesstoken)) to be passed to the MetadataSession for authorization.
 
 
 ```python
