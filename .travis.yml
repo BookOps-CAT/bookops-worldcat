@@ -13,6 +13,6 @@ install:
   - pip install coveralls
 # command to run tests
 script:
-  - pytest -m "not holdings" --cov=bookops_worldcat/
+  - pytest -m "not webtest" --cov=bookops_worldcat/
 after_success:
   - coveralls
