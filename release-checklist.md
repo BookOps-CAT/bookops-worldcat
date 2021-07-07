@@ -1,5 +1,5 @@
 1. Update documentation  
-    a) update Changelog: version, date, descriptions of changes
+    a) update Changelog: version, date, descriptions of changes, any links within docs
     b) rebuild docs using mike:
         - mike --rebase (optional, to fetch remote version of docs to your local branch)
         - mike deploy [version] [alias] --push
