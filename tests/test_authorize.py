@@ -415,6 +415,7 @@ class TestWorldcatAccessToken:
         assert token.server_response.json() == mock_oauth_server_response.json()
         assert token.timeout == (3, 3)
 
+    @pytest.mark.webtest
     def test_cred_in_env_variables(self, live_keys):
         assert os.getenv("WCKey") is not None
         assert os.getenv("WCSecret") is not None
