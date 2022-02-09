@@ -11,6 +11,19 @@ import requests
 from bookops_worldcat import WorldcatAccessToken
 
 
+@pytest.fixture
+def live_keys():
+    if os.name == "nt":
+        fh = os.path.join(os.environ["USERPROFILE"], ".oclc/nyp_wc_test.json")
+        with open(fh, "r") as file:
+            data = json.load(file)
+            os.environ["WCKey"] = data["key"]
+            os.environ["WCSecret"] = data["secret"]
+            os.environ["WCScopes"] = data["scopes"]
+            os.environ["WCPrincipalID"] = data["principal_id"]
+            os.environ["WCPrincipalIDNS"] = data["principal_idns"]
+
+
 class FakeUtcNow(datetime.datetime):
     @classmethod
     def utcnow(cls):
@@ -87,19 +100,30 @@ class MockConnectionError:
         raise requests.exceptions.ConnectionError
 
 
-class MockSuccessfulHTTP200SessionResponse:
-    def __init__(self):
-        self.status_code = 200
+class MockHTTPSessionResponse:
+    def __init__(self, http_code):
+        self.status_code = http_code
 
 
-class MockSuccessfulHTTP201SessionResponse:
-    def __init__(self):
-        self.status_code = 201
+@pytest.fixture
+def mock_session_response(request, monkeypatch):
+    """
+    Use together with `pytest.mark.http_code` marker to pass
+    specific HTTP code to be returned to simulate various
+    responses from different endpoints
+    """
+    marker = request.node.get_closest_marker("http_code")
+    if marker is None:
+        http_code = 200
+    else:
+        http_code = marker.args[0]
 
+    def mock_api_response(*args, http_code=http_code, **kwargs):
+        return MockHTTPSessionResponse(http_code=http_code)
 
-class MockSuccessfulHTTP207SessionResponse:
-    def __init__(self):
-        self.status_code = 207
+    monkeypatch.setattr(requests.Session, "get", mock_api_response)
+    monkeypatch.setattr(requests.Session, "post", mock_api_response)
+    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
 
 
 @pytest.fixture
@@ -162,67 +186,8 @@ def mock_connectionerror(monkeypatch):
 
 
 @pytest.fixture
-def live_keys():
-    if os.name == "nt":
-        fh = os.path.join(os.environ["USERPROFILE"], ".oclc/nyp_wc_test.json")
-        with open(fh, "r") as file:
-            data = json.load(file)
-            os.environ["WCKey"] = data["key"]
-            os.environ["WCSecret"] = data["secret"]
-            os.environ["WCScopes"] = data["scopes"]
-            os.environ["WCPrincipalID"] = data["principal_id"]
-            os.environ["WCPrincipalIDNS"] = data["principal_idns"]
-
-    else:
-        # Travis env variables defined in the repository settings
-        pass
-
-
-@pytest.fixture
 def mock_token(mock_credentials, mock_successful_post_token_response):
     return WorldcatAccessToken(**mock_credentials)
-
-
-@pytest.fixture
-def mock_successful_session_get_request(monkeypatch):
-    def mock_api_response(*args, **kwargs):
-        return MockSuccessfulHTTP200SessionResponse()
-
-    monkeypatch.setattr(requests.Session, "get", mock_api_response)
-
-
-@pytest.fixture
-def mock_successful_session_post_request(monkeypatch):
-    def mock_api_response(*args, **kwargs):
-        return MockSuccessfulHTTP200SessionResponse()
-
-    monkeypatch.setattr(requests.Session, "post", mock_api_response)
-
-
-@pytest.fixture
-def mock_successful_holdings_post_request(monkeypatch):
-    def mock_api_response(*args, **kwargs):
-        return MockSuccessfulHTTP201SessionResponse()
-
-    monkeypatch.setattr(requests.Session, "post", mock_api_response)
-
-
-@pytest.fixture
-def mock_successful_holdings_delete_request(monkeypatch):
-    def mock_api_response(*args, **kwargs):
-        return MockSuccessfulHTTP200SessionResponse()
-
-    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
-
-
-@pytest.fixture
-def mock_successful_multi_status_request(monkeypatch):
-    def mock_api_response(*args, **kwargs):
-        return MockSuccessfulHTTP207SessionResponse()
-
-    monkeypatch.setattr(requests.Session, "get", mock_api_response)
-    monkeypatch.setattr(requests.Session, "post", mock_api_response)
-    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
 
 
 @pytest.fixture

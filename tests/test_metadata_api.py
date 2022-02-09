@@ -205,7 +205,7 @@ class TestMockedMetadataSession:
                 == "https://worldcat.org/ih/institutionlist"
             )
 
-    def test_get_brief_bib(self, mock_token, mock_successful_session_get_request):
+    def test_get_brief_bib(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert session.get_brief_bib(12345).status_code == 200
 
@@ -220,7 +220,7 @@ class TestMockedMetadataSession:
                 session.get_brief_bib(oclcNumber=None)
 
     def test_get_brief_bib_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -255,7 +255,7 @@ class TestMockedMetadataSession:
                 session.get_brief_bib(12345)
             assert msg in str(exc.value)
 
-    def test_get_full_bib(self, mock_token, mock_successful_session_get_request):
+    def test_get_full_bib(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert session.get_full_bib(12345).status_code == 200
 
@@ -269,9 +269,7 @@ class TestMockedMetadataSession:
             with pytest.raises(WorldcatSessionError):
                 session.get_full_bib(oclcNumber=None)
 
-    def test_get_full_bib_with_stale_token(
-        self, mock_token, mock_successful_session_get_request
-    ):
+    def test_get_full_bib_with_stale_token(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
                 datetime.datetime.utcnow() - datetime.timedelta(0, 1),
@@ -305,7 +303,7 @@ class TestMockedMetadataSession:
                 session.get_full_bib(12345)
             assert msg in str(exc.value)
 
-    def test_holding_get_status(self, mock_token, mock_successful_session_get_request):
+    def test_holding_get_status(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert session.holding_get_status(12345).status_code == 200
 
@@ -320,7 +318,7 @@ class TestMockedMetadataSession:
                 session.holding_get_status(oclcNumber=None)
 
     def test_holding_get_status_with_stale_token(
-        self, mock_token, mock_successful_session_get_request
+        self, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -357,7 +355,8 @@ class TestMockedMetadataSession:
                 session.holding_get_status(12345)
             assert msg in str(exc.value)
 
-    def test_holding_set(self, mock_token, mock_successful_holdings_post_request):
+    @pytest.mark.http_code(201)
+    def test_holding_set(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert session.holding_set(850940548).status_code == 201
 
@@ -371,9 +370,8 @@ class TestMockedMetadataSession:
             with pytest.raises(WorldcatSessionError):
                 session.holding_set(oclcNumber=None)
 
-    def test_holding_set_stale_token(
-        self, mock_token, mock_successful_holdings_post_request
-    ):
+    @pytest.mark.http_code(201)
+    def test_holding_set_stale_token(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
                 datetime.datetime.utcnow() - datetime.timedelta(0, 1),
@@ -417,7 +415,7 @@ class TestMockedMetadataSession:
                 session.holding_set(850940548)
             assert msg in str(exc.value)
 
-    def test_holding_unset(self, mock_token, mock_successful_holdings_delete_request):
+    def test_holding_unset(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert session.holding_unset(850940548).status_code == 200
 
@@ -432,7 +430,7 @@ class TestMockedMetadataSession:
                 session.holding_unset(oclcNumber=None)
 
     def test_holding_unset_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_holdings_delete_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -491,9 +489,8 @@ class TestMockedMetadataSession:
             ([850940548, 850940552, 850940554], does_not_raise()),
         ],
     )
-    def test_holdings_set(
-        self, argm, expectation, mock_token, mock_successful_multi_status_request
-    ):
+    @pytest.mark.http_code(207)
+    def test_holdings_set(self, argm, expectation, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             with expectation:
                 session.holdings_set(argm)
@@ -503,8 +500,9 @@ class TestMockedMetadataSession:
             with pytest.raises(TypeError):
                 session.holdings_set()
 
+    @pytest.mark.http_code(207)
     def test_holdings_set_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_multi_status_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -552,9 +550,8 @@ class TestMockedMetadataSession:
             ([850940548, 850940552, 850940554], does_not_raise()),
         ],
     )
-    def test_holdings_unset(
-        self, argm, expectation, mock_token, mock_successful_multi_status_request
-    ):
+    @pytest.mark.http_code(207)
+    def test_holdings_unset(self, argm, expectation, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             with expectation:
                 session.holdings_unset(argm)
@@ -564,8 +561,9 @@ class TestMockedMetadataSession:
             with pytest.raises(TypeError):
                 session.holdings_unset()
 
+    @pytest.mark.http_code(207)
     def test_holdings_unset_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_multi_status_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -600,14 +598,12 @@ class TestMockedMetadataSession:
                 session.holdings_unset([850940548, 850940552, 850940554])
             assert msg in str(exc.value)
 
-    def test_search_brief_bib_other_editions(
-        self, mock_token, mock_successful_session_get_request
-    ):
+    def test_search_brief_bibs_other_editions(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert session.search_brief_bib_other_editions(12345).status_code == 200
 
     def test_search_brief_bibs_other_editions_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -655,7 +651,7 @@ class TestMockedMetadataSession:
                 session.search_brief_bib_other_editions(oclcNumber=12345)
             assert msg in str(exc.value)
 
-    def test_seach_brief_bibs(self, mock_token, mock_successful_session_get_request):
+    def test_seach_brief_bibs(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert session.search_brief_bibs(q="ti:Zendegi").status_code == 200
 
@@ -667,7 +663,7 @@ class TestMockedMetadataSession:
             assert "Argument 'q' is requried to construct query." in str(exc.value)
 
     def test_search_brief_bibs_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -704,9 +700,8 @@ class TestMockedMetadataSession:
                 session.search_brief_bibs("ti:foo")
             assert msg in str(exc.value)
 
-    def test_seach_current_control_numbers(
-        self, mock_token, mock_successful_multi_status_request
-    ):
+    @pytest.mark.http_code(207)
+    def test_seach_current_control_numbers(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert (
                 session.search_current_control_numbers(
@@ -715,8 +710,9 @@ class TestMockedMetadataSession:
                 == 207
             )
 
+    @pytest.mark.http_code(207)
     def test_seach_current_control_numbers_passed_as_str(
-        self, mock_token, mock_successful_multi_status_request
+        self, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             assert (
@@ -734,8 +730,9 @@ class TestMockedMetadataSession:
                 session.search_current_control_numbers(argm)
             assert err_msg in str(exc.value)
 
+    @pytest.mark.http_code(207)
     def test_search_current_control_numbers_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_multi_status_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -776,9 +773,7 @@ class TestMockedMetadataSession:
                 session.search_current_control_numbers(["12345", "65891"])
             assert msg in str(exc.value)
 
-    def test_search_general_holdings(
-        self, mock_token, mock_successful_session_get_request
-    ):
+    def test_search_general_holdings(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert session.search_general_holdings(oclcNumber=12345).status_code == 200
 
@@ -797,7 +792,7 @@ class TestMockedMetadataSession:
             assert msg in str(exc.value)
 
     def test_search_general_holdings_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
@@ -838,9 +833,7 @@ class TestMockedMetadataSession:
                 session.search_general_holdings(oclcNumber=12345)
             assert msg in str(exc.value)
 
-    def test_search_shared_print_holdings(
-        self, mock_token, mock_successful_session_get_request
-    ):
+    def test_search_shared_print_holdings(self, mock_token, mock_session_response):
         with MetadataSession(authorization=mock_token) as session:
             assert (
                 session.search_shared_print_holdings(oclcNumber=12345).status_code
@@ -864,7 +857,7 @@ class TestMockedMetadataSession:
             assert msg in str(exc.value)
 
     def test_search_shared_print_holdings_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, mock_token, mock_session_response
     ):
         with MetadataSession(authorization=mock_token) as session:
             session.authorization.token_expires_at = datetime.datetime.strftime(
