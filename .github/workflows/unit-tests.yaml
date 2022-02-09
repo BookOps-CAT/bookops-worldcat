@@ -22,7 +22,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r dev-requirements.txt
       - name: Run tests
-        run: pytest -m "not webtest" --cov=bookops-worldcat/
+        run: pytest -m "not webtest" --cov=bookops_worldcat/
       - name: Send report to Coveralls
         uses: AndreMiras/coveralls-python-action@develop
         with:
