@@ -6,23 +6,7 @@ Shared utilities module.
 
 from typing import List, Union
 
-from requests import Response
-
 from .errors import InvalidOclcNumber
-
-
-def _parse_error_response(response: Response) -> str:
-    """
-    Parses and formats error responses from OCLC web service
-
-    Args:
-        response: requests.Response obj
-    """
-
-    response.encoding = "utf-8"
-    msg = response.text.strip()
-
-    return f"Web service returned {response.status_code} error: {msg}; {response.url}"
 
 
 def _str2list(s: str) -> List[str]:
