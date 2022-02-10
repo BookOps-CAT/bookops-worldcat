@@ -10,6 +10,7 @@ nav:
   - API: mkapi/api/bookops_worldcat
 theme: readthedocs
 plugins:
+  - mike
   - search
   - mkapi
 extra_css:
