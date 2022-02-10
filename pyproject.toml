@@ -37,10 +37,10 @@ pytest = "^7.0"
 pytest-cov = "^3.0"
 pytest-mock = "^3.7"
 pytest-recording = "^0.12.0"
-mkdocs = "^1.1"
+mkdocs = "^1.2"
 black = "^22.1.0"
-mike = "^0.5.3"
-mkapi = "^1.0.13"
+mike = "^1.1.2"
+mkapi = "^1.0.14"
 mypy = "^0.931"
 
 [tool.poetry.urls]
