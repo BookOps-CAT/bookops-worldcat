@@ -9,7 +9,7 @@ import requests
 
 from requests import Response
 
-from bookops_worldcat import WorldcatAccessToken
+from bookops_worldcat import WorldcatAccessToken, MetadataSession
 
 
 @pytest.fixture
@@ -124,9 +124,6 @@ def mock_session_response(request, monkeypatch):
     def mock_api_response(*args, http_code=http_code, **kwargs):
         return MockHTTPSessionResponse(http_code=http_code)
 
-    # monkeypatch.setattr(requests.Session, "get", mock_api_response)
-    # monkeypatch.setattr(requests.Session, "post", mock_api_response)
-    # monkeypatch.setattr(requests.Session, "delete", mock_api_response)
     monkeypatch.setattr(requests.Session, "send", mock_api_response)
 
 
@@ -192,6 +189,12 @@ def mock_connectionerror(monkeypatch):
 @pytest.fixture
 def mock_token(mock_credentials, mock_successful_post_token_response):
     return WorldcatAccessToken(**mock_credentials)
+
+
+@pytest.fixture
+def stub_session(mock_token):
+    with MetadataSession(authorization=mock_token) as session:
+        yield session
 
 
 @pytest.fixture
