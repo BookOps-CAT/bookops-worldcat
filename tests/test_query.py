@@ -36,6 +36,13 @@ def test_query_live(live_keys):
         assert query.response.status_code == 200
 
 
+def test_query_not_prepared_request(stub_session):
+    with pytest.raises(AttributeError) as exc:
+        req = Request("GET", "https://foo.org")
+        Query(stub_session, req, timeout=2)
+    assert "Invalid type for argument 'prepared_request'." in str(exc.value)
+
+
 @pytest.mark.http_code(200)
 def test_query_http_200_response(stub_session, mock_session_response):
     with does_not_raise():
@@ -124,3 +131,13 @@ def test_query_unexpected_exception(stub_session, mock_unexpected_error):
         Query(stub_session, prepped)
 
     assert "Unexpected request error: <class 'Exception'>" in str(exc.value)
+
+
+@pytest.mark.http_code(409)
+def test_query_holding_endpoint_409_http_code(stub_session, mock_session_response):
+    req = Request("POST", "https://worldcat.org/ih/data", params={"foo": "bar"})
+    prepped = stub_session.prepare_request(req)
+    with does_not_raise():
+        query = Query(stub_session, prepped)
+
+    assert query.response.status_code == 409

@@ -17,6 +17,9 @@ from .errors import WorldcatRequestError
 class Query:
     """
     Sends a request to OClC service and unifies received excepitons
+
+    `Query.response` attribute is `requests.Response` instance that
+    can be parsed to exctract received information from the web service.
     """
 
     def __init__(
@@ -28,16 +31,36 @@ class Query:
         ] = None,
     ) -> None:
         """
-        session:                        `requests.Session` instance
-        prepared_request:               `requests.models.PreparedRequest` instance
-        timeout:                        how long to wait for server to send data before
-                                        giving up
+        Args:
+            session:                        `requests.Session` instance
+            prepared_request:               `requests.models.PreparedRequest` instance
+            timeout:                        how long to wait for server to send data
+                                            before giving up
+
+        Raises:
+            WorldcatRequestError
+
         """
+        if not isinstance(prepared_request, PreparedRequest):
+            raise AttributeError("Invalid type for argument 'prepared_request'.")
+
         self.response = None
 
         try:
             self.response = session.send(prepared_request, timeout=timeout)
-            self.response.raise_for_status()
+
+            if "/ih/data" in prepared_request.url:
+                if self.response.status_code == 409:
+                    # HTTP 409 code returns when trying to set/unset
+                    # holdings on already set/unset record
+                    # It is reasonable not to raise any exceptions
+                    # in this case
+                    pass  # pragma: no cover
+                else:
+                    self.response.raise_for_status()
+            else:
+                self.response.raise_for_status()
+
         except HTTPError as exc:
             raise WorldcatRequestError(f"{exc}")
         except (Timeout, ConnectionError):
