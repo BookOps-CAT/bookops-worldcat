@@ -41,8 +41,6 @@ class Query:
         except HTTPError as exc:
             raise WorldcatRequestError(f"{exc}")
         except (Timeout, ConnectionError):
-            raise WorldcatRequestError(f"Connection error: {sys.exc_info()[0]}.")
+            raise WorldcatRequestError(f"Connection Error: {sys.exc_info()[0]}")
         except:
-            raise WorldcatRequestError(
-                f"Unexpected request error: {sys.exc_info()[0]}."
-            )
+            raise WorldcatRequestError(f"Unexpected request error: {sys.exc_info()[0]}")
