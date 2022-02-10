@@ -1,6 +1,17 @@
 # Changelog
 
-## 0.4.0 (6/22/2021)
+## [0.4.1] - (2/10/2022) 
+### Fixed
++ Handling of unexpected 206 HTTP code that is occasionally returned by the MetadataAPI /brief-bibs endpoint
+
+### Changed
++ requests to OCLC services are now handled by a new `query.Query` class
++ dependencies update
+    + requests to 2.27.1
+    + dev dependencies
+
+## [0.4.0] - (6/22/2021)
+### Changed
 + Changes to `MetadataSession.search_brief_bibs` method due to /brief-bibs endpoint changes:
     + removed deprecated argument `heldBy`
     + added `groupVariantRecord` and `preferredLanuage` argument
@@ -16,45 +27,51 @@
     `peerReviewed`, `facets`, `groupVariantRecords`, `preferredLanguage`, 
     and `orderBy`. 
 
-## 0.3.5 (6/2/2021)
+## [0.3.5] - (6/2/2021)
+### Changed
 + Dependencies update
     + urllib3 from 1.26.4 to 1.26.5
 
-## 0.3.4 (3/22/2021)
+## [0.3.4] - (3/22/2021)
+### Changed
 + Dependencies update
     + certifi to 2020.12.5
     + chardet to 4.0.0
     + requests to 2.25.1
     + urllib3 to 1.26.4
 
-## 0.3.3 (12/28/2020)
-+ Type hints added
+## [0.3.3] - (12/28/2020)
+### Added
++ Type hints
 + Default timeout in the MetadataSesssion extended to 5 seconds
 
+### Changed
 + Dependencies:
     + pytest bump to 6.1.2
     + mypy 0.7.8
 
-## 0.3.2 (11/25/2020)
-+ Bug fixes:
-    + MetadataSession timeout paramerter correctly passed into every session request
+## [0.3.2] - (11/25/2020)
+### Fixed
++ MetadataSession timeout paramerter correctly passed into every session request
 
 
-## 0.3.1 (11/24/2020)
+## [0.3.1] - (11/24/2020)
+### Fixed
++ Fixed auto refreshing of the access token when expired
++ testing: fixed testing for error messages on exceptions & testing of stale tokens
 
-+ Bug fixes:
-    + Fixed auto refreshing of the access token when expired
-    + testing: fixed testing for error messages on exceptions & testing of stale tokens
-
+### Changed
 + Dependencies bump
     + certifi from 2020.6.20 to 2020.11.8
     + requests from 2.24.0 to 2.25.0
     + urlib3 from 1.25.10 to 1.26.2
+
+### Added
 + Added Python 3.9 testing to CI
 
 
-## 0.3.0 (10/03/2020)
-
+## [0.3.0] - (10/03/2020)
+### Changed
 + Introduces multiple breaking changes compared to the previous version!
 + Dropped features related to the WorldCat Search API
 + Support for Worldcat Metadata API v.1.1 introduced in May 2020
@@ -69,16 +86,32 @@
     + /ih/data (POST|DELETE)
     + /ih/checkholdings
     + /ih/datalist (POST|DELETE)
+
+### Added
 + API reference added to docs with mkapi
 
-## 0.2.1 (9/28/2020)
-
+## 0.2.1 - (9/28/2020)
+### Added
 + added functionality for docs versioning with mike
 
-## 0.2.0 (04/30/2020)
-
+## 0.2.0 - (04/30/2020)
+### Added
 + Expanded and improved documentation
 + Customizable "user-agent" in session header and token request
-+ SRU/CQL query syntax aligned with OCLC specifications
 + `TokenRequestError` exception added on failed access token request
+
+### Changed
++ SRU/CQL query syntax aligned with OCLC specifications
+
+### Fixed
 + fixed hooks info in docstrings in `SearchSession` and `MetadataSession`
+
+
+[0.4.1]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.3.5...v0.4.0
+[0.3.5]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.3.4...v0.3.5
+[0.3.4]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.3.3...v0.3.4
+[0.3.3]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.3.2...v0.3.3
+[0.3.2]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.2.0...v0.3.0
