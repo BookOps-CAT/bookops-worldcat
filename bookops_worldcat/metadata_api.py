@@ -8,7 +8,7 @@ import sys
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import requests
-from requests import Response
+from requests import Request, Response
 
 from ._session import WorldcatSession
 from .authorize import WorldcatAccessToken
@@ -18,7 +18,7 @@ from .errors import (
     InvalidOclcNumber,
     WorldcatAuthorizationError,
 )
-from .utils import verify_oclc_number, verify_oclc_numbers, _parse_error_response
+from .utils import verify_oclc_number, verify_oclc_numbers
 
 
 class MetadataSession(WorldcatSession):
@@ -182,8 +182,14 @@ class MetadataSession(WorldcatSession):
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclcNumber)
 
-        # send request
+        #  prep & send request
         try:
+            prepared_request = Request(
+                "GET", url, headers=headers, hooks=hooks, timeout=self.timeout
+            )
+
+            response = Query(prepared_request)
+
             response = self.get(url, headers=header, hooks=hooks, timeout=self.timeout)
             if response.status_code == requests.codes.ok:
                 return response
