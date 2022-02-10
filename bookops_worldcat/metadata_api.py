@@ -8,7 +8,7 @@ import sys
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import requests
-from requests import Response
+from requests import Request, Response
 
 from ._session import WorldcatSession
 from .authorize import WorldcatAccessToken
@@ -18,7 +18,8 @@ from .errors import (
     InvalidOclcNumber,
     WorldcatAuthorizationError,
 )
-from .utils import verify_oclc_number, verify_oclc_numbers, _parse_error_response
+from .query import Query
+from .utils import verify_oclc_number, verify_oclc_numbers
 
 
 class MetadataSession(WorldcatSession):
@@ -158,6 +159,7 @@ class MetadataSession(WorldcatSession):
     ) -> Response:
         """
         Retrieve specific brief bibliographic resource.
+        Uses /brief-bibs/{oclcNumber} endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be
@@ -167,7 +169,7 @@ class MetadataSession(WorldcatSession):
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            `requests.models.Response` object
+            `requests.Response` instance
         """
 
         try:
@@ -182,20 +184,14 @@ class MetadataSession(WorldcatSession):
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclcNumber)
 
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.get(url, headers=header, hooks=hooks, timeout=self.timeout)
-            if response.status_code == requests.codes.ok:
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def get_full_bib(
         self,
@@ -205,6 +201,7 @@ class MetadataSession(WorldcatSession):
     ) -> Response:
         """
         Send a GET request for a full bibliographic resource.
+        Uses /bib/data/{oclcNumber} endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
@@ -232,20 +229,14 @@ class MetadataSession(WorldcatSession):
             )
         header = {"Accept": response_format}
 
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.get(url, headers=header, hooks=hooks, timeout=self.timeout)
-            if response.status_code == requests.codes.ok:
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def holding_get_status(
         self,
@@ -259,6 +250,7 @@ class MetadataSession(WorldcatSession):
         Retrieves Worlcat holdings status of a record with provided OCLC number.
         The service automatically recognizes institution based on the issued access
         token.
+        Uses /ih/checkholdings endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
@@ -289,22 +281,14 @@ class MetadataSession(WorldcatSession):
         header = {"Accept": response_format}
         payload = {"oclcNumber": oclcNumber, "inst": inst, "instSymbol": instSymbol}
 
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.get(
-                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
-            )
-            if response.status_code == requests.codes.ok:
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def holding_set(
         self,
@@ -318,6 +302,7 @@ class MetadataSession(WorldcatSession):
     ) -> Response:
         """
         Sets institution's Worldcat holding on an individual record.
+        Uses /ih/data endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
@@ -358,28 +343,14 @@ class MetadataSession(WorldcatSession):
             "classificationScheme": classificationScheme,
         }
 
+        # prep request
+        req = Request("POST", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.post(
-                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
-            )
-            if response.status_code == 201:
-                # the service does not return any meaningful response
-                # when holdings are succesfully set
-                return response
-            elif response.status_code == 409:
-                # holdings already set
-                # it seems resonable to simply ignore this response
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def holding_unset(
         self,
@@ -394,6 +365,7 @@ class MetadataSession(WorldcatSession):
     ) -> Response:
         """
         Deletes institution's Worldcat holding on an individual record.
+        Uses /ih/data endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
@@ -441,28 +413,14 @@ class MetadataSession(WorldcatSession):
             "classificationScheme": classificationScheme,
         }
 
+        # prep request
+        req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.delete(
-                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
-            )
-            if response.status_code == requests.codes.ok:
-                # the service does not return any meaningful response
-                # when holdings are succesfully deleted
-                return response
-            elif response.status_code == 409:
-                # holdings already set
-                # it seems resonable to simply ignore this response
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def holdings_set(
         self,
@@ -474,6 +432,7 @@ class MetadataSession(WorldcatSession):
     ) -> List[Response]:
         """
         Set institution holdings for multiple OCLC numbers
+        Uses /ih/datalist endpoint.
 
         Args:
             oclcNumbers:            list of OCLC control numbers for which holdings
@@ -515,30 +474,15 @@ class MetadataSession(WorldcatSession):
             if self.authorization.is_expired():
                 self._get_new_access_token()
 
-            # send request
-            try:
-                response = self.post(
-                    url,
-                    headers=header,
-                    params=payload,
-                    hooks=hooks,
-                    timeout=self.timeout,
-                )
+            # prep request
+            req = Request("POST", url, params=payload, headers=header, hooks=hooks)
+            prepared_request = self.prepare_request(req)
 
-                if response.status_code == 207:
-                    # the service returns multi-status response
-                    responses.append(response)
-                else:
-                    error_msg = _parse_error_response(response)
-                    raise WorldcatRequestError(error_msg)
-            except WorldcatRequestError as exc:
-                raise WorldcatSessionError(exc)
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-                raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-            except:
-                raise WorldcatSessionError(
-                    f"Unexpected request error: {sys.exc_info()[0]}"
-                )
+            # send request
+            query = Query(self, prepared_request, timeout=self.timeout)
+
+            responses.append(query.response)
+
         return responses
 
     def holdings_unset(
@@ -552,6 +496,7 @@ class MetadataSession(WorldcatSession):
     ) -> List[Response]:
         """
         Set institution holdings for multiple OCLC numbers
+        Uses /ih/datalist endpoint.
 
         Args:
             oclcNumbers:            list of OCLC control numbers for which holdings
@@ -599,30 +544,15 @@ class MetadataSession(WorldcatSession):
             if self.authorization.is_expired():
                 self._get_new_access_token()
 
-            # send request
-            try:
-                response = self.delete(
-                    url,
-                    headers=header,
-                    params=payload,
-                    hooks=hooks,
-                    timeout=self.timeout,
-                )
+            # prep request
+            req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
+            prepared_request = self.prepare_request(req)
 
-                if response.status_code == 207:
-                    # the service returns multi-status response
-                    responses.append(response)
-                else:
-                    error_msg = _parse_error_response(response)
-                    raise WorldcatRequestError(error_msg)
-            except WorldcatRequestError as exc:
-                raise WorldcatSessionError(exc)
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-                raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-            except:
-                raise WorldcatSessionError(
-                    f"Unexpected request error: {sys.exc_info()[0]}"
-                )
+            # send request
+            query = Query(self, prepared_request, timeout=self.timeout)
+
+            responses.append(query.response)
+
         return responses
 
     def search_brief_bib_other_editions(
@@ -659,6 +589,7 @@ class MetadataSession(WorldcatSession):
         """
         Retrieve other editions related to bibliographic resource with provided
         OCLC #.
+        Uses /brief-bibs/{oclcNumber}/other-editions endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
@@ -768,22 +699,14 @@ class MetadataSession(WorldcatSession):
             "orderBy": orderBy,
         }
 
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.get(
-                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
-            )
-            if response.status_code == requests.codes.ok:
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def search_brief_bibs(
         self,
@@ -810,6 +733,7 @@ class MetadataSession(WorldcatSession):
     ) -> Response:
         """
         Send a GET request for brief bibliographic resources.
+        Uses /brief-bibs endpoint.
 
         Args:
             q:                      query in the form of a keyword search or
@@ -863,6 +787,7 @@ class MetadataSession(WorldcatSession):
                                         'recency'
                                         'bestMatch'
                                         'creator'
+                                        'library'
                                         'publicationDateAsc'
                                         'publicationDateDesc'
                                         'mostWidelyHeld'
@@ -910,22 +835,14 @@ class MetadataSession(WorldcatSession):
             "limit": limit,
         }
 
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.get(
-                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
-            )
-            if response.status_code == requests.codes.ok:
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatRequestError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def search_current_control_numbers(
         self,
@@ -935,6 +852,7 @@ class MetadataSession(WorldcatSession):
     ) -> Response:
         """
         Retrieve current OCLC control numbers
+        Uses /bib/checkcontrolnumbers endpoint.
 
         Args:
             oclcNumbers:            list of OCLC control numbers to be checked;
@@ -964,22 +882,14 @@ class MetadataSession(WorldcatSession):
         url = self._url_bib_check_oclc_numbers()
         payload = {"oclcNumbers": ",".join(vetted_numbers)}
 
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.get(
-                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
-            )
-            if response.status_code == 207:  # multi-status response
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def search_general_holdings(
         self,
@@ -1001,6 +911,7 @@ class MetadataSession(WorldcatSession):
     ) -> Response:
         """
         Given a known item gets summary of holdings.
+        Uses /bibs-summary-holdings endpoint.
 
         Args:
             oclcNumber:                 OCLC bibliographic record number; can be
@@ -1068,22 +979,14 @@ class MetadataSession(WorldcatSession):
             "limit": limit,
         }
 
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.get(
-                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
-            )
-            if response.status_code == requests.codes.ok:
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Connection error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def search_shared_print_holdings(
         self,
@@ -1092,12 +995,15 @@ class MetadataSession(WorldcatSession):
         issn: Optional[str] = None,
         heldByGroup: Optional[str] = None,
         heldInState: Optional[str] = None,
+        itemType: Optional[str] = None,
+        itemSubType: Optional[str] = None,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Response:
         """
         Finds member shared print holdings for specified item.
+        Uses /bibs-retained-holdings endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be
@@ -1109,6 +1015,10 @@ class MetadataSession(WorldcatSession):
             heldByGroup:            restricts to holdings held by group symbol
             heldInState:            restricts to holings held by institutions
                                     in requested state, example: "NY"
+            itemType:               restricts results to specified item type (example
+                                    'book' or 'vis')
+            itemSubType:            restricts results to specified item sub type
+                                    examples: 'book-digital' or 'audiobook-cd'
             offset:                 start position of bibliographic records to
                                     return; default 1
             limit:                  maximum nuber of records to return;
@@ -1145,19 +1055,11 @@ class MetadataSession(WorldcatSession):
             "limit": limit,
         }
 
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
         # send request
-        try:
-            response = self.get(
-                url, headers=header, params=payload, hooks=hooks, timeout=self.timeout
-            )
-            if response.status_code == requests.codes.ok:
-                return response
-            else:
-                error_msg = _parse_error_response(response)
-                raise WorldcatRequestError(error_msg)
-        except WorldcatRequestError as exc:
-            raise WorldcatSessionError(exc)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
-            raise WorldcatSessionError(f"Request error: {sys.exc_info()[0]}")
-        except:
-            raise WorldcatSessionError(f"Unexpected request error: {sys.exc_info()[0]}")
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response

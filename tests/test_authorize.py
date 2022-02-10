@@ -303,7 +303,7 @@ class TestWorldcatAccessToken:
             )
 
     def test_post_token_request_connectionerror(
-        self, mock_credentials, mock_connectionerror
+        self, mock_credentials, mock_connection_error
     ):
         creds = mock_credentials
         with pytest.raises(WorldcatAuthorizationError):

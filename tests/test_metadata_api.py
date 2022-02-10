@@ -8,7 +8,7 @@ import pytest
 
 
 from bookops_worldcat import MetadataSession, WorldcatAccessToken
-from bookops_worldcat.errors import WorldcatSessionError
+from bookops_worldcat.errors import WorldcatSessionError, WorldcatRequestError
 
 
 @contextmanager
@@ -51,10 +51,9 @@ class TestMockedMetadataSession:
             assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
             assert session.authorization.is_expired() is False
 
-    def test_get_new_access_token_exceptions(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session._get_new_access_token()
+    def test_get_new_access_token_exceptions(self, stub_session, mock_timeout):
+        with pytest.raises(WorldcatSessionError):
+            stub_session._get_new_access_token()
 
     @pytest.mark.parametrize(
         "oclcNumbers,buckets,expectation",
@@ -73,43 +72,36 @@ class TestMockedMetadataSession:
         ],
     )
     def test_split_into_legal_volume(
-        self, mock_token, oclcNumbers, buckets, expectation
+        self, stub_session, oclcNumbers, buckets, expectation
     ):
-        token = mock_token
-        with MetadataSession(authorization=token) as session:
-            assert session._split_into_legal_volume(oclcNumbers) == expectation
+        assert stub_session._split_into_legal_volume(oclcNumbers) == expectation
 
-    def test_url_base(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session._url_base() == "https://worldcat.org"
+    def test_url_base(self, stub_session):
+        assert stub_session._url_base() == "https://worldcat.org"
 
-    def test_url_search_base(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_search_base()
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1"
-            )
+    def test_url_search_base(self, stub_session):
+        assert (
+            stub_session._url_search_base()
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1"
+        )
 
-    def test_url_shared_print_holdings(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_member_shared_print_holdings()
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/bibs-retained-holdings"
-            )
+    def test_url_shared_print_holdings(self, stub_session):
+        assert (
+            stub_session._url_member_shared_print_holdings()
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/bibs-retained-holdings"
+        )
 
-    def test_url_member_general_holdings(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_member_general_holdings()
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/bibs-summary-holdings"
-            )
+    def test_url_member_general_holdings(self, stub_session):
+        assert (
+            stub_session._url_member_general_holdings()
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/bibs-summary-holdings"
+        )
 
-    def test_url_brief_bib_search(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_brief_bib_search()
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs"
-            )
+    def test_url_brief_bib_search(self, stub_session):
+        assert (
+            stub_session._url_brief_bib_search()
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs"
+        )
 
     @pytest.mark.parametrize(
         "argm, expectation",
@@ -124,359 +116,213 @@ class TestMockedMetadataSession:
             ),
         ],
     )
-    def test_url_brief_bib_oclc_number(self, argm, expectation, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_brief_bib_oclc_number(oclcNumber=argm)
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345"
-            )
+    def test_url_brief_bib_oclc_number(self, argm, expectation, stub_session):
+        assert (
+            stub_session._url_brief_bib_oclc_number(oclcNumber=argm)
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345"
+        )
 
-    def test_url_brief_bib_other_editions(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_brief_bib_other_editions(oclcNumber="12345")
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345/other-editions"
-            )
+    def test_url_brief_bib_other_editions(self, stub_session):
+        assert (
+            stub_session._url_brief_bib_other_editions(oclcNumber="12345")
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345/other-editions"
+        )
 
-    def test_url_lhr_control_number(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_lhr_control_number(controlNumber="12345")
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/my-holdings/12345"
-            )
+    def test_url_lhr_control_number(self, stub_session):
+        assert (
+            stub_session._url_lhr_control_number(controlNumber="12345")
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/my-holdings/12345"
+        )
 
-    def test_url_lhr_search(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_lhr_search()
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/my-holdings"
-            )
+    def test_url_lhr_search(self, stub_session):
+        assert (
+            stub_session._url_lhr_search()
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/my-holdings"
+        )
 
-    def test_url_lhr_shared_print(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_lhr_shared_print()
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/retained-holdings"
-            )
+    def test_url_lhr_shared_print(self, stub_session):
+        assert (
+            stub_session._url_lhr_shared_print()
+            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/retained-holdings"
+        )
 
-    def test_url_bib_oclc_number(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_bib_oclc_number(oclcNumber="12345")
-                == "https://worldcat.org/bib/data/12345"
-            )
+    def test_url_bib_oclc_number(self, stub_session):
+        assert (
+            stub_session._url_bib_oclc_number(oclcNumber="12345")
+            == "https://worldcat.org/bib/data/12345"
+        )
 
-    def test_url_bib_check_oclc_numbers(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_bib_check_oclc_numbers()
-                == "https://worldcat.org/bib/checkcontrolnumbers"
-            )
+    def test_url_bib_check_oclc_numbers(self, stub_session):
+        assert (
+            stub_session._url_bib_check_oclc_numbers()
+            == "https://worldcat.org/bib/checkcontrolnumbers"
+        )
 
-    def test_url_bib_holding_libraries(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_bib_holding_libraries()
-                == "https://worldcat.org/bib/holdinglibraries"
-            )
+    def test_url_bib_holding_libraries(self, stub_session):
+        assert (
+            stub_session._url_bib_holding_libraries()
+            == "https://worldcat.org/bib/holdinglibraries"
+        )
 
-    def test_url_bib_holdings_action(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session._url_bib_holdings_action() == "https://worldcat.org/ih/data"
+    def test_url_bib_holdings_action(self, stub_session):
+        assert stub_session._url_bib_holdings_action() == "https://worldcat.org/ih/data"
 
-    def test_url_bib_holdings_check(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_bib_holdings_check()
-                == "https://worldcat.org/ih/checkholdings"
-            )
+    def test_url_bib_holdings_check(self, stub_session):
+        assert (
+            stub_session._url_bib_holdings_check()
+            == "https://worldcat.org/ih/checkholdings"
+        )
 
-    def test_url_bib_holdings_batch_action(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_bib_holdings_batch_action()
-                == "https://worldcat.org/ih/datalist"
-            )
+    def test_url_bib_holdings_batch_action(self, stub_session):
+        assert (
+            stub_session._url_bib_holdings_batch_action()
+            == "https://worldcat.org/ih/datalist"
+        )
 
-    def test_url_bib_holdings_multi_institution_batch_action(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session._url_bib_holdings_multi_institution_batch_action()
-                == "https://worldcat.org/ih/institutionlist"
-            )
+    def test_url_bib_holdings_multi_institution_batch_action(self, stub_session):
+        assert (
+            stub_session._url_bib_holdings_multi_institution_batch_action()
+            == "https://worldcat.org/ih/institutionlist"
+        )
 
-    def test_get_brief_bib(self, mock_token, mock_successful_session_get_request):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session.get_brief_bib(12345).status_code == 200
+    @pytest.mark.http_code(200)
+    def test_get_brief_bib(self, stub_session, mock_session_response):
+        assert stub_session.get_brief_bib(12345).status_code == 200
 
-    def test_get_brief_bib_no_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(TypeError):
-                session.get_brief_bib()
+    def test_get_brief_bib_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.get_brief_bib()
 
-    def test_get_brief_bib_None_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.get_brief_bib(oclcNumber=None)
+    def test_get_brief_bib_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.get_brief_bib(oclcNumber=None)
 
+    @pytest.mark.http_code(200)
     def test_get_brief_bib_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.get_brief_bib(oclcNumber=12345)
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 200
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.get_brief_bib(oclcNumber=12345)
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
 
-    def test_get_brief_bib_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.get_brief_bib(12345)
+    @pytest.mark.http_code(206)
+    def test_get_brief_bib_odd_206_http_code(self, stub_session, mock_session_response):
+        with does_not_raise():
+            response = stub_session.get_brief_bib(12345)
+        assert response.status_code == 206
 
-    def test_get_brief_bib_connectionerror(self, mock_token, mock_connectionerror):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.get_brief_bib(12345)
-
-    def test_get_brief_bib_unexpected_error(self, mock_token, mock_unexpected_error):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.get_brief_bib(12345)
-
-    def test_get_brief_bib_400_error_response(self, mock_token, mock_400_response):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.get_brief_bib(12345)
-            assert msg in str(exc.value)
-
-    def test_get_full_bib(self, mock_token, mock_successful_session_get_request):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session.get_full_bib(12345).status_code == 200
-
-    def test_get_full_bib_no_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(TypeError):
-                session.get_full_bib()
-
-    def test_get_full_bib_None_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.get_full_bib(oclcNumber=None)
-
-    def test_get_full_bib_with_stale_token(
-        self, mock_token, mock_successful_session_get_request
+    @pytest.mark.http_code(404)
+    def test_get_brief_bib_404_error_response(
+        self, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.get_full_bib(12345)
-            assert session.authorization.is_expired() is False
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert response.status_code == 200
+        with pytest.raises(WorldcatRequestError):
+            stub_session.get_brief_bib(12345)
 
-    def test_get_full_bib_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.get_full_bib(12345)
+    @pytest.mark.http_code(200)
+    def test_get_full_bib(self, stub_session, mock_session_response):
+        assert stub_session.get_full_bib(12345).status_code == 200
 
-    def test_get_full_bib_connectionerror(self, mock_token, mock_connectionerror):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.get_full_bib(12345)
+    def test_get_full_bib_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.get_full_bib()
 
-    def test_get_full_bib_unexpected_error(self, mock_token, mock_unexpected_error):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.get_full_bib(12345)
+    def test_get_full_bib_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.get_full_bib(oclcNumber=None)
 
-    def test_get_full_bib_400_error_response(self, mock_token, mock_400_response):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.get_full_bib(12345)
-            assert msg in str(exc.value)
+    @pytest.mark.http_code(200)
+    def test_get_full_bib_with_stale_token(self, stub_session, mock_session_response):
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.get_full_bib(12345)
+        assert stub_session.authorization.is_expired() is False
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert response.status_code == 200
 
-    def test_holding_get_status(self, mock_token, mock_successful_session_get_request):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session.holding_get_status(12345).status_code == 200
+    @pytest.mark.http_code(200)
+    def test_holding_get_status(self, stub_session, mock_session_response):
+        assert stub_session.holding_get_status(12345).status_code == 200
 
-    def test_holding_get_status_no_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(TypeError):
-                session.holding_get_status()
+    def test_holding_get_status_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holding_get_status()
 
-    def test_holding_get_status_None_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_get_status(oclcNumber=None)
+    def test_holding_get_status_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.holding_get_status(oclcNumber=None)
 
+    @pytest.mark.http_code(200)
     def test_holding_get_status_with_stale_token(
-        self, mock_token, mock_successful_session_get_request
+        self, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.holding_get_status(12345)
-            assert session.authorization.is_expired() is False
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert response.status_code == 200
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.holding_get_status(12345)
+        assert stub_session.authorization.is_expired() is False
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert response.status_code == 200
 
-    def test_holding_get_status_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_get_status(12345)
+    @pytest.mark.http_code(201)
+    def test_holding_set(self, stub_session, mock_session_response):
+        assert stub_session.holding_set(850940548).status_code == 201
 
-    def test_holding_get_status_connectionerror(self, mock_token, mock_connectionerror):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_get_status(12345)
+    def test_holding_set_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holding_set()
 
-    def test_holding_get_status_unexpected_error(
-        self, mock_token, mock_unexpected_error
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_get_status(12345)
+    def test_holding_set_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.holding_set(oclcNumber=None)
 
-    def test_holding_status_400_error_response(self, mock_token, mock_400_response):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.holding_get_status(12345)
-            assert msg in str(exc.value)
+    @pytest.mark.http_code(201)
+    def test_holding_set_stale_token(self, stub_session, mock_session_response):
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.holding_set(850940548)
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 201
 
-    def test_holding_set(self, mock_token, mock_successful_holdings_post_request):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session.holding_set(850940548).status_code == 201
+    @pytest.mark.http_code(200)
+    def test_holding_unset(self, stub_session, mock_session_response):
+        assert stub_session.holding_unset(850940548).status_code == 200
 
-    def test_holding_set_no_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(TypeError):
-                session.holding_set()
+    def test_holding_unset_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holding_unset()
 
-    def test_holding_set_None_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_set(oclcNumber=None)
+    def test_holding_unset_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.holding_unset(oclcNumber=None)
 
-    def test_holding_set_stale_token(
-        self, mock_token, mock_successful_holdings_post_request
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.holding_set(850940548)
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 201
-
-    def test_holding_set_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_set(850940548)
-
-    def test_holding_set_connectionerror(self, mock_token, mock_connectionerror):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_set(850940548)
-
-    def test_holding_set_unexpected_error(self, mock_token, mock_unexpected_error):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_set(850940548)
-
-    def test_holding_set_409_error_response(self, mock_token, mock_409_response):
-        msg = {
-            "code": {"value": "WS-409", "type": "application"},
-            "message": "Trying to set hold while holding already exists",
-            "detail": None,
-        }
-        with MetadataSession(authorization=mock_token) as session:
-            response = session.holding_set(850940548)
-            assert response.json() == msg
-
-    def test_holding_set_400_error_response(self, mock_token, mock_400_response):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.holding_set(850940548)
-            assert msg in str(exc.value)
-
-    def test_holding_unset(self, mock_token, mock_successful_holdings_delete_request):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session.holding_unset(850940548).status_code == 200
-
-    def test_holding_unset_no_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(TypeError):
-                session.holding_unset()
-
-    def test_holding_unset_None_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_unset(oclcNumber=None)
-
+    @pytest.mark.http_code(200)
     def test_holding_unset_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_holdings_delete_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.holding_unset(850940548)
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 200
-
-    def test_holding_unset_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_unset(850940548)
-
-    def test_holding_unset_connectionerror(self, mock_token, mock_connectionerror):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_unset(850940548)
-
-    def test_holding_unset_unexpected_error(self, mock_token, mock_unexpected_error):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_unset(850940548)
-
-    def test_holding_unset_409_error_response(self, mock_token, mock_409_response):
-        # cheating here a bit, response is bit different
-        msg = {
-            "code": {"value": "WS-409", "type": "application"},
-            "message": "Trying to set hold while holding already exists",
-            "detail": None,
-        }
-        with MetadataSession(authorization=mock_token) as session:
-            response = session.holding_unset(850940548)
-            assert response.json() == msg
-
-    def test_holding_unset_400_error_response(self, mock_token, mock_400_response):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.holding_unset(850940548)
-            assert msg in str(exc.value)
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.holding_unset(850940548)
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
 
     @pytest.mark.parametrize(
         "argm,expectation",
@@ -491,53 +337,28 @@ class TestMockedMetadataSession:
             ([850940548, 850940552, 850940554], does_not_raise()),
         ],
     )
-    def test_holdings_set(
-        self, argm, expectation, mock_token, mock_successful_multi_status_request
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with expectation:
-                session.holdings_set(argm)
+    @pytest.mark.http_code(207)
+    def test_holdings_set(self, argm, expectation, stub_session, mock_session_response):
+        with expectation:
+            stub_session.holdings_set(argm)
 
-    def test_holdings_set_no_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(TypeError):
-                session.holdings_set()
+    def test_holdings_set_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_set()
 
+    @pytest.mark.http_code(207)
     def test_holdings_set_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_multi_status_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            with does_not_raise():
-                assert session.authorization.is_expired() is True
-                session.holdings_set([850940548, 850940552, 850940554])
-                assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-                assert session.authorization.is_expired() is False
-
-    def test_holdings_set_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holdings_set([850940548, 850940552, 850940554])
-
-    def test_holdings_set_connectionerror(self, mock_token, mock_connectionerror):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_set([850940548, 850940552, 850940554])
-
-    def test_holdings_set_unexpected_error(self, mock_token, mock_unexpected_error):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holdings_set([850940548, 850940552, 850940554])
-
-    def test_holdings_set_400_error_response(self, mock_token, mock_400_response):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.holdings_set([850940548, 850940552, 850940554])
-            assert msg in str(exc.value)
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        with does_not_raise():
+            assert stub_session.authorization.is_expired() is True
+            stub_session.holdings_set([850940548, 850940552, 850940554])
+            assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+            assert stub_session.authorization.is_expired() is False
 
     @pytest.mark.parametrize(
         "argm,expectation",
@@ -552,358 +373,186 @@ class TestMockedMetadataSession:
             ([850940548, 850940552, 850940554], does_not_raise()),
         ],
     )
+    @pytest.mark.http_code(207)
     def test_holdings_unset(
-        self, argm, expectation, mock_token, mock_successful_multi_status_request
+        self, argm, expectation, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            with expectation:
-                session.holdings_unset(argm)
+        with expectation:
+            stub_session.holdings_unset(argm)
 
-    def test_holdings_unset_no_oclcNumber_passed(self, mock_token):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(TypeError):
-                session.holdings_unset()
+    def test_holdings_unset_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_unset()
 
+    @pytest.mark.http_code(207)
     def test_holdings_unset_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_multi_status_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            with does_not_raise():
-                assert session.authorization.is_expired() is True
-                session.holdings_unset([850940548, 850940552, 850940554])
-                assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-                assert session.authorization.is_expired() is False
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        with does_not_raise():
+            assert stub_session.authorization.is_expired() is True
+            stub_session.holdings_unset([850940548, 850940552, 850940554])
+            assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+            assert stub_session.authorization.is_expired() is False
 
-    def test_holdings_uset_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holdings_unset([850940548, 850940552, 850940554])
-
-    def test_holdings_unset_connectionerror(self, mock_token, mock_connectionerror):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holding_unset([850940548, 850940552, 850940554])
-
-    def test_holdings_unset_unexpected_error(self, mock_token, mock_unexpected_error):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.holdings_unset([850940548, 850940552, 850940554])
-
-    def test_holdings_unset_400_error_response(self, mock_token, mock_400_response):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.holdings_unset([850940548, 850940552, 850940554])
-            assert msg in str(exc.value)
-
-    def test_search_brief_bib_other_editions(
-        self, mock_token, mock_successful_session_get_request
+    @pytest.mark.http_code(200)
+    def test_search_brief_bibs_other_editions(
+        self, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session.search_brief_bib_other_editions(12345).status_code == 200
+        assert stub_session.search_brief_bib_other_editions(12345).status_code == 200
 
+    @pytest.mark.http_code(200)
     def test_search_brief_bibs_other_editions_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.search_brief_bib_other_editions(12345)
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 200
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_brief_bib_other_editions(12345)
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
 
-    def test_search_brief_bib_other_editions_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_brief_bib_other_editions(12345)
-
-    def test_search_brief_bib_other_editions_connectionerror(
-        self, mock_token, mock_connectionerror
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_brief_bib_other_editions(12345)
-
-    def test_search_brief_bib_other_editions_unexpected_error(
-        self, mock_token, mock_unexpected_error
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_brief_bib_other_editions(12345)
-
-    def test_search_brief_bibs_other_editions_invalid_oclc_number(self, mock_token):
+    def test_search_brief_bibs_other_editions_invalid_oclc_number(self, stub_session):
         msg = "Invalid OCLC # was passed as an argument"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_brief_bib_other_editions("odn12345")
-            assert msg in str(exc.value)
+        with pytest.raises(WorldcatSessionError) as exc:
+            stub_session.search_brief_bib_other_editions("odn12345")
+        assert msg in str(exc.value)
 
-    def test_search_brief_bib_other_editions_400_error_response(
-        self, mock_token, mock_400_response
-    ):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_brief_bib_other_editions(oclcNumber=12345)
-            assert msg in str(exc.value)
-
-    def test_seach_brief_bibs(self, mock_token, mock_successful_session_get_request):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session.search_brief_bibs(q="ti:Zendegi").status_code == 200
+    @pytest.mark.http_code(200)
+    def test_seach_brief_bibs(self, stub_session, mock_session_response):
+        assert stub_session.search_brief_bibs(q="ti:Zendegi").status_code == 200
 
     @pytest.mark.parametrize("argm", [(None), ("")])
-    def test_search_brief_bibs_missing_query(self, mock_token, argm):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_brief_bibs(argm)
-            assert "Argument 'q' is requried to construct query." in str(exc.value)
+    def test_search_brief_bibs_missing_query(self, stub_session, argm):
+        with pytest.raises(WorldcatSessionError) as exc:
+            stub_session.search_brief_bibs(argm)
+        assert "Argument 'q' is requried to construct query." in str(exc.value)
 
+    @pytest.mark.http_code(200)
     def test_search_brief_bibs_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.search_brief_bibs(q="ti:foo")
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 200
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_brief_bibs(q="ti:foo")
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
 
-    def test_search_brief_bibs_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_brief_bibs("ti:foo")
+    @pytest.mark.http_code(207)
+    def test_seach_current_control_numbers(self, stub_session, mock_session_response):
+        assert (
+            stub_session.search_current_control_numbers(
+                oclcNumbers=["12345", "65891"]
+            ).status_code
+            == 207
+        )
 
-    def test_search_brief_bibs_connectionerror(self, mock_token, mock_connectionerror):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_brief_bibs("ti:foo")
-
-    def test_search_brief_bibs_unexpected_error(
-        self, mock_token, mock_unexpected_error
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_brief_bibs("ti:foo")
-
-    def test_search_brief_bibs_400_error_response(self, mock_token, mock_400_response):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_brief_bibs("ti:foo")
-            assert msg in str(exc.value)
-
-    def test_seach_current_control_numbers(
-        self, mock_token, mock_successful_multi_status_request
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session.search_current_control_numbers(
-                    oclcNumbers=["12345", "65891"]
-                ).status_code
-                == 207
-            )
-
+    @pytest.mark.http_code(207)
     def test_seach_current_control_numbers_passed_as_str(
-        self, mock_token, mock_successful_multi_status_request
+        self, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session.search_current_control_numbers(
-                    oclcNumbers="12345,65891"
-                ).status_code
-                == 207
-            )
+        assert (
+            stub_session.search_current_control_numbers(
+                oclcNumbers="12345,65891"
+            ).status_code
+            == 207
+        )
 
     @pytest.mark.parametrize("argm", [(None), (""), ([])])
-    def test_search_current_control_numbers_missing_numbers(self, mock_token, argm):
+    def test_search_current_control_numbers_missing_numbers(self, stub_session, argm):
         err_msg = "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #."
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_current_control_numbers(argm)
-            assert err_msg in str(exc.value)
+        with pytest.raises(WorldcatSessionError) as exc:
+            stub_session.search_current_control_numbers(argm)
+        assert err_msg in str(exc.value)
 
+    @pytest.mark.http_code(207)
     def test_search_current_control_numbers_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_multi_status_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.search_current_control_numbers(["12345", "65891"])
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 207
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_current_control_numbers(["12345", "65891"])
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 207
 
-    def test_search_current_control_numbers_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_current_control_numbers(["12345", "65891"])
+    @pytest.mark.http_code(200)
+    def test_search_general_holdings(self, stub_session, mock_session_response):
+        assert stub_session.search_general_holdings(oclcNumber=12345).status_code == 200
 
-    def test_search_current_control_numbers_connectionerror(
-        self, mock_token, mock_connectionerror
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_current_control_numbers(["12345", "65891"])
-
-    def test_search_current_control_numbers_unexpected_error(
-        self, mock_token, mock_unexpected_error
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_current_control_numbers(["12345", "65891"])
-
-    def test_search_current_control_numbers_400_error_response(
-        self, mock_token, mock_400_response
-    ):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_current_control_numbers(["12345", "65891"])
-            assert msg in str(exc.value)
-
-    def test_search_general_holdings(
-        self, mock_token, mock_successful_session_get_request
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            assert session.search_general_holdings(oclcNumber=12345).status_code == 200
-
-    def test_search_general_holdings_missing_arguments(self, mock_token):
+    def test_search_general_holdings_missing_arguments(self, stub_session):
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_general_holdings(holdingsAllEditions=True, limit=20)
-            assert msg in str(exc.value)
+        with pytest.raises(WorldcatSessionError) as exc:
+            stub_session.search_general_holdings(holdingsAllEditions=True, limit=20)
+        assert msg in str(exc.value)
 
-    def test_search_general_holdings_invalid_oclc_number(self, mock_token):
+    def test_search_general_holdings_invalid_oclc_number(self, stub_session):
         msg = "Invalid OCLC # was passed as an argument"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_general_holdings(oclcNumber="odn12345")
-            assert msg in str(exc.value)
+        with pytest.raises(WorldcatSessionError) as exc:
+            stub_session.search_general_holdings(oclcNumber="odn12345")
+        assert msg in str(exc.value)
 
+    @pytest.mark.http_code(200)
     def test_search_general_holdings_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.search_general_holdings(oclcNumber=12345)
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 200
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_general_holdings(oclcNumber=12345)
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
 
-    def test_search_general_holdings_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_general_holdings(oclcNumber="12345")
+    @pytest.mark.http_code(200)
+    def test_search_shared_print_holdings(self, stub_session, mock_session_response):
+        assert (
+            stub_session.search_shared_print_holdings(oclcNumber=12345).status_code
+            == 200
+        )
 
-    def test_search_general_holdings_connectionerror(
-        self, mock_token, mock_connectionerror
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_general_holdings(oclcNumber=12345)
-
-    def test_search_general_holdings_unexpectederror(
-        self, mock_token, mock_unexpected_error
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_general_holdings(oclcNumber="12345")
-
-    def test_search_general_holdings_400_error_response(
-        self, mock_token, mock_400_response
-    ):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_general_holdings(oclcNumber=12345)
-            assert msg in str(exc.value)
-
-    def test_search_shared_print_holdings(
-        self, mock_token, mock_successful_session_get_request
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            assert (
-                session.search_shared_print_holdings(oclcNumber=12345).status_code
-                == 200
-            )
-
-    def test_search_shared_print_holdings_missing_arguments(self, mock_token):
+    def test_search_shared_print_holdings_missing_arguments(self, stub_session):
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_shared_print_holdings(heldInState="NY", limit=20)
-            assert msg in str(exc.value)
+        with pytest.raises(WorldcatSessionError) as exc:
+            stub_session.search_shared_print_holdings(heldInState="NY", limit=20)
+        assert msg in str(exc.value)
 
     def test_search_shared_print_holdings_with_invalid_oclc_number_passsed(
-        self, mock_token
+        self, stub_session
     ):
         msg = "Invalid OCLC # was passed as an argument"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_shared_print_holdings(oclcNumber="odn12345")
-            assert msg in str(exc.value)
+        with pytest.raises(WorldcatSessionError) as exc:
+            stub_session.search_shared_print_holdings(oclcNumber="odn12345")
+        assert msg in str(exc.value)
 
+    @pytest.mark.http_code(200)
     def test_search_shared_print_holdings_with_stale_token(
-        self, mock_utcnow, mock_token, mock_successful_session_get_request
+        self, mock_utcnow, stub_session, mock_session_response
     ):
-        with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = datetime.datetime.strftime(
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-                "%Y-%m-%d %H:%M:%SZ",
-            )
-            assert session.authorization.is_expired() is True
-            response = session.search_shared_print_holdings(oclcNumber=12345)
-            assert session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 200
-
-    def test_search_shared_print_holdings_timeout(self, mock_token, mock_timeout):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_shared_print_holdings(oclcNumber="12345")
-
-    def test_search_shared_print_holdings_connectionerror(
-        self, mock_token, mock_connectionerror
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_shared_print_holdings(oclcNumber=12345)
-
-    def test_search_shared_print_holdings_unexpectederror(
-        self, mock_token, mock_unexpected_error
-    ):
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError):
-                session.search_shared_print_holdings(oclcNumber="12345")
-
-    def test_search_shared_print_holdings_400_error_response(
-        self, mock_token, mock_400_response
-    ):
-        msg = "Web service returned 400 error: {'type': 'MISSING_QUERY_PARAMETER', 'title': 'Validation Failure', 'detail': 'details here'}; https://test.org/some_endpoint"
-        with MetadataSession(authorization=mock_token) as session:
-            with pytest.raises(WorldcatSessionError) as exc:
-                session.search_shared_print_holdings(oclcNumber=12345)
-            assert msg in str(exc.value)
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_shared_print_holdings(oclcNumber=12345)
+        assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
 
 
 @pytest.mark.webtest
@@ -920,6 +569,7 @@ class TestLiveMetadataSession:
                 "generalFormat",
                 "isbns",
                 "language",
+                "machineReadableDate",
                 "mergedOclcNumbers",
                 "oclcNumber",
                 "publicationPlace",
@@ -952,13 +602,13 @@ class TestLiveMetadataSession:
             principal_idns=os.getenv("WCPrincipalIDNS"),
         )
         token.token_str = "invalid-token"
-        err_msg = 'Web service returned 401 error: {"message":"Unauthorized"}; https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045'
+        err_msg = "401 Client Error: Unauthorized for url: https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
         with MetadataSession(authorization=token) as session:
             session.headers.update({"Authorization": f"Bearer invalid-token"})
-            with pytest.raises(WorldcatSessionError) as exc:
+            with pytest.raises(WorldcatRequestError) as exc:
                 session.get_brief_bib(41266045)
 
-            assert err_msg in str(exc.value)
+            assert err_msg == str(exc.value)
 
     def test_get_brief_bib_with_stale_token(self, live_keys):
         token = WorldcatAccessToken(
