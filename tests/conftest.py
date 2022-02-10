@@ -7,6 +7,7 @@ import os
 import pytest
 import requests
 
+from requests import Response
 
 from bookops_worldcat import WorldcatAccessToken
 
@@ -100,9 +101,11 @@ class MockConnectionError:
         raise requests.exceptions.ConnectionError
 
 
-class MockHTTPSessionResponse:
+class MockHTTPSessionResponse(Response):
     def __init__(self, http_code):
         self.status_code = http_code
+        self.reason = "'foo'"
+        self.url = "https://foo.bar?query"
 
 
 @pytest.fixture
@@ -121,9 +124,10 @@ def mock_session_response(request, monkeypatch):
     def mock_api_response(*args, http_code=http_code, **kwargs):
         return MockHTTPSessionResponse(http_code=http_code)
 
-    monkeypatch.setattr(requests.Session, "get", mock_api_response)
-    monkeypatch.setattr(requests.Session, "post", mock_api_response)
-    monkeypatch.setattr(requests.Session, "delete", mock_api_response)
+    # monkeypatch.setattr(requests.Session, "get", mock_api_response)
+    # monkeypatch.setattr(requests.Session, "post", mock_api_response)
+    # monkeypatch.setattr(requests.Session, "delete", mock_api_response)
+    monkeypatch.setattr(requests.Session, "send", mock_api_response)
 
 
 @pytest.fixture
