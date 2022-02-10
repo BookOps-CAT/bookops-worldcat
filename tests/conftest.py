@@ -163,27 +163,21 @@ def mock_failed_post_token_response(monkeypatch):
 def mock_unexpected_error(monkeypatch):
     monkeypatch.setattr("requests.post", MockUnexpectedException)
     monkeypatch.setattr("requests.get", MockUnexpectedException)
-    monkeypatch.setattr("requests.Session.get", MockUnexpectedException)
-    monkeypatch.setattr("requests.Session.post", MockUnexpectedException)
-    monkeypatch.setattr("requests.Session.delete", MockUnexpectedException)
+    monkeypatch.setattr("requests.Session.send", MockUnexpectedException)
 
 
 @pytest.fixture
 def mock_timeout(monkeypatch):
     monkeypatch.setattr("requests.post", MockTimeout)
     monkeypatch.setattr("requests.get", MockTimeout)
-    monkeypatch.setattr("requests.Session.get", MockTimeout)
-    monkeypatch.setattr("requests.Session.post", MockTimeout)
-    monkeypatch.setattr("requests.Session.delete", MockTimeout)
+    monkeypatch.setattr("requests.Session.send", MockTimeout)
 
 
 @pytest.fixture
-def mock_connectionerror(monkeypatch):
+def mock_connection_error(monkeypatch):
     monkeypatch.setattr("requests.post", MockConnectionError)
     monkeypatch.setattr("requests.get", MockConnectionError)
-    monkeypatch.setattr("requests.Session.get", MockConnectionError)
-    monkeypatch.setattr("requests.Session.post", MockConnectionError)
-    monkeypatch.setattr("requests.Session.delete", MockConnectionError)
+    monkeypatch.setattr("requests.Session.send", MockConnectionError)
 
 
 @pytest.fixture
