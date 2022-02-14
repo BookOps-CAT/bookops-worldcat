@@ -11,6 +11,10 @@ nav:
 theme: readthedocs
 plugins:
   - mike
+    version_selector: true
+    css_dir: css
+    javascript_dir: js
+    canonical_version: null
   - search
   - mkapi
 extra_css:
