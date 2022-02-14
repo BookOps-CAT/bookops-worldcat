@@ -5,6 +5,10 @@
 + Handling of unexpected 206 HTTP code that is occasionally returned by the MetadataAPI /brief-bibs endpoint
 
 ### Changed
++ Introduced a breaking change to exceptions raised on calls to the web service for bibliographic resources: `WorldcatSessionError` was changed to `WorldcatRequestError`. 
++ Dev dependencies updates (pytest, pytest-cov, pytest-mock, mkdocs, black, mik, mkapi, mypy)
+
+### Changed
 + requests to OCLC services are now handled by a new `query.Query` class
 + dependencies update
     + requests to 2.27.1
