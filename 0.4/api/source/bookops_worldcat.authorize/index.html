@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../../img/favicon.ico">
+  <title>bookops_worldcat.authorize - BookOps-Worldcat Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../../css/theme.css" />
+  <link rel="stylesheet" href="../../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" rel="stylesheet" />
+  <link href="../../../css/mkapi-common.css" rel="stylesheet" />
+  <link href="../../../css/mkapi-readthedocs.css" rel="stylesheet" />
+  <link href="../../../css/version-select.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "bookops_worldcat.authorize";
+    var mkdocs_page_input_path = "api\\source\\bookops_worldcat.authorize.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../../.." class="icon icon-home"> BookOps-Worldcat Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../changelog/">Changelog</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="" href="https://github.com/BookOps-CAT/bookops-worldcat">Source Code</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="" href="https://github.com/BookOps-CAT/bookops-worldcat/issues">Issue Tracker</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/">Tutorials</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../about/">About</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="#">bookops_worldcat</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat/">bookops_worldcat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.authorize/">bookops_worldcat.authorize</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.errors/">bookops_worldcat.errors</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.metadata_api/">bookops_worldcat.metadata_api</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.query/">bookops_worldcat.query</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.utils/">bookops_worldcat.utils</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../..">BookOps-Worldcat Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>bookops_worldcat.authorize</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <div class="mkapi-node">
+<h1 id="" class="mkapi-object mkapi-object-code plain">
+<span class="mkapi-object-kind mkapi-object-kind-code">SOURCE CODE</span>
+<span class="mkapi-object-prefix">bookops_worldcat.</span><span class="mkapi-object-name">authorize</span>
+<span id="bookops_worldcat.authorize"></span><a class="mkapi-docs-link" href="../../bookops_worldcat.authorize">DOCS</a>
+</h1>
+
+<div class="mkapi-code">
+<pre class="codehilite"><code class="language-python"># -*- coding: utf-8 -*-
+
+&quot;&quot;&quot;
+This module provides means to authenticate and obtain a WorldCat access token.
+&quot;&quot;&quot;
+
+import datetime
+import sys
+from typing import Dict, List, Optional, Tuple, Union
+
+import requests
+from requests import Response
+
+
+from . import __title__, __version__  # type: ignore
+from .errors import WorldcatAuthorizationError
+
+
+class WorldcatAccessToken:
+# __mkapi__:bookops_worldcat.authorize:bookops_worldcat.authorize.WorldcatAccessToken
+    &quot;&quot;&quot;
+    Requests Worldcat access token.
+    Authenticates and authorizes using Client Credentials Grant. Does not support
+    Explicit Authorization Code and Refresh Token flows. Token with correctly
+    bonded scopes can then be passed into a session of particular web service
+    to authorize requests for resources.
+    More on OCLC's web services authorization:
+    https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html
+
+    Args:
+        key:                    your WSKey public client_id
+        secret:                 your WSKey secret
+        scopes:                 request scopes for the access token
+        principal_id:           principalID (required for read/write endpoints)
+        principal_idns:         principalIDNS (required for read/write endpoints)
+        agent:                  &quot;User-agent&quot; parameter to be passed in the request
+                                header; usage strongly encouraged
+        timeout:                how long to wait for server to send data before
+                                giving up; default value is 3 seconds
+
+
+    Examples:
+        &gt;&gt;&gt; from bookops_worldcat import WorldcatAccessToken
+        &gt;&gt;&gt; token = WorldcatAccessToken(
+                key=&quot;my_WSKey_client_id&quot;,
+                secret=&quot;my_WSKey_secret&quot;,
+                scope=&quot;WorldCatMetadataAPI&quot;,
+                principal_id=&quot;your principalID here&quot;,
+                principal_idns=&quot;your principalIDNS here&quot;,
+                agent=&quot;my_app/1.0.0&quot;)
+        &gt;&gt;&gt; token.token_str
+        &quot;tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW&quot;
+        &gt;&gt;&gt; token.is_expired()
+        False
+        &gt;&gt;&gt; token.server_response.json()
+        {&quot;token_token&quot;: &quot;tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW&quot;,
+         &quot;token_type&quot;: &quot;bearer&quot;,
+         &quot;expires_in&quot;: &quot;1199&quot;,
+         &quot;principalID&quot;: &quot;&quot;,
+         &quot;principalIDNS&quot;: &quot;&quot;,
+         &quot;scopes&quot;: &quot;WorldCatMetadataAPI&quot;,
+         &quot;contextInstitutionId&quot;: &quot;00001&quot;,
+         &quot;expires_at&quot;: &quot;2020-08-23 18:45:29Z&quot;}
+        &gt;&gt;&gt; token.server_response.request.headers
+        {&quot;User-Agent&quot;: &quot;my_app/1.0.0&quot;,
+         &quot;Accept-Encoding&quot;: &quot;gzip, deflate&quot;,
+         &quot;Accept&quot;: &quot;application/json&quot;,
+         &quot;Connection&quot;: &quot;keep-alive&quot;,
+         &quot;Content-Length&quot;: &quot;67&quot;,
+         &quot;Content-Type&quot;: &quot;application/x-www-form-urlencoded&quot;,
+         &quot;Authorization&quot;: &quot;Basic encoded_authorization_here=&quot;}
+
+    &quot;&quot;&quot;
+
+    def __init__(
+        self,
+        key: str,
+        secret: str,
+        scopes: Union[str, List[str]],
+        principal_id: str,
+        principal_idns: str,
+        agent: Optional[str] = None,
+        timeout: Optional[
+            Union[int, float, Tuple[int, int], Tuple[float, float]]
+        ] = None,
+    ) -&gt; None:
+        &quot;&quot;&quot;Constructor&quot;&quot;&quot;
+
+        self.agent = agent
+        self.grant_type = &quot;client_credentials&quot;
+        self.key = key
+        self.oauth_server = &quot;https://oauth.oclc.org&quot;
+        self.principal_id = principal_id
+        self.principal_idns = principal_idns
+        self.scopes = scopes
+        self.secret = secret
+        self.server_response = None
+        self.timeout = timeout
+        self.token_expires_at = None
+        self.token_str = None
+        self.token_type = None
+
+        # default bookops-worldcat request header
+        if self.agent is None:
+            self.agent = f&quot;{__title__}/{__version__}&quot;
+        else:
+            if type(self.agent) is not str:
+                raise WorldcatAuthorizationError(&quot;Argument 'agent' must be a string.&quot;)
+
+        # asure passed arguments are valid
+        if not self.key:
+            raise WorldcatAuthorizationError(&quot;Argument 'key' is required.&quot;)
+        else:
+            if type(self.key) is not str:
+                raise WorldcatAuthorizationError(&quot;Argument 'key' must be a string.&quot;)
+
+        if not self.secret:
+            raise WorldcatAuthorizationError(&quot;Argument 'secret' is required.&quot;)
+        else:
+            if type(self.secret) is not str:
+                raise WorldcatAuthorizationError(&quot;Argument 'secret' must be a string.&quot;)
+
+        if not self.principal_id:
+            raise WorldcatAuthorizationError(
+                &quot;Argument 'principal_id' is required for read/write endpoint of Metadata API.&quot;
+            )
+        if not self.principal_idns:
+            raise WorldcatAuthorizationError(
+                &quot;Argument 'principal_idns' is required for read/write endpoint of Metadata API.&quot;
+            )
+
+        # validate passed scopes
+        if type(self.scopes) is list:
+            self.scopes = &quot; &quot;.join(self.scopes)
+        elif type(self.scopes) is not str:
+            raise WorldcatAuthorizationError(
+                &quot;Argument 'scopes' must a string or a list.&quot;
+            )
+        self.scopes = self.scopes.strip()  # type: ignore
+        if self.scopes == &quot;&quot;:
+            raise WorldcatAuthorizationError(&quot;Argument 'scope' is missing.&quot;)
+
+        # assign default value for timout
+        if not self.timeout:
+            self.timeout = (3, 3)
+
+        # initiate request
+        self._request_token()
+
+    def _auth(self) -&gt; Tuple[str, str]:
+        return (self.key, self.secret)
+
+    def _hasten_expiration_time(self, utc_stamp_str: str) -&gt; str:
+        &quot;&quot;&quot;
+        Resets expiration time one second earlier to account
+        for any delays between expiration check and request for
+        new token in session setting.
+
+        Args:
+            utcstamp:               utc timestamp string
+
+        Returns:
+            utcstamp
+        &quot;&quot;&quot;
+        utcstamp = datetime.datetime.strptime(
+            utc_stamp_str, &quot;%Y-%m-%d %H:%M:%SZ&quot;
+        ) - datetime.timedelta(seconds=1)
+        return datetime.datetime.strftime(utcstamp, &quot;%Y-%m-%d %H:%M:%SZ&quot;)
+
+    def _parse_server_response(self, response: Response) -&gt; None:
+        &quot;&quot;&quot;Parses authorization server response&quot;&quot;&quot;
+        self.server_response = response  # type: ignore
+        if response.status_code == requests.codes.ok:
+            self.token_str = response.json()[&quot;access_token&quot;]
+            self.token_expires_at = self._hasten_expiration_time(  # type: ignore
+                response.json()[&quot;expires_at&quot;]
+            )
+            self.token_type = response.json()[&quot;token_type&quot;]
+        else:
+            raise WorldcatAuthorizationError(response.json())
+
+    def _payload(self) -&gt; Dict[str, str]:
+        &quot;&quot;&quot;Preps requests params&quot;&quot;&quot;
+        return {
+            &quot;grant_type&quot;: self.grant_type,
+            &quot;scope&quot;: self.scopes,  # type: ignore
+            &quot;principalID&quot;: self.principal_id,
+            &quot;principalIDNS&quot;: self.principal_idns,
+        }
+
+    def _post_token_request(self) -&gt; Response:
+        &quot;&quot;&quot;
+        Fetches Worldcat access token for specified scope (web service)
+
+        Returns:
+            requests.models.Response
+        &quot;&quot;&quot;
+
+        token_url = self._token_url()
+        headers = self._token_headers()
+        auth = self._auth()
+        payload = self._payload()
+        try:
+            response = requests.post(
+                token_url,
+                auth=auth,
+                headers=headers,
+                params=payload,
+                timeout=self.timeout,
+            )
+            return response
+
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            raise WorldcatAuthorizationError(f&quot;Trouble connecting: {sys.exc_info()[0]}&quot;)
+        except Exception:
+            raise WorldcatAuthorizationError(f&quot;Unexpected error: {sys.exc_info()[0]}&quot;)
+
+    def _request_token(self):
+        &quot;&quot;&quot;
+        Initiates access token request and parses the response if successful.
+        &quot;&quot;&quot;
+        response = self._post_token_request()
+        self._parse_server_response(response)
+
+    def _token_headers(self) -&gt; Dict[str, str]:
+        return {&quot;User-Agent&quot;: self.agent, &quot;Accept&quot;: &quot;application/json&quot;}  # type: ignore
+
+    def _token_url(self) -&gt; str:
+        return f&quot;{self.oauth_server}/token&quot;
+
+    def is_expired(self) -&gt; bool:
+# __mkapi__:bookops_worldcat.authorize:bookops_worldcat.authorize.WorldcatAccessToken.is_expired
+        &quot;&quot;&quot;
+        Checks if the access token is expired.
+
+        Returns:
+            bool
+
+        Example:
+        &gt;&gt;&gt; token.is_expired()
+        False
+        &quot;&quot;&quot;
+        try:
+            if (
+                datetime.datetime.strptime(self.token_expires_at, &quot;%Y-%m-%d %H:%M:%SZ&quot;)  # type: ignore
+                &lt; datetime.datetime.utcnow()
+            ):
+                return True
+            else:
+                return False
+        except TypeError:
+            raise
+        except ValueError:
+            raise
+</code></pre>
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../js/mkapi.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+      <script src="../../../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
