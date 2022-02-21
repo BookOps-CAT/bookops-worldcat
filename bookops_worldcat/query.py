@@ -16,7 +16,7 @@ from .errors import WorldcatRequestError
 
 class Query:
     """
-    Sends a request to OClC service and unifies received excepitons
+    Sends a request to OClC service and unifies received exceptions
 
     `Query.response` attribute is `requests.Response` instance that
     can be parsed to exctract received information from the web service.
