@@ -177,10 +177,6 @@ class MetadataSession(WorldcatSession):
         except InvalidOclcNumber:
             raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclcNumber)
 
@@ -217,10 +213,6 @@ class MetadataSession(WorldcatSession):
             oclcNumber = verify_oclc_number(oclcNumber)
         except InvalidOclcNumber:
             raise WorldcatSessionError("Invalid OCLC # was passed as an argument.")
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_bib_oclc_number(oclcNumber)
         if not response_format:
@@ -273,10 +265,6 @@ class MetadataSession(WorldcatSession):
         except InvalidOclcNumber as exc:
             raise WorldcatSessionError(exc)
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         url = self._url_bib_holdings_check()
         header = {"Accept": response_format}
         payload = {"oclcNumber": oclcNumber, "inst": inst, "instSymbol": instSymbol}
@@ -328,10 +316,6 @@ class MetadataSession(WorldcatSession):
             oclcNumber = verify_oclc_number(oclcNumber)
         except InvalidOclcNumber as exc:
             raise WorldcatSessionError(exc)
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_bib_holdings_action()
         header = {"Accept": response_format}
@@ -397,10 +381,6 @@ class MetadataSession(WorldcatSession):
             oclcNumber = verify_oclc_number(oclcNumber)
         except InvalidOclcNumber as exc:
             raise WorldcatSessionError(exc)
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_bib_holdings_action()
         header = {"Accept": response_format}
@@ -470,10 +450,6 @@ class MetadataSession(WorldcatSession):
                 "instSymbol": instSymbol,
             }
 
-            # make sure access token is still valid and if not request a new one
-            if self.authorization.is_expired():
-                self._get_new_access_token()
-
             # prep request
             req = Request("POST", url, params=payload, headers=header, hooks=hooks)
             prepared_request = self.prepare_request(req)
@@ -539,10 +515,6 @@ class MetadataSession(WorldcatSession):
                 "inst": inst,
                 "instSymbol": instSymbol,
             }
-
-            # make sure access token is still valid and if not request a new one
-            if self.authorization.is_expired():
-                self._get_new_access_token()
 
             # prep request
             req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
@@ -664,10 +636,6 @@ class MetadataSession(WorldcatSession):
             oclcNumber = verify_oclc_number(oclcNumber)
         except InvalidOclcNumber:
             raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_brief_bib_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
@@ -807,10 +775,6 @@ class MetadataSession(WorldcatSession):
         if not q:
             raise WorldcatSessionError("Argument 'q' is requried to construct query.")
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         url = self._url_brief_bib_search()
         header = {"Accept": "application/json"}
         payload = {
@@ -873,10 +837,6 @@ class MetadataSession(WorldcatSession):
             vetted_numbers = verify_oclc_numbers(oclcNumbers)
         except InvalidOclcNumber as exc:
             raise WorldcatSessionError(exc)
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         header = {"Accept": response_format}
         url = self._url_bib_check_oclc_numbers()
@@ -956,10 +916,6 @@ class MetadataSession(WorldcatSession):
             except InvalidOclcNumber:
                 raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         url = self._url_member_general_holdings()
         header = {"Accept": "application/json"}
         payload = {
@@ -1038,10 +994,6 @@ class MetadataSession(WorldcatSession):
                 oclcNumber = verify_oclc_number(oclcNumber)
             except InvalidOclcNumber:
                 raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_member_shared_print_holdings()
         header = {"Accept": "application/json"}
