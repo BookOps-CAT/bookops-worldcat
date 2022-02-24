@@ -4,19 +4,15 @@
 This module provides MetadataSession class for requests to WorldCat Metadata API.
 """
 
-import sys
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
-import requests
 from requests import Request, Response
 
 from ._session import WorldcatSession
 from .authorize import WorldcatAccessToken
 from .errors import (
     WorldcatSessionError,
-    WorldcatRequestError,
     InvalidOclcNumber,
-    WorldcatAuthorizationError,
 )
 from .query import Query
 from .utils import verify_oclc_number, verify_oclc_numbers
@@ -39,54 +35,26 @@ class MetadataSession(WorldcatSession):
             agent:                  "User-agent" parameter to be passed in the request
                                     header; usage strongly encouraged
             timeout:                how long to wait for server to send data before
-                                    giving up; default value is 3 seconds
+                                    giving up; default value is 5 seconds
         """
-        WorldcatSession.__init__(self, agent=agent, timeout=timeout)
+        super().__init__(authorization, agent=agent, timeout=timeout)
 
-        self.authorization = authorization
-
-        if type(self.authorization).__name__ != "WorldcatAccessToken":
-            raise WorldcatSessionError(
-                "Argument 'authorization' must include 'WorldcatAccessToken' object."
-            )
-
-        self._update_authorization()
-
-    def _update_authorization(self) -> None:
-        self.headers.update({"Authorization": f"Bearer {self.authorization.token_str}"})
-
-    def _get_new_access_token(self) -> None:
-        """
-        Allows to continue sending request with new access token after
-        the previous one expired
-        """
-        try:
-            self.authorization._request_token()
-            self._update_authorization()
-        except WorldcatAuthorizationError as exc:
-            raise WorldcatSessionError(exc)
-
-    def _split_into_legal_volume(self, oclc_numbers: List[str] = []) -> List[str]:
+    def _split_into_legal_volume(
+        self, oclc_numbers: List[str] = [], n: int = 50
+    ) -> List[str]:
         """
         OCLC requries that no more than 50 numbers are passed for batch processing
-        """
-        incomplete = True
-        batches = []
-        start = 0
-        end = 50
-        while incomplete:
-            batch = oclc_numbers[start:end]
-            if not batch:
-                incomplete = False
-            elif len(batch) < 50:
-                batches.append(",".join([str(x) for x in batch]))
-                incomplete = False
-            else:
-                batches.append(",".join([str(x) for x in batch]))
-                start += 50
-                end += 50
 
-        return batches
+        Args:
+            oclc_numbers:           list of oclc numbers
+            n:                      batch size, default (max) 50
+
+        Yields:
+            n-sized batch
+        """
+
+        for i in range(0, len(oclc_numbers), n):
+            yield ",".join(oclc_numbers[i : i + n])
 
     def _url_base(self) -> str:
         return "https://worldcat.org"
