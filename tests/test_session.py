@@ -11,11 +11,17 @@ from bookops_worldcat.errors import WorldcatSessionError
 class TestWorldcatSession:
     """Test the base WorldcatSession"""
 
-    def test_default_user_agent_header(self):
-        assert WorldcatSession().headers["User-Agent"] == f"{__title__}/{__version__}"
+    def test_default_user_agent_header(self, mock_token):
+        assert (
+            WorldcatSession(mock_token).headers["User-Agent"]
+            == f"{__title__}/{__version__}"
+        )
 
-    def test_custom_user_agent_header(self):
-        assert WorldcatSession(agent="my_app").headers["User-Agent"] == "my_app"
+    def test_custom_user_agent_header(self, mock_token):
+        assert (
+            WorldcatSession(mock_token, agent="my_app").headers["User-Agent"]
+            == "my_app"
+        )
 
     @pytest.mark.parametrize(
         "argm,expectation",
@@ -25,15 +31,15 @@ class TestWorldcatSession:
             ((), pytest.raises(WorldcatSessionError)),
         ],
     )
-    def test_invalid_user_agent_arguments(self, argm, expectation):
+    def test_invalid_user_agent_arguments(self, argm, expectation, mock_token):
         with expectation:
-            WorldcatSession(agent=argm)
+            WorldcatSession(mock_token, agent=argm)
             assert "Argument 'agent' must be a str" in str(expectation.value)
 
-    def test_default_timeout(self):
-        with WorldcatSession(timeout=None) as session:
+    def test_default_timeout(self, mock_token):
+        with WorldcatSession(mock_token, timeout=None) as session:
             assert session.timeout == (5, 5)
 
-    def test_custom_timeout(self):
-        with WorldcatSession(timeout=1) as session:
+    def test_custom_timeout(self, mock_token):
+        with WorldcatSession(mock_token, timeout=1) as session:
             assert session.timeout == 1
