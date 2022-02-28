@@ -495,6 +495,25 @@ class MetadataSession(WorldcatSession):
 
         return responses
 
+    def holdings_set_multi_institutions(
+        self, oclcNumber: Union[int, str], instSymbols: str
+    ) -> List[Response]:
+        """
+        Batch sets intitution holdings for multiple intitutions
+
+        Uses /ih/institutionlist endpoint
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            instSymbols:            a comma-separated list of OCLC symbols of the
+                                    institution whose holdings are being set
+        """
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber:
+            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
     def search_brief_bib_other_editions(
         self,
         oclcNumber: Union[int, str],
