@@ -398,7 +398,7 @@ class MetadataSession(WorldcatSession):
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            `requests.Response` object
+            list of `requests.Response` objects
         """
         responses = []
 
@@ -463,7 +463,7 @@ class MetadataSession(WorldcatSession):
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            `requests.Response` object
+            list of `requests.Response` objects
         """
         responses = []
 
