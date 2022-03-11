@@ -14,7 +14,7 @@ from .errors import WorldcatRequestError
 
 
 if TYPE_CHECKING:
-    from .metadata_api import MetadataSession
+    from .metadata_api import MetadataSession  # pragma: no cover
 
 
 class Query:
