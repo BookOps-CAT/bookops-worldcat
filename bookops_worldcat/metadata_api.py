@@ -514,6 +514,8 @@ class MetadataSession(WorldcatSession):
         except InvalidOclcNumber:
             raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
+        url = self._url_bib_holdings_multi_institution_batch_action()
+
     def search_brief_bib_other_editions(
         self,
         oclcNumber: Union[int, str],

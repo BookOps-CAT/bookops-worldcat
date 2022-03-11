@@ -65,9 +65,7 @@ class TestWorldcatAccessToken:
             ),
         ],
     )
-    def test_secret_exceptions(
-        self, argm, expectation, msg, mock_successful_post_token_response
-    ):
+    def test_secret_exceptions(self, argm, expectation, msg):
         with expectation as exp:
             WorldcatAccessToken(
                 key="my_key",
@@ -78,7 +76,7 @@ class TestWorldcatAccessToken:
             )
             assert msg in str(exp.value)
 
-    def test_agent_exceptions(self, mock_successful_post_token_response):
+    def test_agent_exceptions(self):
         with pytest.raises(WorldcatAuthorizationError) as exp:
             WorldcatAccessToken(
                 key="my_key",
