@@ -113,9 +113,7 @@ class TestWorldcatAccessToken:
             ),
         ],
     )
-    def test_principal_id_exception(
-        self, arg, expectation, msg, mock_successful_post_token_response
-    ):
+    def test_principal_id_exception(self, arg, expectation, msg):
         with expectation as exc:
             WorldcatAccessToken(
                 key="my_key",
@@ -141,9 +139,7 @@ class TestWorldcatAccessToken:
             ),
         ],
     )
-    def test_principal_idns_exception(
-        self, arg, expectation, msg, mock_successful_post_token_response
-    ):
+    def test_principal_idns_exception(self, arg, expectation, msg):
         with expectation as exc:
             WorldcatAccessToken(
                 key="my_key",
@@ -179,9 +175,7 @@ class TestWorldcatAccessToken:
             ),
         ],
     )
-    def test_scope_exceptions(
-        self, argm, expectation, msg, mock_successful_post_token_response
-    ):
+    def test_scope_exceptions(self, argm, expectation, msg):
         with expectation as exp:
             WorldcatAccessToken(
                 key="my_key",
@@ -350,42 +344,23 @@ class TestWorldcatAccessToken:
         )
         assert token.is_expired() is False
 
-    def test_is_expired_true(
-        self, mock_utcnow, mock_credentials, mock_successful_post_token_response
-    ):
-        creds = mock_credentials
-        token = WorldcatAccessToken(
-            key=creds["key"],
-            secret=creds["secret"],
-            scopes=creds["scopes"],
-            principal_id=creds["principal_id"],
-            principal_idns=creds["principal_idns"],
-        )
-        token.token_expires_at = datetime.datetime.strftime(
+    def test_is_expired_true(self, mock_utcnow, mock_token):
+        mock_token.is_expired() is False
+        mock_token.token_expires_at = datetime.datetime.strftime(
             datetime.datetime.utcnow() - datetime.timedelta(0, 1),
             "%Y-%m-%d %H:%M:%SZ",
         )
 
-        assert token.is_expired() is True
+        assert mock_token.is_expired() is True
 
     @pytest.mark.parametrize(
         "arg,expectation",
         [(None, pytest.raises(TypeError)), ("20-01-01", pytest.raises(ValueError))],
     )
-    def test_is_expired_exception(
-        self, arg, expectation, mock_credentials, mock_successful_post_token_response
-    ):
-        creds = mock_credentials
-        token = WorldcatAccessToken(
-            key=creds["key"],
-            secret=creds["secret"],
-            scopes=creds["scopes"],
-            principal_id=creds["principal_id"],
-            principal_idns=creds["principal_idns"],
-        )
-        token.token_expires_at = arg
+    def test_is_expired_exception(self, arg, expectation, mock_token):
+        mock_token.token_expires_at = arg
         with expectation:
-            token.is_expired()
+            mock_token.is_expired()
 
     def test_post_token_request(
         self,
