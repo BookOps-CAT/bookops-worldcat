@@ -415,6 +415,16 @@ class TestWorldcatAccessToken:
         assert token.server_response.json() == mock_oauth_server_response.json()
         assert token.timeout == (3, 3)
 
+    def test_token_repr(
+        self,
+        mock_token,
+        mock_utcnow,
+    ):
+        assert (
+            str(mock_token)
+            == "access_token: 'tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW', token_type: 'bearer', expires_at: '2020-01-01 17:19:58Z'"
+        )
+
     @pytest.mark.webtest
     def test_cred_in_env_variables(self, live_keys):
         assert os.getenv("WCKey") is not None

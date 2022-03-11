@@ -250,3 +250,6 @@ class WorldcatAccessToken:
             raise
         except ValueError:
             raise
+
+    def __repr__(self):
+        return f"access_token: '{self.token_str}', token_type: '{self.token_type}', expires_at: '{self.token_expires_at}'"
