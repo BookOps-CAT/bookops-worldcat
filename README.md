@@ -45,6 +45,8 @@ At the moment, BookOps-Worldcat supports requests to following OCLC's web servic
         + retrieve holding status of a single resource
         + set institution holdings for a batch of resources
         + unset institution holdings for a batch of resouces
+        + set holdings for a single resource for multiple institutions
+        + unset holdings for a single resource for multiple institutions
 
 
 #### Basic usage:
@@ -160,6 +162,5 @@ Please use [Github issue tracker](https://github.com/BookOps-CAT/bookops-worldca
 + Metadata API:
   + support for local holdings resources endpoints of the search functionality of the Metadata API
   + support for local bibliographic data endpoints
-  + support for holdings batch actions for multiple institutions
   + record validation endpoints
   + methods to create and update bibliographic records
