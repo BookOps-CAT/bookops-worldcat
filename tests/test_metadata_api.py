@@ -400,6 +400,82 @@ class TestMockedMetadataSession:
             assert stub_session.authorization.is_expired() is False
 
     @pytest.mark.http_code(200)
+    def test_holdings_set_multi_institutions(self, stub_session, mock_session_response):
+        results = stub_session.holdings_set_multi_institutions(
+            oclcNumber=850940548, instSymbols="BKL,NYP"
+        )
+        assert results.status_code == 200
+
+    def test_holdings_set_multi_institutions_missing_oclc_number(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_set_multi_institutions(instSymbols="NYP,BKL")
+
+    def test_holdings_set_multi_institutions_missing_inst_symbols(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_set_multi_institutions(oclcNumber=123)
+
+    def test_holdings_set_multi_institutions_invalid_oclc_number(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.holdings_set_multi_institutions(
+                oclcNumber="odn1234", instSymbols="NYP,BKL"
+            )
+
+    @pytest.mark.http_code(200)
+    def test_holdings_set_multi_institutions_stale_token(
+        self, mock_utcnow, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        with does_not_raise():
+            assert stub_session.authorization.is_expired() is True
+            stub_session.holdings_set_multi_institutions(
+                oclcNumber=850940548, instSymbols="NYP,BKL"
+            )
+            assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+            assert stub_session.authorization.is_expired() is False
+
+    @pytest.mark.http_code(200)
+    def test_holdings_unset_multi_institutions(
+        self, stub_session, mock_session_response
+    ):
+        results = stub_session.holdings_unset_multi_institutions(
+            850940548, "BKL,NYP", cascade="1"
+        )
+        assert results.status_code == 200
+
+    def test_holdings_unset_multi_institutions_missing_oclc_number(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_unset_multi_institutions(instSymbols="NYP,BKL")
+
+    def test_holdings_unset_multi_institutions_missing_inst_symbols(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_unset_multi_institutions(oclcNumber=123)
+
+    def test_holdings_unset_multi_institutions_invalid_oclc_number(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.holdings_unset_multi_institutions(
+                oclcNumber="odn1234", instSymbols="NYP,BKL"
+            )
+
+    @pytest.mark.http_code(200)
+    def test_holdings_unset_multi_institutions_stale_token(
+        self, mock_utcnow, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        with does_not_raise():
+            assert stub_session.authorization.is_expired() is True
+            stub_session.holdings_unset_multi_institutions(
+                oclcNumber=850940548, instSymbols="NYP,BKL"
+            )
+            assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+            assert stub_session.authorization.is_expired() is False
+
+    @pytest.mark.http_code(200)
     def test_search_brief_bibs_other_editions(
         self, stub_session, mock_session_response
     ):

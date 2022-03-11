@@ -496,8 +496,12 @@ class MetadataSession(WorldcatSession):
         return responses
 
     def holdings_set_multi_institutions(
-        self, oclcNumber: Union[int, str], instSymbols: str
-    ) -> List[Response]:
+        self,
+        oclcNumber: Union[int, str],
+        instSymbols: str,
+        response_format: str = "application/atom+json",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Response:
         """
         Batch sets intitution holdings for multiple intitutions
 
@@ -508,6 +512,13 @@ class MetadataSession(WorldcatSession):
                                     integer, or string with or without OCLC # prefix
             instSymbols:            a comma-separated list of OCLC symbols of the
                                     institution whose holdings are being set
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
         """
         try:
             oclcNumber = verify_oclc_number(oclcNumber)
@@ -515,6 +526,73 @@ class MetadataSession(WorldcatSession):
             raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
         url = self._url_bib_holdings_multi_institution_batch_action()
+        header = {"Accept": response_format}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "instSymbols": instSymbols,
+        }
+
+        # prep request
+        req = Request("POST", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def holdings_unset_multi_institutions(
+        self,
+        oclcNumber: Union[int, str],
+        instSymbols: str,
+        cascade: str = "0",
+        response_format: str = "application/atom+json",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Response:
+        """
+        Batch unsets intitution holdings for multiple intitutions
+
+        Uses /ih/institutionlist endpoint
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            instSymbols:            a comma-separated list of OCLC symbols of the
+                                    institution whose holdings are being set
+            cascade:                0 or 1, default 0;
+                                    0 - don't remove holdings if local holding
+                                    record or local bibliographic records exists;
+                                    1 - remove holding and delete local holdings
+                                    record and local bibliographic record
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber:
+            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
+        url = self._url_bib_holdings_multi_institution_batch_action()
+        header = {"Accept": response_format}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "instSymbols": instSymbols,
+            "cascade": cascade,
+        }
+
+        # prep request
+        req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def search_brief_bib_other_editions(
         self,
