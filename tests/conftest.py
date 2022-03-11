@@ -65,6 +65,7 @@ class MockAuthServerResponseFailure:
 
     def __init__(self):
         self.status_code = 403
+        self.content = b""
 
     def json(self):
         return {

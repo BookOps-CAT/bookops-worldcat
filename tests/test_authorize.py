@@ -393,7 +393,7 @@ class TestWorldcatAccessToken:
     ):
         assert (
             str(mock_token)
-            == "access_token: 'tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW', token_type: 'bearer', expires_at: '2020-01-01 17:19:58Z'"
+            == "access_token: 'tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW', expires_at: '2020-01-01 17:19:58Z'"
         )
 
     @pytest.mark.webtest
