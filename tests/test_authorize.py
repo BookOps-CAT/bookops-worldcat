@@ -34,9 +34,7 @@ class TestWorldcatAccessToken:
             ),
         ],
     )
-    def test_key_exceptions(
-        self, argm, expectation, msg, mock_successful_post_token_response
-    ):
+    def test_key_exceptions(self, argm, expectation, msg):
         with expectation as exp:
             WorldcatAccessToken(
                 key=argm,
