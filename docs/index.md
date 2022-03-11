@@ -37,13 +37,14 @@ At the moment, the wrapper supports only [OAuth 2.0 endpoints and flows](https:/
     + Set and unset institution holding  (`/ih/data`)
     + Retrieve status of institution holdings (`/ih/checkholdings`)
     + Set and unset institution holdings for a batch or records (`/ih/datalist`)
+    + Set and unset holdings for a single record for multiple intitutions (`/ih/institutionlist`)
 
 
 ## Installation
 
 To install use pip:
 
-`$ pip install bookops-worldcat`
+`$ pip -m install bookops-worldcat`
 
 
 ## Quickstart
@@ -63,8 +64,8 @@ The Worldcat access token can be obtained by passing credential parameters into 
     principal_id="my_principal_id",
     principlal_idns="my_principal_idns"
 )
->>> print(token.token_str)
-"tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
+>>> print(token)
+"access_token: 'tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW', expires_at: '2020-01-01 17:19:58Z'"
 >>> print(token.is_expired())
 False
 ```
@@ -429,6 +430,8 @@ session.search_current_control_numbers(oclcNumbers=[12345, 12346, 12347], respon
 + `holding_unset` deletes holding on an individual bibliographic record
 + `holdings_set` allows holdings to be set on multiple records, and is not limited by OCLC's 50 bib record limit
 + `holdings_unset` allows holdings to be deleted on multiple records, and is not limited to OCLC's 50 bib record restriction
++ `holdings_set_multi_institutions` allows to set holdings for a single record for multiple institutions
++ `holdings_unset_multi_institutions` deletes holdings on a single record for multiple institutions
 
 By default, responses are returned in `atom+json` format, but `atom+xml` can be specified:
 ```python
