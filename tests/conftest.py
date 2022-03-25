@@ -107,6 +107,7 @@ class MockHTTPSessionResponse(Response):
         self.status_code = http_code
         self.reason = "'foo'"
         self.url = "https://foo.bar?query"
+        self._content = b"spam"
 
 
 @pytest.fixture

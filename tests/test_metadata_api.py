@@ -222,8 +222,13 @@ class TestMockedMetadataSession:
     def test_get_brief_bib_404_error_response(
         self, stub_session, mock_session_response
     ):
-        with pytest.raises(WorldcatRequestError):
+        with pytest.raises(WorldcatRequestError) as exc:
             stub_session.get_brief_bib(12345)
+
+        assert (
+            "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: b'spam'"
+            in (str(exc.value))
+        )
 
     @pytest.mark.http_code(200)
     def test_get_full_bib(self, stub_session, mock_session_response):
@@ -435,6 +440,20 @@ class TestMockedMetadataSession:
             )
             assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
             assert stub_session.authorization.is_expired() is False
+
+    @pytest.mark.http_code(403)
+    def test_holdings_set_multi_institutions_permission_error(
+        self, stub_session, mock_session_response
+    ):
+        with pytest.raises(WorldcatRequestError) as exc:
+            stub_session.holdings_set_multi_institutions(
+                oclcNumber=850940548, instSymbols="NYP,BKL"
+            )
+
+        assert (
+            "403 Client Error: 'foo' for url: https://foo.bar?query. Server response: b'spam'"
+            in str(exc.value)
+        )
 
     @pytest.mark.http_code(200)
     def test_holdings_unset_multi_institutions(

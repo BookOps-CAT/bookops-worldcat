@@ -71,7 +71,9 @@ class Query:
                 self.response.raise_for_status()
 
         except HTTPError as exc:
-            raise WorldcatRequestError(f"{exc}")
+            raise WorldcatRequestError(
+                f"{exc}. Server response: {self.response.content}"
+            )
         except (Timeout, ConnectionError):
             raise WorldcatRequestError(f"Connection Error: {sys.exc_info()[0]}")
         except:
