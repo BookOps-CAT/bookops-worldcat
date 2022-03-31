@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0] - (3/11/2022)
+### Added
++ feature to set and unset holdings for individual record for multiple institutions (/ih/institutionlist endpoint)
++ `__repr__` method to `WorldcatAccessToken` object
+
+### Changed
++ "refreshing" of access tokens moved to `_session.WorldcatSession` from `metadata_api.MetadataSession` to allow inheritance of this functionality by future clients
++ refactors some of tests
+
 ## [0.4.1] - (2/10/2022) 
 ### Fixed
 + Handling of unexpected 206 HTTP code that is occasionally returned by the MetadataAPI /brief-bibs endpoint

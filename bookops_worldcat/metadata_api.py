@@ -4,19 +4,15 @@
 This module provides MetadataSession class for requests to WorldCat Metadata API.
 """
 
-import sys
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
-import requests
 from requests import Request, Response
 
 from ._session import WorldcatSession
 from .authorize import WorldcatAccessToken
 from .errors import (
     WorldcatSessionError,
-    WorldcatRequestError,
     InvalidOclcNumber,
-    WorldcatAuthorizationError,
 )
 from .query import Query
 from .utils import verify_oclc_number, verify_oclc_numbers
@@ -39,54 +35,26 @@ class MetadataSession(WorldcatSession):
             agent:                  "User-agent" parameter to be passed in the request
                                     header; usage strongly encouraged
             timeout:                how long to wait for server to send data before
-                                    giving up; default value is 3 seconds
+                                    giving up; default value is 5 seconds
         """
-        WorldcatSession.__init__(self, agent=agent, timeout=timeout)
+        super().__init__(authorization, agent=agent, timeout=timeout)
 
-        self.authorization = authorization
-
-        if type(self.authorization).__name__ != "WorldcatAccessToken":
-            raise WorldcatSessionError(
-                "Argument 'authorization' must include 'WorldcatAccessToken' object."
-            )
-
-        self._update_authorization()
-
-    def _update_authorization(self) -> None:
-        self.headers.update({"Authorization": f"Bearer {self.authorization.token_str}"})
-
-    def _get_new_access_token(self) -> None:
-        """
-        Allows to continue sending request with new access token after
-        the previous one expired
-        """
-        try:
-            self.authorization._request_token()
-            self._update_authorization()
-        except WorldcatAuthorizationError as exc:
-            raise WorldcatSessionError(exc)
-
-    def _split_into_legal_volume(self, oclc_numbers: List[str] = []) -> List[str]:
+    def _split_into_legal_volume(
+        self, oclc_numbers: List[str] = [], n: int = 50
+    ) -> List[str]:
         """
         OCLC requries that no more than 50 numbers are passed for batch processing
-        """
-        incomplete = True
-        batches = []
-        start = 0
-        end = 50
-        while incomplete:
-            batch = oclc_numbers[start:end]
-            if not batch:
-                incomplete = False
-            elif len(batch) < 50:
-                batches.append(",".join([str(x) for x in batch]))
-                incomplete = False
-            else:
-                batches.append(",".join([str(x) for x in batch]))
-                start += 50
-                end += 50
 
-        return batches
+        Args:
+            oclc_numbers:           list of oclc numbers
+            n:                      batch size, default (max) 50
+
+        Yields:
+            n-sized batch
+        """
+
+        for i in range(0, len(oclc_numbers), n):
+            yield ",".join(oclc_numbers[i : i + n])
 
     def _url_base(self) -> str:
         return "https://worldcat.org"
@@ -177,10 +145,6 @@ class MetadataSession(WorldcatSession):
         except InvalidOclcNumber:
             raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclcNumber)
 
@@ -217,10 +181,6 @@ class MetadataSession(WorldcatSession):
             oclcNumber = verify_oclc_number(oclcNumber)
         except InvalidOclcNumber:
             raise WorldcatSessionError("Invalid OCLC # was passed as an argument.")
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_bib_oclc_number(oclcNumber)
         if not response_format:
@@ -273,10 +233,6 @@ class MetadataSession(WorldcatSession):
         except InvalidOclcNumber as exc:
             raise WorldcatSessionError(exc)
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         url = self._url_bib_holdings_check()
         header = {"Accept": response_format}
         payload = {"oclcNumber": oclcNumber, "inst": inst, "instSymbol": instSymbol}
@@ -328,10 +284,6 @@ class MetadataSession(WorldcatSession):
             oclcNumber = verify_oclc_number(oclcNumber)
         except InvalidOclcNumber as exc:
             raise WorldcatSessionError(exc)
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_bib_holdings_action()
         header = {"Accept": response_format}
@@ -398,10 +350,6 @@ class MetadataSession(WorldcatSession):
         except InvalidOclcNumber as exc:
             raise WorldcatSessionError(exc)
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         url = self._url_bib_holdings_action()
         header = {"Accept": response_format}
         payload = {
@@ -450,7 +398,7 @@ class MetadataSession(WorldcatSession):
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            `requests.Response` object
+            list of `requests.Response` objects
         """
         responses = []
 
@@ -469,10 +417,6 @@ class MetadataSession(WorldcatSession):
                 "inst": inst,
                 "instSymbol": instSymbol,
             }
-
-            # make sure access token is still valid and if not request a new one
-            if self.authorization.is_expired():
-                self._get_new_access_token()
 
             # prep request
             req = Request("POST", url, params=payload, headers=header, hooks=hooks)
@@ -519,7 +463,7 @@ class MetadataSession(WorldcatSession):
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
-            `requests.Response` object
+            list of `requests.Response` objects
         """
         responses = []
 
@@ -540,10 +484,6 @@ class MetadataSession(WorldcatSession):
                 "instSymbol": instSymbol,
             }
 
-            # make sure access token is still valid and if not request a new one
-            if self.authorization.is_expired():
-                self._get_new_access_token()
-
             # prep request
             req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
             prepared_request = self.prepare_request(req)
@@ -554,6 +494,105 @@ class MetadataSession(WorldcatSession):
             responses.append(query.response)
 
         return responses
+
+    def holdings_set_multi_institutions(
+        self,
+        oclcNumber: Union[int, str],
+        instSymbols: str,
+        response_format: str = "application/atom+json",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Response:
+        """
+        Batch sets intitution holdings for multiple intitutions
+
+        Uses /ih/institutionlist endpoint
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            instSymbols:            a comma-separated list of OCLC symbols of the
+                                    institution whose holdings are being set
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber:
+            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
+        url = self._url_bib_holdings_multi_institution_batch_action()
+        header = {"Accept": response_format}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "instSymbols": instSymbols,
+        }
+
+        # prep request
+        req = Request("POST", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def holdings_unset_multi_institutions(
+        self,
+        oclcNumber: Union[int, str],
+        instSymbols: str,
+        cascade: str = "0",
+        response_format: str = "application/atom+json",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Response:
+        """
+        Batch unsets intitution holdings for multiple intitutions
+
+        Uses /ih/institutionlist endpoint
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            instSymbols:            a comma-separated list of OCLC symbols of the
+                                    institution whose holdings are being set
+            cascade:                0 or 1, default 0;
+                                    0 - don't remove holdings if local holding
+                                    record or local bibliographic records exists;
+                                    1 - remove holding and delete local holdings
+                                    record and local bibliographic record
+            response_format:        'application/atom+json' (default) or
+                                    'application/atom+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        try:
+            oclcNumber = verify_oclc_number(oclcNumber)
+        except InvalidOclcNumber:
+            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
+        url = self._url_bib_holdings_multi_institution_batch_action()
+        header = {"Accept": response_format}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "instSymbols": instSymbols,
+            "cascade": cascade,
+        }
+
+        # prep request
+        req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
 
     def search_brief_bib_other_editions(
         self,
@@ -664,10 +703,6 @@ class MetadataSession(WorldcatSession):
             oclcNumber = verify_oclc_number(oclcNumber)
         except InvalidOclcNumber:
             raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_brief_bib_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
@@ -807,10 +842,6 @@ class MetadataSession(WorldcatSession):
         if not q:
             raise WorldcatSessionError("Argument 'q' is requried to construct query.")
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         url = self._url_brief_bib_search()
         header = {"Accept": "application/json"}
         payload = {
@@ -873,10 +904,6 @@ class MetadataSession(WorldcatSession):
             vetted_numbers = verify_oclc_numbers(oclcNumbers)
         except InvalidOclcNumber as exc:
             raise WorldcatSessionError(exc)
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         header = {"Accept": response_format}
         url = self._url_bib_check_oclc_numbers()
@@ -956,10 +983,6 @@ class MetadataSession(WorldcatSession):
             except InvalidOclcNumber:
                 raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
 
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
-
         url = self._url_member_general_holdings()
         header = {"Accept": "application/json"}
         payload = {
@@ -1038,10 +1061,6 @@ class MetadataSession(WorldcatSession):
                 oclcNumber = verify_oclc_number(oclcNumber)
             except InvalidOclcNumber:
                 raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
-
-        # make sure access token is still valid and if not request a new one
-        if self.authorization.is_expired():
-            self._get_new_access_token()
 
         url = self._url_member_shared_print_holdings()
         header = {"Accept": "application/json"}

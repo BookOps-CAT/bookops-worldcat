@@ -3,6 +3,7 @@
 from contextlib import contextmanager
 import datetime
 import os
+from types import GeneratorType
 
 import pytest
 
@@ -34,7 +35,7 @@ class TestMockedMetadataSession:
             MetadataSession()
 
     def test_invalid_authorizaiton(self):
-        err_msg = "Argument 'authorization' must include 'WorldcatAccessToken' object."
+        err_msg = "Argument 'authorization' must be 'WorldcatAccessToken' object."
         with pytest.raises(WorldcatSessionError) as exc:
             MetadataSession(authorization="my_token")
         assert err_msg in str(exc.value)
@@ -56,25 +57,25 @@ class TestMockedMetadataSession:
             stub_session._get_new_access_token()
 
     @pytest.mark.parametrize(
-        "oclcNumbers,buckets,expectation",
+        "oclcNumbers,expectation",
         [
-            ([], 0, []),
-            (["1", "2", "3"], 1, ["1,2,3"]),
-            ([1, 2, 3], 1, ["1,2,3"]),
-            (["1"], 1, ["1"]),
-            (["1"] * 50, 1, [",".join(["1"] * 50)]),
-            (["1"] * 51, 2, [",".join(["1"] * 50), "1"]),
-            (
+            pytest.param([], [], id="empty list"),
+            pytest.param(["1", "2", "3"], ["1,2,3"], id="list of str"),
+            pytest.param(["1"], ["1"], id="list of one"),
+            pytest.param(["1"] * 50, [",".join(["1"] * 50)], id="full batch"),
+            pytest.param(["1"] * 51, [",".join(["1"] * 50), "1"], id="2 batches"),
+            pytest.param(
                 ["1"] * 103,
-                3,
                 [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],
+                id="3 batches",
             ),
         ],
     )
-    def test_split_into_legal_volume(
-        self, stub_session, oclcNumbers, buckets, expectation
-    ):
-        assert stub_session._split_into_legal_volume(oclcNumbers) == expectation
+    def test_split_into_legal_volume(self, stub_session, oclcNumbers, expectation):
+        batches = stub_session._split_into_legal_volume(oclcNumbers)
+        assert isinstance(batches, GeneratorType)
+        all_batches = [b for b in batches]
+        assert all_batches == expectation
 
     def test_url_base(self, stub_session):
         assert stub_session._url_base() == "https://worldcat.org"
@@ -221,8 +222,13 @@ class TestMockedMetadataSession:
     def test_get_brief_bib_404_error_response(
         self, stub_session, mock_session_response
     ):
-        with pytest.raises(WorldcatRequestError):
+        with pytest.raises(WorldcatRequestError) as exc:
             stub_session.get_brief_bib(12345)
+
+        assert (
+            "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: b'spam'"
+            in (str(exc.value))
+        )
 
     @pytest.mark.http_code(200)
     def test_get_full_bib(self, stub_session, mock_session_response):
@@ -395,6 +401,96 @@ class TestMockedMetadataSession:
         with does_not_raise():
             assert stub_session.authorization.is_expired() is True
             stub_session.holdings_unset([850940548, 850940552, 850940554])
+            assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+            assert stub_session.authorization.is_expired() is False
+
+    @pytest.mark.http_code(200)
+    def test_holdings_set_multi_institutions(self, stub_session, mock_session_response):
+        results = stub_session.holdings_set_multi_institutions(
+            oclcNumber=850940548, instSymbols="BKL,NYP"
+        )
+        assert results.status_code == 200
+
+    def test_holdings_set_multi_institutions_missing_oclc_number(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_set_multi_institutions(instSymbols="NYP,BKL")
+
+    def test_holdings_set_multi_institutions_missing_inst_symbols(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_set_multi_institutions(oclcNumber=123)
+
+    def test_holdings_set_multi_institutions_invalid_oclc_number(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.holdings_set_multi_institutions(
+                oclcNumber="odn1234", instSymbols="NYP,BKL"
+            )
+
+    @pytest.mark.http_code(200)
+    def test_holdings_set_multi_institutions_stale_token(
+        self, mock_utcnow, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        with does_not_raise():
+            assert stub_session.authorization.is_expired() is True
+            stub_session.holdings_set_multi_institutions(
+                oclcNumber=850940548, instSymbols="NYP,BKL"
+            )
+            assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
+            assert stub_session.authorization.is_expired() is False
+
+    @pytest.mark.http_code(403)
+    def test_holdings_set_multi_institutions_permission_error(
+        self, stub_session, mock_session_response
+    ):
+        with pytest.raises(WorldcatRequestError) as exc:
+            stub_session.holdings_set_multi_institutions(
+                oclcNumber=850940548, instSymbols="NYP,BKL"
+            )
+
+        assert (
+            "403 Client Error: 'foo' for url: https://foo.bar?query. Server response: b'spam'"
+            in str(exc.value)
+        )
+
+    @pytest.mark.http_code(200)
+    def test_holdings_unset_multi_institutions(
+        self, stub_session, mock_session_response
+    ):
+        results = stub_session.holdings_unset_multi_institutions(
+            850940548, "BKL,NYP", cascade="1"
+        )
+        assert results.status_code == 200
+
+    def test_holdings_unset_multi_institutions_missing_oclc_number(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_unset_multi_institutions(instSymbols="NYP,BKL")
+
+    def test_holdings_unset_multi_institutions_missing_inst_symbols(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_unset_multi_institutions(oclcNumber=123)
+
+    def test_holdings_unset_multi_institutions_invalid_oclc_number(self, stub_session):
+        with pytest.raises(WorldcatSessionError):
+            stub_session.holdings_unset_multi_institutions(
+                oclcNumber="odn1234", instSymbols="NYP,BKL"
+            )
+
+    @pytest.mark.http_code(200)
+    def test_holdings_unset_multi_institutions_stale_token(
+        self, mock_utcnow, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.strftime(
+            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
+            "%Y-%m-%d %H:%M:%SZ",
+        )
+        with does_not_raise():
+            assert stub_session.authorization.is_expired() is True
+            stub_session.holdings_unset_multi_institutions(
+                oclcNumber=850940548, instSymbols="NYP,BKL"
+            )
             assert stub_session.authorization.token_expires_at == "2020-01-01 17:19:58Z"
             assert stub_session.authorization.is_expired() is False
 

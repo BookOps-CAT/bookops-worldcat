@@ -176,7 +176,7 @@ class WorldcatAccessToken:
             )
             self.token_type = response.json()["token_type"]
         else:
-            raise WorldcatAuthorizationError(response.json())
+            raise WorldcatAuthorizationError(response.content)
 
     def _payload(self) -> Dict[str, str]:
         """Preps requests params"""
@@ -250,3 +250,8 @@ class WorldcatAccessToken:
             raise
         except ValueError:
             raise
+
+    def __repr__(self):
+        return (
+            f"access_token: '{self.token_str}', expires_at: '{self.token_expires_at}'"
+        )

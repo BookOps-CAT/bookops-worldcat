@@ -65,6 +65,7 @@ class MockAuthServerResponseFailure:
 
     def __init__(self):
         self.status_code = 403
+        self.content = b""
 
     def json(self):
         return {
@@ -106,6 +107,7 @@ class MockHTTPSessionResponse(Response):
         self.status_code = http_code
         self.reason = "'foo'"
         self.url = "https://foo.bar?query"
+        self._content = b"spam"
 
 
 @pytest.fixture
