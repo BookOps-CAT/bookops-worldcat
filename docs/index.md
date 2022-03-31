@@ -472,6 +472,12 @@ for r in results:
     print(r.json())
 ```
 
+A consortium type of organizations that serve multiple libraries can utilize `holdings_set_multi_institutions` and `holdings_unset_multi_institutions` methods to set and unset holdings for selected libraries. List of library OCLC codes is passed as a comma separated string to instSymbol parameter.
+
+```python
+results = session.holdings_set_multi_institutions(oclcNumber=1234, instSymbols="BKL,NYP")
+```
+
 ## Examples
 
 Complex search query:
