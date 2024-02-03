@@ -2,7 +2,7 @@
 name = "bookops-worldcat"
 version = "0.5.0"
 description = "OCLC WorldCat Metadata APIs wrapper"
-authors = ["Tomasz Kalata <klingaroo@gmail.com>"]
+authors = ["Tomasz Kalata <klingaroo@gmail.com>", "Charlotte Kostelic <charlottekostelic@gmail.com>"]
 license = "MIT"
 exclude = ["bookops_worldcat/temp.py", "bookops_worldcat/temp/*"]
 
@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/BookOps-CAT/bookops-worldcat"
 homepage = "https://bookops-cat.github.io/bookops-worldcat/"
 
-keywords = ["api", "worldcat", "cataloging", "bibliographic records", "holdings", "library metadata"]
+keywords = ["api", "api-wrapper", "oclc", "worldcat", "cataloging", "bibliographic records", "marcxml", "holdings", "library metadata"]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -45,6 +45,20 @@ mypy = "^0.931"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+	"webtest: mark a test hitting live endpoints",
+	"holdings: mark holdings live endpoint tests",
+	"http_code: use to pass returned http code to 'mock_session_response' fixture that mocks 'requests.Session.send' method",
+
+]
+
+[tool.coverage.run]
+relative_files = true
+source = ["."]
+omit = bookops_worldcat/temp.py
 
 [tool.black]
 line-length = 88
