@@ -29,18 +29,18 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
-requests = "^2.27"
+python = "^3.8"
+requests = "^2.31"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"
 pytest-cov = "^3.0"
 pytest-mock = "^3.7"
 mkdocs = "^1.2"
-black = "^22.1.0"
-mike = "^1.1.2"
+black = "^23.3.0"
+mike = "^2.0.0"
 mkapi = "^1.0.14"
-mypy = "^0.931"
+mypy = "^1.8"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
