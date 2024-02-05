@@ -58,7 +58,6 @@ markers = [
 [tool.coverage.run]
 relative_files = true
 source = ["."]
-omit = bookops_worldcat/temp.py
 
 [tool.black]
 line-length = 88
