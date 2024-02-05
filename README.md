@@ -1,8 +1,6 @@
 [![Build Status](https://github.com/BookOps-CAT/bookops-marc/actions/workflows/unit-tests.yaml/badge.svg?branch=main)](https://github.com/BookOps-CAT/bookops-worldcat/actions) [![Coverage Status](https://coveralls.io/repos/github/BookOps-CAT/bookops-worldcat/badge.svg?branch=main)](https://coveralls.io/github/BookOps-CAT/bookops-worldcat?branch=main) [![PyPI version](https://badge.fury.io/py/bookops-worldcat.svg)](https://badge.fury.io/py/bookops-worldcat) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/bookops-worldcat) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # bookops-worldcat
-**Early ALPHA version**
-
 
 BookOps-Worldcat provides a Python interface for the WorldCat Metadata API.
 This wrapper simplifies requests to OCLC web services making them ideally more accessible to OCLC member libraries.
