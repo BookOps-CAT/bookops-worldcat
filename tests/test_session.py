@@ -24,20 +24,16 @@ class TestWorldcatSession:
         )
 
     @pytest.mark.parametrize(
-        "argm,expectation",
-        [
-            (123, pytest.raises(WorldcatSessionError)),
-            ({}, pytest.raises(WorldcatSessionError)),
-            ((), pytest.raises(WorldcatSessionError)),
-        ],
+        "arg",
+        [123, {}, (), ""],
     )
-    def test_invalid_user_agent_arguments(self, argm, expectation, mock_token):
-        with expectation:
-            WorldcatSession(mock_token, agent=argm)
-            assert "Argument 'agent' must be a str" in str(expectation.value)
+    def test_invalid_user_agent_arguments(self, arg, mock_token):
+        with pytest.raises(WorldcatSessionError) as exc:
+            WorldcatSession(mock_token, agent=arg)
+        assert "Argument 'agent' must be a string." in str(exc.value)
 
     def test_default_timeout(self, mock_token):
-        with WorldcatSession(mock_token, timeout=None) as session:
+        with WorldcatSession(mock_token) as session:
             assert session.timeout == (5, 5)
 
     def test_custom_timeout(self, mock_token):

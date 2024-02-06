@@ -9,7 +9,7 @@ from typing import Optional, Tuple, Union
 
 import requests
 
-from . import __title__, __version__  # type: ignore
+from . import __title__, __version__
 from .authorize import WorldcatAccessToken
 from .errors import WorldcatSessionError, WorldcatAuthorizationError
 
@@ -21,9 +21,10 @@ class WorldcatSession(requests.Session):
         self,
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
-        timeout: Optional[
-            Union[int, float, Tuple[int, int], Tuple[float, float]]
-        ] = None,
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float]] = (
+            5,
+            5,
+        ),
     ) -> None:
         """
         Args:
@@ -44,15 +45,12 @@ class WorldcatSession(requests.Session):
 
         if agent is None:
             self.headers.update({"User-Agent": f"{__title__}/{__version__}"})
-        elif type(agent) is str:
+        elif agent and isinstance(agent, str):
             self.headers.update({"User-Agent": agent})
         else:
-            raise WorldcatSessionError("Argument 'agent' must be a str")
+            raise WorldcatSessionError("Argument 'agent' must be a string.")
 
-        if timeout is None:
-            self.timeout = (5, 5)
-        else:
-            self.timeout = timeout  # type: ignore
+        self.timeout = timeout
 
         self._update_authorization()
 
