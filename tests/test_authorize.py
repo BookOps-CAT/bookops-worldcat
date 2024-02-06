@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+from contextlib import nullcontext as does_not_raise
 import os
 
 import pytest
@@ -156,22 +157,22 @@ class TestWorldcatAccessToken:
             (
                 None,
                 pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scope' must a string or a list.",
+                "Argument 'scopes' must a string.",
             ),
             (
                 123,
                 pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scope' must a string or a list.",
+                "Argument 'scopes' must a string.",
             ),
             (
                 " ",
                 pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scope' is missing.",
+                "Argument 'scopes' is required.",
             ),
             (
                 ["", ""],
                 pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scope' is missing.",
+                "Argument 'scopes' is required.",
             ),
         ],
     )
@@ -211,7 +212,7 @@ class TestWorldcatAccessToken:
 
     @pytest.mark.parametrize(
         "argm,expectation",
-        [("scope1", "scope1"), (["scope1", "scope2"], "scope1 scope2")],
+        [("scope1 ", "scope1"), (" scope1 scope2 ", "scope1 scope2")],
     )
     def test_scope_manipulation(
         self, argm, expectation, mock_successful_post_token_response
@@ -436,5 +437,7 @@ class TestWorldcatAccessToken:
         assert sorted(params) == sorted(response.keys())
 
         # test if token looks right
-        assert token.token_str is not None
+        assert token.token_str.startswith("tk_")
         assert token.is_expired() is False
+        with does_not_raise():
+            datetime.datetime.strptime(token.token_expires_at, "%Y-%m-%d %H:%M:%SZ")
