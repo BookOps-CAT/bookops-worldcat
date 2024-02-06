@@ -134,7 +134,7 @@ def mock_credentials():
     return {
         "key": "my_WSkey",
         "secret": "my_WSsecret",
-        "scopes": ["scope1", "scope2"],
+        "scopes": "scope1 scope2",
         "principal_id": "my_principalID",
         "principal_idns": "my_principalIDNS",
     }
