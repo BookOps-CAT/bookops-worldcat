@@ -1,3 +1,0 @@
-[run]
-omit = bookops_worldcat/temp.py
-relative_files = True
