@@ -94,7 +94,7 @@ class WorldcatAccessToken:
         self.secret = secret
         self.server_response: Optional[requests.Response] = None
         self.timeout = timeout
-        self.token_expires_at = ""
+        self.token_expires_at: Optional[datetime.datetime] = None
         self.token_str = ""
         self.token_type = ""
 
@@ -146,7 +146,7 @@ class WorldcatAccessToken:
     def _auth(self) -> Tuple[str, str]:
         return (self.key, self.secret)
 
-    def _hasten_expiration_time(self, utc_stamp_str: str) -> str:
+    def _hasten_expiration_time(self, utc_stamp_str: str) -> datetime.datetime:
         """
         Resets expiration time one second earlier to account
         for any delays between expiration check and request for
@@ -161,7 +161,7 @@ class WorldcatAccessToken:
         utcstamp = datetime.datetime.strptime(
             utc_stamp_str, "%Y-%m-%d %H:%M:%SZ"
         ) - datetime.timedelta(seconds=1)
-        return datetime.datetime.strftime(utcstamp, "%Y-%m-%d %H:%M:%SZ")
+        return utcstamp
 
     def _parse_server_response(self, response: requests.Response) -> None:
         """Parses authorization server response"""
@@ -235,20 +235,16 @@ class WorldcatAccessToken:
         >>> token.is_expired()
         False
         """
-        try:
-            if (
-                datetime.datetime.strptime(self.token_expires_at, "%Y-%m-%d %H:%M:%SZ")
-                < datetime.datetime.utcnow()
-            ):
+        if isinstance(self.token_expires_at, datetime.datetime):
+            if self.token_expires_at < datetime.datetime.utcnow():
                 return True
             else:
                 return False
-        except TypeError:
-            raise
-        except ValueError:
-            raise
+        else:
+            raise TypeError
 
     def __repr__(self):
         return (
-            f"access_token: '{self.token_str}', expires_at: '{self.token_expires_at}'"
+            f"access_token: '{self.token_str}', "
+            f"expires_at: '{self.token_expires_at:%Y-%m-%d %H:%M:%SZ}'"
         )

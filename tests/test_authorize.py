@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from contextlib import nullcontext as does_not_raise
 import os
 
 import pytest
@@ -264,7 +263,9 @@ class TestWorldcatAccessToken:
     def test_hasten_expiration_time(self, mock_token):
         utc_stamp = "2020-01-01 17:19:59Z"
         token = mock_token
-        assert token._hasten_expiration_time(utc_stamp) == "2020-01-01 17:19:58Z"
+        timestamp = token._hasten_expiration_time(utc_stamp)
+        assert isinstance(timestamp, datetime.datetime)
+        assert timestamp == datetime.datetime(2020, 1, 1, 17, 19, 58, 0)
 
     def test_payload(self, mock_successful_post_token_response):
         token = WorldcatAccessToken(
@@ -347,16 +348,15 @@ class TestWorldcatAccessToken:
 
     def test_is_expired_true(self, mock_utcnow, mock_token):
         mock_token.is_expired() is False
-        mock_token.token_expires_at = datetime.datetime.strftime(
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-            "%Y-%m-%d %H:%M:%SZ",
+        mock_token.token_expires_at = datetime.datetime.utcnow() - datetime.timedelta(
+            0, 1
         )
 
         assert mock_token.is_expired() is True
 
     @pytest.mark.parametrize(
         "arg,expectation",
-        [(None, pytest.raises(TypeError)), ("20-01-01", pytest.raises(ValueError))],
+        [(None, pytest.raises(TypeError))],
     )
     def test_is_expired_exception(self, arg, expectation, mock_token):
         mock_token.token_expires_at = arg
@@ -439,5 +439,4 @@ class TestWorldcatAccessToken:
         # test if token looks right
         assert token.token_str.startswith("tk_")
         assert token.is_expired() is False
-        with does_not_raise():
-            datetime.datetime.strptime(token.token_expires_at, "%Y-%m-%d %H:%M:%SZ")
+        assert isinstance(token.token_expires_at, datetime.datetime)
