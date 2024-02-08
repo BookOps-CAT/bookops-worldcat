@@ -27,12 +27,12 @@ def live_keys():
 
 class FakeUtcNow(datetime.datetime):
     @classmethod
-    def utcnow(cls):
+    def now(cls, tzinfo=datetime.timezone.utc):
         return cls(2020, 1, 1, 17, 0, 0, 0)
 
 
 @pytest.fixture
-def mock_utcnow(monkeypatch):
+def mock_now(monkeypatch):
     monkeypatch.setattr(datetime, "datetime", FakeUtcNow)
 
 
@@ -44,7 +44,7 @@ class MockAuthServerResponseSuccess:
 
     def json(self):
         expires_at = datetime.datetime.strftime(
-            datetime.datetime.utcnow() + datetime.timedelta(0, 1199),
+            datetime.datetime.now() + datetime.timedelta(0, 1199),
             "%Y-%m-%d %H:%M:%SZ",
         )
 
@@ -141,12 +141,12 @@ def mock_credentials():
 
 
 @pytest.fixture
-def mock_oauth_server_response(mock_utcnow, *args, **kwargs):
+def mock_oauth_server_response(mock_now, *args, **kwargs):
     return MockAuthServerResponseSuccess()
 
 
 @pytest.fixture
-def mock_successful_post_token_response(mock_utcnow, monkeypatch):
+def mock_successful_post_token_response(mock_now, monkeypatch):
     def mock_oauth_server_response(*args, **kwargs):
         return MockAuthServerResponseSuccess()
 

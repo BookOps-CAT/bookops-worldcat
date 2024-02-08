@@ -45,10 +45,10 @@ def test_query_not_prepared_request(stub_session):
 
 
 @pytest.mark.http_code(200)
-def test_query_with_stale_token(stub_session, mock_utcnow, mock_session_response):
-    stub_session.authorization.token_expires_at = (
-        datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-    )
+def test_query_with_stale_token(stub_session, mock_now, mock_session_response):
+    stub_session.authorization.token_expires_at = datetime.datetime.now(
+        datetime.timezone.utc
+    ) - datetime.timedelta(0, 1)
     assert stub_session.authorization.is_expired() is True
 
     req = Request("GET", "http://foo.org")

@@ -236,7 +236,7 @@ class WorldcatAccessToken:
         False
         """
         if isinstance(self.token_expires_at, datetime.datetime):
-            if self.token_expires_at < datetime.datetime.utcnow():
+            if self.token_expires_at < datetime.datetime.now(datetime.timezone.utc):
                 return True
             else:
                 return False

@@ -334,7 +334,7 @@ class TestWorldcatAccessToken:
             )
 
     def test_is_expired_false(
-        self, mock_utcnow, mock_credentials, mock_successful_post_token_response
+        self, mock_now, mock_credentials, mock_successful_post_token_response
     ):
         creds = mock_credentials
         token = WorldcatAccessToken(
@@ -346,11 +346,11 @@ class TestWorldcatAccessToken:
         )
         assert token.is_expired() is False
 
-    def test_is_expired_true(self, mock_utcnow, mock_token):
+    def test_is_expired_true(self, mock_now, mock_token):
         mock_token.is_expired() is False
-        mock_token.token_expires_at = datetime.datetime.utcnow() - datetime.timedelta(
-            0, 1
-        )
+        mock_token.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
 
         assert mock_token.is_expired() is True
 
@@ -390,7 +390,7 @@ class TestWorldcatAccessToken:
     def test_token_repr(
         self,
         mock_token,
-        mock_utcnow,
+        mock_now,
     ):
         assert (
             str(mock_token)

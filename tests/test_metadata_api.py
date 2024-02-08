@@ -40,12 +40,12 @@ class TestMockedMetadataSession:
             MetadataSession(authorization="my_token")
         assert err_msg in str(exc.value)
 
-    def test_get_new_access_token(self, mock_token, mock_utcnow):
+    def test_get_new_access_token(self, mock_token, mock_now):
         assert mock_token.is_expired() is False
         with MetadataSession(authorization=mock_token) as session:
-            session.authorization.token_expires_at = (
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-            )
+            session.authorization.token_expires_at = datetime.datetime.now(
+                datetime.timezone.utc
+            ) - datetime.timedelta(0, 1)
             assert session.authorization.is_expired() is True
             session._get_new_access_token()
             assert session.authorization.token_expires_at == datetime.datetime(
@@ -201,11 +201,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_get_brief_bib_with_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.get_brief_bib(oclcNumber=12345)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
@@ -246,9 +246,9 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_get_full_bib_with_stale_token(self, stub_session, mock_session_response):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
 
         assert stub_session.authorization.is_expired() is True
         response = stub_session.get_full_bib(12345)
@@ -274,9 +274,9 @@ class TestMockedMetadataSession:
     def test_holding_get_status_with_stale_token(
         self, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.holding_get_status(12345)
         assert stub_session.authorization.is_expired() is False
@@ -299,9 +299,9 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(201)
     def test_holding_set_stale_token(self, stub_session, mock_session_response):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.holding_set(850940548)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
@@ -324,11 +324,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_holding_unset_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.holding_unset(850940548)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
@@ -361,11 +361,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(207)
     def test_holdings_set_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         with does_not_raise():
             assert stub_session.authorization.is_expired() is True
             stub_session.holdings_set([850940548, 850940552, 850940554])
@@ -400,11 +400,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(207)
     def test_holdings_unset_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         with does_not_raise():
             assert stub_session.authorization.is_expired() is True
             stub_session.holdings_unset([850940548, 850940552, 850940554])
@@ -436,11 +436,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_holdings_set_multi_institutions_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         with does_not_raise():
             assert stub_session.authorization.is_expired() is True
             stub_session.holdings_set_multi_institutions(
@@ -490,11 +490,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_holdings_unset_multi_institutions_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         with does_not_raise():
             assert stub_session.authorization.is_expired() is True
             stub_session.holdings_unset_multi_institutions(
@@ -513,11 +513,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_search_brief_bibs_other_editions_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_brief_bib_other_editions(12345)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
@@ -544,11 +544,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_search_brief_bibs_with_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_brief_bibs(q="ti:foo")
         assert stub_session.authorization.token_expires_at == datetime.datetime(
@@ -586,11 +586,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(207)
     def test_search_current_control_numbers_with_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_current_control_numbers(["12345", "65891"])
         assert stub_session.authorization.token_expires_at == datetime.datetime(
@@ -617,11 +617,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_search_general_holdings_with_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_general_holdings(oclcNumber=12345)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
@@ -653,11 +653,11 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_search_shared_print_holdings_with_stale_token(
-        self, mock_utcnow, stub_session, mock_session_response
+        self, mock_now, stub_session, mock_session_response
     ):
-        stub_session.authorization.token_expires_at = (
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-        )
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_shared_print_holdings(oclcNumber=12345)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
@@ -716,7 +716,7 @@ class TestLiveMetadataSession:
         token.token_str = "invalid-token"
         err_msg = "401 Client Error: Unauthorized for url: https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
         with MetadataSession(authorization=token) as session:
-            session.headers.update({"Authorization": f"Bearer invalid-token"})
+            session.headers.update({"Authorization": "Bearer invalid-token"})
             with pytest.raises(WorldcatRequestError) as exc:
                 session.get_brief_bib(41266045)
 
@@ -732,9 +732,9 @@ class TestLiveMetadataSession:
         )
         with MetadataSession(authorization=token) as session:
             session.authorization.is_expired() is False
-            session.authorization.token_expires_at = (
-                datetime.datetime.utcnow() - datetime.timedelta(0, 1)
-            )
+            session.authorization.token_expires_at = datetime.datetime.now(
+                datetime.timezone.utc
+            ) - datetime.timedelta(0, 1)
             assert session.authorization.is_expired() is True
             response = session.get_brief_bib(oclcNumber=41266045)
             assert session.authorization.is_expired() is False
