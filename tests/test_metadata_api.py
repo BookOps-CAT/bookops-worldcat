@@ -579,7 +579,7 @@ class TestMockedMetadataSession:
 
     @pytest.mark.parametrize("argm", [(None), (""), ([])])
     def test_search_current_control_numbers_missing_numbers(self, stub_session, argm):
-        err_msg = "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #."
+        err_msg = "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s."
         with pytest.raises(WorldcatSessionError) as exc:
             stub_session.search_current_control_numbers(argm)
         assert err_msg in str(exc.value)

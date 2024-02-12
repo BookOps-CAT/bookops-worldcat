@@ -11,7 +11,7 @@ from .errors import InvalidOclcNumber
 
 def _str2list(s: str) -> List[str]:
     """Converts str into list - use for list of OCLC numbers"""
-    return [n.strip() for n in s.split(",")]
+    return [n.strip() for n in s.split(",") if n.strip()]
 
 
 def prep_oclc_number_str(oclcNumber: str) -> str:
@@ -22,11 +22,12 @@ def prep_oclc_number_str(oclcNumber: str) -> str:
         oclcNumber:                OCLC record as string
 
     Returns:
-        oclcNumber as int
+        oclcNumber as str
     """
-    if "ocm" in oclcNumber or "ocn" in oclcNumber:
+
+    if oclcNumber.strip().startswith("ocm") or oclcNumber.strip().startswith("ocn"):
         oclcNumber = oclcNumber.strip()[3:]
-    elif "on" in oclcNumber:
+    elif oclcNumber.strip().startswith("on"):
         oclcNumber = oclcNumber.strip()[2:]
 
     try:
@@ -44,20 +45,20 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
         oclcNumber:                OCLC record number
 
     Returns:
-        oclcNumber
+        oclcNumber as str
 
     """
-    if oclcNumber is None:
+    if not oclcNumber:
         raise InvalidOclcNumber("Argument 'oclcNumber' is missing.")
 
-    elif type(oclcNumber) is int:
+    elif isinstance(oclcNumber, int):
         return str(oclcNumber)
 
-    elif type(oclcNumber) is str:
-        return prep_oclc_number_str(oclcNumber)  # type: ignore
+    elif isinstance(oclcNumber, str):
+        return prep_oclc_number_str(oclcNumber)
 
     else:
-        raise InvalidOclcNumber("Argument 'oclc_number' is of invalid type.")
+        raise InvalidOclcNumber("Argument 'oclcNumber' is of invalid type.")
 
 
 def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[str]:
@@ -73,18 +74,20 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[
     Returns:
         vetted_numbers:         list of vetted oclcNumbers
     """
-
-    # change to list if comma separated string
-    if type(oclcNumbers) is str and oclcNumbers != "":
-        oclcNumbers = _str2list(oclcNumbers)  # type: ignore
-
-    if not oclcNumbers or type(oclcNumbers) is not list:
+    if isinstance(oclcNumbers, str):
+        oclcNumbers_lst = _str2list(oclcNumbers)
+    elif isinstance(oclcNumbers, list):
+        oclcNumbers_lst = oclcNumbers  # type: ignore
+    else:
         raise InvalidOclcNumber(
-            "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #."
+            "Argument 'oclcNumbers' must be a list or comma separated string "
+            "of valid OCLC #s."
+        )
+    if not oclcNumbers_lst:
+        raise InvalidOclcNumber(
+            "Argument 'oclcNumbers' must be a list or comma separated string "
+            "of valid OCLC #s."
         )
 
-    try:
-        vetted_numbers = [str(verify_oclc_number(n)) for n in oclcNumbers]
-        return vetted_numbers
-    except InvalidOclcNumber:
-        raise InvalidOclcNumber("One of passed OCLC #s is invalid.")
+    vetted_numbers = [verify_oclc_number(n) for n in oclcNumbers_lst]
+    return vetted_numbers
