@@ -24,9 +24,10 @@ def prep_oclc_number_str(oclcNumber: str) -> str:
     Returns:
         oclcNumber as str
     """
-    if oclcNumber.startswith("ocm") or oclcNumber.startswith("ocn"):
+
+    if oclcNumber.strip().startswith("ocm") or oclcNumber.strip().startswith("ocn"):
         oclcNumber = oclcNumber.strip()[3:]
-    elif oclcNumber.startswith("on"):
+    elif oclcNumber.strip().startswith("on"):
         oclcNumber = oclcNumber.strip()[2:]
 
     try:
@@ -44,17 +45,17 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
         oclcNumber:                OCLC record number
 
     Returns:
-        oclcNumber
+        oclcNumber as str
 
     """
     if oclcNumber is None:
         raise InvalidOclcNumber("Argument 'oclcNumber' is missing.")
 
-    elif type(oclcNumber) is int:
+    elif isinstance(oclcNumber, int):
         return str(oclcNumber)
 
-    elif type(oclcNumber) is str:
-        return prep_oclc_number_str(oclcNumber)  # type: ignore
+    elif isinstance(oclcNumber, str):
+        return prep_oclc_number_str(oclcNumber)
 
     else:
         raise InvalidOclcNumber("Argument 'oclc_number' is of invalid type.")

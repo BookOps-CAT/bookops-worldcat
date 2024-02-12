@@ -16,7 +16,12 @@ class TestUtils:
 
     @pytest.mark.parametrize(
         "argm,expectation",
-        [("ocm00012345", "12345"), ("ocn00012346", "12346"), ("on000012347", "12347")],
+        [
+            ("ocm00012345", "12345"),
+            ("ocn00012346", "12346"),
+            ("on000012347", "12347"),
+            (" ocm00012348", "12348"),
+        ],
     )
     def test_prep_oclc_number_str(self, argm, expectation):
         assert prep_oclc_number_str(argm) == expectation
