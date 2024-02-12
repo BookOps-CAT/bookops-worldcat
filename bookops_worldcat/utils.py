@@ -22,11 +22,11 @@ def prep_oclc_number_str(oclcNumber: str) -> str:
         oclcNumber:                OCLC record as string
 
     Returns:
-        oclcNumber as int
+        oclcNumber as str
     """
-    if "ocm" in oclcNumber or "ocn" in oclcNumber:
+    if oclcNumber.startswith("ocm") or oclcNumber.startswith("ocn"):
         oclcNumber = oclcNumber.strip()[3:]
-    elif "on" in oclcNumber:
+    elif oclcNumber.startswith("on"):
         oclcNumber = oclcNumber.strip()[2:]
 
     try:
