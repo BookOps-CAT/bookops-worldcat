@@ -265,7 +265,9 @@ class TestWorldcatAccessToken:
         token = mock_token
         timestamp = token._hasten_expiration_time(utc_stamp)
         assert isinstance(timestamp, datetime.datetime)
-        assert timestamp == datetime.datetime(2020, 1, 1, 17, 19, 58, 0)
+        assert timestamp == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, 0, tzinfo=datetime.timezone.utc
+        )
 
     def test_payload(self, mock_successful_post_token_response):
         token = WorldcatAccessToken(
