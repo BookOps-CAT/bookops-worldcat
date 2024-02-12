@@ -39,6 +39,8 @@ class TestUtils:
             ("12345", ["12345"]),
             ("12345,67890", ["12345", "67890"]),
             ("12345, 67890", ["12345", "67890"]),
+            (" , ", []),
+            ("", []),
         ],
     )
     def test_str2list(self, argm, expectation):
@@ -50,34 +52,34 @@ class TestUtils:
             (
                 None,
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclc_number' is missing.",
+                "Argument 'oclcNumber' is missing.",
             ),
             (
                 [12345],
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclc_number' is of invalid type.",
+                "Argument 'oclcNumber' is of invalid type.",
             ),
             (
                 12345.5,
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclc_number' is of invalid type.",
+                "Argument 'oclcNumber' is of invalid type.",
             ),
             (
                 "bt12345",
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclc_number' does not look like real OCLC #.",
+                "Argument 'oclcNumber' does not look like real OCLC #.",
             ),
             (
                 "odn12345",
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclc_number' does not look like real OCLC #.",
+                "Argument 'oclcNumber' does not look like real OCLC #.",
             ),
         ],
     )
     def test_verify_oclc_number_exceptions(self, argm, expectation, msg):
         with expectation as exp:
             verify_oclc_number(argm)
-            assert msg == str(exp.value)
+        assert msg == str(exp.value)
 
     @pytest.mark.parametrize(
         "argm,expectation",
@@ -99,44 +101,44 @@ class TestUtils:
             (
                 None,
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #.",
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
             ),
             (
                 "",
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #.",
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
             ),
             (
                 [],
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #.",
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
             ),
             (
                 ",,",
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #.",
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
             ),
             (
                 12345.5,
                 pytest.raises(InvalidOclcNumber),
-                "One of passed OCLC #s is invalid.",
+                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
             ),
             (
                 "bt12345",
                 pytest.raises(InvalidOclcNumber),
-                "One of passed OCLC #s is invalid.",
+                "Argument 'oclcNumber' does not look like real OCLC #.",
             ),
             (
                 "odn12345",
                 pytest.raises(InvalidOclcNumber),
-                "One of passed OCLC #s is invalid.",
+                "Argument 'oclcNumber' does not look like real OCLC #.",
             ),
         ],
     )
     def test_verify_oclc_numbers_exceptions(self, argm, expectation, msg):
         with expectation as exp:
             verify_oclc_numbers(argm)
-            assert msg == str(exp.value)
+        assert msg == str(exp.value)
 
     @pytest.mark.parametrize(
         "argm,expectation",
