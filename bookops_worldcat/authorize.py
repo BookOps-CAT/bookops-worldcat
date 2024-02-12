@@ -171,6 +171,9 @@ class WorldcatAccessToken:
             self.token_expires_at = self._hasten_expiration_time(
                 response.json()["expires_at"]
             )
+            self.token_expires_at = self.token_expires_at.replace(
+                tzinfo=datetime.timezone.utc
+            )
             self.token_type = response.json()["token_type"]
         else:
             raise WorldcatAuthorizationError(response.content)

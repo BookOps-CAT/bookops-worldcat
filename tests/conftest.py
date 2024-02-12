@@ -28,7 +28,7 @@ def live_keys():
 class FakeUtcNow(datetime.datetime):
     @classmethod
     def now(cls, tzinfo=datetime.timezone.utc):
-        return cls(2020, 1, 1, 17, 0, 0, 0)
+        return cls(2020, 1, 1, 17, 0, 0, 0, tzinfo=datetime.timezone.utc)
 
 
 @pytest.fixture
