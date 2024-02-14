@@ -49,7 +49,7 @@ class TestMockedMetadataSession:
             assert session.authorization.is_expired() is True
             session._get_new_access_token()
             assert session.authorization.token_expires_at == datetime.datetime(
-                2020, 1, 1, 17, 19, 58
+                2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
             )
             assert session.authorization.is_expired() is False
 
@@ -209,7 +209,7 @@ class TestMockedMetadataSession:
         assert stub_session.authorization.is_expired() is True
         response = stub_session.get_brief_bib(oclcNumber=12345)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 200
@@ -254,7 +254,7 @@ class TestMockedMetadataSession:
         response = stub_session.get_full_bib(12345)
         assert stub_session.authorization.is_expired() is False
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert response.status_code == 200
 
@@ -281,7 +281,7 @@ class TestMockedMetadataSession:
         response = stub_session.holding_get_status(12345)
         assert stub_session.authorization.is_expired() is False
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert response.status_code == 200
 
@@ -305,7 +305,7 @@ class TestMockedMetadataSession:
         assert stub_session.authorization.is_expired() is True
         response = stub_session.holding_set(850940548)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 201
@@ -332,7 +332,7 @@ class TestMockedMetadataSession:
         assert stub_session.authorization.is_expired() is True
         response = stub_session.holding_unset(850940548)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 200
@@ -370,7 +370,7 @@ class TestMockedMetadataSession:
             assert stub_session.authorization.is_expired() is True
             stub_session.holdings_set([850940548, 850940552, 850940554])
             assert stub_session.authorization.token_expires_at == datetime.datetime(
-                2020, 1, 1, 17, 19, 58
+                2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
             )
             assert stub_session.authorization.is_expired() is False
 
@@ -409,7 +409,7 @@ class TestMockedMetadataSession:
             assert stub_session.authorization.is_expired() is True
             stub_session.holdings_unset([850940548, 850940552, 850940554])
             assert stub_session.authorization.token_expires_at == datetime.datetime(
-                2020, 1, 1, 17, 19, 58
+                2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
             )
             assert stub_session.authorization.is_expired() is False
 
@@ -447,7 +447,7 @@ class TestMockedMetadataSession:
                 oclcNumber=850940548, instSymbols="NYP,BKL"
             )
             assert stub_session.authorization.token_expires_at == datetime.datetime(
-                2020, 1, 1, 17, 19, 58
+                2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
             )
             assert stub_session.authorization.is_expired() is False
 
@@ -501,7 +501,7 @@ class TestMockedMetadataSession:
                 oclcNumber=850940548, instSymbols="NYP,BKL"
             )
             assert stub_session.authorization.token_expires_at == datetime.datetime(
-                2020, 1, 1, 17, 19, 58
+                2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
             )
             assert stub_session.authorization.is_expired() is False
 
@@ -521,7 +521,7 @@ class TestMockedMetadataSession:
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_brief_bib_other_editions(12345)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 200
@@ -552,7 +552,7 @@ class TestMockedMetadataSession:
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_brief_bibs(q="ti:foo")
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 200
@@ -594,7 +594,7 @@ class TestMockedMetadataSession:
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_current_control_numbers(["12345", "65891"])
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 207
@@ -625,7 +625,7 @@ class TestMockedMetadataSession:
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_general_holdings(oclcNumber=12345)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 200
@@ -661,7 +661,7 @@ class TestMockedMetadataSession:
         assert stub_session.authorization.is_expired() is True
         response = stub_session.search_shared_print_holdings(oclcNumber=12345)
         assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 200

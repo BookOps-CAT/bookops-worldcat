@@ -161,6 +161,7 @@ class WorldcatAccessToken:
         utcstamp = datetime.datetime.strptime(
             utc_stamp_str, "%Y-%m-%d %H:%M:%SZ"
         ) - datetime.timedelta(seconds=1)
+        utcstamp = utcstamp.replace(tzinfo=datetime.timezone.utc)
         return utcstamp
 
     def _parse_server_response(self, response: requests.Response) -> None:
