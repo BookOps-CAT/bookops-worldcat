@@ -10,10 +10,7 @@ from requests import Request, Response
 
 from ._session import WorldcatSession
 from .authorize import WorldcatAccessToken
-from .errors import (
-    WorldcatSessionError,
-    InvalidOclcNumber,
-)
+from .errors import InvalidOclcNumber
 from .query import Query
 from .utils import verify_oclc_number, verify_oclc_numbers
 
@@ -139,11 +136,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` instance
         """
-
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         header = {"Accept": "application/json"}
         url = self._url_brief_bib_oclc_number(oclcNumber)
@@ -177,10 +170,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument.")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_bib_oclc_number(oclcNumber)
         if not response_format:
@@ -228,10 +218,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber as exc:
-            raise WorldcatSessionError(exc)
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_bib_holdings_check()
         header = {"Accept": response_format}
@@ -279,11 +266,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber as exc:
-            raise WorldcatSessionError(exc)
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_bib_holdings_action()
         header = {"Accept": response_format}
@@ -344,11 +327,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber as exc:
-            raise WorldcatSessionError(exc)
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_bib_holdings_action()
         header = {"Accept": response_format}
@@ -401,11 +380,7 @@ class MetadataSession(WorldcatSession):
             list of `requests.Response` objects
         """
         responses = []
-
-        try:
-            vetted_numbers = verify_oclc_numbers(oclcNumbers)
-        except InvalidOclcNumber as exc:
-            raise WorldcatSessionError(exc)
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
 
         url = self._url_bib_holdings_batch_action()
         header = {"Accept": response_format}
@@ -466,11 +441,7 @@ class MetadataSession(WorldcatSession):
             list of `requests.Response` objects
         """
         responses = []
-
-        try:
-            vetted_numbers = verify_oclc_numbers(oclcNumbers)
-        except InvalidOclcNumber as exc:
-            raise WorldcatSessionError(exc)
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
 
         url = self._url_bib_holdings_batch_action()
         header = {"Accept": response_format}
@@ -520,10 +491,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_bib_holdings_multi_institution_batch_action()
         header = {"Accept": response_format}
@@ -572,10 +540,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_bib_holdings_multi_institution_batch_action()
         header = {"Accept": response_format}
@@ -699,10 +664,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_brief_bib_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
@@ -840,7 +802,7 @@ class MetadataSession(WorldcatSession):
 
         """
         if not q:
-            raise WorldcatSessionError("Argument 'q' is requried to construct query.")
+            raise TypeError("Argument 'q' is requried to construct query.")
 
         url = self._url_brief_bib_search()
         header = {"Accept": "application/json"}
@@ -900,10 +862,7 @@ class MetadataSession(WorldcatSession):
             `requests.Response` object
         """
 
-        try:
-            vetted_numbers = verify_oclc_numbers(oclcNumbers)
-        except InvalidOclcNumber as exc:
-            raise WorldcatSessionError(exc)
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
 
         header = {"Accept": response_format}
         url = self._url_bib_check_oclc_numbers()
@@ -973,15 +932,12 @@ class MetadataSession(WorldcatSession):
             `requests.Response` object
         """
         if not any([oclcNumber, isbn, issn]):
-            raise WorldcatSessionError(
+            raise TypeError(
                 "Missing required argument. "
                 "One of the following args are required: oclcNumber, issn, isbn"
             )
         if oclcNumber is not None:
-            try:
-                oclcNumber = verify_oclc_number(oclcNumber)
-            except InvalidOclcNumber:
-                raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+            oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_member_general_holdings()
         header = {"Accept": "application/json"}
@@ -1051,16 +1007,13 @@ class MetadataSession(WorldcatSession):
             `requests.Response` object
         """
         if not any([oclcNumber, isbn, issn]):
-            raise WorldcatSessionError(
+            raise TypeError(
                 "Missing required argument. "
                 "One of the following args are required: oclcNumber, issn, isbn"
             )
 
         if oclcNumber is not None:
-            try:
-                oclcNumber = verify_oclc_number(oclcNumber)
-            except InvalidOclcNumber:
-                raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+            oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_member_shared_print_holdings()
         header = {"Accept": "application/json"}

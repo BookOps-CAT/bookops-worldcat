@@ -9,7 +9,11 @@ import pytest
 
 
 from bookops_worldcat import MetadataSession, WorldcatAccessToken
-from bookops_worldcat.errors import WorldcatSessionError, WorldcatRequestError
+from bookops_worldcat.errors import (
+    WorldcatRequestError,
+    WorldcatAuthorizationError,
+    InvalidOclcNumber,
+)
 
 
 @contextmanager
@@ -36,7 +40,7 @@ class TestMockedMetadataSession:
 
     def test_invalid_authorizaiton(self):
         err_msg = "Argument 'authorization' must be 'WorldcatAccessToken' object."
-        with pytest.raises(WorldcatSessionError) as exc:
+        with pytest.raises(TypeError) as exc:
             MetadataSession(authorization="my_token")
         assert err_msg in str(exc.value)
 
@@ -54,7 +58,7 @@ class TestMockedMetadataSession:
             assert session.authorization.is_expired() is False
 
     def test_get_new_access_token_exceptions(self, stub_session, mock_timeout):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(WorldcatAuthorizationError):
             stub_session._get_new_access_token()
 
     @pytest.mark.parametrize(
@@ -196,7 +200,7 @@ class TestMockedMetadataSession:
             stub_session.get_brief_bib()
 
     def test_get_brief_bib_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(InvalidOclcNumber):
             stub_session.get_brief_bib(oclcNumber=None)
 
     @pytest.mark.http_code(200)
@@ -241,7 +245,7 @@ class TestMockedMetadataSession:
             stub_session.get_full_bib()
 
     def test_get_full_bib_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(InvalidOclcNumber):
             stub_session.get_full_bib(oclcNumber=None)
 
     @pytest.mark.http_code(200)
@@ -267,7 +271,7 @@ class TestMockedMetadataSession:
             stub_session.holding_get_status()
 
     def test_holding_get_status_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(InvalidOclcNumber):
             stub_session.holding_get_status(oclcNumber=None)
 
     @pytest.mark.http_code(200)
@@ -294,7 +298,7 @@ class TestMockedMetadataSession:
             stub_session.holding_set()
 
     def test_holding_set_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(InvalidOclcNumber):
             stub_session.holding_set(oclcNumber=None)
 
     @pytest.mark.http_code(201)
@@ -319,7 +323,7 @@ class TestMockedMetadataSession:
             stub_session.holding_unset()
 
     def test_holding_unset_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(InvalidOclcNumber):
             stub_session.holding_unset(oclcNumber=None)
 
     @pytest.mark.http_code(200)
@@ -340,9 +344,9 @@ class TestMockedMetadataSession:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            (None, pytest.raises(WorldcatSessionError)),
-            ([], pytest.raises(WorldcatSessionError)),
-            (["bt2111111111"], pytest.raises(WorldcatSessionError)),
+            (None, pytest.raises(InvalidOclcNumber)),
+            ([], pytest.raises(InvalidOclcNumber)),
+            (["bt2111111111"], pytest.raises(InvalidOclcNumber)),
             (["850940548"], does_not_raise()),
             (["ocn850940548"], does_not_raise()),
             ("850940548,850940552, 850940554", does_not_raise()),
@@ -377,9 +381,9 @@ class TestMockedMetadataSession:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            (None, pytest.raises(WorldcatSessionError)),
-            ([], pytest.raises(WorldcatSessionError)),
-            (["bt2111111111"], pytest.raises(WorldcatSessionError)),
+            (None, pytest.raises(InvalidOclcNumber)),
+            ([], pytest.raises(InvalidOclcNumber)),
+            (["bt2111111111"], pytest.raises(InvalidOclcNumber)),
             (["850940548"], does_not_raise()),
             (["ocn850940548"], does_not_raise()),
             ("850940548,850940552, 850940554", does_not_raise()),
@@ -429,7 +433,7 @@ class TestMockedMetadataSession:
             stub_session.holdings_set_multi_institutions(oclcNumber=123)
 
     def test_holdings_set_multi_institutions_invalid_oclc_number(self, stub_session):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(InvalidOclcNumber):
             stub_session.holdings_set_multi_institutions(
                 oclcNumber="odn1234", instSymbols="NYP,BKL"
             )
@@ -483,7 +487,7 @@ class TestMockedMetadataSession:
             stub_session.holdings_unset_multi_institutions(oclcNumber=123)
 
     def test_holdings_unset_multi_institutions_invalid_oclc_number(self, stub_session):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(InvalidOclcNumber):
             stub_session.holdings_unset_multi_institutions(
                 oclcNumber="odn1234", instSymbols="NYP,BKL"
             )
@@ -527,8 +531,8 @@ class TestMockedMetadataSession:
         assert response.status_code == 200
 
     def test_search_brief_bibs_other_editions_invalid_oclc_number(self, stub_session):
-        msg = "Invalid OCLC # was passed as an argument"
-        with pytest.raises(WorldcatSessionError) as exc:
+        msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
             stub_session.search_brief_bib_other_editions("odn12345")
         assert msg in str(exc.value)
 
@@ -538,7 +542,7 @@ class TestMockedMetadataSession:
 
     @pytest.mark.parametrize("argm", [(None), ("")])
     def test_search_brief_bibs_missing_query(self, stub_session, argm):
-        with pytest.raises(WorldcatSessionError) as exc:
+        with pytest.raises(TypeError) as exc:
             stub_session.search_brief_bibs(argm)
         assert "Argument 'q' is requried to construct query." in str(exc.value)
 
@@ -580,7 +584,7 @@ class TestMockedMetadataSession:
     @pytest.mark.parametrize("argm", [(None), (""), ([])])
     def test_search_current_control_numbers_missing_numbers(self, stub_session, argm):
         err_msg = "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s."
-        with pytest.raises(WorldcatSessionError) as exc:
+        with pytest.raises(InvalidOclcNumber) as exc:
             stub_session.search_current_control_numbers(argm)
         assert err_msg in str(exc.value)
 
@@ -605,13 +609,13 @@ class TestMockedMetadataSession:
 
     def test_search_general_holdings_missing_arguments(self, stub_session):
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
-        with pytest.raises(WorldcatSessionError) as exc:
+        with pytest.raises(TypeError) as exc:
             stub_session.search_general_holdings(holdingsAllEditions=True, limit=20)
         assert msg in str(exc.value)
 
     def test_search_general_holdings_invalid_oclc_number(self, stub_session):
-        msg = "Invalid OCLC # was passed as an argument"
-        with pytest.raises(WorldcatSessionError) as exc:
+        msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
             stub_session.search_general_holdings(oclcNumber="odn12345")
         assert msg in str(exc.value)
 
@@ -639,15 +643,15 @@ class TestMockedMetadataSession:
 
     def test_search_shared_print_holdings_missing_arguments(self, stub_session):
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
-        with pytest.raises(WorldcatSessionError) as exc:
+        with pytest.raises(TypeError) as exc:
             stub_session.search_shared_print_holdings(heldInState="NY", limit=20)
         assert msg in str(exc.value)
 
     def test_search_shared_print_holdings_with_invalid_oclc_number_passsed(
         self, stub_session
     ):
-        msg = "Invalid OCLC # was passed as an argument"
-        with pytest.raises(WorldcatSessionError) as exc:
+        msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
             stub_session.search_shared_print_holdings(oclcNumber="odn12345")
         assert msg in str(exc.value)
 

@@ -11,7 +11,7 @@ from typing import Dict, Optional, Tuple, Union
 import requests
 
 from . import __title__, __version__
-from .errors import WorldcatAuthorizationError
+from .errors import WorldcatAuthorizationError, WorldcatRequestError
 
 
 class WorldcatAccessToken:
@@ -242,7 +242,10 @@ class WorldcatAccessToken:
             else:
                 return False
         else:
-            raise TypeError
+            raise TypeError(
+                "Attribue 'WorldcatAccessToken.token_expires_at' is of invalid type. "
+                "Expected `datetime.datetime` object."
+            )
 
     def __repr__(self):
         return (
