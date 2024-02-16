@@ -38,7 +38,7 @@ def test_query_live(live_keys):
 
 
 def test_query_not_prepared_request(stub_session):
-    with pytest.raises(AttributeError) as exc:
+    with pytest.raises(TypeError) as exc:
         req = Request("GET", "https://foo.org")
         Query(stub_session, req, timeout=2)
     assert "Invalid type for argument 'prepared_request'." in str(exc.value)

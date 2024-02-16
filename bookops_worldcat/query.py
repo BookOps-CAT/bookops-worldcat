@@ -47,7 +47,7 @@ class Query:
 
         """
         if not isinstance(prepared_request, PreparedRequest):
-            raise AttributeError("Invalid type for argument 'prepared_request'.")
+            raise TypeError("Invalid type for argument 'prepared_request'.")
 
         # make sure access token is still valid and if not request a new one
         if session.authorization.is_expired():
