@@ -53,28 +53,28 @@ class Query:
         if session.authorization.is_expired():
             session._get_new_access_token()
 
-        self.response = None
+        # self.response = None
 
         try:
             self.response = session.send(prepared_request, timeout=timeout)
 
-            if "/ih/data" in prepared_request.url:
-                if self.response.status_code == 409:
-                    # HTTP 409 code returns when trying to set/unset
-                    # holdings on already set/unset record
-                    # It is reasonable not to raise any exceptions
-                    # in this case
-                    pass  # pragma: no cover
-                else:
-                    self.response.raise_for_status()
-            else:
-                self.response.raise_for_status()
+            # if "/ih/data" in prepared_request.url:
+            #     if self.response.status_code == 409:
+            #         # HTTP 409 code returns when trying to set/unset
+            #         # holdings on already set/unset record
+            #         # It is reasonable not to raise any exceptions
+            #         # in this case
+            #         pass  # pragma: no cover
+            #     else:
+            #         self.response.raise_for_status()
+            # else:
+            self.response.raise_for_status()
 
         except HTTPError as exc:
             raise WorldcatRequestError(
-                f"{exc}. Server response: {self.response.content}"
+                f"{exc}. Server response: {str(self.response.content, 'UTF-8')}"
             )
         except (Timeout, ConnectionError):
             raise WorldcatRequestError(f"Connection Error: {sys.exc_info()[0]}")
-        except:
+        except Exception:
             raise WorldcatRequestError(f"Unexpected request error: {sys.exc_info()[0]}")

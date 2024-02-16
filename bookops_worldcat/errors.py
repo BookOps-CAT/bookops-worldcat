@@ -21,7 +21,7 @@ class WorldcatAuthorizationError(BookopsWorldcatError):
 
 class WorldcatSessionError(BookopsWorldcatError):
     """
-    Exception raised during WorlCat session
+    Exception raised during WorldCat session
     """
 
     pass
