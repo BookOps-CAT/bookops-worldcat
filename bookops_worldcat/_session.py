@@ -11,7 +11,6 @@ import requests
 
 from . import __title__, __version__
 from .authorize import WorldcatAccessToken
-from .errors import WorldcatAuthorizationError
 
 
 class WorldcatSession(requests.Session):
