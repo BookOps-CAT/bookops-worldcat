@@ -11,7 +11,7 @@ from typing import Dict, Optional, Tuple, Union
 import requests
 
 from . import __title__, __version__
-from .errors import WorldcatAuthorizationError, WorldcatRequestError
+from .errors import WorldcatAuthorizationError
 
 
 class WorldcatAccessToken:
