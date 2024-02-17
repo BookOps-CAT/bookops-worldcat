@@ -99,41 +99,43 @@ class WorldcatAccessToken:
         self.token_type = ""
 
         # default bookops-worldcat request header
-        if not self.agent:
-            self.agent = f"{__title__}/{__version__}"
+        if isinstance(self.agent, str):
+            if not self.agent.strip():
+                self.agent = f"{__title__}/{__version__}"
         else:
-            if not isinstance(self.agent, str):
-                raise WorldcatAuthorizationError("Argument 'agent' must be a string.")
+            raise TypeError("Argument 'agent' must be a string.")
 
         # asure passed arguments are valid
-        if not self.key:
-            raise WorldcatAuthorizationError("Argument 'key' is required.")
+        if isinstance(self.key, str):
+            if not self.key.strip():
+                raise ValueError("Argument 'key' cannot be an empty string.")
         else:
-            if not isinstance(self.key, str):
-                raise WorldcatAuthorizationError("Argument 'key' must be a string.")
+            raise TypeError("Argument 'key' must be a string.")
 
-        if not self.secret:
-            raise WorldcatAuthorizationError("Argument 'secret' is required.")
+        if isinstance(self.secret, str):
+            if not self.secret.strip():
+                raise ValueError("Argument 'secret' cannot be an empty string.")
         else:
-            if not isinstance(self.secret, str):
-                raise WorldcatAuthorizationError("Argument 'secret' must be a string.")
+            raise TypeError("Argument 'secret' must be a string.")
 
-        if not self.principal_id:
-            raise WorldcatAuthorizationError(
-                "Argument 'principal_id' is required for read/write endpoint of "
-                "Metadata API."
-            )
-        if not self.principal_idns:
-            raise WorldcatAuthorizationError(
-                "Argument 'principal_idns' is required for read/write endpoint of "
-                "Metadata API."
-            )
+        if isinstance(self.principal_id, str):
+            if not self.principal_id.strip():
+                raise ValueError("Argument 'principal_id' cannot be an empty string.")
+        else:
+            raise TypeError("Argument 'principal_id' must be a string.")
+
+        if isinstance(self.principal_idns, str):
+            if not self.principal_idns.strip():
+                raise ValueError("Argument 'principal_idns' cannot be an empty string.")
+        else:
+            raise TypeError("Argument 'principal_idns' must be a string.")
 
         # validate passed scopes
-        if not self.scopes:
-            raise WorldcatAuthorizationError("Argument 'scopes' is required.")
-        elif not isinstance(self.scopes, str):
-            raise WorldcatAuthorizationError("Argument 'scopes' must a string.")
+        if isinstance(self.scopes, str):
+            if not self.scopes.strip():
+                raise ValueError("Argument 'scopes' cannot be an empty string.")
+        else:
+            raise TypeError("Argument 'scopes' must a string.")
         self.scopes = self.scopes.strip()
 
         # assign default value for timout
