@@ -232,7 +232,7 @@ class TestMockedMetadataSession:
             stub_session.get_brief_bib(12345)
 
         assert (
-            "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: b'spam'"
+            "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: spam"
             in (str(exc.value))
         )
 
@@ -465,7 +465,7 @@ class TestMockedMetadataSession:
             )
 
         assert (
-            "403 Client Error: 'foo' for url: https://foo.bar?query. Server response: b'spam'"
+            "403 Client Error: 'foo' for url: https://foo.bar?query. Server response: spam"
             in str(exc.value)
         )
 
