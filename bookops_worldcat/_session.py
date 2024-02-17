@@ -20,7 +20,7 @@ class WorldcatSession(requests.Session):
         self,
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float]] = (
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
             5,
             5,
         ),
