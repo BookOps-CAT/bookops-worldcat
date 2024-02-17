@@ -72,7 +72,7 @@ class Query:
 
         except HTTPError as exc:
             raise WorldcatRequestError(
-                f"{exc}. Server response: {self.response.content}"
+                f"{exc}. Server response: {self.response.content.decode('utf-8')}"
             )
         except (Timeout, ConnectionError):
             raise WorldcatRequestError(f"Connection Error: {sys.exc_info()[0]}")
