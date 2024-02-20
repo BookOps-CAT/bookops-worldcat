@@ -38,7 +38,7 @@ def test_query_live(live_keys):
 
 
 def test_query_not_prepared_request(stub_session):
-    with pytest.raises(AttributeError) as exc:
+    with pytest.raises(TypeError) as exc:
         req = Request("GET", "https://foo.org")
         Query(stub_session, req, timeout=2)
     assert "Invalid type for argument 'prepared_request'." in str(exc.value)
@@ -106,7 +106,10 @@ def test_query_http_404_response(stub_session, mock_session_response):
     with pytest.raises(WorldcatRequestError) as exc:
         Query(stub_session, prepped)
 
-    assert "404 Client Error: 'foo' for url: https://foo.bar?query" in str(exc.value)
+    assert (
+        "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: spam"
+        in str(exc.value)
+    )
 
 
 @pytest.mark.http_code(500)
@@ -116,7 +119,10 @@ def test_query_http_500_response(stub_session, mock_session_response):
     with pytest.raises(WorldcatRequestError) as exc:
         Query(stub_session, prepped)
 
-    assert "500 Server Error: 'foo' for url: https://foo.bar?query" in str(exc.value)
+    assert (
+        "500 Server Error: 'foo' for url: https://foo.bar?query. Server response: spam"
+        in str(exc.value)
+    )
 
 
 def test_query_timeout_exception(stub_session, mock_timeout):

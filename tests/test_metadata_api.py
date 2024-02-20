@@ -9,7 +9,11 @@ import pytest
 
 
 from bookops_worldcat import MetadataSession, WorldcatAccessToken
-from bookops_worldcat.errors import WorldcatSessionError, WorldcatRequestError
+from bookops_worldcat.errors import (
+    WorldcatRequestError,
+    WorldcatAuthorizationError,
+    InvalidOclcNumber,
+)
 
 
 @contextmanager
@@ -36,7 +40,7 @@ class TestMockedMetadataSession:
 
     def test_invalid_authorizaiton(self):
         err_msg = "Argument 'authorization' must be 'WorldcatAccessToken' object."
-        with pytest.raises(WorldcatSessionError) as exc:
+        with pytest.raises(TypeError) as exc:
             MetadataSession(authorization="my_token")
         assert err_msg in str(exc.value)
 
@@ -54,7 +58,7 @@ class TestMockedMetadataSession:
             assert session.authorization.is_expired() is False
 
     def test_get_new_access_token_exceptions(self, stub_session, mock_timeout):
-        with pytest.raises(WorldcatSessionError):
+        with pytest.raises(WorldcatAuthorizationError):
             stub_session._get_new_access_token()
 
     @pytest.mark.parametrize(
@@ -293,6 +297,176 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/search/my-local-bib-data"
         )
 
+    # from here
+    @pytest.mark.http_code(200)
+    def test_get_brief_bib(self, stub_session, mock_session_response):
+        assert stub_session.get_brief_bib(12345).status_code == 200
+
+    def test_get_brief_bib_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.get_brief_bib()
+
+    def test_get_brief_bib_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.get_brief_bib(oclcNumber=None)
+
+    @pytest.mark.http_code(200)
+    def test_get_brief_bib_with_stale_token(
+        self, mock_now, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.get_brief_bib(oclcNumber=12345)
+        assert stub_session.authorization.token_expires_at == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
+        )
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
+
+    @pytest.mark.http_code(206)
+    def test_get_brief_bib_odd_206_http_code(self, stub_session, mock_session_response):
+        with does_not_raise():
+            response = stub_session.get_brief_bib(12345)
+        assert response.status_code == 206
+
+    @pytest.mark.http_code(404)
+    def test_get_brief_bib_404_error_response(
+        self, stub_session, mock_session_response
+    ):
+        with pytest.raises(WorldcatRequestError) as exc:
+            stub_session.get_brief_bib(12345)
+
+        assert (
+            "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: spam"
+            in (str(exc.value))
+        )
+
+    @pytest.mark.http_code(200)
+    def test_get_full_bib(self, stub_session, mock_session_response):
+        assert stub_session.get_full_bib(12345).status_code == 200
+
+    def test_get_full_bib_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.get_full_bib()
+
+    def test_get_full_bib_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.get_full_bib(oclcNumber=None)
+
+    @pytest.mark.http_code(200)
+    def test_get_full_bib_with_stale_token(self, stub_session, mock_session_response):
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
+
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.get_full_bib(12345)
+        assert stub_session.authorization.is_expired() is False
+        assert stub_session.authorization.token_expires_at == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
+        )
+        assert response.status_code == 200
+
+    @pytest.mark.http_code(201)
+    def test_holding_set(self, stub_session, mock_session_response):
+        assert stub_session.holding_set(850940548).status_code == 201
+
+    def test_holding_set_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holding_set()
+
+    def test_holding_set_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.holding_set(oclcNumber=None)
+
+    @pytest.mark.http_code(201)
+    def test_holding_set_stale_token(self, stub_session, mock_session_response):
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.holding_set(850940548)
+        assert stub_session.authorization.token_expires_at == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
+        )
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 201
+
+    @pytest.mark.http_code(200)
+    def test_holding_unset(self, stub_session, mock_session_response):
+        assert stub_session.holding_unset(850940548).status_code == 200
+
+    def test_holding_unset_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holding_unset()
+
+    def test_holding_unset_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.holding_unset(oclcNumber=None)
+
+    @pytest.mark.http_code(200)
+    def test_holding_unset_stale_token(
+        self, mock_now, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.holding_unset(850940548)
+        assert stub_session.authorization.token_expires_at == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
+        )
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_search_brief_bibs_other_editions(
+        self, stub_session, mock_session_response
+    ):
+        assert stub_session.search_brief_bib_other_editions(12345).status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_search_brief_bibs_other_editions_stale_token(
+        self, mock_now, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_brief_bib_other_editions(12345)
+        assert stub_session.authorization.token_expires_at == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
+        )
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_seach_brief_bibs(self, stub_session, mock_session_response):
+        assert stub_session.search_brief_bibs(q="ti:Zendegi").status_code == 200
+
+    @pytest.mark.parametrize("argm", [(None), ("")])
+    def test_search_brief_bibs_missing_query(self, stub_session, argm):
+        with pytest.raises(TypeError) as exc:
+            stub_session.search_brief_bibs(argm)
+        assert "Argument 'q' is requried to construct query." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_search_brief_bibs_with_stale_token(
+        self, mock_now, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_brief_bibs(q="ti:foo")
+        assert stub_session.authorization.token_expires_at == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
+        )
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
+
     @pytest.mark.http_code(207)
     def test_search_current_control_numbers(self, stub_session, mock_session_response):
         assert (
@@ -316,7 +490,7 @@ class TestMockedMetadataSession:
     @pytest.mark.parametrize("argm", [(None), (""), ([])])
     def test_search_current_control_numbers_missing_numbers(self, stub_session, argm):
         err_msg = "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s."
-        with pytest.raises(WorldcatSessionError) as exc:
+        with pytest.raises(InvalidOclcNumber) as exc:
             stub_session.search_current_control_numbers(argm)
         assert err_msg in str(exc.value)
 
@@ -334,6 +508,53 @@ class TestMockedMetadataSession:
         )
         assert stub_session.authorization.is_expired() is False
         assert response.status_code == 207
+
+    @pytest.mark.http_code(200)
+    def test_search_general_holdings(self, stub_session, mock_session_response):
+        assert stub_session.search_general_holdings(oclcNumber=12345).status_code == 200
+
+    def test_search_general_holdings_missing_arguments(self, stub_session):
+        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
+        with pytest.raises(TypeError) as exc:
+            stub_session.search_general_holdings(holdingsAllEditions=True)
+        assert msg in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_search_general_holdings_with_stale_token(
+        self, mock_now, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_general_holdings(oclcNumber=12345)
+        assert stub_session.authorization.token_expires_at == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
+        )
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_search_shared_print_holdings(self, stub_session, mock_session_response):
+        assert (
+            stub_session.search_shared_print_holdings(oclcNumber=12345).status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_search_shared_print_holdings_with_stale_token(
+        self, mock_now, stub_session, mock_session_response
+    ):
+        stub_session.authorization.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
+        assert stub_session.authorization.is_expired() is True
+        response = stub_session.search_shared_print_holdings(oclcNumber=12345)
+        assert stub_session.authorization.token_expires_at == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
+        )
+        assert stub_session.authorization.is_expired() is False
+        assert response.status_code == 200
 
 
 @pytest.mark.webtest

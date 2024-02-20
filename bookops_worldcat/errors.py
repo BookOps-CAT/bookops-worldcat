@@ -19,15 +19,7 @@ class WorldcatAuthorizationError(BookopsWorldcatError):
     pass
 
 
-class WorldcatSessionError(BookopsWorldcatError):
-    """
-    Exception raised during WorldCat session
-    """
-
-    pass
-
-
-class WorldcatRequestError(WorldcatSessionError):
+class WorldcatRequestError(BookopsWorldcatError):
     """
     Exceptions raised on HTTP errors returned by web service
     """

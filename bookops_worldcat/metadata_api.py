@@ -4,16 +4,12 @@
 This module provides MetadataSession class for requests to WorldCat Metadata API.
 """
 
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, Iterator, List, Optional, Tuple, Union
 
 from requests import Request, Response
 
 from ._session import WorldcatSession
 from .authorize import WorldcatAccessToken
-from .errors import (
-    WorldcatSessionError,
-    InvalidOclcNumber,
-)
 from .query import Query
 from .utils import verify_oclc_number, verify_oclc_numbers
 
@@ -25,10 +21,7 @@ class MetadataSession(WorldcatSession):
         self,
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float]] = (
-            5,
-            5,
-        ),
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = None,
     ) -> None:
         """
         Args:
@@ -42,7 +35,7 @@ class MetadataSession(WorldcatSession):
 
     def _split_into_legal_volume(
         self, oclc_numbers: List[str] = [], n: int = 50
-    ) -> List[str]:
+    ) -> Iterator[str]:
         """
         OCLC requries that no more than 50 numbers are passed for batch processing
 
@@ -55,7 +48,7 @@ class MetadataSession(WorldcatSession):
         """
 
         for i in range(0, len(oclc_numbers), n):
-            yield ",".join(oclc_numbers[i : i + n])
+            yield ",".join(oclc_numbers[i : i + n])  # noqa: E203
 
     def _url_base(self) -> str:
         return "https://metadata.api.oclc.org/worldcat"
@@ -206,9 +199,7 @@ class MetadataSession(WorldcatSession):
             "validateAdd",
             "validateReplace",
         ]:
-            raise WorldcatSessionError(
-                "Invalid validationLevel was passed as an argument"
-            )
+            raise TypeError("Invalid validationLevel was passed as an argument")
 
         # defaults to validateFull if validationLevel is not provided
         if not validationLevel:
@@ -234,7 +225,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumbers: Union[str, List[Union[str, int]]],
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Retrieve current OCLC control numbers
         Uses /manage/bibs/current endpoint.
@@ -251,10 +242,7 @@ class MetadataSession(WorldcatSession):
             `requests.Response` instance
         """
 
-        try:
-            vetted_numbers = verify_oclc_numbers(oclcNumbers)
-        except InvalidOclcNumber as exc:
-            raise WorldcatSessionError(exc)
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
 
         url = self._url_manage_bib_current_oclc_number()
         header = {"Accept": "application/json"}
@@ -274,7 +262,7 @@ class MetadataSession(WorldcatSession):
         record: str,
         recordFormat: str,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Create a bib record in OCLC if it does not already exist
         Uses /manage/bibs/ endpoint.
@@ -294,7 +282,7 @@ class MetadataSession(WorldcatSession):
             "application/marc",
             "application/marcxml+xml",
         ]:
-            raise WorldcatSessionError("Invalid recordFormat was passed as an argument")
+            raise TypeError("Invalid recordFormat was passed as an argument")
 
         url = self._url_manage_bib_create()
         header = {"Accept": "application/json", "content-type": recordFormat}
@@ -313,7 +301,7 @@ class MetadataSession(WorldcatSession):
         oclcNumber: Union[int, str],
         responseFormat: Optional[str] = None,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Given an OCLC number, retrieve the bib record
         Uses /manage/bibs/{oclcNumber} endpoint.
@@ -330,10 +318,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` instance
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument.")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         # defaults to marcxml if responseFormat is not provided
         if not responseFormat:
@@ -357,7 +342,7 @@ class MetadataSession(WorldcatSession):
         record: str,
         recordFormat: str,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Given an OCLC number, replace the bib record
         If the bib record does not exist, then a new bib record will be created
@@ -375,16 +360,13 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` instance
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument.")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         if recordFormat and recordFormat not in [
             "application/marc",
             "application/marcxml+xml",
         ]:
-            raise WorldcatSessionError("Invalid recordFormat was passed as an argument")
+            raise TypeError("Invalid recordFormat was passed as an argument")
 
         url = self._url_manage_bib(oclcNumber)
         header = {"Accept": "application/json", "content-type": recordFormat}
@@ -403,7 +385,7 @@ class MetadataSession(WorldcatSession):
         record: str,
         recordFormat: str,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Given a bib record in MARC21 or MARCXML identify the best match
         Uses /manage/bibs/match endpoint.
@@ -425,7 +407,7 @@ class MetadataSession(WorldcatSession):
             "application/marc",
             "application/marcxml+xml",
         ]:
-            raise WorldcatSessionError("Invalid recordFormat was passed as an argument")
+            raise TypeError("Invalid recordFormat was passed as an argument")
 
         url = self._url_manage_bib_match()
         header = {"Accept": "application/json", "content-type": recordFormat}
@@ -445,7 +427,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumbers: Union[str, List[Union[str, int]]],
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Retrieves Worldcat holdings status of records with provided OCLC number(s).
         The service automatically recognizes institution based on the issued access
@@ -463,10 +445,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            vetted_numbers = verify_oclc_numbers(oclcNumbers)
-        except InvalidOclcNumber as exc:
-            raise WorldcatSessionError(exc)
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
 
         url = self._url_manage_ih_current()
         header = {"Accept": "application/json"}
@@ -486,7 +465,7 @@ class MetadataSession(WorldcatSession):
         record: str,
         recordFormat: str,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Set holdings on a bib record
         Uses /manage/institution/holdings/set/ endpoint.
@@ -505,7 +484,7 @@ class MetadataSession(WorldcatSession):
             "application/marc",
             "application/marcxml+xml",
         ]:
-            raise WorldcatSessionError("Invalid recordFormat was passed as an argument")
+            raise TypeError("Invalid recordFormat was passed as an argument")
 
         url = self._url_manage_ih_set()
         header = {"Accept": "application/json", "content-type": recordFormat}
@@ -524,7 +503,7 @@ class MetadataSession(WorldcatSession):
         record: str,
         recordFormat: str,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Unset holdings on a bib record
         Uses /manage/institution/holdings/unset/ endpoint.
@@ -543,7 +522,7 @@ class MetadataSession(WorldcatSession):
             "application/marc",
             "application/marcxml+xml",
         ]:
-            raise WorldcatSessionError("Invalid recordFormat was passed as an argument")
+            raise TypeError("Invalid recordFormat was passed as an argument")
 
         url = self._url_manage_ih_unset()
         header = {"Accept": "application/json", "content-type": recordFormat}
@@ -561,7 +540,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumber: Union[int, str],
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Given an OCLC Number, set holdings on a bib record
         Uses /manage/institution/holdings/{oclcNumber}/set/ endpoint.
@@ -575,10 +554,8 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument.")
+
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_manage_ih_oclc_number_set(oclcNumber)
         header = {"Accept": "application/json"}
@@ -596,7 +573,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumber: Union[int, str],
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Given an OCLC Number, unset holdings on a bib record
         Uses /manage/institution/holdings/{oclcNumber}/unset/ endpoint.
@@ -610,10 +587,8 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument.")
+
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_manage_ih_oclc_number_unset(oclcNumber)
         header = {"Accept": "application/json"}
@@ -630,7 +605,7 @@ class MetadataSession(WorldcatSession):
     def get_holding_codes(
         self,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Retrieve the all holding codes for the authenticated institution.
         Uses /manage/institution/holding-codes/ endpoint.
@@ -642,7 +617,6 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-
         url = self._url_manage_ih_codes()
         header = {"Accept": "application/json"}
 
@@ -685,7 +659,7 @@ class MetadataSession(WorldcatSession):
         itemType: Optional[List[str]] = None,
         itemSubType: Optional[List[str]] = None,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Finds member shared print holdings for specified item.
         Uses /search/bibs-retained-holdings endpoint.
@@ -710,16 +684,13 @@ class MetadataSession(WorldcatSession):
             `requests.Response` object
         """
         if not any([oclcNumber, isbn, issn]):
-            raise WorldcatSessionError(
+            raise TypeError(
                 "Missing required argument. "
                 "One of the following args are required: oclcNumber, issn, isbn"
             )
 
         if oclcNumber is not None:
-            try:
-                oclcNumber = verify_oclc_number(oclcNumber)
-            except InvalidOclcNumber:
-                raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+            oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_search_shared_print_holdings()
         header = {"Accept": "application/json"}
@@ -763,7 +734,7 @@ class MetadataSession(WorldcatSession):
         distance: Optional[int] = None,
         unit: Optional[str] = None,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Given a known item get summary of holdings and brief bib record
         Uses /search/bibs-summary-holdings endpoint.
@@ -807,15 +778,13 @@ class MetadataSession(WorldcatSession):
             `requests.Response` object
         """
         if not any([oclcNumber, isbn, issn]):
-            raise WorldcatSessionError(
+            raise TypeError(
                 "Missing required argument. "
                 "One of the following args are required: oclcNumber, issn, isbn"
             )
+
         if oclcNumber is not None:
-            try:
-                oclcNumber = verify_oclc_number(oclcNumber)
-            except InvalidOclcNumber:
-                raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+            oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_search_general_holdings()
         header = {"Accept": "application/json"}
@@ -866,7 +835,7 @@ class MetadataSession(WorldcatSession):
         distance: Optional[int] = None,
         unit: Optional[str] = None,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Given an OCLC number get summary of holdings
         Uses /search/summary-holdings/ endpoint.
@@ -906,10 +875,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_search_general_holdings_summary()
         header = {"Accept": "application/json"}
@@ -977,7 +943,7 @@ class MetadataSession(WorldcatSession):
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Search for brief bibliographic resources.
         Uses /search/brief-bibs endpoint.
@@ -1079,7 +1045,7 @@ class MetadataSession(WorldcatSession):
 
         """
         if not q:
-            raise WorldcatSessionError("Argument 'q' is requried to construct query.")
+            raise TypeError("Argument 'q' is requried to construct query.")
 
         url = self._url_search_brief_bibs()
         header = {"Accept": "application/json"}
@@ -1130,7 +1096,7 @@ class MetadataSession(WorldcatSession):
 
     def get_brief_bib(
         self, oclcNumber: Union[int, str], hooks: Optional[Dict[str, Callable]] = None
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Retrieve specific brief bibliographic resource.
         Uses /search/brief-bibs/{oclcNumber} endpoint.
@@ -1146,10 +1112,7 @@ class MetadataSession(WorldcatSession):
             `requests.Response` instance
         """
 
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_search_brief_bibs_oclc_number(oclcNumber)
         header = {"Accept": "application/json"}
@@ -1194,7 +1157,7 @@ class MetadataSession(WorldcatSession):
         limit: Optional[int] = None,
         orderBy: Optional[str] = None,
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Retrieve other editions related to bibliographic resource with provided
         OCLC number.
@@ -1281,10 +1244,7 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_search_brief_bibs_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
@@ -1331,7 +1291,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumber: Union[int, str],
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
+    ) -> Optional[Response]:
         """
         Retrieve classification recommendations for an OCLC number.
         Uses /search/classification-bibs/{oclcNumber}/other-editions endpoint.
@@ -1345,10 +1305,8 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        try:
-            oclcNumber = verify_oclc_number(oclcNumber)
-        except InvalidOclcNumber:
-            raise WorldcatSessionError("Invalid OCLC # was passed as an argument")
+
+        oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_search_classification_bibs(oclcNumber)
         header = {"Accept": "application/json"}
