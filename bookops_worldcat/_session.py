@@ -11,7 +11,6 @@ import requests
 
 from . import __title__, __version__
 from .authorize import WorldcatAccessToken
-from .errors import WorldcatSessionError, WorldcatAuthorizationError
 
 
 class WorldcatSession(requests.Session):
@@ -21,7 +20,7 @@ class WorldcatSession(requests.Session):
         self,
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float]] = (
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
             5,
             5,
         ),
@@ -39,7 +38,7 @@ class WorldcatSession(requests.Session):
         self.authorization = authorization
 
         if not isinstance(self.authorization, WorldcatAccessToken):
-            raise WorldcatSessionError(
+            raise TypeError(
                 "Argument 'authorization' must be 'WorldcatAccessToken' object."
             )
 
@@ -48,7 +47,7 @@ class WorldcatSession(requests.Session):
         elif agent and isinstance(agent, str):
             self.headers.update({"User-Agent": agent})
         else:
-            raise WorldcatSessionError("Argument 'agent' must be a string.")
+            raise ValueError("Argument 'agent' must be a string.")
 
         self.timeout = timeout
 
@@ -59,11 +58,8 @@ class WorldcatSession(requests.Session):
         Allows to continue sending request with new access token after
         the previous one expired
         """
-        try:
-            self.authorization._request_token()
-            self._update_authorization()
-        except WorldcatAuthorizationError as exc:
-            raise WorldcatSessionError(exc)
+        self.authorization._request_token()
+        self._update_authorization()
 
     def _update_authorization(self) -> None:
         self.headers.update({"Authorization": f"Bearer {self.authorization.token_str}"})

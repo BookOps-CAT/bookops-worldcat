@@ -5,7 +5,6 @@ import pytest
 
 from bookops_worldcat._session import WorldcatSession
 from bookops_worldcat.__version__ import __title__, __version__
-from bookops_worldcat.errors import WorldcatSessionError
 
 
 class TestWorldcatSession:
@@ -28,7 +27,7 @@ class TestWorldcatSession:
         [123, {}, (), ""],
     )
     def test_invalid_user_agent_arguments(self, arg, mock_token):
-        with pytest.raises(WorldcatSessionError) as exc:
+        with pytest.raises(ValueError) as exc:
             WorldcatSession(mock_token, agent=arg)
         assert "Argument 'agent' must be a string." in str(exc.value)
 

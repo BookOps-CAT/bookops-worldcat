@@ -47,7 +47,7 @@ class Query:
 
         """
         if not isinstance(prepared_request, PreparedRequest):
-            raise AttributeError("Invalid type for argument 'prepared_request'.")
+            raise TypeError("Invalid type for argument 'prepared_request'.")
 
         # make sure access token is still valid and if not request a new one
         if session.authorization.is_expired():
@@ -58,7 +58,7 @@ class Query:
         try:
             self.response = session.send(prepared_request, timeout=timeout)
 
-            if "/ih/data" in prepared_request.url:
+            if "/ih/data" in prepared_request.url:  # type: ignore
                 if self.response.status_code == 409:
                     # HTTP 409 code returns when trying to set/unset
                     # holdings on already set/unset record
@@ -72,7 +72,8 @@ class Query:
 
         except HTTPError as exc:
             raise WorldcatRequestError(
-                f"{exc}. Server response: {self.response.content}"
+                f"{exc}. Server response: "  # type: ignore
+                f"{self.response.content.decode('utf-8')}"
             )
         except (Timeout, ConnectionError):
             raise WorldcatRequestError(f"Connection Error: {sys.exc_info()[0]}")

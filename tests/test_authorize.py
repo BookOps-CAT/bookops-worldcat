@@ -19,17 +19,17 @@ class TestWorldcatAccessToken:
         [
             (
                 None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'key' is required.",
+                pytest.raises(TypeError),
+                "Argument 'key' must be a string.",
             ),
             (
                 "",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'key' is required.",
+                pytest.raises(ValueError),
+                "Argument 'key' cannot be an empty string.",
             ),
             (
                 124,
-                pytest.raises(WorldcatAuthorizationError),
+                pytest.raises(TypeError),
                 "Argument 'key' must be a string.",
             ),
         ],
@@ -43,24 +43,24 @@ class TestWorldcatAccessToken:
                 principal_id="my_principalID",
                 principal_idns="my_principalIDNS",
             )
-            assert msg in str(exp.value)
+        assert msg in str(exp.value)
 
     @pytest.mark.parametrize(
         "argm,expectation,msg",
         [
             (
                 None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'secret' is required.",
+                pytest.raises(TypeError),
+                "Argument 'secret' must be a string.",
             ),
             (
                 "",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'secret' is required.",
+                pytest.raises(ValueError),
+                "Argument 'secret' cannot be an empty string.",
             ),
             (
                 123,
-                pytest.raises(WorldcatAuthorizationError),
+                pytest.raises(TypeError),
                 "Argument 'secret' must be a string.",
             ),
         ],
@@ -74,10 +74,10 @@ class TestWorldcatAccessToken:
                 principal_id="my_principalID",
                 principal_idns="my_principalIDNS",
             )
-            assert msg in str(exp.value)
+        assert msg in str(exp.value)
 
     def test_agent_exceptions(self):
-        with pytest.raises(WorldcatAuthorizationError) as exp:
+        with pytest.raises(TypeError) as exp:
             WorldcatAccessToken(
                 key="my_key",
                 secret="my_secret",
@@ -86,7 +86,7 @@ class TestWorldcatAccessToken:
                 principal_idns="my_principalIDNS",
                 agent=124,
             )
-            assert "Argument 'agent' must be a string." in str(exp.value)
+        assert "Argument 'agent' must be a string." in str(exp.value)
 
     def test_agent_default_values(self, mock_successful_post_token_response):
         token = WorldcatAccessToken(
@@ -103,13 +103,13 @@ class TestWorldcatAccessToken:
         [
             (
                 None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'principal_id' is required for read/write endpoint of Metadata API.",
+                pytest.raises(TypeError),
+                "Argument 'principal_id' must be a string.",
             ),
             (
                 "",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'principal_id' is required for read/write endpoint of Metadata API.",
+                pytest.raises(ValueError),
+                "Argument 'principal_id' cannot be an empty string.",
             ),
         ],
     )
@@ -122,20 +122,20 @@ class TestWorldcatAccessToken:
                 principal_id=arg,
                 principal_idns="my_principalIDNS",
             )
-            assert msg in str(exc.value)
+        assert msg in str(exc.value)
 
     @pytest.mark.parametrize(
         "arg,expectation,msg",
         [
             (
                 None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'principal_idns' is required for read/write endpoint of Metadata API.",
+                pytest.raises(TypeError),
+                "Argument 'principal_idns' must be a string.",
             ),
             (
                 "",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'principal_idns' is required for read/write endpoint of Metadata API.",
+                pytest.raises(ValueError),
+                "Argument 'principal_idns' cannot be an empty string.",
             ),
         ],
     )
@@ -148,29 +148,29 @@ class TestWorldcatAccessToken:
                 principal_id="my_principalID",
                 principal_idns=arg,
             )
-            assert msg in str(exc.value)
+        assert msg in str(exc.value)
 
     @pytest.mark.parametrize(
         "argm,expectation,msg",
         [
             (
                 None,
-                pytest.raises(WorldcatAuthorizationError),
+                pytest.raises(TypeError),
                 "Argument 'scopes' must a string.",
             ),
             (
                 123,
-                pytest.raises(WorldcatAuthorizationError),
+                pytest.raises(TypeError),
                 "Argument 'scopes' must a string.",
             ),
             (
                 " ",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scopes' is required.",
+                pytest.raises(ValueError),
+                "Argument 'scopes' cannot be an empty string.",
             ),
             (
                 ["", ""],
-                pytest.raises(WorldcatAuthorizationError),
+                pytest.raises(TypeError),
                 "Argument 'scopes' is required.",
             ),
         ],
