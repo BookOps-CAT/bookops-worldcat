@@ -165,89 +165,69 @@ class MetadataSession(WorldcatSession):
         base_url = self._url_base()
         return f"{base_url}/search/my-local-bib-data"
 
-    # Manage Bibliographic Resources
-
-    def validate_bib(
+    def browse_my_holdings(
         self,
-        validationLevel: Optional[str],
-        record: str,
-        recordFormat: Optional[str],
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Response:
-        """
-        Given a bib record, validate that record conforms to MARC standards
-        Uses /manage/bibs/validate/{validationLevel} endpoint.
-
-        Args:
-            validationLevel:        Level at which to validate records
-                                    available values: validateFull, validateAdd,
-                                    validateReplace
-                                    default is validateFull
-            record:                 MARC record to be validated
-            recordFormat:           format for MARC record, options:
-                                    "application/marc", "application/marcxml+xml"
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` instance
-        """
-
-        # check if validationLevel arg is valid
-        if validationLevel and validationLevel not in [
-            "validateFull",
-            "validateAdd",
-            "validateReplace",
-        ]:
-            raise TypeError("Invalid validationLevel was passed as an argument")
-
-        # defaults to validateFull if validationLevel is not provided
-        if not validationLevel:
-            validationLevel = "validateFull"
-
-        # defaults to marcxml if recordFormat is not provided
-        if not recordFormat:
-            recordFormat = "application/marcxml+xml"
-
-        url = self._url_manage_bib_validate(validationLevel)
-        header = {"Accept": "application/json", "content-type": recordFormat}
-
-        # prep request
-        req = Request("POST", url, data=record, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def search_current_control_numbers(
-        self,
-        oclcNumbers: Union[str, List[Union[str, int]]],
+        callNumber: Optional[str] = None,
+        oclcNumber: Optional[str] = None,
+        holdingLocation: str = "",
+        shelvingLocation: str = "",
+        browsePosition: Optional[int] = 0,
+        limit: Optional[int] = 10,
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
-        Retrieve current OCLC control numbers
-        Uses /manage/bibs/current endpoint.
+        Browse local holdings records
+        Uses /browse/my-holdings endpoint.
 
         Args:
-            oclcNumbers:            list of OCLC control numbers to be checked;
-                                    they can be integers or strings with or
-                                    without OCLC # prefix;
-                                    if str the numbers must be separated by comma
+            callNumber:             Item call number
+            oclcNumber:             OCLC Number for the bib record
+            holdingLocation:        holding location of item
+            shelvingLocation:       shelving location of item
+            browsePosition:         The position in the browse list where the matching
+                                    record should be. Default is 0
+            limit:                  Maximum number of records to return. Maximum limit
+                                    is 50, default is 10
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` instance
         """
+        if not holdingLocation and shelvingLocation:
+            raise TypeError(
+                "Missing required argument. "
+                "The following args are required: holdingLocation, shelvingLocation"
+            )
+        if isinstance(holdingLocation, str):
+            if not holdingLocation.strip():
+                raise ValueError(
+                    "Argument 'holdingLocation' cannot be an empty string."
+                )
+        elif not isinstance(holdingLocation, str):
+            raise TypeError("Argument 'holdingLocation' must be a string.")
+        if isinstance(shelvingLocation, str):
+            if not shelvingLocation.strip():
+                raise ValueError(
+                    "Argument 'shelvingLocation' cannot be an empty string."
+                )
+        elif not isinstance(shelvingLocation, str):
+            raise TypeError("Argument 'shelvingLocation' must be a string.")
 
-        vetted_numbers = verify_oclc_numbers(oclcNumbers)
+        if oclcNumber:
+            oclcNumber = verify_oclc_number(oclcNumber)
 
-        url = self._url_manage_bib_current_oclc_number()
+        url = self._url_browse_lhr()
         header = {"Accept": "application/json"}
-        payload = {"oclcNumbers": ",".join(vetted_numbers)}
 
+        payload = {
+            "callNumber": callNumber,
+            "oclcNumber": oclcNumber,
+            "holdingLocation": holdingLocation,
+            "shelvingLocation": shelvingLocation,
+            "browsePosition": browsePosition,
+            "limit": limit,
+        }
         # prep request
         req = Request("GET", url, params=payload, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
@@ -296,7 +276,59 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def get_full_bib(
+    # def create_lbd():
+    #     """
+    #     Create an lbd record
+    #     Uses /manage/lbds/ endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    # def create_lhr():
+    #     """
+    #     Create a bib record in OCLC if it does not already exist
+    #     Uses /manage/lhr/ endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    # def delete_lbd():
+    #     """
+    #     Delete an lbd record
+    #     Uses /manage/lbds/ endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    # def delete_lhr():
+    #     """
+    #     Delete a bib record in OCLC if it does not already exist
+    #     Uses /manage/lhr/ endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    def get_bib(
         self,
         oclcNumber: Union[int, str],
         responseFormat: Optional[str] = None,
@@ -329,6 +361,353 @@ class MetadataSession(WorldcatSession):
 
         # prep request
         req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_bib_class(
+        self,
+        oclcNumber: Union[int, str],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Retrieve classification recommendations for an OCLC number.
+        Uses /search/classification-bibs/{oclcNumber}/other-editions endpoint.
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_classification_bibs(oclcNumber)
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_bib_holdings(
+        self,
+        oclcNumber: Union[int, str],
+        holdingsAllEditions: Optional[bool] = None,
+        holdingsAllVariantRecords: Optional[bool] = None,
+        preferredLanguage: Optional[str] = None,
+        holdingsFilterFormat: Optional[List[str]] = None,
+        heldInCountry: Optional[str] = None,
+        heldInState: Optional[str] = None,
+        heldByGroup: Optional[str] = None,
+        heldBySymbol: Optional[List[str]] = None,
+        heldByInstitutionID: Optional[List[int]] = None,
+        heldByLibraryType: Optional[List[str]] = None,
+        lat: Optional[float] = None,
+        lon: Optional[float] = None,
+        distance: Optional[int] = None,
+        unit: Optional[str] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given an OCLC number get summary of holdings
+        Uses /search/summary-holdings/ endpoint.
+
+        Args:
+            oclcNumber:                 OCLC bibliographic record number; can be
+                                        an integer, or string that can include
+                                        OCLC # prefix
+            holdingsAllEditions:        get holdings for all editions;
+                                        options: True, False
+            holdingsAllVariantRecords:  get holdings for specific edition across variant
+                                        records; options: True, False
+            preferredLanguage:          language of metadata description;
+                                        default 'en' (English)
+            holdingsFilterFormat:       get holdings for specific itemSubType,
+                                        example: book-digital
+            heldInCountry:              limits to holdings held by institutions
+                                        in requested country
+            heldInState:                limits to holdings held by institutions
+                                        in requested state, example: "US-NY"
+            heldByGroup:                limits to holdings held by institutions
+                                        indicated by group symbol
+            heldBySymbol:               limits to holdings held by institutions
+                                        indicated by institution symbol
+            heldByInstitutionID:        limits to holdings held by institutions
+                                        indicated by institution registryID
+            heldByLibraryType:          limits to holdings held by library type,
+                                        options: "PUBLIC", "ALL"
+            lat:                        limit to latitude, example: 37.502508
+            lon:                        limit to longitute, example: -122.22702
+            distance:                   distance from latitude and longitude
+            unit:                       unit of distance param; options:
+                                        'M' (miles) or 'K' (kilometers)
+            hooks:                      Requests library hook system that can be
+                                        used for signal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_general_holdings_summary()
+        header = {"Accept": "application/json"}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "holdingsAllEditions": holdingsAllEditions,
+            "holdingsAllVariantRecords": holdingsAllVariantRecords,
+            "preferredLanguage": preferredLanguage,
+            "holdingsFilterFormat": holdingsFilterFormat,
+            "heldInCountry": heldInCountry,
+            "heldInState": heldInState,
+            "heldByGroup": heldByGroup,
+            "heldBySymbol": heldBySymbol,
+            "heldByInstitutionID": heldByInstitutionID,
+            "heldByLibraryType": heldByLibraryType,
+            "lat": lat,
+            "lon": lon,
+            "distance": distance,
+            "unit": unit,
+        }
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_brief_bib(
+        self, oclcNumber: Union[int, str], hooks: Optional[Dict[str, Callable]] = None
+    ) -> Optional[Response]:
+        """
+        Retrieve specific brief bibliographic resource.
+        Uses /search/brief-bibs/{oclcNumber} endpoint.
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer, or string that can include
+                                    OCLC # prefix
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_brief_bibs_oclc_number(oclcNumber)
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_current_oclc_number(
+        self,
+        oclcNumbers: Union[str, List[Union[str, int]]],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Retrieve current OCLC control numbers
+        Uses /manage/bibs/current endpoint.
+
+        Args:
+            oclcNumbers:            list of OCLC control numbers to be checked;
+                                    they can be integers or strings with or
+                                    without OCLC # prefix;
+                                    if str the numbers must be separated by comma
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
+
+        url = self._url_manage_bib_current_oclc_number()
+        header = {"Accept": "application/json"}
+        payload = {"oclcNumbers": ",".join(vetted_numbers)}
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_institution_holding_codes(
+        self,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Retrieve the all holding codes for the authenticated institution.
+        Uses /manage/institution/holding-codes/ endpoint.
+
+        Args:
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        url = self._url_manage_ih_codes()
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_institution_holdings(
+        self,
+        oclcNumbers: Union[str, List[Union[str, int]]],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Retrieves Worldcat holdings status of records with provided OCLC number(s).
+        The service automatically recognizes institution based on the issued access
+        token.
+        Uses /manage/institution/holdings/current/ endpoint.
+
+        Args:
+            oclcNumbers:            list of OCLC control numbers to be checked;
+                                    they can be integers or strings with or
+                                    without OCLC # prefix;
+                                    if str the numbers must be separated by comma
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
+
+        url = self._url_manage_ih_current()
+        header = {"Accept": "application/json"}
+        payload = {"oclcNumbers": ",".join(vetted_numbers)}
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    # def get_lbd_data():
+    #     """
+    #     Given a control number, retrieve the lbd
+    #     Uses /search/my-local-bib-data/{controlNumber} endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    # def get_lbd_record():
+    #     """
+    #     Given a control number, retrieve the lbd MARC record
+    #     Uses /manage/lbds/{controlNumber} endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    # def get_lhr_data():
+    #     """
+    #     Given a control number, retrieve the lhr
+    #     Uses /search/my-holdings/{controlNumber} endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    # def get_lhr_record():
+    #     """
+    #     Given a control number, retrieve the lhr MARC record
+    #     Uses /manage/lhrs/{controlNumber} endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    def match_bib(
+        self,
+        record: str,
+        recordFormat: str,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a bib record in MARC21 or MARCXML identify the best match
+        Uses /manage/bibs/match endpoint.
+
+        Args:
+            record:                 MARC record to be matched
+            recordFormat:           format for MARC record, options:
+                                    "application/marc", "application/marcxml+xml"
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        # work in progress
+        # takes MARC XML or MARC21 as request body
+
+        if recordFormat and recordFormat not in [
+            "application/marc",
+            "application/marcxml+xml",
+        ]:
+            raise TypeError("Invalid recordFormat was passed as an argument")
+
+        url = self._url_manage_bib_match()
+        header = {"Accept": "application/json", "content-type": recordFormat}
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request
@@ -380,341 +759,33 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def match_bib(
-        self,
-        record: str,
-        recordFormat: str,
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Given a bib record in MARC21 or MARCXML identify the best match
-        Uses /manage/bibs/match endpoint.
+    # def replace_lbd():
+    #     """
+    #     Given a control number, replace the lbd MARC record
+    #     Uses /manage/lbds/{controlNumber} endpoint.
 
-        Args:
-            record:                 MARC record to be matched
-            recordFormat:           format for MARC record, options:
-                                    "application/marc", "application/marcxml+xml"
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` instance
-        """
-        # work in progress
-        # takes MARC XML or MARC21 as request body
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
 
-        if recordFormat and recordFormat not in [
-            "application/marc",
-            "application/marcxml+xml",
-        ]:
-            raise TypeError("Invalid recordFormat was passed as an argument")
+    # def replace_lhr():
+    #     """
+    #     Given a control number, replace the lhr MARC record
+    #     Uses /manage/lhrs/{controlNumber} endpoint.
 
-        url = self._url_manage_bib_match()
-        header = {"Accept": "application/json", "content-type": recordFormat}
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
 
-        # prep request
-        req = Request("POST", url, data=record, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    # Manage Institution
-
-    def holding_get_status(
-        self,
-        oclcNumbers: Union[str, List[Union[str, int]]],
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Retrieves Worldcat holdings status of records with provided OCLC number(s).
-        The service automatically recognizes institution based on the issued access
-        token.
-        Uses /manage/institution/holdings/current/ endpoint.
-
-        Args:
-            oclcNumbers:            list of OCLC control numbers to be checked;
-                                    they can be integers or strings with or
-                                    without OCLC # prefix;
-                                    if str the numbers must be separated by comma
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-        vetted_numbers = verify_oclc_numbers(oclcNumbers)
-
-        url = self._url_manage_ih_current()
-        header = {"Accept": "application/json"}
-        payload = {"oclcNumbers": ",".join(vetted_numbers)}
-
-        # prep request
-        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def bib_holding_set(
-        self,
-        record: str,
-        recordFormat: str,
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Set holdings on a bib record
-        Uses /manage/institution/holdings/set/ endpoint.
-
-        Args:
-            record:                 MARC record on which to set holdings
-            recordFormat:           format for MARC record, options:
-                                    "application/marc", "application/marcxml+xml"
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-        if recordFormat and recordFormat not in [
-            "application/marc",
-            "application/marcxml+xml",
-        ]:
-            raise TypeError("Invalid recordFormat was passed as an argument")
-
-        url = self._url_manage_ih_set()
-        header = {"Accept": "application/json", "content-type": recordFormat}
-
-        # prep request
-        req = Request("POST", url, data=record, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def bib_holding_unset(
-        self,
-        record: str,
-        recordFormat: str,
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Unset holdings on a bib record
-        Uses /manage/institution/holdings/unset/ endpoint.
-
-        Args:
-            record:                 MARC record on which to unset holdings
-            recordFormat:           format for MARC record, options:
-                                    "application/marc", "application/marcxml+xml"
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-        if recordFormat and recordFormat not in [
-            "application/marc",
-            "application/marcxml+xml",
-        ]:
-            raise TypeError("Invalid recordFormat was passed as an argument")
-
-        url = self._url_manage_ih_unset()
-        header = {"Accept": "application/json", "content-type": recordFormat}
-
-        # prep request
-        req = Request("POST", url, data=record, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def holding_set(
-        self,
-        oclcNumber: Union[int, str],
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Given an OCLC Number, set holdings on a bib record
-        Uses /manage/institution/holdings/{oclcNumber}/set/ endpoint.
-
-        Args:
-            oclcNumber:             OCLC bibliographic record number; can be an
-                                    integer, or string with or without OCLC # prefix
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-
-        oclcNumber = verify_oclc_number(oclcNumber)
-
-        url = self._url_manage_ih_oclc_number_set(oclcNumber)
-        header = {"Accept": "application/json"}
-
-        # prep request
-        req = Request("POST", url, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def holding_unset(
-        self,
-        oclcNumber: Union[int, str],
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Given an OCLC Number, unset holdings on a bib record
-        Uses /manage/institution/holdings/{oclcNumber}/unset/ endpoint.
-
-        Args:
-            oclcNumber:             OCLC bibliographic record number; can be an
-                                    integer, or string with or without OCLC # prefix
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-
-        oclcNumber = verify_oclc_number(oclcNumber)
-
-        url = self._url_manage_ih_oclc_number_unset(oclcNumber)
-        header = {"Accept": "application/json"}
-
-        # prep request
-        req = Request("POST", url, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def get_holding_codes(
-        self,
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Retrieve the all holding codes for the authenticated institution.
-        Uses /manage/institution/holding-codes/ endpoint.
-
-        Args:
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-        url = self._url_manage_ih_codes()
-        header = {"Accept": "application/json"}
-
-        # prep request
-        req = Request("GET", url, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    # Manage Local Bibliographic Data
-    # def manage_lbd_create():
-
-    # def manage_lbd_get():
-
-    # def manage_lbd_replace():
-
-    # def manage_lbd_delete():
-
-    # # Manage Local Holdings Records
-
-    # def manage_lhrs_create():
-
-    # def manage_lhrs_get():
-
-    # def manage_lhrs_replace():
-
-    # def manage_lhrs_delete():
-
-    # Search Member Shared Print Holdings
-    def search_shared_print_holdings(
-        self,
-        oclcNumber: Union[int, str],
-        isbn: Optional[str] = None,
-        issn: Optional[str] = None,
-        heldByGroup: Optional[str] = None,
-        heldInState: Optional[str] = None,
-        itemType: Optional[List[str]] = None,
-        itemSubType: Optional[List[str]] = None,
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Finds member shared print holdings for specified item.
-        Uses /search/bibs-retained-holdings endpoint.
-
-        Args:
-            oclcNumber:             OCLC bibliographic record number; can be
-                                    an integer, or string that can include
-                                    OCLC # prefix
-            isbn:                   ISBN without any dashes,
-                                    example: "978149191646x"
-            issn:                   ISSN with hyphen, example: "0099-1234"
-            heldByGroup:            limits to holdings held by institutions
-                                    indicated by group symbol
-            heldInState:            limits to holdings held by institutions in
-                                    requested state, example: "US-NY"
-            itemType:               limits results to specified item type
-                                    examples: "book" or "vis"
-            itemSubType:            limits results to specified item sub type
-                                    examples: "book-digital" or "audiobook-cd"
-            ""
-        Returns:
-            `requests.Response` object
-        """
-        if not any([oclcNumber, isbn, issn]):
-            raise TypeError(
-                "Missing required argument. "
-                "One of the following args are required: oclcNumber, issn, isbn"
-            )
-
-        if oclcNumber is not None:
-            oclcNumber = verify_oclc_number(oclcNumber)
-
-        url = self._url_search_shared_print_holdings()
-        header = {"Accept": "application/json"}
-        payload = {
-            "oclcNumber": oclcNumber,
-            "isbn": isbn,
-            "issn": issn,
-            "heldByGroup": heldByGroup,
-            "heldInState": heldInState,
-            "itemType": itemType,
-            "itemSubType": itemSubType,
-        }
-
-        # prep request
-        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    # Search Member General Holdings
-    def search_general_holdings(
+    def search_bib_holdings(
         self,
         oclcNumber: Optional[Union[int, str]] = None,
         isbn: Optional[str] = None,
@@ -817,84 +888,156 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def search_general_holdings_summary(
+    def search_brief_bib_other_editions(
         self,
         oclcNumber: Union[int, str],
-        holdingsAllEditions: Optional[bool] = None,
-        holdingsAllVariantRecords: Optional[bool] = None,
-        preferredLanguage: Optional[str] = None,
-        holdingsFilterFormat: Optional[List[str]] = None,
-        heldInCountry: Optional[str] = None,
-        heldInState: Optional[str] = None,
+        deweyNumber: Optional[List[str]] = None,
+        datePublished: Optional[List[str]] = None,
         heldByGroup: Optional[str] = None,
         heldBySymbol: Optional[List[str]] = None,
-        heldByInstitutionID: Optional[List[int]] = None,
-        heldByLibraryType: Optional[List[str]] = None,
-        lat: Optional[float] = None,
-        lon: Optional[float] = None,
-        distance: Optional[int] = None,
-        unit: Optional[str] = None,
+        heldByInstitutionID: Optional[Union[int]] = None,
+        inLanguage: Optional[str] = None,
+        inCatalogLanguage: Optional[str] = None,
+        materialType: Optional[str] = None,
+        catalogSource: Optional[str] = None,
+        itemType: Optional[List[str]] = None,
+        itemSubType: Optional[List[str]] = None,
+        retentionCommitments: Optional[bool] = None,
+        spProgram: Optional[str] = None,
+        genre: Optional[str] = None,
+        topic: Optional[str] = None,
+        subtopic: Optional[str] = None,
+        audience: Optional[str] = None,
+        content: Optional[List[str]] = None,
+        openAccess: Optional[bool] = None,
+        peerReviewed: Optional[bool] = None,
+        facets: Optional[List[str]] = None,
+        groupVariantRecords: Optional[bool] = None,
+        preferredLanguage: Optional[str] = None,
+        showHoldingsIndicators: Optional[bool] = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        orderBy: Optional[str] = None,
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
-        Given an OCLC number get summary of holdings
-        Uses /search/summary-holdings/ endpoint.
+        Retrieve other editions related to bibliographic resource with provided
+        OCLC number.
+        Uses /search/brief-bibs/{oclcNumber}/other-editions endpoint.
 
         Args:
-            oclcNumber:                 OCLC bibliographic record number; can be
-                                        an integer, or string that can include
-                                        OCLC # prefix
-            holdingsAllEditions:        get holdings for all editions;
-                                        options: True, False
-            holdingsAllVariantRecords:  get holdings for specific edition across variant
-                                        records; options: True, False
-            preferredLanguage:          language of metadata description;
-                                        default 'en' (English)
-            holdingsFilterFormat:       get holdings for specific itemSubType,
-                                        example: book-digital
-            heldInCountry:              limits to holdings held by institutions
-                                        in requested country
-            heldInState:                limits to holdings held by institutions
-                                        in requested state, example: "US-NY"
-            heldByGroup:                limits to holdings held by institutions
-                                        indicated by group symbol
-            heldBySymbol:               limits to holdings held by institutions
-                                        indicated by institution symbol
-            heldByInstitutionID:        limits to holdings held by institutions
-                                        indicated by institution registryID
-            heldByLibraryType:          limits to holdings held by library type,
-                                        options: "PUBLIC", "ALL"
-            lat:                        limit to latitude, example: 37.502508
-            lon:                        limit to longitute, example: -122.22702
-            distance:                   distance from latitude and longitude
-            unit:                       unit of distance param; options:
-                                        'M' (miles) or 'K' (kilometers)
-            hooks:                      Requests library hook system that can be
-                                        used for signal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            deweyNumber:            limits the response to the
+                                    specified dewey classification number(s);
+                                    for multiple values repeat the parameter,
+                                    example:
+                                        '794,180'
+            datePublished:          restricts the response to one or
+                                    more dates, or to a range,
+                                    examples:
+                                        '2000'
+                                        '2000-2005'
+                                        '2000,2005'
+            heldByGroup:            restricts to holdings held by group symbol
+            heldBySymbol:           restricts to holdings with specified intitution
+                                    symbol
+            heldByInstitutionID:    restrict to specified institution regisgtryId
+            inLanguage:             restrics the response to the single
+                                    specified language, example: 'fre'
+            inCataloglanguage:      restrics the response to specified
+                                    cataloging language, example: 'eng';
+                                    default 'eng'
+            materialType:           restricts responses to specified material type,
+                                    example: 'bks', 'vis'
+            catalogSource:          restrict to responses to single OCLC symbol as
+                                    the cataloging source, example: 'DLC'
+            itemType:               restricts reponses to single specified OCLC
+                                    top-level facet type, example: 'book'
+            itemSubType:            restricts responses to single specified OCLC
+                                    sub facet type, example: 'digital'
+            retentionCommitments:   restricts responses to bibliographic records
+                                    with retention commitment; True or False,
+                                    default False
+            spProgram:              restricts responses to bibliographic records
+                                    associated with particular shared print
+                                    program
+            genre:                  genre to limit results to (ge index)
+            topic:                  topic to limit results to (s0 index)
+            subtopic:               subtopic to limit results to (s1 index)
+            audience:               audience to limit results to,
+                                    available values: "juv", "nonJuv"
+            content:                content to limit results to
+                                    avaiable values: "fic", "nonFic", "bio"
+            openAccess:             limit to just open access content
+            peerReviewed:           limit to just peer reviewed content
+            facets:                 list of facets to restrict responses
+                                    available values: 'subject', 'creator',
+                                    'datePublished', 'genre', 'itemType',
+                                    'itemSubTypeBrief', 'itemSubType', 'language',
+                                    'topic', 'subtopic', 'content', 'audience',
+                                    'databases'
+            groupRelatedEditions:   whether or not use FRBR grouping,
+                                    options: False, True (default is False)
+            groupVariantRecords:    whether or not to group variant records.
+                                    options: False, True (default False)
+            preferredLanguage:      language of metadata description,
+                                    default is "en" (English)
+            showHoldingsIndicators: whether or not to show holdings indicators in
+                                    response. options: False, True (default is False)
+            offset:                 start position of bibliographic records to
+                                    return; default 1
+            limit:                  maximum nuber of records to return;
+                                    maximum 50, default 10
+            orderBy:                results sort key;
+                                    options:
+                                        'library'
+                                        'recency'
+                                        'bestMatch'
+                                        'creator'
+                                        'publicationDateAsc'
+                                        'publicationDateDesc'
+                                        'mostWidelyHeld'
+                                        'title'
+                                    default is bestMatch
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
         """
         oclcNumber = verify_oclc_number(oclcNumber)
 
-        url = self._url_search_general_holdings_summary()
+        url = self._url_search_brief_bibs_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
         payload = {
-            "oclcNumber": oclcNumber,
-            "holdingsAllEditions": holdingsAllEditions,
-            "holdingsAllVariantRecords": holdingsAllVariantRecords,
-            "preferredLanguage": preferredLanguage,
-            "holdingsFilterFormat": holdingsFilterFormat,
-            "heldInCountry": heldInCountry,
-            "heldInState": heldInState,
+            "deweyNumber": deweyNumber,
+            "datePublished": datePublished,
             "heldByGroup": heldByGroup,
             "heldBySymbol": heldBySymbol,
             "heldByInstitutionID": heldByInstitutionID,
-            "heldByLibraryType": heldByLibraryType,
-            "lat": lat,
-            "lon": lon,
-            "distance": distance,
-            "unit": unit,
+            "inLanguage": inLanguage,
+            "inCatalogLanguage": inCatalogLanguage,
+            "materialType": materialType,
+            "catalogSource": catalogSource,
+            "itemType": itemType,
+            "itemSubType": itemSubType,
+            "retentionCommitments": retentionCommitments,
+            "spProgram": spProgram,
+            "genre": genre,
+            "topic": topic,
+            "subtopic": subtopic,
+            "audience": audience,
+            "content": content,
+            "openAccess": openAccess,
+            "peerReviewed": peerReviewed,
+            "facets": facets,
+            "groupVariantRecords": groupVariantRecords,
+            "preferredLanguage": preferredLanguage,
+            "showHoldingsIndicators": showHoldingsIndicators,
+            "offset": offset,
+            "limit": limit,
+            "orderBy": orderBy,
         }
 
         # prep request
@@ -906,7 +1049,6 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    # Search Bibliographic Resources
     def search_brief_bibs(
         self,
         q: str,
@@ -1094,188 +1236,85 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def get_brief_bib(
-        self, oclcNumber: Union[int, str], hooks: Optional[Dict[str, Callable]] = None
+    # def search_my_holdings():
+    #     """
+    #     Search for a local holding record
+    #     Uses /search/my-holdings endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    # def search_my_local_bibs():
+    #     """
+    #     Search for a local holding record
+    #     Uses /search/my-local-bib-data endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    def search_shared_print_holdings(
+        self,
+        oclcNumber: Union[int, str],
+        isbn: Optional[str] = None,
+        issn: Optional[str] = None,
+        heldByGroup: Optional[str] = None,
+        heldInState: Optional[str] = None,
+        itemType: Optional[List[str]] = None,
+        itemSubType: Optional[List[str]] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
-        Retrieve specific brief bibliographic resource.
-        Uses /search/brief-bibs/{oclcNumber} endpoint.
+        Finds member shared print holdings for specified item.
+        Uses /search/bibs-retained-holdings endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be
                                     an integer, or string that can include
                                     OCLC # prefix
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` instance
-        """
-
-        oclcNumber = verify_oclc_number(oclcNumber)
-
-        url = self._url_search_brief_bibs_oclc_number(oclcNumber)
-        header = {"Accept": "application/json"}
-
-        # prep request
-        req = Request("GET", url, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def search_brief_bib_other_editions(
-        self,
-        oclcNumber: Union[int, str],
-        deweyNumber: Optional[List[str]] = None,
-        datePublished: Optional[List[str]] = None,
-        heldByGroup: Optional[str] = None,
-        heldBySymbol: Optional[List[str]] = None,
-        heldByInstitutionID: Optional[Union[int]] = None,
-        inLanguage: Optional[str] = None,
-        inCatalogLanguage: Optional[str] = None,
-        materialType: Optional[str] = None,
-        catalogSource: Optional[str] = None,
-        itemType: Optional[List[str]] = None,
-        itemSubType: Optional[List[str]] = None,
-        retentionCommitments: Optional[bool] = None,
-        spProgram: Optional[str] = None,
-        genre: Optional[str] = None,
-        topic: Optional[str] = None,
-        subtopic: Optional[str] = None,
-        audience: Optional[str] = None,
-        content: Optional[List[str]] = None,
-        openAccess: Optional[bool] = None,
-        peerReviewed: Optional[bool] = None,
-        facets: Optional[List[str]] = None,
-        groupVariantRecords: Optional[bool] = None,
-        preferredLanguage: Optional[str] = None,
-        showHoldingsIndicators: Optional[bool] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        orderBy: Optional[str] = None,
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Retrieve other editions related to bibliographic resource with provided
-        OCLC number.
-        Uses /search/brief-bibs/{oclcNumber}/other-editions endpoint.
-
-        Args:
-            oclcNumber:             OCLC bibliographic record number; can be an
-                                    integer, or string with or without OCLC # prefix
-            deweyNumber:            limits the response to the
-                                    specified dewey classification number(s);
-                                    for multiple values repeat the parameter,
-                                    example:
-                                        '794,180'
-            datePublished:          restricts the response to one or
-                                    more dates, or to a range,
-                                    examples:
-                                        '2000'
-                                        '2000-2005'
-                                        '2000,2005'
-            heldByGroup:            restricts to holdings held by group symbol
-            heldBySymbol:           restricts to holdings with specified intitution
-                                    symbol
-            heldByInstitutionID:    restrict to specified institution regisgtryId
-            inLanguage:             restrics the response to the single
-                                    specified language, example: 'fre'
-            inCataloglanguage:      restrics the response to specified
-                                    cataloging language, example: 'eng';
-                                    default 'eng'
-            materialType:           restricts responses to specified material type,
-                                    example: 'bks', 'vis'
-            catalogSource:          restrict to responses to single OCLC symbol as
-                                    the cataloging source, example: 'DLC'
-            itemType:               restricts reponses to single specified OCLC
-                                    top-level facet type, example: 'book'
-            itemSubType:            restricts responses to single specified OCLC
-                                    sub facet type, example: 'digital'
-            retentionCommitments:   restricts responses to bibliographic records
-                                    with retention commitment; True or False,
-                                    default False
-            spProgram:              restricts responses to bibliographic records
-                                    associated with particular shared print
-                                    program
-            genre:                  genre to limit results to (ge index)
-            topic:                  topic to limit results to (s0 index)
-            subtopic:               subtopic to limit results to (s1 index)
-            audience:               audience to limit results to,
-                                    available values: "juv", "nonJuv"
-            content:                content to limit results to
-                                    avaiable values: "fic", "nonFic", "bio"
-            openAccess:             limit to just open access content
-            peerReviewed:           limit to just peer reviewed content
-            facets:                 list of facets to restrict responses
-                                    available values: 'subject', 'creator',
-                                    'datePublished', 'genre', 'itemType',
-                                    'itemSubTypeBrief', 'itemSubType', 'language',
-                                    'topic', 'subtopic', 'content', 'audience',
-                                    'databases'
-            groupRelatedEditions:   whether or not use FRBR grouping,
-                                    options: False, True (default is False)
-            groupVariantRecords:    whether or not to group variant records.
-                                    options: False, True (default False)
-            preferredLanguage:      language of metadata description,
-                                    default is "en" (English)
-            showHoldingsIndicators: whether or not to show holdings indicators in
-                                    response. options: False, True (default is False)
-            offset:                 start position of bibliographic records to
-                                    return; default 1
-            limit:                  maximum nuber of records to return;
-                                    maximum 50, default 10
-            orderBy:                results sort key;
-                                    options:
-                                        'library'
-                                        'recency'
-                                        'bestMatch'
-                                        'creator'
-                                        'publicationDateAsc'
-                                        'publicationDateDesc'
-                                        'mostWidelyHeld'
-                                        'title'
-                                    default is bestMatch
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            isbn:                   ISBN without any dashes,
+                                    example: "978149191646x"
+            issn:                   ISSN with hyphen, example: "0099-1234"
+            heldByGroup:            limits to holdings held by institutions
+                                    indicated by group symbol
+            heldInState:            limits to holdings held by institutions in
+                                    requested state, example: "US-NY"
+            itemType:               limits results to specified item type
+                                    examples: "book" or "vis"
+            itemSubType:            limits results to specified item sub type
+                                    examples: "book-digital" or "audiobook-cd"
+            ""
         Returns:
             `requests.Response` object
         """
-        oclcNumber = verify_oclc_number(oclcNumber)
+        if not any([oclcNumber, isbn, issn]):
+            raise TypeError(
+                "Missing required argument. "
+                "One of the following args are required: oclcNumber, issn, isbn"
+            )
 
-        url = self._url_search_brief_bibs_other_editions(oclcNumber)
+        if oclcNumber is not None:
+            oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_shared_print_holdings()
         header = {"Accept": "application/json"}
         payload = {
-            "deweyNumber": deweyNumber,
-            "datePublished": datePublished,
+            "oclcNumber": oclcNumber,
+            "isbn": isbn,
+            "issn": issn,
             "heldByGroup": heldByGroup,
-            "heldBySymbol": heldBySymbol,
-            "heldByInstitutionID": heldByInstitutionID,
-            "inLanguage": inLanguage,
-            "inCatalogLanguage": inCatalogLanguage,
-            "materialType": materialType,
-            "catalogSource": catalogSource,
+            "heldInState": heldInState,
             "itemType": itemType,
             "itemSubType": itemSubType,
-            "retentionCommitments": retentionCommitments,
-            "spProgram": spProgram,
-            "genre": genre,
-            "topic": topic,
-            "subtopic": subtopic,
-            "audience": audience,
-            "content": content,
-            "openAccess": openAccess,
-            "peerReviewed": peerReviewed,
-            "facets": facets,
-            "groupVariantRecords": groupVariantRecords,
-            "preferredLanguage": preferredLanguage,
-            "showHoldingsIndicators": showHoldingsIndicators,
-            "offset": offset,
-            "limit": limit,
-            "orderBy": orderBy,
         }
 
         # prep request
@@ -1287,14 +1326,65 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def get_bib_classification(
+    # def search_shared_print_lhr():
+    #     """
+    #     Search for shared print lhr resources
+    #     Uses /search/retained-holdings endpoint.
+
+    #     Args:
+    #         hooks:                  Requests library hook system that can be
+    #                                 used for signal event handling, see more at:
+    #                                 https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+    #     Returns:
+    #         `requests.Response` instance
+    #     """
+
+    def set_holding(
+        self,
+        record: str,
+        recordFormat: str,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Set holdings on a bib record
+        Uses /manage/institution/holdings/set/ endpoint.
+
+        Args:
+            record:                 MARC record on which to set holdings
+            recordFormat:           format for MARC record, options:
+                                    "application/marc", "application/marcxml+xml"
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if recordFormat and recordFormat not in [
+            "application/marc",
+            "application/marcxml+xml",
+        ]:
+            raise TypeError("Invalid recordFormat was passed as an argument")
+
+        url = self._url_manage_ih_set()
+        header = {"Accept": "application/json", "content-type": recordFormat}
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def set_holding_oclc_number(
         self,
         oclcNumber: Union[int, str],
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
-        Retrieve classification recommendations for an OCLC number.
-        Uses /search/classification-bibs/{oclcNumber}/other-editions endpoint.
+        Given an OCLC Number, set holdings on a bib record
+        Uses /manage/institution/holdings/{oclcNumber}/set/ endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
@@ -1308,11 +1398,11 @@ class MetadataSession(WorldcatSession):
 
         oclcNumber = verify_oclc_number(oclcNumber)
 
-        url = self._url_search_classification_bibs(oclcNumber)
+        url = self._url_manage_ih_oclc_number_set(oclcNumber)
         header = {"Accept": "application/json"}
 
         # prep request
-        req = Request("GET", url, headers=header, hooks=hooks)
+        req = Request("POST", url, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request
@@ -1320,16 +1410,126 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    # Search Local Holdings Resources
-    # def search_lhr_shared_print():
+    def unset_holding(
+        self,
+        record: str,
+        recordFormat: str,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Unset holdings on a bib record
+        Uses /manage/institution/holdings/unset/ endpoint.
 
-    # def search_lhr_control_number():
+        Args:
+            record:                 MARC record on which to unset holdings
+            recordFormat:           format for MARC record, options:
+                                    "application/marc", "application/marcxml+xml"
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if recordFormat and recordFormat not in [
+            "application/marc",
+            "application/marcxml+xml",
+        ]:
+            raise TypeError("Invalid recordFormat was passed as an argument")
 
-    # def search_lhr():
+        url = self._url_manage_ih_unset()
+        header = {"Accept": "application/json", "content-type": recordFormat}
 
-    # def browse_lhr():
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
 
-    # Search Local Bib Resources
-    # def search_lbd_control_number():
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+        return query.response
 
-    # def search_lbd():
+    def unset_holding_oclc_number(
+        self,
+        oclcNumber: Union[int, str],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given an OCLC Number, unset holdings on a bib record
+        Uses /manage/institution/holdings/{oclcNumber}/unset/ endpoint.
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_manage_ih_oclc_number_unset(oclcNumber)
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("POST", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def validate_bib(
+        self,
+        validationLevel: Optional[str],
+        record: str,
+        recordFormat: Optional[str],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a bib record, validate that record conforms to MARC standards
+        Uses /manage/bibs/validate/{validationLevel} endpoint.
+
+        Args:
+            validationLevel:        Level at which to validate records
+                                    available values: validateFull, validateAdd,
+                                    validateReplace
+                                    default is validateFull
+            record:                 MARC record to be validated
+            recordFormat:           format for MARC record, options:
+                                    "application/marc", "application/marcxml+xml"
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+
+        # check if validationLevel arg is valid
+        if validationLevel and validationLevel not in [
+            "validateFull",
+            "validateAdd",
+            "validateReplace",
+        ]:
+            raise TypeError("Invalid validationLevel was passed as an argument")
+
+        # defaults to validateFull if validationLevel is not provided
+        if not validationLevel:
+            validationLevel = "validateFull"
+
+        # defaults to marcxml if recordFormat is not provided
+        if not recordFormat:
+            recordFormat = "application/marcxml+xml"
+
+        url = self._url_manage_bib_validate(validationLevel)
+        header = {"Accept": "application/json", "content-type": recordFormat}
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response

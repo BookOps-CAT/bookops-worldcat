@@ -28,7 +28,7 @@ class WorldcatSession(requests.Session):
         """
         Args:
             authorization:          WorldcatAccessToken instance
-            agent:                  "User-agent" parameter to attached to each
+            agent:                  "User-agent" parameter to attach to each
                                     request in the session
             timeout:                how long to wait for server to send data
                                     before giving up
