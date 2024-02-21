@@ -25,6 +25,20 @@ def live_keys():
             os.environ["WCPrincipalIDNS"] = data["principal_idns"]
 
 
+@pytest.fixture
+def stub_marc_xml():
+    with open("tests/test.xml", "r") as stub:
+        stub_marc_xml = stub.read()
+    return stub_marc_xml
+
+
+@pytest.fixture
+def stub_marc21():
+    with open("tests/test.mrc", "rb") as stub:
+        stub_marc21 = stub.read()
+    return stub_marc21
+
+
 class FakeUtcNow(datetime.datetime):
     @classmethod
     def now(cls, tzinfo=datetime.timezone.utc):

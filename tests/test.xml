@@ -1,0 +1,24 @@
+<record>
+    <leader>00000nam a2200000 a 4500</leader>
+    <controlfield tag="008">120827s2012    nyua          000 0 eng d</controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+        <subfield code="a">   63011276 </subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="a">ocn850940548</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+        <subfield code="a">OCWMS</subfield>
+        <subfield code="b">eng</subfield>
+        <subfield code="c">OCWMS</subfield>
+    </datafield>
+    <datafield tag="100" ind1="0" ind2=" ">
+        <subfield code="a">OCLC Developer Network</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+        <subfield code="a">Test Record</subfield>
+    </datafield>
+    <datafield tag="500" ind1=" " ind2=" ">
+        <subfield code="a">FOR OCLC DEVELOPER NETWORK DOCUMENTATION</subfield>
+    </datafield>
+</record>  
