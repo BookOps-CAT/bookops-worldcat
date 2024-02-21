@@ -184,45 +184,6 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def get_bib(
-        self,
-        oclcNumber: Union[int, str],
-        responseFormat: Optional[str] = None,
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Given an OCLC number, retrieve the bib record
-        Uses /manage/bibs/{oclcNumber} endpoint.
-
-        Args:
-            oclcNumber:             OCLC bibliographic record number; can be
-                                    an integer or string with or without OCLC # prefix
-            responseFormat:         format of returned record; options:
-                                    'application/marcxml+xml', 'application/marc'
-                                    default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` instance
-        """
-        oclcNumber = verify_oclc_number(oclcNumber)
-
-        if not responseFormat:
-            responseFormat = "application/marcxml+xml"
-
-        url = self._url_manage_bib(oclcNumber)
-        header = {"Accept": responseFormat}
-
-        # prep request
-        req = Request("GET", url, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
     def get_bib_classification(
         self,
         oclcNumber: Union[int, str],
@@ -400,6 +361,45 @@ class MetadataSession(WorldcatSession):
 
         # prep request
         req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_full_bib(
+        self,
+        oclcNumber: Union[int, str],
+        responseFormat: Optional[str] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given an OCLC number, retrieve the bib record
+        Uses /manage/bibs/{oclcNumber} endpoint.
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer or string with or without OCLC # prefix
+            responseFormat:         format of returned record; options:
+                                    'application/marcxml+xml', 'application/marc'
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        if not responseFormat:
+            responseFormat = "application/marcxml+xml"
+
+        url = self._url_manage_bib(oclcNumber)
+        header = {"Accept": responseFormat}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request

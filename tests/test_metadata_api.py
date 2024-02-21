@@ -318,10 +318,6 @@ class TestMockedMetadataSession:
         assert "Argument 'recordFormat' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
-    def test_get_bib(self, stub_session, mock_session_response):
-        assert stub_session.get_bib(12345).status_code == 200
-
-    @pytest.mark.http_code(200)
     def test_get_bib_classification(self, stub_session, mock_session_response):
         assert stub_session.get_bib_classification(12345).status_code == 200
 
@@ -365,6 +361,10 @@ class TestMockedMetadataSession:
             ).status_code
             == 200
         )
+
+    @pytest.mark.http_code(200)
+    def test_get_full_bib(self, stub_session, mock_session_response):
+        assert stub_session.get_full_bib(12345).status_code == 200
 
     @pytest.mark.http_code(200)
     def test_match_bib(self, stub_session, mock_session_response, stub_marc_xml):
@@ -618,24 +618,6 @@ class TestLiveMetadataSession:
             assert session.authorization.is_expired() is False
             assert response.status_code == 200
 
-    def test_get_bib(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.get_bib(41266045)
-
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/41266045"
-            )
-            assert response.status_code == 200
-
     def test_get_bib_classification(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
@@ -723,6 +705,24 @@ class TestLiveMetadataSession:
             jres = response.json()
             assert sorted(jres.keys()) == ["controlNumbers"]
             assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
+
+    def test_get_full_bib(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+            principal_id=os.getenv("WCPrincipalID"),
+            principal_idns=os.getenv("WCPrincipalIDNS"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.get_full_bib(41266045)
+
+            assert (
+                response.url
+                == "https://metadata.api.oclc.org/worldcat/manage/bibs/41266045"
+            )
+            assert response.status_code == 200
 
     @pytest.mark.holdings
     def test_get_institution_holding_codes(self, live_keys):
