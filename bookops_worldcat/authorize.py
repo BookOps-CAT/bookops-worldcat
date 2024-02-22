@@ -41,8 +41,6 @@ class WorldcatAccessToken:
                 key="my_WSKey_client_id",
                 secret="my_WSKey_secret",
                 scope="WorldCatMetadataAPI",
-                principal_id="your principalID here",
-                principal_idns="your principalIDNS here",
                 agent="my_app/1.0.0")
         >>> token.token_str
         "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
