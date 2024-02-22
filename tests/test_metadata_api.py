@@ -502,7 +502,7 @@ class TestMockedMetadataSession:
         assert response.status_code == 200
 
     @pytest.mark.http_code(207)
-    def test_seach_current_control_numbers(self, stub_session, mock_session_response):
+    def test_get_current_oclc_number(self, stub_session, mock_session_response):
         assert (
             stub_session.get_current_oclc_number(
                 oclcNumbers=["12345", "65891"]
@@ -511,7 +511,7 @@ class TestMockedMetadataSession:
         )
 
     @pytest.mark.http_code(207)
-    def test_seach_current_control_numbers_passed_as_str(
+    def test_get_current_oclc_number_passed_as_str(
         self, stub_session, mock_session_response
     ):
         assert (
