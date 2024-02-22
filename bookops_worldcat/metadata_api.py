@@ -562,27 +562,27 @@ class MetadataSession(WorldcatSession):
     def search_brief_bibs_other_editions(
         self,
         oclcNumber: Union[int, str],
-        deweyNumber: Optional[List[str]] = None,
-        datePublished: Optional[List[str]] = None,
+        deweyNumber: Optional[Union[str, List[str]]] = None,
+        datePublished: Optional[Union[str, List[str]]] = None,
         heldByGroup: Optional[str] = None,
-        heldBySymbol: Optional[List[str]] = None,
-        heldByInstitutionID: Optional[Union[int]] = None,
-        inLanguage: Optional[str] = None,
+        heldBySymbol: Optional[Union[str, List[str]]] = None,
+        heldByInstitutionID: Optional[Union[str, int, List[str], List[int]]] = None,
+        inLanguage: Optional[Union[str, List[str]]] = None,
         inCatalogLanguage: Optional[str] = None,
         materialType: Optional[str] = None,
         catalogSource: Optional[str] = None,
-        itemType: Optional[List[str]] = None,
-        itemSubType: Optional[List[str]] = None,
+        itemType: Optional[Union[str, List[str]]] = None,
+        itemSubType: Optional[Union[str, List[str]]] = None,
         retentionCommitments: Optional[bool] = None,
         spProgram: Optional[str] = None,
         genre: Optional[str] = None,
         topic: Optional[str] = None,
         subtopic: Optional[str] = None,
         audience: Optional[str] = None,
-        content: Optional[List[str]] = None,
+        content: Optional[Union[str, List[str]]] = None,
         openAccess: Optional[bool] = None,
         peerReviewed: Optional[bool] = None,
-        facets: Optional[List[str]] = None,
+        facets: Optional[Union[str, List[str]]] = None,
         groupVariantRecords: Optional[bool] = None,
         preferredLanguage: Optional[str] = None,
         showHoldingsIndicators: Optional[bool] = None,
@@ -594,87 +594,75 @@ class MetadataSession(WorldcatSession):
         """
         Retrieve other editions related to bibliographic resource with provided
         OCLC #.
-        Uses /search/brief-bibs/{oclcNumber}/other-editions endpoint.
+        Uses /brief-bibs/{oclcNumber}/other-editions endpoint.
 
         Args:
-            oclcNumber:             OCLC bibliographic record number; can be
-                                    an integer or string with or without OCLC # prefix
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
             deweyNumber:            limits the response to the
-                                    specified dewey classification number(s);
-                                    examples:
+                                    specified dewey classification number(s)
+                                    example:
                                         '794,180'
-                                        '794'
-            datePublished:          limits the response to one or more dates or ranges
+            datePublished:          restricts the response to one or
+                                    more dates, or to a range,
                                     examples:
                                         '2000'
                                         '2000-2005'
                                         '2000,2005'
-                                        '2000-2002,2003-2005'
-            heldByGroup:            restricts response to holdings held by group symbol
-            heldBySymbol:           restricts response to holdings held by specified
-                                    institution symbol
-            heldByInstitutionID:    restricts response to holdings held by specified
-                                    institution registryId
-            inLanguage:             restricts response to the single
+            heldByGroup:            restricts to holdings held by group symbol
+            heldBySymbol:           restricts to holdings with specified intitution
+                                    symbol
+            heldByInstitutionID:    restrict to specified institution regisgtryId
+            inLanguage:             restrics the response to the single
                                     specified language, example: 'fre'
-            inCataloglanguage:      restricts response to specified
+            inCataloglanguage:      restrics the response to specified
                                     cataloging language, example: 'eng';
-                                    default is 'eng'
-            materialType:           restricts response to specified material type,
+                                    default 'eng'
+            materialType:           restricts responses to specified material type,
                                     example: 'bks', 'vis'
-            catalogSource:          restricts response to single OCLC symbol as
+            catalogSource:          restrict to responses to single OCLC symbol as
                                     the cataloging source, example: 'DLC'
             itemType:               restricts reponses to single specified OCLC
                                     top-level facet type, example: 'book'
-            itemSubType:            restricts response to single specified OCLC
+            itemSubType:            restricts responses to single specified OCLC
                                     sub facet type, example: 'digital'
-            retentionCommitments:   restricts response to bibliographic records
-                                    with retention commitment; options: True, False,
-                                    default is False
-            spProgram:              restricts response to bibliographic records
+            retentionCommitments:   restricts responses to bibliographic records
+                                    with retention commitment; True or False,
+                                    default False
+            spProgram:              restricts responses to bibliographic records
                                     associated with particular shared print
                                     program
-            genre:                  genre to limit results to (ge index)
-            topic:                  topic to limit results to (s0 index)
-            subtopic:               subtopic to limit results to (s1 index)
+            genre:                  genre to limit results to
+            topic:                  topic to limit results to
+            subtopic:               subtopic to limit results to
             audience:               audience to limit results to,
-                                    available values: "juv", 'nonJuv'
-            content:                content to limit results to
-                                    available values: 'fic', 'nonFic', 'bio'
-            openAccess:             restricts response to just open access content
-            peerReviewed:           restricts response to just peer reviewed content
-            facets:                 list of facets requested in response
-                                    available values: 'subject', 'creator',
-                                    'datePublished', 'genre', 'itemType',
-                                    'itemSubTypeBrief', 'itemSubType', 'language',
-                                    'topic', 'subtopic', 'content', 'audience',
-                                    'databases'
+                                    example:
+                                        juv,
+                                        nonJuv
+            content:                content to limit resutls to,
+                                    example:
+                                        fic,
+                                        nonFic,
+                                        fic,bio
+            openAccess:             filter to only open access content, False or True
+            peerReviewed:           filter to only peer reviewed content, False or True
+            facets:                 list of facets to restrict responses
             groupVariantRecords:    whether or not to group variant records.
-                                    options: True, False, default is False
+                                    options: False, True (default False)
             preferredLanguage:      language of metadata description,
-                                    default is 'en' (English)
-            showHoldingsIndicators: whether or not to show holdings indicators in
-                                    response. options: True, False, default is False
             offset:                 start position of bibliographic records to
-                                    return; default is 1
+                                    return; default 1
             limit:                  maximum nuber of records to return;
-                                    maximum is 50, default is 10
-            orderBy:                results sort key;
-                                    options:
-                                        'library'
-                                        'recency'
-                                        'bestMatch'
-                                        'creator'
-                                        'publicationDateAsc'
-                                        'publicationDateDesc'
-                                        'mostWidelyHeld'
-                                        'title'
-                                    default is bestMatch
+                                    maximum 50, default 10
+            orderBy:                sort of restuls;
+                                    available values:
+                                        +date, -date, +language, -language;
+                                    default value: -date
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
+            Returns:
+                `requests.Response` object
         """
         oclcNumber = verify_oclc_number(oclcNumber)
 
@@ -722,27 +710,27 @@ class MetadataSession(WorldcatSession):
     def search_brief_bibs(
         self,
         q: str,
-        deweyNumber: Optional[List[str]] = None,
-        datePublished: Optional[List[str]] = None,
+        deweyNumber: Optional[Union[str, List[str]]] = None,
+        datePublished: Optional[Union[str, List[str]]] = None,
         heldByGroup: Optional[str] = None,
-        heldBySymbol: Optional[List[str]] = None,
-        heldByInstitutionID: Optional[List[int]] = None,
-        inLanguage: Optional[List[str]] = None,
-        inCatalogLanguage: Optional[str] = "eng",
+        heldBySymbol: Optional[Union[str, List[str]]] = None,
+        heldByInstitutionID: Optional[Union[str, int, List[str], List[int]]] = None,
+        inLanguage: Optional[Union[str, List[str]]] = None,
+        inCatalogLanguage: Optional[str] = None,
         materialType: Optional[str] = None,
         catalogSource: Optional[str] = None,
-        itemType: Optional[List[str]] = None,
-        itemSubType: Optional[List[str]] = None,
+        itemType: Optional[Union[str, List[str]]] = None,
+        itemSubType: Optional[Union[str, List[str]]] = None,
         retentionCommitments: Optional[bool] = None,
         spProgram: Optional[str] = None,
         genre: Optional[str] = None,
         topic: Optional[str] = None,
         subtopic: Optional[str] = None,
         audience: Optional[str] = None,
-        content: Optional[List[str]] = None,
+        content: Optional[Union[str, List[str]]] = None,
         openAccess: Optional[bool] = None,
         peerReviewed: Optional[bool] = None,
-        facets: Optional[List[str]] = None,
+        facets: Optional[Union[str, List[str]]] = None,
         groupRelatedEditions: Optional[bool] = None,
         groupVariantRecords: Optional[bool] = None,
         preferredLanguage: Optional[str] = None,
@@ -772,37 +760,36 @@ class MetadataSession(WorldcatSession):
                                         (au:Okken OR au:Myers) AND su:python
             deweyNumber:            limits the response to the
                                     specified dewey classification number(s);
-                                    examples:
+                                    for multiple values repeat the parameter,
+                                    example:
                                         '794,180'
-                                        '794'
-            datePublished:          limits the response to one or more dates or ranges
+            datePublished:          restricts the response to one or
+                                    more dates, or to a range,
                                     examples:
                                         '2000'
                                         '2000-2005'
                                         '2000,2005'
-                                        '2000-2002,2003-2005'
-            heldByGroup:            restricts response to holdings held by group symbol
+            heldByGroup:            restricts to holdings held by group symbol
             heldBySymbol:           restricts response to holdings held by specified
                                     institution symbol
             heldByInstitutionID:    restricts response to holdings held by specified
                                     institution registryId
-            inLanguage:             restricts response to the single
+            inLanguage:             restrics the response to the single
                                     specified language, example: 'fre'
-            inCataloglanguage:      restricts response to specified
+            inCataloglanguage:      restrics the response to specified
                                     cataloging language, example: 'eng';
-                                    default is 'eng'
-            materialType:           restricts response to specified material type,
+                                    default 'eng'
+            materialType:           restricts responses to specified material type,
                                     example: 'bks', 'vis'
-            catalogSource:          restricts response to single OCLC symbol as
+            catalogSource:          restrict to responses to single OCLC symbol as
                                     the cataloging source, example: 'DLC'
             itemType:               restricts reponses to single specified OCLC
                                     top-level facet type, example: 'book'
-            itemSubType:            restricts response to single specified OCLC
+            itemSubType:            restricts responses to single specified OCLC
                                     sub facet type, example: 'digital'
-            retentionCommitments:   restricts response to bibliographic records
-                                    with retention commitment; options: True, False,
-                                    default is False
-            spProgram:              restricts response to bibliographic records
+            retentionCommitments:   restricts responses to bibliographic records
+                                    with retention commitment; True or False
+            spProgram:              restricts responses to bibliographic records
                                     associated with particular shared print
                                     program
             genre:                  genre to limit results to (ge index)
@@ -814,18 +801,13 @@ class MetadataSession(WorldcatSession):
                                     available values: 'fic', 'nonFic', 'bio'
             openAccess:             restricts response to just open access content
             peerReviewed:           restricts response to just peer reviewed content
-            facets:                 list of facets requested in response
-                                    available values: 'subject', 'creator',
-                                    'datePublished', 'genre', 'itemType',
-                                    'itemSubTypeBrief', 'itemSubType', 'language',
-                                    'topic', 'subtopic', 'content', 'audience',
-                                    'databases'
+            facets:                 list of facets to restrict responses
             groupRelatedEditions:   whether or not use FRBR grouping,
-                                    options: True, False, default is False
+                                    options: False, True (default is False)
             groupVariantRecords:    whether or not to group variant records.
-                                    options: True, False, default is False
+                                    options: False, True (default False)
             preferredLanguage:      language of metadata description,
-                                    default is 'en' (English)
+                                    default value "en" (English)
             showHoldingsIndicators: whether or not to show holdings indicators in
                                     response. options: True, False, default is False
             lat:                    limit to latitude, example: 37.502508
@@ -835,19 +817,18 @@ class MetadataSession(WorldcatSession):
                                     'M' (miles) or 'K' (kilometers)
             orderBy:                results sort key;
                                     options:
-                                        'library'
                                         'recency'
                                         'bestMatch'
                                         'creator'
+                                        'library'
                                         'publicationDateAsc'
                                         'publicationDateDesc'
                                         'mostWidelyHeld'
                                         'title'
-                                    default is bestMatch
             offset:                 start position of bibliographic records to
-                                    return; default is 1
-            limit:                  maximum number of records to return;
-                                    maximum is 50, default is 10
+                                    return; default 1
+            limit:                  maximum nuber of records to return;
+                                    maximum 50, default 10
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -972,25 +953,25 @@ class MetadataSession(WorldcatSession):
 
         Args:
             oclcNumber:                 OCLC bibliographic record number; can be
-                                        an integer or string with or without OCLC #
-                                        prefix
+                                        an integer, or string that can include
+                                        OCLC # prefix
             isbn:                       ISBN without any dashes,
                                         example: '978149191646x'
-            issn:                       ISSN hyphenated, example: '0099-1234'
+            issn:                       ISSN (hyphenated, example: '0099-1234')
             holdingsAllEditions:        get holdings for all editions;
-                                        options: True, False, default is False
+                                        options: True or False
             holdingsAllVariantRecords:  get holdings for specific edition across variant
-                                        records; options: True, False, default is False
+                                        records; options: False, True
             preferredLanguage:          language of metadata description;
-                                        default is 'en' (English)
+                                        default 'en' (English)
             holdingsFilterFormat:       get holdings for specific itemSubType,
                                         example: book-digital
-            heldInCountry:              limits to holdings held by institutions
+            heldInCountry:              restricts to holdings held by institutions
                                         in requested country
             heldInState:                limits to holdings held by institutions
                                         in requested state, example: 'US-NY'
-            heldByGroup:                limits to holdings held by institutions
-                                        indicated by group symbol
+            heldByGroup:                limits to holdings held by indicated by
+                                        symbol group
             heldBySymbol:               limits to holdings held by institutions
                                         indicated by institution symbol
             heldByInstitutionID:        limits to holdings held by institutions
@@ -1064,18 +1045,21 @@ class MetadataSession(WorldcatSession):
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be
-                                    an integer or string with or without OCLC # prefix
-            isbn:                   ISBN without hyphen,
+                                    an integer, or string that can include
+                                    OCLC # prefix
+            isbn:                   ISBN without any dashes,
                                     example: '978149191646x'
-            issn:                   ISSN with hyphen, example: '0099-1234'
-            heldByGroup:            limits to holdings held by institutions
-                                    indicated by group symbol
-            heldInState:            limits to holdings held by institutions in
-                                    requested state, example: 'US-NY'
-            itemType:               limits results to specified item type
-                                    examples: 'book' or 'vis'
-            itemSubType:            limits results to specified item sub type
+            issn:                   ISSN (hyphenated, example: '0099-1234')
+            heldByGroup:            restricts to holdings held by group symbol
+            heldInState:            restricts to holings held by institutions
+                                    in requested state, example: "NY"
+            itemType:               restricts results to specified item type (example
+                                    'book' or 'vis')
+            itemSubType:            restricts results to specified item sub type
                                     examples: 'book-digital' or 'audiobook-cd'
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
         Returns:
             `requests.Response` object
         """
