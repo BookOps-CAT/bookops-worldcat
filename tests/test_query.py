@@ -18,8 +18,6 @@ def test_query_live(live_keys):
         key=os.getenv("WCKey"),
         secret=os.getenv("WCSecret"),
         scopes=os.getenv("WCScopes"),
-        principal_id=os.getenv("WCPrincipalID"),
-        principal_idns=os.getenv("WCPrincipalIDNS"),
     )
     with MetadataSession(authorization=token) as session:
         header = {"Accept": "application/json"}
