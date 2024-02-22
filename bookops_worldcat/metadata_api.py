@@ -566,7 +566,7 @@ class MetadataSession(WorldcatSession):
         datePublished: Optional[Union[str, List[str]]] = None,
         heldByGroup: Optional[str] = None,
         heldBySymbol: Optional[Union[str, List[str]]] = None,
-        heldByInstitutionID: Optional[Union[str, int, List[str], List[int]]] = None,
+        heldByInstitutionID: Optional[Union[str, int, List[Union[str, int]]]] = None,
         inLanguage: Optional[Union[str, List[str]]] = None,
         inCatalogLanguage: Optional[str] = None,
         materialType: Optional[str] = None,

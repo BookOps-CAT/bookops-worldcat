@@ -845,7 +845,7 @@ class TestLiveMetadataSession:
                 inLanguage="eng",
                 inCatalogLanguage="eng",
                 itemType="book",
-                itemSubType="book-printbook",
+                itemSubType=["book-printbook", "book-digital"],
                 catalogSource="dlc",
                 orderBy="mostWidelyHeld",
                 limit=5,
@@ -854,7 +854,7 @@ class TestLiveMetadataSession:
             assert sorted(response.json().keys()) == fields
             assert (
                 response.request.url
-                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&orderBy=mostWidelyHeld&limit=5"
+                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&itemSubType=book-digital&orderBy=mostWidelyHeld&limit=5"
             )
 
     def test_search_bibs_holdings(self, live_keys):
