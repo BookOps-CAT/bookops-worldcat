@@ -661,8 +661,8 @@ class MetadataSession(WorldcatSession):
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-            Returns:
-                `requests.Response` object
+        Returns:
+            `requests.Response` object
         """
         oclcNumber = verify_oclc_number(oclcNumber)
 
@@ -832,7 +832,6 @@ class MetadataSession(WorldcatSession):
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-
         Returns:
             `requests.Response` object
         """
