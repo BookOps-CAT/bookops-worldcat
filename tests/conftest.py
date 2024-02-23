@@ -21,8 +21,6 @@ def live_keys():
             os.environ["WCKey"] = data["key"]
             os.environ["WCSecret"] = data["secret"]
             os.environ["WCScopes"] = data["scopes"]
-            os.environ["WCPrincipalID"] = data["principal_id"]
-            os.environ["WCPrincipalIDNS"] = data["principal_idns"]
 
 
 class FakeUtcNow(datetime.datetime):
@@ -135,8 +133,6 @@ def mock_credentials():
         "key": "my_WSkey",
         "secret": "my_WSsecret",
         "scopes": "scope1 scope2",
-        "principal_id": "my_principalID",
-        "principal_idns": "my_principalIDNS",
     }
 
 

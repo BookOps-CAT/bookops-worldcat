@@ -29,8 +29,6 @@ class WorldcatAccessToken:
         secret:                 your WSKey secret
         scopes:                 request scopes for the access token as a string,
                                 separate different scopes with space
-        principal_id:           principalID (required for read/write endpoints)
-        principal_idns:         principalIDNS (required for read/write endpoints)
         agent:                  "User-agent" parameter to be passed in the request
                                 header; usage strongly encouraged
         timeout:                how long to wait for server to send data before
@@ -43,8 +41,6 @@ class WorldcatAccessToken:
                 key="my_WSKey_client_id",
                 secret="my_WSKey_secret",
                 scope="WorldCatMetadataAPI",
-                principal_id="your principalID here",
-                principal_idns="your principalIDNS here",
                 agent="my_app/1.0.0")
         >>> token.token_str
         "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
@@ -75,8 +71,6 @@ class WorldcatAccessToken:
         key: str,
         secret: str,
         scopes: str,
-        principal_id: str,
-        principal_idns: str,
         agent: str = "",
         timeout: Optional[
             Union[int, float, Tuple[int, int], Tuple[float, float]]
@@ -88,8 +82,6 @@ class WorldcatAccessToken:
         self.grant_type = "client_credentials"
         self.key = key
         self.oauth_server = "https://oauth.oclc.org"
-        self.principal_id = principal_id
-        self.principal_idns = principal_idns
         self.scopes = scopes
         self.secret = secret
         self.server_response: Optional[requests.Response] = None
@@ -117,18 +109,6 @@ class WorldcatAccessToken:
                 raise ValueError("Argument 'secret' cannot be an empty string.")
         else:
             raise TypeError("Argument 'secret' must be a string.")
-
-        if isinstance(self.principal_id, str):
-            if not self.principal_id.strip():
-                raise ValueError("Argument 'principal_id' cannot be an empty string.")
-        else:
-            raise TypeError("Argument 'principal_id' must be a string.")
-
-        if isinstance(self.principal_idns, str):
-            if not self.principal_idns.strip():
-                raise ValueError("Argument 'principal_idns' cannot be an empty string.")
-        else:
-            raise TypeError("Argument 'principal_idns' must be a string.")
 
         # validate passed scopes
         if isinstance(self.scopes, str):
@@ -183,8 +163,6 @@ class WorldcatAccessToken:
         return {
             "grant_type": self.grant_type,
             "scope": self.scopes,
-            "principalID": self.principal_id,
-            "principalIDNS": self.principal_idns,
         }
 
     def _post_token_request(self) -> requests.Response:

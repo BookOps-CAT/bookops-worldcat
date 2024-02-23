@@ -538,8 +538,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -553,8 +551,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
         token.token_str = "invalid-token"
         err_msg = "401 Client Error: Unauthorized for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045"
@@ -570,8 +566,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -588,8 +582,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -616,8 +608,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -651,8 +641,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -685,8 +673,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -719,8 +705,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -735,8 +719,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -763,8 +745,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
@@ -778,8 +758,6 @@ class TestLiveMetadataSession:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         with MetadataSession(authorization=token) as session:
