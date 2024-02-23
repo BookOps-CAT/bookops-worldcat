@@ -157,7 +157,7 @@ class MetadataSession(WorldcatSession):
     def get_full_bib(
         self,
         oclcNumber: Union[int, str],
-        response_format: Optional[str] = None,
+        response_format: Optional[str] = "application/marcxml+xml",
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
@@ -168,7 +168,8 @@ class MetadataSession(WorldcatSession):
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer, or string with or without OCLC # prefix
             response_format:        format of returned record, options:
-                                    'application/marcxml+xml', 'application/marc'
+                                    'application/marcxml+xml', 'application/marc',
+                                    default is 'application/marcxml+xml'
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -178,8 +179,6 @@ class MetadataSession(WorldcatSession):
         oclcNumber = verify_oclc_number(oclcNumber)
 
         url = self._url_manage_bib(oclcNumber)
-        if not response_format:
-            response_format = "application/marcxml+xml"
         header = {"Accept": response_format}
 
         # prep request
