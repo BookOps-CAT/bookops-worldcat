@@ -17,6 +17,8 @@ from .utils import verify_oclc_number, verify_oclc_numbers
 class MetadataSession(WorldcatSession):
     """OCLC Metadata API wrapper session. Inherits `requests.Session` methods"""
 
+    BASE_URL = "https://metadata.api.oclc.org/worldcat"
+
     def __init__(
         self,
         authorization: WorldcatAccessToken,
@@ -50,78 +52,44 @@ class MetadataSession(WorldcatSession):
         for i in range(0, len(oclc_numbers), n):
             yield ",".join(oclc_numbers[i : i + n])  # noqa: E203
 
-    def URL_BASE(self) -> str:
-        return "https://metadata.api.oclc.org/worldcat"
+    def _url_manage_bibs(self, oclcNumber: str) -> str:
+        return f"{self.BASE_URL}/manage/bibs/{oclcNumber}"
 
-    def _url_base(self) -> str:
-        return "https://worldcat.org"
-
-    def _url_search_base(self) -> str:
-        return "https://americas.metadata.api.oclc.org/worldcat/search/v1"
-
-    def _url_search_shared_print_holdings(self) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/search/bibs-retained-holdings"
-
-    def _url_search_general_holdings(self) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/search/bibs-summary-holdings"
-
-    def _url_search_brief_bibs(self) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/search/brief-bibs"
-
-    def _url_search_brief_bibs_oclc_number(self, oclcNumber: str) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/search/brief-bibs/{oclcNumber}"
-
-    def _url_search_brief_bibs_other_editions(self, oclcNumber: str) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/search/brief-bibs/{oclcNumber}/other-editions"
-
-    def _url_lhr_control_number(self, controlNumber: str) -> str:
-        base_url = self._url_search_base()
-        return f"{base_url}/my-holdings/{controlNumber}"
-
-    def _url_lhr_search(self) -> str:
-        base_url = self._url_search_base()
-        return f"{base_url}/my-holdings"
-
-    def _url_lhr_shared_print(self) -> str:
-        base_url = self._url_search_base()
-        return f"{base_url}/retained-holdings"
-
-    def _url_manage_bib(self, oclcNumber: str) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/manage/bibs/{oclcNumber}"
-
-    def _url_manage_bib_current_oclc_number(self) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/manage/bibs/current"
-
-    def _url_bib_holding_libraries(self) -> str:
-        base_url = self._url_base()
-        return f"{base_url}/bib/holdinglibraries"
-
-    def _url_manage_ih_set(self, oclcNumber: str) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/manage/institution/holdings/{oclcNumber}/set"
-
-    def _url_manage_ih_unset(self, oclcNumber: str) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/manage/institution/holdings/{oclcNumber}/unset"
+    def _url_manage_bibs_current_oclc_number(self) -> str:
+        return f"{self.BASE_URL}/manage/bibs/current"
 
     def _url_manage_ih_current(self) -> str:
-        base_url = self.URL_BASE()
-        return f"{base_url}/manage/institution/holdings/current"
+        return f"{self.BASE_URL}/manage/institution/holdings/current"
 
-    def _url_bib_holdings_batch_action(self) -> str:
-        base_url = self._url_base()
-        return f"{base_url}/ih/datalist"
+    def _url_manage_ih_set(self, oclcNumber: str) -> str:
+        return f"{self.BASE_URL}/manage/institution/holdings/{oclcNumber}/set"
 
-    def _url_bib_holdings_multi_institution_batch_action(self) -> str:
-        base_url = self._url_base()
-        return f"{base_url}/ih/institutionlist"
+    def _url_manage_ih_unset(self, oclcNumber: str) -> str:
+        return f"{self.BASE_URL}/manage/institution/holdings/{oclcNumber}/unset"
+
+    def _url_search_shared_print_holdings(self) -> str:
+        return f"{self.BASE_URL}/search/bibs-retained-holdings"
+
+    def _url_search_general_holdings(self) -> str:
+        return f"{self.BASE_URL}/search/bibs-summary-holdings"
+
+    def _url_search_brief_bibs(self) -> str:
+        return f"{self.BASE_URL}/search/brief-bibs"
+
+    def _url_search_brief_bibs_oclc_number(self, oclcNumber: str) -> str:
+        return f"{self.BASE_URL}/search/brief-bibs/{oclcNumber}"
+
+    def _url_search_brief_bibs_other_editions(self, oclcNumber: str) -> str:
+        return f"{self.BASE_URL}/search/brief-bibs/{oclcNumber}/other-editions"
+
+    def _url_lhr_shared_print(self) -> str:
+        return f"{self.BASE_URL}/retained-holdings"
+
+    def _url_lhr_control_number(self, controlNumber: str) -> str:
+        return f"{self.BASE_URL}/my-holdings/{controlNumber}"
+
+    def _url_lhr_search(self) -> str:
+        return f"{self.BASE_URL}/my-holdings"
 
     def get_brief_bib(
         self, oclcNumber: Union[int, str], hooks: Optional[Dict[str, Callable]] = None
@@ -154,6 +122,43 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
+    def get_current_oclc_number(
+        self,
+        oclcNumbers: Union[str, List[Union[str, int]]],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Retrieve current OCLC control numbers
+        Uses /manage/bibs/current endpoint.
+
+        Args:
+            oclcNumbers:            string or list containing one or more OCLC numbers
+                                    to be checked; numbers can be integers or strings
+                                    with or without OCLC # prefix;
+                                    if str, the numbers must be separated by a comma
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+
+        Returns:
+            `requests.Response` object
+        """
+
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
+
+        header = {"Accept": "application/json"}
+        url = self._url_manage_bibs_current_oclc_number()
+        payload = {"oclcNumbers": ",".join(vetted_numbers)}
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
     def get_full_bib(
         self,
         oclcNumber: Union[int, str],
@@ -178,7 +183,7 @@ class MetadataSession(WorldcatSession):
         """
         oclcNumber = verify_oclc_number(oclcNumber)
 
-        url = self._url_manage_bib(oclcNumber)
+        url = self._url_manage_bibs(oclcNumber)
         header = {"Accept": response_format}
 
         # prep request
@@ -194,7 +199,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumbers: Union[str, List[Union[str, int]]],
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
+    ) -> List[Optional[Response]]:
         """
         Retrieves Worlcat holdings status of a record with provided OCLC number.
         The service automatically recognizes institution based on the issued access
@@ -213,20 +218,24 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
+        responses = []
         vetted_numbers = verify_oclc_numbers(oclcNumbers)
 
         url = self._url_manage_ih_current()
         header = {"Accept": "application/json"}
-        payload = {"oclcNumbers": ",".join(vetted_numbers)}
 
-        # prep request
-        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
+        for batch in self._split_into_legal_volume(oclc_numbers=vetted_numbers, n=10):
+            payload = {"oclcNumbers": batch}
 
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
+            # prep request
+            req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+            prepared_request = self.prepare_request(req)
 
-        return query.response
+            # send request
+            query = Query(self, prepared_request, timeout=self.timeout)
+            responses.append(query.response)
+
+        return responses
 
     def holding_set(
         self,
@@ -288,364 +297,6 @@ class MetadataSession(WorldcatSession):
 
         # prep request
         req = Request("POST", url, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def holdings_set(
-        self,
-        oclcNumbers: Union[str, List],
-        inst: Optional[str] = None,
-        instSymbol: Optional[str] = None,
-        response_format: str = "application/atom+json",
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> List[Optional[Response]]:
-        """
-        Set institution holdings for multiple OCLC numbers
-        Uses /ih/datalist endpoint.
-
-        Args:
-            oclcNumbers:            list of OCLC control numbers for which holdings
-                                    should be set;
-                                    they can be integers or strings with or
-                                    without OCLC # prefix;
-                                    if str the numbers must be separated by comma
-            inst:                   registry ID of the institution whose holdings
-                                    are being checked
-            instSymbol:             optional; OCLC symbol of the institution whose
-                                    holdings are being checked
-            response_format:        'application/atom+json' (default) or
-                                    'application/atom+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            list of `requests.Response` objects
-        """
-        responses = []
-        vetted_numbers = verify_oclc_numbers(oclcNumbers)
-
-        url = self._url_bib_holdings_batch_action()
-        header = {"Accept": response_format}
-
-        # split into batches of 50 and issue request for each batch
-        for batch in self._split_into_legal_volume(vetted_numbers):
-            payload = {
-                "oclcNumbers": batch,
-                "inst": inst,
-                "instSymbol": instSymbol,
-            }
-
-            # prep request
-            req = Request("POST", url, params=payload, headers=header, hooks=hooks)
-            prepared_request = self.prepare_request(req)
-
-            # send request
-            query = Query(self, prepared_request, timeout=self.timeout)
-
-            responses.append(query.response)
-
-        return responses
-
-    def holdings_unset(
-        self,
-        oclcNumbers: Union[str, List],
-        cascade: str = "0",
-        inst: Optional[str] = None,
-        instSymbol: Optional[str] = None,
-        response_format: str = "application/atom+json",
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> List[Optional[Response]]:
-        """
-        Set institution holdings for multiple OCLC numbers
-        Uses /ih/datalist endpoint.
-
-        Args:
-            oclcNumbers:            list of OCLC control numbers for which holdings
-                                    should be set;
-                                    they can be integers or strings with or
-                                    without OCLC # prefix;
-                                    if str the numbers must be separated by comma
-            cascade:                0 or 1, default 0;
-                                    0 - don't remove holdings if local holding
-                                    record or local bibliographic records exists;
-                                    1 - remove holding and delete local holdings
-                                    record and local bibliographic record
-            inst:                   registry ID of the institution whose holdings
-                                    are being checked
-            instSymbol:             optional; OCLC symbol of the institution whose
-                                    holdings are being checked
-            response_format:        'application/atom+json' (default) or
-                                    'application/atom+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            list of `requests.Response` objects
-        """
-        responses = []
-        vetted_numbers = verify_oclc_numbers(oclcNumbers)
-
-        url = self._url_bib_holdings_batch_action()
-        header = {"Accept": response_format}
-
-        # split into batches of 50 and issue request for each batch
-        for batch in self._split_into_legal_volume(vetted_numbers):
-            payload = {
-                "oclcNumbers": batch,
-                "cascade": cascade,
-                "inst": inst,
-                "instSymbol": instSymbol,
-            }
-
-            # prep request
-            req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
-            prepared_request = self.prepare_request(req)
-
-            # send request
-            query = Query(self, prepared_request, timeout=self.timeout)
-
-            responses.append(query.response)
-
-        return responses
-
-    def holdings_set_multi_institutions(
-        self,
-        oclcNumber: Union[int, str],
-        instSymbols: str,
-        response_format: str = "application/atom+json",
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Batch sets intitution holdings for multiple intitutions
-
-        Uses /ih/institutionlist endpoint
-
-        Args:
-            oclcNumber:             OCLC bibliographic record number; can be an
-                                    integer, or string with or without OCLC # prefix
-            instSymbols:            a comma-separated list of OCLC symbols of the
-                                    institution whose holdings are being set
-            response_format:        'application/atom+json' (default) or
-                                    'application/atom+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-        oclcNumber = verify_oclc_number(oclcNumber)
-
-        url = self._url_bib_holdings_multi_institution_batch_action()
-        header = {"Accept": response_format}
-        payload = {
-            "oclcNumber": oclcNumber,
-            "instSymbols": instSymbols,
-        }
-
-        # prep request
-        req = Request("POST", url, params=payload, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def holdings_unset_multi_institutions(
-        self,
-        oclcNumber: Union[int, str],
-        instSymbols: str,
-        cascade: str = "0",
-        response_format: str = "application/atom+json",
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Batch unsets intitution holdings for multiple intitutions
-
-        Uses /ih/institutionlist endpoint
-
-        Args:
-            oclcNumber:             OCLC bibliographic record number; can be an
-                                    integer, or string with or without OCLC # prefix
-            instSymbols:            a comma-separated list of OCLC symbols of the
-                                    institution whose holdings are being set
-            cascade:                0 or 1, default 0;
-                                    0 - don't remove holdings if local holding
-                                    record or local bibliographic records exists;
-                                    1 - remove holding and delete local holdings
-                                    record and local bibliographic record
-            response_format:        'application/atom+json' (default) or
-                                    'application/atom+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-        oclcNumber = verify_oclc_number(oclcNumber)
-
-        url = self._url_bib_holdings_multi_institution_batch_action()
-        header = {"Accept": response_format}
-        payload = {
-            "oclcNumber": oclcNumber,
-            "instSymbols": instSymbols,
-            "cascade": cascade,
-        }
-
-        # prep request
-        req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
-        prepared_request = self.prepare_request(req)
-
-        # send request
-        query = Query(self, prepared_request, timeout=self.timeout)
-
-        return query.response
-
-    def search_brief_bibs_other_editions(
-        self,
-        oclcNumber: Union[int, str],
-        deweyNumber: Optional[Union[str, List[str]]] = None,
-        datePublished: Optional[Union[str, List[str]]] = None,
-        heldByGroup: Optional[str] = None,
-        heldBySymbol: Optional[Union[str, List[str]]] = None,
-        heldByInstitutionID: Optional[Union[str, int, List[Union[str, int]]]] = None,
-        inLanguage: Optional[Union[str, List[str]]] = None,
-        inCatalogLanguage: Optional[str] = None,
-        materialType: Optional[str] = None,
-        catalogSource: Optional[str] = None,
-        itemType: Optional[Union[str, List[str]]] = None,
-        itemSubType: Optional[Union[str, List[str]]] = None,
-        retentionCommitments: Optional[bool] = None,
-        spProgram: Optional[str] = None,
-        genre: Optional[str] = None,
-        topic: Optional[str] = None,
-        subtopic: Optional[str] = None,
-        audience: Optional[str] = None,
-        content: Optional[Union[str, List[str]]] = None,
-        openAccess: Optional[bool] = None,
-        peerReviewed: Optional[bool] = None,
-        facets: Optional[Union[str, List[str]]] = None,
-        groupVariantRecords: Optional[bool] = None,
-        preferredLanguage: Optional[str] = None,
-        showHoldingsIndicators: Optional[bool] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        orderBy: Optional[str] = None,
-        hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
-        """
-        Retrieve other editions related to bibliographic resource with provided
-        OCLC #.
-        Uses /brief-bibs/{oclcNumber}/other-editions endpoint.
-
-        Args:
-            oclcNumber:             OCLC bibliographic record number; can be an
-                                    integer, or string with or without OCLC # prefix
-            deweyNumber:            limits the response to the
-                                    specified dewey classification number(s)
-                                    example:
-                                        '794,180'
-            datePublished:          restricts the response to one or
-                                    more dates, or to a range,
-                                    examples:
-                                        '2000'
-                                        '2000-2005'
-                                        '2000,2005'
-            heldByGroup:            restricts to holdings held by group symbol
-            heldBySymbol:           restricts to holdings with specified intitution
-                                    symbol
-            heldByInstitutionID:    restrict to specified institution regisgtryId
-            inLanguage:             restrics the response to the single
-                                    specified language, example: 'fre'
-            inCataloglanguage:      restrics the response to specified
-                                    cataloging language, example: 'eng';
-                                    default 'eng'
-            materialType:           restricts responses to specified material type,
-                                    example: 'bks', 'vis'
-            catalogSource:          restrict to responses to single OCLC symbol as
-                                    the cataloging source, example: 'DLC'
-            itemType:               restricts reponses to single specified OCLC
-                                    top-level facet type, example: 'book'
-            itemSubType:            restricts responses to single specified OCLC
-                                    sub facet type, example: 'digital'
-            retentionCommitments:   restricts responses to bibliographic records
-                                    with retention commitment; True or False,
-                                    default False
-            spProgram:              restricts responses to bibliographic records
-                                    associated with particular shared print
-                                    program
-            genre:                  genre to limit results to
-            topic:                  topic to limit results to
-            subtopic:               subtopic to limit results to
-            audience:               audience to limit results to,
-                                    example:
-                                        juv,
-                                        nonJuv
-            content:                content to limit resutls to,
-                                    example:
-                                        fic,
-                                        nonFic,
-                                        fic,bio
-            openAccess:             filter to only open access content, False or True
-            peerReviewed:           filter to only peer reviewed content, False or True
-            facets:                 list of facets to restrict responses
-            groupVariantRecords:    whether or not to group variant records.
-                                    options: False, True (default False)
-            preferredLanguage:      language of metadata description,
-            offset:                 start position of bibliographic records to
-                                    return; default 1
-            limit:                  maximum nuber of records to return;
-                                    maximum 50, default 10
-            orderBy:                sort of restuls;
-                                    available values:
-                                        +date, -date, +language, -language;
-                                    default value: -date
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-        Returns:
-            `requests.Response` object
-        """
-        oclcNumber = verify_oclc_number(oclcNumber)
-
-        url = self._url_search_brief_bibs_other_editions(oclcNumber)
-        header = {"Accept": "application/json"}
-        payload = {
-            "deweyNumber": deweyNumber,
-            "datePublished": datePublished,
-            "heldByGroup": heldByGroup,
-            "heldBySymbol": heldBySymbol,
-            "heldByInstitutionID": heldByInstitutionID,
-            "inLanguage": inLanguage,
-            "inCatalogLanguage": inCatalogLanguage,
-            "materialType": materialType,
-            "catalogSource": catalogSource,
-            "itemType": itemType,
-            "itemSubType": itemSubType,
-            "retentionCommitments": retentionCommitments,
-            "spProgram": spProgram,
-            "genre": genre,
-            "topic": topic,
-            "subtopic": subtopic,
-            "audience": audience,
-            "content": content,
-            "openAccess": openAccess,
-            "peerReviewed": peerReviewed,
-            "facets": facets,
-            "groupVariantRecords": groupVariantRecords,
-            "preferredLanguage": preferredLanguage,
-            "showHoldingsIndicators": showHoldingsIndicators,
-            "offset": offset,
-            "limit": limit,
-            "orderBy": orderBy,
-        }
-
-        # prep request
-        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request
@@ -831,33 +482,144 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def get_current_oclc_number(
+    def search_brief_bibs_other_editions(
         self,
-        oclcNumbers: Union[str, List[Union[str, int]]],
+        oclcNumber: Union[int, str],
+        deweyNumber: Optional[Union[str, List[str]]] = None,
+        datePublished: Optional[Union[str, List[str]]] = None,
+        heldByGroup: Optional[str] = None,
+        heldBySymbol: Optional[Union[str, List[str]]] = None,
+        heldByInstitutionID: Optional[Union[str, int, List[Union[str, int]]]] = None,
+        inLanguage: Optional[Union[str, List[str]]] = None,
+        inCatalogLanguage: Optional[str] = None,
+        materialType: Optional[str] = None,
+        catalogSource: Optional[str] = None,
+        itemType: Optional[Union[str, List[str]]] = None,
+        itemSubType: Optional[Union[str, List[str]]] = None,
+        retentionCommitments: Optional[bool] = None,
+        spProgram: Optional[str] = None,
+        genre: Optional[str] = None,
+        topic: Optional[str] = None,
+        subtopic: Optional[str] = None,
+        audience: Optional[str] = None,
+        content: Optional[Union[str, List[str]]] = None,
+        openAccess: Optional[bool] = None,
+        peerReviewed: Optional[bool] = None,
+        facets: Optional[Union[str, List[str]]] = None,
+        groupVariantRecords: Optional[bool] = None,
+        preferredLanguage: Optional[str] = None,
+        showHoldingsIndicators: Optional[bool] = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        orderBy: Optional[str] = None,
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
-        Retrieve current OCLC control numbers
-        Uses /manage/bibs/current endpoint.
+        Retrieve other editions related to bibliographic resource with provided
+        OCLC #.
+        Uses /brief-bibs/{oclcNumber}/other-editions endpoint.
 
         Args:
-            oclcNumbers:            string or list containing one or more OCLC numbers
-                                    to be checked; numbers can be integers or strings
-                                    with or without OCLC # prefix;
-                                    if str, the numbers must be separated by a comma
+            oclcNumber:             OCLC bibliographic record number; can be an
+                                    integer, or string with or without OCLC # prefix
+            deweyNumber:            limits the response to the
+                                    specified dewey classification number(s)
+                                    example:
+                                        '794,180'
+            datePublished:          restricts the response to one or
+                                    more dates, or to a range,
+                                    examples:
+                                        '2000'
+                                        '2000-2005'
+                                        '2000,2005'
+            heldByGroup:            restricts to holdings held by group symbol
+            heldBySymbol:           restricts to holdings with specified intitution
+                                    symbol
+            heldByInstitutionID:    restrict to specified institution regisgtryId
+            inLanguage:             restrics the response to the single
+                                    specified language, example: 'fre'
+            inCataloglanguage:      restrics the response to specified
+                                    cataloging language, example: 'eng';
+                                    default 'eng'
+            materialType:           restricts responses to specified material type,
+                                    example: 'bks', 'vis'
+            catalogSource:          restrict to responses to single OCLC symbol as
+                                    the cataloging source, example: 'DLC'
+            itemType:               restricts reponses to single specified OCLC
+                                    top-level facet type, example: 'book'
+            itemSubType:            restricts responses to single specified OCLC
+                                    sub facet type, example: 'digital'
+            retentionCommitments:   restricts responses to bibliographic records
+                                    with retention commitment; True or False,
+                                    default False
+            spProgram:              restricts responses to bibliographic records
+                                    associated with particular shared print
+                                    program
+            genre:                  genre to limit results to
+            topic:                  topic to limit results to
+            subtopic:               subtopic to limit results to
+            audience:               audience to limit results to,
+                                    example:
+                                        juv,
+                                        nonJuv
+            content:                content to limit resutls to,
+                                    example:
+                                        fic,
+                                        nonFic,
+                                        fic,bio
+            openAccess:             filter to only open access content, False or True
+            peerReviewed:           filter to only peer reviewed content, False or True
+            facets:                 list of facets to restrict responses
+            groupVariantRecords:    whether or not to group variant records.
+                                    options: False, True (default False)
+            preferredLanguage:      language of metadata description,
+            offset:                 start position of bibliographic records to
+                                    return; default 1
+            limit:                  maximum nuber of records to return;
+                                    maximum 50, default 10
+            orderBy:                sort of restuls;
+                                    available values:
+                                        +date, -date, +language, -language;
+                                    default value: -date
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
-
         Returns:
             `requests.Response` object
         """
+        oclcNumber = verify_oclc_number(oclcNumber)
 
-        vetted_numbers = verify_oclc_numbers(oclcNumbers)
-
+        url = self._url_search_brief_bibs_other_editions(oclcNumber)
         header = {"Accept": "application/json"}
-        url = self._url_manage_bib_current_oclc_number()
-        payload = {"oclcNumbers": ",".join(vetted_numbers)}
+        payload = {
+            "deweyNumber": deweyNumber,
+            "datePublished": datePublished,
+            "heldByGroup": heldByGroup,
+            "heldBySymbol": heldBySymbol,
+            "heldByInstitutionID": heldByInstitutionID,
+            "inLanguage": inLanguage,
+            "inCatalogLanguage": inCatalogLanguage,
+            "materialType": materialType,
+            "catalogSource": catalogSource,
+            "itemType": itemType,
+            "itemSubType": itemSubType,
+            "retentionCommitments": retentionCommitments,
+            "spProgram": spProgram,
+            "genre": genre,
+            "topic": topic,
+            "subtopic": subtopic,
+            "audience": audience,
+            "content": content,
+            "openAccess": openAccess,
+            "peerReviewed": peerReviewed,
+            "facets": facets,
+            "groupVariantRecords": groupVariantRecords,
+            "preferredLanguage": preferredLanguage,
+            "showHoldingsIndicators": showHoldingsIndicators,
+            "offset": offset,
+            "limit": limit,
+            "orderBy": orderBy,
+        }
 
         # prep request
         req = Request("GET", url, params=payload, headers=header, hooks=hooks)

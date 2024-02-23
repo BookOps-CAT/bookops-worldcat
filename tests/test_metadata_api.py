@@ -82,16 +82,34 @@ class TestMockedMetadataSession:
         all_batches = [b for b in batches]
         assert all_batches == expectation
 
-    def test_new_url_base(self, stub_session):
-        assert stub_session.URL_BASE() == "https://metadata.api.oclc.org/worldcat"
-
-    def test_url_base(self, stub_session):
-        assert stub_session._url_base() == "https://worldcat.org"
-
-    def test_url_search_base(self, stub_session):
+    def test_url_manage_bibs(self, stub_session):
         assert (
-            stub_session._url_search_base()
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1"
+            stub_session._url_manage_bibs(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/manage/bibs/12345"
+        )
+
+    def test_url_manage_bibs_current_oclc_number(self, stub_session):
+        assert (
+            stub_session._url_manage_bibs_current_oclc_number()
+            == "https://metadata.api.oclc.org/worldcat/manage/bibs/current"
+        )
+
+    def test_url_manage_ih_current(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_current()
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current"
+        )
+
+    def test_url_manage_ih_set(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_set(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/set"
+        )
+
+    def test_url_manage_ih_unset(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_unset(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/unset"
         )
 
     def test_url_search_shared_print_holdings(self, stub_session):
@@ -128,70 +146,22 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/search/brief-bibs/12345/other-editions"
         )
 
+    def test_url_lhr_shared_print(self, stub_session):
+        assert (
+            stub_session._url_lhr_shared_print()
+            == "https://metadata.api.oclc.org/worldcat/retained-holdings"
+        )
+
     def test_url_lhr_control_number(self, stub_session):
         assert (
             stub_session._url_lhr_control_number(controlNumber="12345")
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/my-holdings/12345"
+            == "https://metadata.api.oclc.org/worldcat/my-holdings/12345"
         )
 
     def test_url_lhr_search(self, stub_session):
         assert (
             stub_session._url_lhr_search()
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/my-holdings"
-        )
-
-    def test_url_lhr_shared_print(self, stub_session):
-        assert (
-            stub_session._url_lhr_shared_print()
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/retained-holdings"
-        )
-
-    def test_url_manage_bib(self, stub_session):
-        assert (
-            stub_session._url_manage_bib(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/bibs/12345"
-        )
-
-    def test_url_manage_bib_current_oclc_number(self, stub_session):
-        assert (
-            stub_session._url_manage_bib_current_oclc_number()
-            == "https://metadata.api.oclc.org/worldcat/manage/bibs/current"
-        )
-
-    def test_url_bib_holding_libraries(self, stub_session):
-        assert (
-            stub_session._url_bib_holding_libraries()
-            == "https://worldcat.org/bib/holdinglibraries"
-        )
-
-    def test_url_manage_ih_set(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_set(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/set"
-        )
-
-    def test_url_manage_ih_unset(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_unset(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/unset"
-        )
-
-    def test_url_manage_ih_current(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_current()
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current"
-        )
-
-    def test_url_bib_holdings_batch_action(self, stub_session):
-        assert (
-            stub_session._url_bib_holdings_batch_action()
-            == "https://worldcat.org/ih/datalist"
-        )
-
-    def test_url_bib_holdings_multi_institution_batch_action(self, stub_session):
-        assert (
-            stub_session._url_bib_holdings_multi_institution_batch_action()
-            == "https://worldcat.org/ih/institutionlist"
+            == "https://metadata.api.oclc.org/worldcat/my-holdings"
         )
 
     @pytest.mark.http_code(200)
@@ -238,7 +208,7 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_get_institution_holdings(self, stub_session, mock_session_response):
-        assert stub_session.get_institution_holdings("12345").status_code == 200
+        assert stub_session.get_institution_holdings("12345")[0].status_code == 200
 
     def test_get_institution_holdings_no_oclcNumber_passed(self, stub_session):
         with pytest.raises(TypeError):
@@ -272,159 +242,6 @@ class TestMockedMetadataSession:
         with pytest.raises(InvalidOclcNumber):
             stub_session.holding_unset(oclcNumber=None)
 
-    @pytest.mark.parametrize(
-        "argm,expectation",
-        [
-            (None, pytest.raises(InvalidOclcNumber)),
-            ([], pytest.raises(InvalidOclcNumber)),
-            (["bt2111111111"], pytest.raises(InvalidOclcNumber)),
-            (["850940548"], does_not_raise()),
-            (["ocn850940548"], does_not_raise()),
-            ("850940548,850940552, 850940554", does_not_raise()),
-            (["850940548", "850940552", "850940554"], does_not_raise()),
-            ([850940548, 850940552, 850940554], does_not_raise()),
-        ],
-    )
-    @pytest.mark.http_code(207)
-    def test_holdings_set(self, argm, expectation, stub_session, mock_session_response):
-        with expectation:
-            stub_session.holdings_set(argm)
-
-    def test_holdings_set_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.holdings_set()
-
-    @pytest.mark.parametrize(
-        "argm,expectation",
-        [
-            (None, pytest.raises(InvalidOclcNumber)),
-            ([], pytest.raises(InvalidOclcNumber)),
-            (["bt2111111111"], pytest.raises(InvalidOclcNumber)),
-            (["850940548"], does_not_raise()),
-            (["ocn850940548"], does_not_raise()),
-            ("850940548,850940552, 850940554", does_not_raise()),
-            (["850940548", "850940552", "850940554"], does_not_raise()),
-            ([850940548, 850940552, 850940554], does_not_raise()),
-        ],
-    )
-    @pytest.mark.http_code(207)
-    def test_holdings_unset(
-        self, argm, expectation, stub_session, mock_session_response
-    ):
-        with expectation:
-            stub_session.holdings_unset(argm)
-
-    def test_holdings_unset_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.holdings_unset()
-
-    @pytest.mark.http_code(207)
-    def test_holdings_unset_stale_token(
-        self, mock_now, stub_session, mock_session_response
-    ):
-        stub_session.authorization.token_expires_at = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(0, 1)
-        with does_not_raise():
-            assert stub_session.authorization.is_expired() is True
-            stub_session.holdings_unset([850940548, 850940552, 850940554])
-            assert stub_session.authorization.token_expires_at == datetime.datetime(
-                2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
-            )
-            assert stub_session.authorization.is_expired() is False
-
-    @pytest.mark.http_code(200)
-    def test_holdings_set_multi_institutions(self, stub_session, mock_session_response):
-        results = stub_session.holdings_set_multi_institutions(
-            oclcNumber=850940548, instSymbols="BKL,NYP"
-        )
-        assert results.status_code == 200
-
-    def test_holdings_set_multi_institutions_missing_oclc_number(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.holdings_set_multi_institutions(instSymbols="NYP,BKL")
-
-    def test_holdings_set_multi_institutions_missing_inst_symbols(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.holdings_set_multi_institutions(oclcNumber=123)
-
-    def test_holdings_set_multi_institutions_invalid_oclc_number(self, stub_session):
-        with pytest.raises(InvalidOclcNumber):
-            stub_session.holdings_set_multi_institutions(
-                oclcNumber="odn1234", instSymbols="NYP,BKL"
-            )
-
-    @pytest.mark.http_code(200)
-    def test_holdings_set_multi_institutions_stale_token(
-        self, mock_now, stub_session, mock_session_response
-    ):
-        stub_session.authorization.token_expires_at = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(0, 1)
-        with does_not_raise():
-            assert stub_session.authorization.is_expired() is True
-            stub_session.holdings_set_multi_institutions(
-                oclcNumber=850940548, instSymbols="NYP,BKL"
-            )
-            assert stub_session.authorization.token_expires_at == datetime.datetime(
-                2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
-            )
-            assert stub_session.authorization.is_expired() is False
-
-    @pytest.mark.http_code(403)
-    def test_holdings_set_multi_institutions_permission_error(
-        self, stub_session, mock_session_response
-    ):
-        with pytest.raises(WorldcatRequestError) as exc:
-            stub_session.holdings_set_multi_institutions(
-                oclcNumber=850940548, instSymbols="NYP,BKL"
-            )
-
-        assert (
-            "403 Client Error: 'foo' for url: https://foo.bar?query. Server response: spam"
-            in str(exc.value)
-        )
-
-    @pytest.mark.http_code(200)
-    def test_holdings_unset_multi_institutions(
-        self, stub_session, mock_session_response
-    ):
-        results = stub_session.holdings_unset_multi_institutions(
-            850940548, "BKL,NYP", cascade="1"
-        )
-        assert results.status_code == 200
-
-    def test_holdings_unset_multi_institutions_missing_oclc_number(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.holdings_unset_multi_institutions(instSymbols="NYP,BKL")
-
-    def test_holdings_unset_multi_institutions_missing_inst_symbols(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.holdings_unset_multi_institutions(oclcNumber=123)
-
-    def test_holdings_unset_multi_institutions_invalid_oclc_number(self, stub_session):
-        with pytest.raises(InvalidOclcNumber):
-            stub_session.holdings_unset_multi_institutions(
-                oclcNumber="odn1234", instSymbols="NYP,BKL"
-            )
-
-    @pytest.mark.http_code(200)
-    def test_holdings_unset_multi_institutions_stale_token(
-        self, mock_now, stub_session, mock_session_response
-    ):
-        stub_session.authorization.token_expires_at = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(0, 1)
-        with does_not_raise():
-            assert stub_session.authorization.is_expired() is True
-            stub_session.holdings_unset_multi_institutions(
-                oclcNumber=850940548, instSymbols="NYP,BKL"
-            )
-            assert stub_session.authorization.token_expires_at == datetime.datetime(
-                2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
-            )
-            assert stub_session.authorization.is_expired() is False
-
     @pytest.mark.http_code(200)
     def test_search_brief_bibs_other_editions(
         self, stub_session, mock_session_response
@@ -438,7 +255,7 @@ class TestMockedMetadataSession:
         assert msg in str(exc.value)
 
     @pytest.mark.http_code(200)
-    def test_seach_brief_bibs(self, stub_session, mock_session_response):
+    def test_search_brief_bibs(self, stub_session, mock_session_response):
         assert stub_session.search_brief_bibs(q="ti:Zendegi").status_code == 200
 
     @pytest.mark.parametrize("argm", [(None), ("")])
@@ -585,7 +402,7 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.get_institution_holdings("982651100")
+            response = session.get_institution_holdings("982651100")[0]
 
             assert (
                 response.url
@@ -611,7 +428,7 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.get_institution_holdings("850940548")
+            response = session.get_institution_holdings("850940548")[0]
             holdings = response.json()["holdings"]
 
             # make sure no holdings are set initially
@@ -634,70 +451,6 @@ class TestLiveMetadataSession:
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/unset"
             )
             assert response.json()["action"] == "Unset Holdings"
-
-    @pytest.mark.holdings
-    def test_holdings_set(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_set([850940548, 850940552, 850940554])
-            assert type(response) is list
-            assert response[0].status_code == 207
-            assert (
-                response[0].url
-                == "https://worldcat.org/ih/datalist?oclcNumbers=850940548%2C850940552%2C850940554"
-            )
-            assert sorted(response[0].json().keys()) == sorted(
-                ["entries", "extensions"]
-            )
-            assert sorted(response[0].json()["entries"][0]) == sorted(
-                ["title", "content", "updated"]
-            )
-            assert sorted(response[0].json()["entries"][0]["content"]) == sorted(
-                [
-                    "requestedOclcNumber",
-                    "currentOclcNumber",
-                    "institution",
-                    "status",
-                    "detail",
-                ]
-            )
-
-    @pytest.mark.holdings
-    def test_holdings_unset(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_unset([850940548, 850940552, 850940554])
-            assert type(response) is list
-            assert response[0].status_code == 207
-            assert (
-                response[0].url
-                == "https://worldcat.org/ih/datalist?oclcNumbers=850940548%2C850940552%2C850940554&cascade=0"
-            )
-            assert sorted(response[0].json().keys()) == sorted(
-                ["entries", "extensions"]
-            )
-            assert sorted(response[0].json()["entries"][0]) == sorted(
-                ["title", "content", "updated"]
-            )
-            assert sorted(response[0].json()["entries"][0]["content"]) == sorted(
-                [
-                    "requestedOclcNumber",
-                    "currentOclcNumber",
-                    "institution",
-                    "status",
-                    "detail",
-                ]
-            )
 
     def test_brief_bibs_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
