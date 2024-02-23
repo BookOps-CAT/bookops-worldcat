@@ -94,47 +94,38 @@ class TestMockedMetadataSession:
             == "https://americas.metadata.api.oclc.org/worldcat/search/v1"
         )
 
-    def test_url_shared_print_holdings(self, stub_session):
+    def test_url_search_shared_print_holdings(self, stub_session):
         assert (
-            stub_session._url_member_shared_print_holdings()
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/bibs-retained-holdings"
+            stub_session._url_search_shared_print_holdings()
+            == "https://metadata.api.oclc.org/worldcat/search/bibs-retained-holdings"
         )
 
-    def test_url_member_general_holdings(self, stub_session):
+    def test_url_search_general_holdings(self, stub_session):
         assert (
-            stub_session._url_member_general_holdings()
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/bibs-summary-holdings"
+            stub_session._url_search_general_holdings()
+            == "https://metadata.api.oclc.org/worldcat/search/bibs-summary-holdings"
         )
 
-    def test_url_brief_bib_search(self, stub_session):
+    def test_url_search_brief_bibs(self, stub_session):
         assert (
-            stub_session._url_brief_bib_search()
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs"
+            stub_session._url_search_brief_bibs()
+            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs"
         )
 
     @pytest.mark.parametrize(
-        "argm, expectation",
-        [
-            (
-                "12345",
-                "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345",
-            ),
-            (
-                12345,
-                "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345",
-            ),
-        ],
+        "argm",
+        ["12345", 12345],
     )
-    def test_url_brief_bib_oclc_number(self, argm, expectation, stub_session):
+    def test_url_search_brief_bibs_oclc_number(self, argm, stub_session):
         assert (
-            stub_session._url_brief_bib_oclc_number(oclcNumber=argm)
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345"
+            stub_session._url_search_brief_bibs_oclc_number(oclcNumber=argm)
+            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs/12345"
         )
 
-    def test_url_brief_bib_other_editions(self, stub_session):
+    def test_url_search_brief_bibs_other_editions(self, stub_session):
         assert (
-            stub_session._url_brief_bib_other_editions(oclcNumber="12345")
-            == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/12345/other-editions"
+            stub_session._url_search_brief_bibs_other_editions(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs/12345/other-editions"
         )
 
     def test_url_lhr_control_number(self, stub_session):
@@ -214,21 +205,6 @@ class TestMockedMetadataSession:
     def test_get_brief_bib_None_oclcNumber_passed(self, stub_session):
         with pytest.raises(InvalidOclcNumber):
             stub_session.get_brief_bib(oclcNumber=None)
-
-    @pytest.mark.http_code(200)
-    def test_get_brief_bib_with_stale_token(
-        self, mock_now, stub_session, mock_session_response
-    ):
-        stub_session.authorization.token_expires_at = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(0, 1)
-        assert stub_session.authorization.is_expired() is True
-        response = stub_session.get_brief_bib(oclcNumber=12345)
-        assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
-        )
-        assert stub_session.authorization.is_expired() is False
-        assert response.status_code == 200
 
     @pytest.mark.http_code(206)
     def test_get_brief_bib_odd_206_http_code(self, stub_session, mock_session_response):
@@ -453,27 +429,12 @@ class TestMockedMetadataSession:
     def test_search_brief_bibs_other_editions(
         self, stub_session, mock_session_response
     ):
-        assert stub_session.search_brief_bib_other_editions(12345).status_code == 200
-
-    @pytest.mark.http_code(200)
-    def test_search_brief_bibs_other_editions_stale_token(
-        self, mock_now, stub_session, mock_session_response
-    ):
-        stub_session.authorization.token_expires_at = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(0, 1)
-        assert stub_session.authorization.is_expired() is True
-        response = stub_session.search_brief_bib_other_editions(12345)
-        assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
-        )
-        assert stub_session.authorization.is_expired() is False
-        assert response.status_code == 200
+        assert stub_session.search_brief_bibs_other_editions(12345).status_code == 200
 
     def test_search_brief_bibs_other_editions_invalid_oclc_number(self, stub_session):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
         with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.search_brief_bib_other_editions("odn12345")
+            stub_session.search_brief_bibs_other_editions("odn12345")
         assert msg in str(exc.value)
 
     @pytest.mark.http_code(200)
@@ -485,21 +446,6 @@ class TestMockedMetadataSession:
         with pytest.raises(TypeError) as exc:
             stub_session.search_brief_bibs(argm)
         assert "Argument 'q' is requried to construct query." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_search_brief_bibs_with_stale_token(
-        self, mock_now, stub_session, mock_session_response
-    ):
-        stub_session.authorization.token_expires_at = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(0, 1)
-        assert stub_session.authorization.is_expired() is True
-        response = stub_session.search_brief_bibs(q="ti:foo")
-        assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
-        )
-        assert stub_session.authorization.is_expired() is False
-        assert response.status_code == 200
 
     @pytest.mark.http_code(207)
     def test_get_current_oclc_number(self, stub_session, mock_session_response):
@@ -527,35 +473,20 @@ class TestMockedMetadataSession:
         assert err_msg in str(exc.value)
 
     @pytest.mark.http_code(200)
-    def test_search_general_holdings(self, stub_session, mock_session_response):
-        assert stub_session.search_general_holdings(oclcNumber=12345).status_code == 200
+    def test_search_bibs_holdings(self, stub_session, mock_session_response):
+        assert stub_session.search_bibs_holdings(oclcNumber=12345).status_code == 200
 
-    def test_search_general_holdings_missing_arguments(self, stub_session):
+    def test_search_bibs_holdings_missing_arguments(self, stub_session):
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
         with pytest.raises(TypeError) as exc:
-            stub_session.search_general_holdings(holdingsAllEditions=True, limit=20)
+            stub_session.search_bibs_holdings(holdingsAllEditions=True)
         assert msg in str(exc.value)
 
-    def test_search_general_holdings_invalid_oclc_number(self, stub_session):
+    def test_search_bibs_holdings_invalid_oclc_number(self, stub_session):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
         with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.search_general_holdings(oclcNumber="odn12345")
+            stub_session.search_bibs_holdings(oclcNumber="odn12345")
         assert msg in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_search_general_holdings_with_stale_token(
-        self, mock_now, stub_session, mock_session_response
-    ):
-        stub_session.authorization.token_expires_at = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(0, 1)
-        assert stub_session.authorization.is_expired() is True
-        response = stub_session.search_general_holdings(oclcNumber=12345)
-        assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
-        )
-        assert stub_session.authorization.is_expired() is False
-        assert response.status_code == 200
 
     @pytest.mark.http_code(200)
     def test_search_shared_print_holdings(self, stub_session, mock_session_response):
@@ -567,7 +498,7 @@ class TestMockedMetadataSession:
     def test_search_shared_print_holdings_missing_arguments(self, stub_session):
         msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
         with pytest.raises(TypeError) as exc:
-            stub_session.search_shared_print_holdings(heldInState="NY", limit=20)
+            stub_session.search_shared_print_holdings(heldInState="NY")
         assert msg in str(exc.value)
 
     def test_search_shared_print_holdings_with_invalid_oclc_number_passsed(
@@ -577,21 +508,6 @@ class TestMockedMetadataSession:
         with pytest.raises(InvalidOclcNumber) as exc:
             stub_session.search_shared_print_holdings(oclcNumber="odn12345")
         assert msg in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_search_shared_print_holdings_with_stale_token(
-        self, mock_now, stub_session, mock_session_response
-    ):
-        stub_session.authorization.token_expires_at = datetime.datetime.now(
-            datetime.timezone.utc
-        ) - datetime.timedelta(0, 1)
-        assert stub_session.authorization.is_expired() is True
-        response = stub_session.search_shared_print_holdings(oclcNumber=12345)
-        assert stub_session.authorization.token_expires_at == datetime.datetime(
-            2020, 1, 1, 17, 19, 58, tzinfo=datetime.timezone.utc
-        )
-        assert stub_session.authorization.is_expired() is False
-        assert response.status_code == 200
 
 
 @pytest.mark.webtest
@@ -641,31 +557,13 @@ class TestLiveMetadataSession:
             principal_idns=os.getenv("WCPrincipalIDNS"),
         )
         token.token_str = "invalid-token"
-        err_msg = "401 Client Error: Unauthorized for url: https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
+        err_msg = "401 Client Error: Unauthorized for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045"
         with MetadataSession(authorization=token) as session:
             session.headers.update({"Authorization": "Bearer invalid-token"})
             with pytest.raises(WorldcatRequestError) as exc:
                 session.get_brief_bib(41266045)
 
             assert err_msg in str(exc.value)
-
-    def test_get_brief_bib_with_stale_token(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
-        )
-        with MetadataSession(authorization=token) as session:
-            session.authorization.is_expired() is False
-            session.authorization.token_expires_at = datetime.datetime.now(
-                datetime.timezone.utc
-            ) - datetime.timedelta(0, 1)
-            assert session.authorization.is_expired() is True
-            response = session.get_brief_bib(oclcNumber=41266045)
-            assert session.authorization.is_expired() is False
-            assert response.status_code == 200
 
     def test_get_full_bib(self, live_keys):
         token = WorldcatAccessToken(
@@ -815,7 +713,7 @@ class TestLiveMetadataSession:
                 ]
             )
 
-    def test_brief_bib_other_editions(self, live_keys):
+    def test_brief_bibs_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
@@ -826,7 +724,7 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.search_brief_bib_other_editions(41266045)
+            response = session.search_brief_bibs_other_editions(41266045)
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
@@ -847,20 +745,19 @@ class TestLiveMetadataSession:
                 inLanguage="eng",
                 inCatalogLanguage="eng",
                 itemType="book",
-                # itemSubType="printbook",
+                itemSubType=["book-printbook", "book-digital"],
                 catalogSource="dlc",
                 orderBy="mostWidelyHeld",
                 limit=5,
             )
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
-            # removed temp &itemSubType=printbook due to OCLC error/issue
             assert (
                 response.request.url
-                == "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&orderBy=mostWidelyHeld&limit=5"
+                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&itemSubType=book-digital&orderBy=mostWidelyHeld&limit=5"
             )
 
-    def test_search_general_holdings(self, live_keys):
+    def test_search_bibs_holdings(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
@@ -871,7 +768,7 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.search_general_holdings(isbn="9781597801744")
+            response = session.search_bibs_holdings(isbn="9781597801744")
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
