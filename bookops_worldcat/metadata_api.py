@@ -50,6 +50,9 @@ class MetadataSession(WorldcatSession):
         for i in range(0, len(oclc_numbers), n):
             yield ",".join(oclc_numbers[i : i + n])  # noqa: E203
 
+    def URL_BASE(self) -> str:
+        return "https://metadata.api.oclc.org/worldcat"
+
     def _url_base(self) -> str:
         return "https://worldcat.org"
 
@@ -88,25 +91,29 @@ class MetadataSession(WorldcatSession):
         base_url = self._url_search_base()
         return f"{base_url}/retained-holdings"
 
-    def _url_bib_oclc_number(self, oclcNumber: str) -> str:
-        base_url = self._url_base()
-        return f"{base_url}/bib/data/{oclcNumber}"
+    def _url_manage_bib(self, oclcNumber: str) -> str:
+        base_url = self.URL_BASE()
+        return f"{base_url}/manage/bibs/{oclcNumber}"
 
-    def _url_bib_check_oclc_numbers(self) -> str:
-        base_url = self._url_base()
-        return f"{base_url}/bib/checkcontrolnumbers"
+    def _url_manage_bib_current_oclc_number(self) -> str:
+        base_url = self.URL_BASE()
+        return f"{base_url}/manage/bibs/current"
 
     def _url_bib_holding_libraries(self) -> str:
         base_url = self._url_base()
         return f"{base_url}/bib/holdinglibraries"
 
-    def _url_bib_holdings_action(self) -> str:
-        base_url = self._url_base()
-        return f"{base_url}/ih/data"
+    def _url_manage_ih_set(self, oclcNumber: str) -> str:
+        base_url = self.URL_BASE()
+        return f"{base_url}/manage/institution/holdings/{oclcNumber}/set"
 
-    def _url_bib_holdings_check(self) -> str:
-        base_url = self._url_base()
-        return f"{base_url}/ih/checkholdings"
+    def _url_manage_ih_unset(self, oclcNumber: str) -> str:
+        base_url = self.URL_BASE()
+        return f"{base_url}/manage/institution/holdings/{oclcNumber}/unset"
+
+    def _url_manage_ih_current(self) -> str:
+        base_url = self.URL_BASE()
+        return f"{base_url}/manage/institution/holdings/current"
 
     def _url_bib_holdings_batch_action(self) -> str:
         base_url = self._url_base()
@@ -150,17 +157,19 @@ class MetadataSession(WorldcatSession):
     def get_full_bib(
         self,
         oclcNumber: Union[int, str],
-        response_format: Optional[str] = None,
+        response_format: Optional[str] = "application/marcxml+xml",
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
         Send a GET request for a full bibliographic resource.
-        Uses /bib/data/{oclcNumber} endpoint.
+        Uses /manage/bibs/{oclcNumber} endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer, or string with or without OCLC # prefix
-            response_format:        format of returned record
+            response_format:        format of returned record, options:
+                                    'application/marcxml+xml', 'application/marc',
+                                    default is 'application/marcxml+xml'
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -169,11 +178,7 @@ class MetadataSession(WorldcatSession):
         """
         oclcNumber = verify_oclc_number(oclcNumber)
 
-        url = self._url_bib_oclc_number(oclcNumber)
-        if not response_format:
-            response_format = (
-                'application/atom+xml;content="application/vnd.oclc.marc21+xml"'
-            )
+        url = self._url_manage_bib(oclcNumber)
         header = {"Accept": response_format}
 
         # prep request
@@ -185,29 +190,22 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def holding_get_status(
+    def get_institution_holdings(
         self,
-        oclcNumber: Union[int, str],
-        inst: Optional[str] = None,
-        instSymbol: Optional[str] = None,
-        response_format: Optional[str] = "application/atom+json",
+        oclcNumbers: Union[str, List[Union[str, int]]],
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
         Retrieves Worlcat holdings status of a record with provided OCLC number.
         The service automatically recognizes institution based on the issued access
         token.
-        Uses /ih/checkholdings endpoint.
+        Uses /manage/institution/holdings/current endpoint.
 
         Args:
-            oclcNumber:             OCLC bibliographic record number; can be an
-                                    integer, or string with or without OCLC # prefix
-            inst:                   registry ID of the institution whose holdings
-                                    are being checked
-            instSymbol:             optional; OCLC symbol of the institution whose
-                                    holdings are being checked
-            response_format:        'application/atom+json' (default) or
-                                    'application/atom+xml'
+            oclcNumbers:            string or list containing one or more OCLC numbers
+                                    to be checked; numbers can be integers or strings
+                                    with or without OCLC # prefix;
+                                    if str, the numbers must be separated by a comma
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -215,11 +213,11 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` object
         """
-        oclcNumber = verify_oclc_number(oclcNumber)
+        vetted_numbers = verify_oclc_numbers(oclcNumbers)
 
-        url = self._url_bib_holdings_check()
-        header = {"Accept": response_format}
-        payload = {"oclcNumber": oclcNumber, "inst": inst, "instSymbol": instSymbol}
+        url = self._url_manage_ih_current()
+        header = {"Accept": "application/json"}
+        payload = {"oclcNumbers": ",".join(vetted_numbers)}
 
         # prep request
         req = Request("GET", url, params=payload, headers=header, hooks=hooks)
@@ -233,29 +231,15 @@ class MetadataSession(WorldcatSession):
     def holding_set(
         self,
         oclcNumber: Union[int, str],
-        inst: Optional[str] = None,
-        instSymbol: Optional[str] = None,
-        holdingLibraryCode: Optional[str] = None,
-        classificationScheme: Optional[str] = None,
-        response_format: str = "application/atom+json",
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
         Sets institution's Worldcat holding on an individual record.
-        Uses /ih/data endpoint.
+        Uses /manage/institions/holdings/{oclcNumber}/set endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer, or string with or without OCLC # prefix
-            inst:                   registry ID of the institution whose holdings
-                                    are being checked
-            instSymbol:             optional; OCLC symbol of the institution whose
-                                    holdings are being checked
-            holdingLibraryCode:     four letter holding code to set the holing on
-            classificationScheme:   whether or not to return group availability
-                                    information
-            response_format:        'application/atom+json' (default) or
-                                    'application/atom+xml'
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -265,18 +249,11 @@ class MetadataSession(WorldcatSession):
         """
         oclcNumber = verify_oclc_number(oclcNumber)
 
-        url = self._url_bib_holdings_action()
-        header = {"Accept": response_format}
-        payload = {
-            "oclcNumber": oclcNumber,
-            "inst": inst,
-            "instSymbol": instSymbol,
-            "holdingLibraryCode": holdingLibraryCode,
-            "classificationScheme": classificationScheme,
-        }
+        url = self._url_manage_ih_set(oclcNumber)
+        header = {"Accept": "application/json"}
 
         # prep request
-        req = Request("POST", url, params=payload, headers=header, hooks=hooks)
+        req = Request("POST", url, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request
@@ -287,36 +264,16 @@ class MetadataSession(WorldcatSession):
     def holding_unset(
         self,
         oclcNumber: Union[int, str],
-        cascade: Union[int, str] = "0",
-        inst: Optional[str] = None,
-        instSymbol: Optional[str] = None,
-        holdingLibraryCode: Optional[str] = None,
-        classificationScheme: Optional[str] = None,
-        response_format: str = "application/atom+json",
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
         Deletes institution's Worldcat holding on an individual record.
-        Uses /ih/data endpoint.
+        Uses /manage/institions/holdings/{oclcNumber}/unset endpoint.
 
         Args:
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer, or string with or without OCLC # prefix
                                     if str the numbers must be separated by comma
-            cascade:                0 or 1, default 0;
-                                    0 - don't remove holdings if local holding
-                                    record or local bibliographic records exists;
-                                    1 - remove holding and delete local holdings
-                                    record and local bibliographic record
-            inst:                   registry ID of the institution whose holdings
-                                    are being checked
-            instSymbol:             optional; OCLC symbol of the institution whose
-                                    holdings are being checked
-            holdingLibraryCode:     four letter holding code to set the holing on
-            classificationScheme:   whether or not to return group availability
-                                    information
-            response_format:        'application/atom+json' (default) or
-                                    'application/atom+xml'
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -326,19 +283,11 @@ class MetadataSession(WorldcatSession):
         """
         oclcNumber = verify_oclc_number(oclcNumber)
 
-        url = self._url_bib_holdings_action()
-        header = {"Accept": response_format}
-        payload = {
-            "oclcNumber": oclcNumber,
-            "cascade": cascade,
-            "inst": inst,
-            "instSymbol": instSymbol,
-            "holdingLibraryCode": holdingLibraryCode,
-            "classificationScheme": classificationScheme,
-        }
+        url = self._url_manage_ih_unset(oclcNumber)
+        header = {"Accept": "application/json"}
 
         # prep request
-        req = Request("DELETE", url, params=payload, headers=header, hooks=hooks)
+        req = Request("POST", url, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request
@@ -834,23 +783,20 @@ class MetadataSession(WorldcatSession):
 
         return query.response
 
-    def search_current_control_numbers(
+    def get_current_oclc_number(
         self,
         oclcNumbers: Union[str, List[Union[str, int]]],
-        response_format: str = "application/atom+json",
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
         Retrieve current OCLC control numbers
-        Uses /bib/checkcontrolnumbers endpoint.
+        Uses /manage/bibs/current endpoint.
 
         Args:
-            oclcNumbers:            list of OCLC control numbers to be checked;
-                                    they can be integers or strings with or
-                                    without OCLC # prefix;
-                                    if str the numbers must be separated by comma
-            response_format:        'application/atom+json' (default) or
-                                    'application/atom+xml'
+            oclcNumbers:            string or list containing one or more OCLC numbers
+                                    to be checked; numbers can be integers or strings
+                                    with or without OCLC # prefix;
+                                    if str, the numbers must be separated by a comma
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -861,8 +807,8 @@ class MetadataSession(WorldcatSession):
 
         vetted_numbers = verify_oclc_numbers(oclcNumbers)
 
-        header = {"Accept": response_format}
-        url = self._url_bib_check_oclc_numbers()
+        header = {"Accept": "application/json"}
+        url = self._url_manage_bib_current_oclc_number()
         payload = {"oclcNumbers": ",".join(vetted_numbers)}
 
         # prep request
