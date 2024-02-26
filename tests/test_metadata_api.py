@@ -82,35 +82,8 @@ class TestMockedMetadataSession:
         all_batches = [b for b in batches]
         assert all_batches == expectation
 
-    def test_url_manage_bibs(self, stub_session):
-        assert (
-            stub_session._url_manage_bibs(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/bibs/12345"
-        )
-
-    def test_url_manage_bibs_current_oclc_number(self, stub_session):
-        assert (
-            stub_session._url_manage_bibs_current_oclc_number()
-            == "https://metadata.api.oclc.org/worldcat/manage/bibs/current"
-        )
-
-    def test_url_manage_ih_current(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_current()
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current"
-        )
-
-    def test_url_manage_ih_set(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_set(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/set"
-        )
-
-    def test_url_manage_ih_unset(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_unset(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/unset"
-        )
+    def test_url_base(self, stub_session):
+        assert stub_session.BASE_URL == "https://metadata.api.oclc.org/worldcat"
 
     def test_url_search_shared_print_holdings(self, stub_session):
         assert (
@@ -146,22 +119,34 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/search/brief-bibs/12345/other-editions"
         )
 
-    def test_url_lhr_shared_print(self, stub_session):
+    def test_url_manage_bib(self, stub_session):
         assert (
-            stub_session._url_lhr_shared_print()
-            == "https://metadata.api.oclc.org/worldcat/retained-holdings"
+            stub_session._url_manage_bibs(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/manage/bibs/12345"
         )
 
-    def test_url_lhr_control_number(self, stub_session):
+    def test_url_manage_bib_current_oclc_number(self, stub_session):
         assert (
-            stub_session._url_lhr_control_number(controlNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/my-holdings/12345"
+            stub_session._url_manage_bibs_current_oclc_number()
+            == "https://metadata.api.oclc.org/worldcat/manage/bibs/current"
         )
 
-    def test_url_lhr_search(self, stub_session):
+    def test_url_manage_ih_set(self, stub_session):
         assert (
-            stub_session._url_lhr_search()
-            == "https://metadata.api.oclc.org/worldcat/my-holdings"
+            stub_session._url_manage_ih_set(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/set"
+        )
+
+    def test_url_manage_ih_unset(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_unset(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/unset"
+        )
+
+    def test_url_manage_ih_current(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_current()
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current"
         )
 
     @pytest.mark.http_code(200)
