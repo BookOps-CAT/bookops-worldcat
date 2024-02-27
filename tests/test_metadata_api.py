@@ -744,6 +744,11 @@ class TestMockedMetadataSession:
     def test_search_my_holdings(self, stub_session, mock_session_response):
         assert stub_session.search_my_holdings(oclcNumber=12345).status_code == 200
 
+    def test_search_my_holdings_no_oclcNumber_passed(
+        self, stub_session, mock_session_response
+    ):
+        assert stub_session.search_my_holdings(barcode=12345).status_code == 200
+
     def test_search_my_holdings_invalid_oclc_number(self, stub_session):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
         with pytest.raises(InvalidOclcNumber) as exc:
@@ -763,6 +768,12 @@ class TestMockedMetadataSession:
     @pytest.mark.http_code(200)
     def test_search_shared_print_lhr(self, stub_session, mock_session_response):
         assert stub_session.search_shared_print_lhr(oclcNumber=12345).status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_search_shared_print_lhr_no_oclcNumber_passed(
+        self, stub_session, mock_session_response
+    ):
+        assert stub_session.search_shared_print_lhr(barcode=12345).status_code == 200
 
     def test_search_shared_print_lhr_with_invalid_oclc_number_passsed(
         self, stub_session
