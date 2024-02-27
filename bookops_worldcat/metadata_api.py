@@ -27,7 +27,7 @@ class MetadataSession(WorldcatSession):
     ) -> None:
         """
         Args:
-            authorization:          WorlcatAccessToken object
+            authorization:          WorldcatAccessToken object
             agent:                  "User-agent" parameter to be passed in the request
                                     header; usage strongly encouraged
             timeout:                how long to wait for server to send data before
@@ -81,6 +81,60 @@ class MetadataSession(WorldcatSession):
 
     def _url_manage_ih_current(self) -> str:
         return f"{self.BASE_URL}/manage/institution/holdings/current"
+
+    def _url_manage_bibs_validate(self, validationLevel: str) -> str:
+        return f"{self.BASE_URL}/manage/bibs/validate/{validationLevel}"
+
+    def _url_manage_bibs_create(self) -> str:
+        return f"{self.BASE_URL}/manage/bibs"
+
+    def _url_manage_bibs_match(self) -> str:
+        return f"{self.BASE_URL}/manage/bibs/match"
+
+    def _url_manage_ih_set_on_record(self) -> str:
+        return f"{self.BASE_URL}/manage/institution/holdings/set"
+
+    def _url_manage_ih_unset_on_record(self) -> str:
+        return f"{self.BASE_URL}/manage/institution/holdings/unset"
+
+    def _url_manage_ih_codes(self) -> str:
+        return f"{self.BASE_URL}/manage/institution/holding-codes"
+
+    def _url_manage_lbd_create(self) -> str:
+        return f"{self.BASE_URL}/manage/lbds"
+
+    def _url_manage_lbd(self, controlNumber: Union[str, int]) -> str:
+        return f"{self.BASE_URL}/manage/lbds/{controlNumber}"
+
+    def _url_manage_lhr_create(self) -> str:
+        return f"{self.BASE_URL}/manage/lhrs"
+
+    def _url_manage_lhr(self, controlNumber: Union[str, int]) -> str:
+        return f"{self.BASE_URL}/manage/lhrs/{controlNumber}"
+
+    def _url_search_general_holdings_summary(self) -> str:
+        return f"{self.BASE_URL}/search/summary-holdings"
+
+    def _url_search_classification_bibs(self, oclcNumber: str) -> str:
+        return f"{self.BASE_URL}/search/classification-bibs/{oclcNumber}"
+
+    def _url_search_lhr_shared_print(self) -> str:
+        return f"{self.BASE_URL}/search/retained-holdings"
+
+    def _url_search_lhr_control_number(self, controlNumber: Union[str, int]) -> str:
+        return f"{self.BASE_URL}/search/my-holdings/{controlNumber}"
+
+    def _url_search_lhr(self) -> str:
+        return f"{self.BASE_URL}/search/my-holdings"
+
+    def _url_browse_lhr(self) -> str:
+        return f"{self.BASE_URL}/browse/my-holdings"
+
+    def _url_search_lbd_control_number(self, controlNumber: Union[str, int]) -> str:
+        return f"{self.BASE_URL}/search/my-local-bib-data/{controlNumber}"
+
+    def _url_search_lbd(self) -> str:
+        return f"{self.BASE_URL}/search/my-local-bib-data"
 
     def get_brief_bib(
         self, oclcNumber: Union[int, str], hooks: Optional[Dict[str, Callable]] = None
@@ -311,7 +365,7 @@ class MetadataSession(WorldcatSession):
             heldByGroup:            restricts to holdings held by group symbol
             heldBySymbol:           restricts to holdings with specified intitution
                                     symbol
-            heldByInstitutionID:    restrict to specified institution regisgtryId
+            heldByInstitutionID:    restrict to specified institution registryId
             inLanguage:             restrics the response to the single
                                     specified language, example: 'fre'
             inCataloglanguage:      restrics the response to specified
@@ -351,7 +405,7 @@ class MetadataSession(WorldcatSession):
             preferredLanguage:      language of metadata description,
             offset:                 start position of bibliographic records to
                                     return; default 1
-            limit:                  maximum nuber of records to return;
+            limit:                  maximum number of records to return;
                                     maximum 50, default 10
             orderBy:                sort of restuls;
                                     available values:
@@ -526,7 +580,7 @@ class MetadataSession(WorldcatSession):
                                         'title'
             offset:                 start position of bibliographic records to
                                     return; default 1
-            limit:                  maximum nuber of records to return;
+            limit:                  maximum number of records to return;
                                     maximum 50, default 10
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
@@ -781,6 +835,1029 @@ class MetadataSession(WorldcatSession):
 
         # prep request
         req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def browse_my_holdings(
+        self,
+        callNumber: Optional[str] = None,
+        oclcNumber: Optional[Union[int, str]] = None,
+        holdingLocation: str = "",
+        shelvingLocation: str = "",
+        browsePosition: Optional[str] = None,
+        limit: Optional[int] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Browse local holdings
+        Uses /browse/my-holdings endpoint.
+
+        Args:
+            callNumber:             call number for item
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer or string with or without OCLC #
+                                    prefix
+            holdingLocation:        holding location for item
+            shelvingLocation:       shelving location for item
+            browsePosition:         position within browse list where the matching
+                                    record should be, default is 10
+            limit:                  maximum number of records to return;
+                                    maximum 50, default 10
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        if not holdingLocation:
+            raise TypeError("Argument 'holdingLocation' is missing.")
+        if not shelvingLocation:
+            raise TypeError("Argument 'shelvingLocation' is missing.")
+
+        if oclcNumber is not None:
+            oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_browse_lhr()
+        header = {"Accept": "application/json"}
+        payload = {
+            "callNumber": callNumber,
+            "oclcNumber": oclcNumber,
+            "holdingLocation": holdingLocation,
+            "shelvingLocation": shelvingLocation,
+            "browsePosition": browsePosition,
+            "limit": limit,
+        }
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def create_bib(
+        self,
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        responseFormat: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Create a bib record in OCLC if it does not already exist
+        Uses /manage/bibs endpoint.
+
+        Args:
+            record:                 MARC record to be created
+            recordFormat:           format of MARC record, options:
+                                    'application/marcxml+xml', 'application/marc'
+            responseFormat:         format of returned record; options:
+                                    'application/marcxml+xml', 'application/marc'
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_bibs_create()
+        header = {
+            "Accept": responseFormat,
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def create_lbd(
+        self,
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        responseFormat: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a local bibliographic data record, create it in WorldCat
+        Uses /manage/lbds endpoint.
+
+        Args:
+            record:                 MARC record to be created
+            recordFormat:           format of MARC record, options:
+                                    'application/marcxml+xml', 'application/marc'
+            responseFormat:         format of returned record; options:
+                                    'application/marcxml+xml', 'application/marc'
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_lbd_create()
+        header = {
+            "Accept": responseFormat,
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def create_lhr(
+        self,
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        responseFormat: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a local holdings record, create it in WorldCat
+        Uses /manage/lhrs endpoint.
+
+        Args:
+            record:                 Holdings record to be created
+            recordFormat:           format of MARC record, options:
+                                    'application/marcxml+xml', 'application/marc'
+            responseFormat:         format of returned record; options:
+                                    'application/marcxml+xml', 'application/marc'
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_lhr_create()
+        header = {
+            "Accept": responseFormat,
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def delete_lbd(
+        self,
+        controlNumber: Union[int, str],
+        responseFormat: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a control number, delete the associated Local Bibliographic Data record
+        Uses /manage/lbds/{controlNumber} endpoint.
+
+        Args:
+            controlNumber:          control number associated with Local Bibliographic
+                                    Data record; can be an integer, or string
+            response_format:        format of returned record, options:
+                                    'application/marcxml+xml', 'application/marc',
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        url = self._url_manage_lbd(controlNumber)
+        header = {"Accept": responseFormat}
+
+        # prep request
+        req = Request("DELETE", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def delete_lhr(
+        self,
+        controlNumber: Union[int, str],
+        responseFormat: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a control number, delete a Local Holdings record.
+        Uses /manage/lhrs/{controlNumber} endpoint.
+
+        Args:
+            controlNumber:          control number associated with Local Holdings
+                                    record; can be an integer, or string
+            response_format:        format of returned record, options:
+                                    'application/marcxml+xml', 'application/marc',
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        url = self._url_manage_lhr(controlNumber)
+        header = {"Accept": responseFormat}
+
+        # prep request
+        req = Request("DELETE", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_bib_classification(
+        self,
+        oclcNumber: Union[int, str],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given an OCLC number, retrieve classification recommendations for the bib record
+        Uses /search/classification-bibs/{oclcNumber} endpoint.
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer or string with or without OCLC # prefix
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_classification_bibs(oclcNumber)
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_bib_holdings(
+        self,
+        oclcNumber: Union[int, str],
+        holdingsAllEditions: Optional[bool] = None,
+        holdingsAllVariantRecords: Optional[bool] = None,
+        holdingsFilterFormat: Optional[List[str]] = None,
+        heldInCountry: Optional[str] = None,
+        heldInState: Optional[str] = None,
+        heldByGroup: Optional[str] = None,
+        heldBySymbol: Optional[List[str]] = None,
+        heldByInstitutionID: Optional[List[int]] = None,
+        heldByLibraryType: Optional[List[str]] = None,
+        lat: Optional[float] = None,
+        lon: Optional[float] = None,
+        distance: Optional[int] = None,
+        unit: Optional[str] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given an OCLC number get summary of holdings
+        Uses /search/summary-holdings endpoint.
+
+        Args:
+            oclcNumber:                 OCLC bibliographic record number; can be
+                                        an integer or string with or without OCLC #
+                                        prefix
+            holdingsAllEditions:        get holdings for all editions;
+                                        options: True, False, default is False
+            holdingsAllVariantRecords:  get holdings for specific edition across
+                                        all variant records; options: True, False,
+                                        default is False
+            holdingsFilterFormat:       get holdings for specific itemSubType,
+                                        example: book-digital
+            heldInCountry:              limits to holdings held by institutions
+                                        in requested country
+            heldInState:                limits to holdings held by institutions
+                                        in requested state, example: 'US-NY'
+            heldByGroup:                limits to holdings held by institutions
+                                        indicated by group symbol
+            heldBySymbol:               limits to holdings held by institutions
+                                        indicated by institution symbol
+            heldByInstitutionID:        limits to holdings held by institutions
+                                        indicated by institution registryID
+            heldByLibraryType:          limits to holdings held by library type,
+                                        options: 'PUBLIC', 'ALL'
+            lat:                        limit to latitude, example: 37.502508
+            lon:                        limit to longitute, example: -122.22702
+            distance:                   distance from latitude and longitude
+            unit:                       unit of distance param; options:
+                                        'M' (miles) or 'K' (kilometers)
+            hooks:                      Requests library hook system that can be
+                                        used for signal event handling, see more at:
+                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_general_holdings_summary()
+        header = {"Accept": "application/json"}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "holdingsAllEditions": holdingsAllEditions,
+            "holdingsAllVariantRecords": holdingsAllVariantRecords,
+            "holdingsFilterFormat": holdingsFilterFormat,
+            "heldInCountry": heldInCountry,
+            "heldInState": heldInState,
+            "heldByGroup": heldByGroup,
+            "heldBySymbol": heldBySymbol,
+            "heldByInstitutionID": heldByInstitutionID,
+            "heldByLibraryType": heldByLibraryType,
+            "lat": lat,
+            "lon": lon,
+            "distance": distance,
+            "unit": unit,
+        }
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_institution_holding_codes(
+        self,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Retrieve the all holding codes for the authenticated institution.
+        Uses /manage/institution/holding-codes endpoint.
+
+        Args:
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        url = self._url_manage_ih_codes()
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_lbd_data(
+        self,
+        controlNumber: Union[int, str],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Retrieve LBD Resource
+        Uses /search/my-local-bib-data/{controlNumber} endpoint.
+
+        Args:
+            controlNumber:          control number associated with Local Bibliographic
+                                    Data record; can be an integer, or string
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        url = self._url_search_lbd_control_number(controlNumber)
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_lhr_data(
+        self,
+        controlNumber: Union[int, str],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Retrieve LHR Resource
+        Uses /search/my-holdings/{controlNumber} endpoint.
+
+        Args:
+            controlNumber:          control number associated with Local Holdings
+                                    record; can be an integer, or string
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        url = self._url_search_lhr_control_number(controlNumber)
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_lbd_record(
+        self,
+        controlNumber: Union[int, str],
+        response_format: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a Control Number, retrieve a Local Bibliographic Data record.
+        Uses /manage/lbds/{controlNumber} endpoint.
+
+        Args:
+            controlNumber:          control number associated with Local Bibliographic
+                                    Data record; can be an integer, or string
+            response_format:        format of returned record, options:
+                                    'application/marcxml+xml', 'application/marc',
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        url = self._url_manage_lbd(controlNumber)
+        header = {"Accept": response_format}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def get_lhr_record(
+        self,
+        controlNumber: Union[int, str],
+        response_format: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Send a GET request for a local holdings record
+        Uses /manage/lhrs/{controlNumber} endpoint.
+
+        Args:
+            controlNumber:          control number associated with Local Holdings
+                                    record; can be an integer, or string
+            response_format:        format of returned record, options:
+                                    'application/marcxml+xml', 'application/marc',
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        url = self._url_manage_lhr(controlNumber)
+        header = {"Accept": response_format}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def holding_set_on_record(
+        self,
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a MARC record in MARC XML or MARC21, set a holding on the record.
+        MARC record must contain OCLC number in 001 or 035 subfield a.
+        Only one MARC record is allowed in the request body.
+        Uses /manage/institution/holdings/set endpoint.
+
+        Args:
+            record:                 MARC record on which to set holdings
+            recordFormat:           format of MARC record, options:
+                                    'application/marcxml+xml', 'application/marc'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_ih_set_on_record()
+        header = {
+            "Accept": "application/json",
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def holding_unset_on_record(
+        self,
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a MARC record in MARC XML or MARC21, unset a holding on the record.
+        MARC record must contain OCLC number in 001 or 035 subfield a.
+        Only one MARC record is allowed in the request body.
+        Uses /manage/institution/holdings/unset endpoint.
+
+        Args:
+            record:                 MARC record on which to unset holdings
+            recordFormat:           format of MARC record, options:
+                                    'application/marcxml+xml', 'application/marc'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_ih_unset_on_record()
+        header = {
+            "Accept": "application/json",
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+        return query.response
+
+    def match_bib(
+        self,
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a bib record in MARC21 or MARCXML identify the best match in WorldCat.
+        Record must contain at minimum an 008 and 245. Response contains number of
+        potential matches in numberOfRecords and best match in briefRecords
+        Uses /manage/bibs/match endpoint.
+
+        Args:
+            record:                 MARC record to be matched
+            recordFormat:           format of MARC record, options:
+                                    'application/marcxml+xml', 'application/marc'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_bibs_match()
+        header = {
+            "Accept": "application/json",
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def replace_bib(
+        self,
+        oclcNumber: Union[int, str],
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        responseFormat: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given an OCLC number and MARC record, find record in WorldCat and replace it.
+        If the record does not exist in WorldCat, a new bib record will be created.
+        Uses /manage/bibs/{oclcNumber} endpoint.
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number for record to be
+                                    replaced; can be an integer or string with or
+                                    without OCLC # prefix
+            record:                 MARC record to replace existing WorldCat record
+            recordFormat:           format of MARC record, options:
+                                    'application/marcxml+xml', 'application/marc'
+            responseFormat:         format of returned record; options:
+                                    'application/marcxml+xml', 'application/marc'
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_bibs(oclcNumber)
+        header = {
+            "Accept": responseFormat,
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("PUT", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def replace_lbd(
+        self,
+        controlNumber: Union[int, str],
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        responseFormat: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a Control Number, find the associated Local Bibliographic Data
+        Record and replace it. If the Control Number is not found in
+        WorldCat, then the provided Local Bibliographic Data Record will be created.
+        Uses /manage/lbds/{controlNumber} endpoint.
+
+        Args:
+            controlNumber:          control number associated with Local Bibliographic
+                                    Data record; can be an integer, or string
+            response_format:        format of returned record, options:
+                                    'application/marcxml+xml', 'application/marc',
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_lbd(controlNumber)
+        header = {
+            "Accept": responseFormat,
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("PUT", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def replace_lhr(
+        self,
+        controlNumber: Union[int, str],
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        responseFormat: Optional[str] = "application/marcxml+xml",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a Control Number, find the associated Local Holdings
+        Record and replace it. If the Control Number is not found in
+        WorldCat, then the provided Local Holdings Record will be created.
+        Uses /manage/lhrs/{controlNumber} endpoint.
+
+        Args:
+            controlNumber:          control number associated with Local Holdings
+                                    record; can be an integer, or string
+            response_format:        format of returned record, options:
+                                    'application/marcxml+xml', 'application/marc',
+                                    default is 'application/marcxml+xml'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_lhr(controlNumber)
+        header = {
+            "Accept": responseFormat,
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request("PUT", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def search_my_holdings(
+        self,
+        oclcNumber: Optional[Union[int, str]] = None,
+        barcode: Optional[str] = None,
+        orderBy: Optional[str] = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Search LHR Resources
+        Uses /search/my-holdings endpoint.
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer, or string that can include
+                                    OCLC # prefix
+            barcode:                barcode as a string,
+            orderBy:                results sort key;
+                                    options:
+                                        'commitmentExpirationDate'
+                                        'location'
+                                        'oclcSymbol'
+                                    default is 'oclcSymbol'
+            offset:                 start position of bibliographic records to
+                                    return; default is 1
+            limit:                  maximum number of records to return;
+                                    maximum is 50, default is 10
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if oclcNumber is not None:
+            oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_lhr()
+        header = {"Accept": "application/json"}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "barcode": barcode,
+            "orderBy": orderBy,
+            "offset": offset,
+            "limit": limit,
+        }
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def search_my_local_bibs(
+        self,
+        q: str,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Search LBD Resources
+        Uses /search/my-local-bib-data endpoint.
+
+        Args:
+            q:                      query in the form of a keyword search or
+                                    fielded search;
+                                    examples:
+                                        ti:Zendegi
+                                        ti:"Czarne oceany"
+                                        bn:9781680502404
+                                        kw:python databases
+                                        ti:Zendegi AND au:greg egan
+                                        (au:Okken OR au:Myers) AND su:python
+            offset:                 start position of bibliographic records to
+                                    return; default is 1
+            limit:                  maximum number of records to return;
+                                    maximum is 50, default is 10
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if not q:
+            raise TypeError("Argument 'q' is requried to construct query.")
+
+        url = self._url_search_lbd()
+        header = {"Accept": "application/json"}
+        payload = {"q": q, "offset": offset, "limit": limit}
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def search_shared_print_lhr(
+        self,
+        oclcNumber: Optional[Union[int, str]] = None,
+        barcode: Optional[str] = None,
+        heldBySymbol: Optional[List[str]] = None,
+        heldByInstitutionID: Optional[List[int]] = None,
+        spProgram: Optional[List[str]] = None,
+        orderBy: Optional[str] = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Search for shared print LHR Resources
+        Uses /search/retained-holdings endpoint.
+
+        Args:
+            oclcNumber:             OCLC bibliographic record number; can be
+                                    an integer, or string that can include
+                                    OCLC # prefix
+            barcode:                barcode as a string,
+            heldBySymbol:           restricts to holdings with specified intitution
+                                    symbol
+            heldByInstitutionID:    restrict to specified institution registryId
+            spProgram:              restricts responses to bibliographic records
+                                    associated with particular shared print
+                                    program
+            orderBy:                results sort key;
+                                    options:
+                                        'commitmentExpirationDate'
+                                        'location'
+                                        'oclcSymbol'
+                                    default is 'oclcSymbol'
+            offset:                 start position of bibliographic records to
+                                    return; default is 1
+            limit:                  maximum number of records to return;
+                                    maximum is 50, default is 10
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` object
+        """
+        if oclcNumber is not None:
+            oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_lhr_shared_print()
+        header = {"Accept": "application/json"}
+        payload = {
+            "oclcNumber": oclcNumber,
+            "barcode": barcode,
+            "heldBySymbol": heldBySymbol,
+            "heldByInstitutionID": heldByInstitutionID,
+            "spProgram": spProgram,
+            "orderBy": orderBy,
+            "offset": offset,
+            "limit": limit,
+        }
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def validate_bib(
+        self,
+        record: Optional[str] = None,
+        recordFormat: Optional[str] = None,
+        validationLevel: str = "validateFull",
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Optional[Response]:
+        """
+        Given a bib record, validate that record conforms to MARC standards
+        Uses /manage/bibs/validate/{validationLevel} endpoint.
+
+        Args:
+            record:                 MARC record to be validated
+            recordFormat:           format of MARC record, options:
+                                    'application/marcxml+xml', 'application/marc'
+            validationLevel:        Level at which to validate records
+                                    available values: 'validateFull', 'validateAdd',
+                                    'validateReplace'
+                                    default is 'validateFull'
+            hooks:                  Requests library hook system that can be
+                                    used for signal event handling, see more at:
+                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+        Returns:
+            `requests.Response` instance
+        """
+        if not record:
+            raise TypeError("Argument 'record' is missing.")
+
+        if not recordFormat:
+            raise TypeError("Argument 'recordFormat' is missing.")
+
+        url = self._url_manage_bibs_validate(validationLevel)
+        header = {
+            "Accept": "application/json",
+            "content-type": recordFormat,
+        }
+
+        # prep request
+        req = Request(
+            "POST",
+            url,
+            data=record,
+            headers=header,
+            hooks=hooks,
+        )
         prepared_request = self.prepare_request(req)
 
         # send request

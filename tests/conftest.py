@@ -23,6 +23,28 @@ def live_keys():
             os.environ["WCScopes"] = data["scopes"]
 
 
+@pytest.fixture
+def stub_marc_xml():
+    stub_marc_xml = "<record><leader>00000nam a2200000 a 4500</leader><controlfield tag='008'>120827s2012    nyua          000 0 eng d</controlfield><datafield tag='010' ind1=' ' ind2=' '><subfield code='a'>   63011276 </subfield></datafield><datafield tag='035' ind1=' ' ind2=' '><subfield code='a'>ocn850940548</subfield></datafield><datafield tag='040' ind1=' ' ind2=' '><subfield code='a'>OCWMS</subfield><subfield code='b'>eng</subfield><subfield code='c'>OCWMS</subfield></datafield><datafield tag='100' ind1='0' ind2=' '><subfield code='a'>OCLC Developer Network</subfield></datafield><datafield tag='245' ind1='1' ind2='0'><subfield code='a'>Test Record</subfield></datafield><datafield tag='500' ind1=' ' ind2=' '><subfield code='a'>FOR OCLC DEVELOPER NETWORK DOCUMENTATION</subfield></datafield></record>"
+    return stub_marc_xml
+
+
+@pytest.fixture
+def stub_holding_xml():
+    stub_holding_xml = "<record><leader>00000nx  a2200000zi 4500</leader><controlfield tag='004'>312010</controlfield><controlfield tag='007'>zu</controlfield><controlfield tag='008'>1103280p    0   4001uueng0210908</controlfield><datafield ind2=' ' ind1=' ' tag='852'><subfield code='a'>OCWMS</subfield><subfield code='b'>EAST</subfield><subfield code='c'>EAST-STACKS</subfield></datafield><datafield ind2=' ' ind1=' ' tag='876'><subfield code='p'>879456</subfield></datafield></record>"
+    return stub_holding_xml
+
+
+@pytest.fixture
+def stub_marc21():
+    fh = os.path.join(
+        os.environ["USERPROFILE"], "github/bookops-worldcat/temp/test.mrc"
+    )
+    with open(fh, "rb") as stub:
+        stub_marc21 = stub.read()
+    return stub_marc21
+
+
 class FakeUtcNow(datetime.datetime):
     @classmethod
     def now(cls, tzinfo=datetime.timezone.utc):
