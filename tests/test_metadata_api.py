@@ -336,6 +336,10 @@ class TestMockedMetadataSession:
             stub_session.get_full_bib(oclcNumber=None)
 
     @pytest.mark.http_code(200)
+    def test_get_institution_holding_codes(self, stub_session, mock_session_response):
+        assert stub_session.get_institution_holding_codes().status_code == 200
+
+    @pytest.mark.http_code(200)
     def test_get_institution_holdings(self, stub_session, mock_session_response):
         assert stub_session.get_institution_holdings("12345")[0].status_code == 200
 
