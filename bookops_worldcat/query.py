@@ -57,18 +57,7 @@ class Query:
 
         try:
             self.response = session.send(prepared_request, timeout=timeout)
-
-            if "/ih/data" in prepared_request.url:  # type: ignore
-                if self.response.status_code == 409:
-                    # HTTP 409 code returns when trying to set/unset
-                    # holdings on already set/unset record
-                    # It is reasonable not to raise any exceptions
-                    # in this case
-                    pass  # pragma: no cover
-                else:
-                    self.response.raise_for_status()
-            else:
-                self.response.raise_for_status()
+            self.response.raise_for_status()
 
         except HTTPError as exc:
             raise WorldcatRequestError(
