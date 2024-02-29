@@ -9,7 +9,9 @@ import sys
 
 from requests.models import PreparedRequest
 from requests.exceptions import ConnectionError, HTTPError, Timeout
-
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
+from urllib3.exceptions import MaxRetryError
 from .errors import WorldcatRequestError
 
 
@@ -19,12 +21,12 @@ if TYPE_CHECKING:
 
 class Query:
     """
-    Sends a request to OClC service and unifies received exceptions
+    Sends a request to OCLC service and unifies exceptions.
     Query object handles refreshing expired token before request is
     made to the web service.
 
     `Query.response` attribute is `requests.Response` instance that
-    can be parsed to exctract received information from the web service.
+    can be parsed to extract information received from the web service.
     """
 
     def __init__(
@@ -46,6 +48,12 @@ class Query:
             WorldcatRequestError
 
         """
+        # figure out how to automatically get a new token for retries
+        retries = Retry(total=2, backoff_factor=1, status_forcelist=[500, 502])
+        session.mount("https://", HTTPAdapter(max_retries=retries))
+
+        session.hooks = {"response": [self._get_token_on_retry()]}
+        r = session
         if not isinstance(prepared_request, PreparedRequest):
             raise TypeError("Invalid type for argument 'prepared_request'.")
 
@@ -53,9 +61,9 @@ class Query:
         if session.authorization.is_expired():
             session._get_new_access_token()
 
-        self.response = None
-
         try:
+            if retries.is_exhausted() == False:
+                session._get_new_access_token()
             self.response = session.send(prepared_request, timeout=timeout)
             self.response.raise_for_status()
 
@@ -66,5 +74,16 @@ class Query:
             )
         except (Timeout, ConnectionError):
             raise WorldcatRequestError(f"Connection Error: {sys.exc_info()[0]}")
-        except:
+
+        except Exception:
             raise WorldcatRequestError(f"Unexpected request error: {sys.exc_info()[0]}")
+
+        def _get_token_on_retry(self, retry: Retry) -> str:
+            """
+            Request a new token if there is a specific server response
+            """
+            if retry.is_exhausted() == False:
+                new_token = session._get_new_access_token()
+                session.auth = new_token
+            else:
+                pass
