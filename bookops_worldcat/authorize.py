@@ -29,6 +29,14 @@ class WorldcatAccessToken:
         secret:                 your WSKey secret
         scopes:                 request scopes for the access token as a string,
                                 separate different scopes with space
+                                users with WSKeys set up to act as multiple institutions
+                                should provide scope and registryID in the format
+                                "{scope} context:{registryID}"
+                                examples:
+                                    single institution WSKey:
+                                        "WorldCatMetadataAPI"
+                                    multi-institution WSKey:
+                                        "WorldCatMetadataAPI context:00001"
         agent:                  "User-agent" parameter to be passed in the request
                                 header; usage strongly encouraged
         timeout:                how long to wait for server to send data before
@@ -40,7 +48,7 @@ class WorldcatAccessToken:
         >>> token = WorldcatAccessToken(
                 key="my_WSKey_client_id",
                 secret="my_WSKey_secret",
-                scope="WorldCatMetadataAPI",
+                scopes="WorldCatMetadataAPI",
                 agent="my_app/1.0.0")
         >>> token.token_str
         "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
@@ -223,7 +231,7 @@ class WorldcatAccessToken:
                 return False
         else:
             raise TypeError(
-                "Attribue 'WorldcatAccessToken.token_expires_at' is of invalid type. "
+                "Attribute 'WorldcatAccessToken.token_expires_at' is of invalid type. "
                 "Expected `datetime.datetime` object."
             )
 
