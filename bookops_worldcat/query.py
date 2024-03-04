@@ -11,7 +11,6 @@ from requests.models import PreparedRequest
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
-from urllib3.exceptions import MaxRetryError
 from .errors import WorldcatRequestError
 
 
@@ -48,22 +47,20 @@ class Query:
             WorldcatRequestError
 
         """
-        # figure out how to automatically get a new token for retries
-        retries = Retry(total=2, backoff_factor=1, status_forcelist=[500, 502])
-        session.mount("https://", HTTPAdapter(max_retries=retries))
-
-        session.hooks = {"response": [self._get_token_on_retry()]}
-        r = session
         if not isinstance(prepared_request, PreparedRequest):
             raise TypeError("Invalid type for argument 'prepared_request'.")
+
+        # allow session to retry a request up to 3 times
+        retries = Retry(
+            total=3, backoff_factor=0.5, status_forcelist=[429, 500, 502, 503, 504]
+        )
+        session.mount("https://", HTTPAdapter(max_retries=retries))
 
         # make sure access token is still valid and if not request a new one
         if session.authorization.is_expired():
             session._get_new_access_token()
 
         try:
-            if retries.is_exhausted() == False:
-                session._get_new_access_token()
             self.response = session.send(prepared_request, timeout=timeout)
             self.response.raise_for_status()
 
@@ -77,13 +74,3 @@ class Query:
 
         except Exception:
             raise WorldcatRequestError(f"Unexpected request error: {sys.exc_info()[0]}")
-
-        def _get_token_on_retry(self, retry: Retry) -> str:
-            """
-            Request a new token if there is a specific server response
-            """
-            if retry.is_exhausted() == False:
-                new_token = session._get_new_access_token()
-                session.auth = new_token
-            else:
-                pass

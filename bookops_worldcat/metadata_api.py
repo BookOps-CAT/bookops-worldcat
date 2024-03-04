@@ -207,7 +207,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumbers: Union[str, List[Union[str, int]]],
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> List[Optional[Response]]:
+    ) -> List[Response]:
         """
         Retrieves Worlcat holdings status of a record with provided OCLC number.
         The service automatically recognizes institution based on the issued access

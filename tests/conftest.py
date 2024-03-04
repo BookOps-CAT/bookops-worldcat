@@ -24,17 +24,6 @@ def live_keys():
 
 
 @pytest.fixture
-def fake_keys():
-    if os.name == "nt":
-        fh = os.path.join(os.environ["USERPROFILE"], ".oclc/nyp_wc_fake_creds.json")
-        with open(fh, "r") as file:
-            data = json.load(file)
-            os.environ["WCKey"] = data["key"]
-            os.environ["WCSecret"] = data["secret"]
-            os.environ["WCScopes"] = data["scopes"]
-
-
-@pytest.fixture
 def stub_marc_xml():
     stub_marc_xml = "<record><leader>00000nam a2200000 a 4500</leader><controlfield tag='008'>120827s2012    nyua          000 0 eng d</controlfield><datafield tag='010' ind1=' ' ind2=' '><subfield code='a'>   63011276 </subfield></datafield><datafield tag='035' ind1=' ' ind2=' '><subfield code='a'>ocn850940548</subfield></datafield><datafield tag='040' ind1=' ' ind2=' '><subfield code='a'>OCWMS</subfield><subfield code='b'>eng</subfield><subfield code='c'>OCWMS</subfield></datafield><datafield tag='100' ind1='0' ind2=' '><subfield code='a'>OCLC Developer Network</subfield></datafield><datafield tag='245' ind1='1' ind2='0'><subfield code='a'>Test Record</subfield></datafield><datafield tag='500' ind1=' ' ind2=' '><subfield code='a'>FOR OCLC DEVELOPER NETWORK DOCUMENTATION</subfield></datafield></record>"
     return stub_marc_xml
