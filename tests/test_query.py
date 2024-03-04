@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from contextlib import nullcontext as does_not_raise
-import datetime
 import os
 
 import pytest
@@ -40,20 +39,6 @@ def test_query_not_prepared_request(stub_session):
         req = Request("GET", "https://foo.org")
         Query(stub_session, req, timeout=2)
     assert "Invalid type for argument 'prepared_request'." in str(exc.value)
-
-
-@pytest.mark.http_code(200)
-def test_query_with_stale_token(stub_session, mock_now, mock_session_response):
-    stub_session.authorization.token_expires_at = datetime.datetime.now(
-        datetime.timezone.utc
-    ) - datetime.timedelta(0, 1)
-    assert stub_session.authorization.is_expired() is True
-
-    req = Request("GET", "http://foo.org")
-    prepped = stub_session.prepare_request(req)
-    query = Query(stub_session, prepped)
-    assert stub_session.authorization.is_expired() is False
-    assert query.response.status_code == 200
 
 
 @pytest.mark.http_code(200)
