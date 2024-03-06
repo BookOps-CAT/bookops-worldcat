@@ -141,6 +141,17 @@ def test_query_connection_exception(stub_session, mock_connection_error):
     )
 
 
+def test_query_retry_exception(stub_session, mock_retry_error):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError) as exc:
+        Query(stub_session, prepped)
+
+    assert "Connection Error: <class 'requests.exceptions.RetryError'>" in str(
+        exc.value
+    )
+
+
 def test_query_unexpected_exception(stub_session, mock_unexpected_error):
     req = Request("GET", "https://foo.org")
     prepped = stub_session.prepare_request(req)
@@ -148,3 +159,14 @@ def test_query_unexpected_exception(stub_session, mock_unexpected_error):
         Query(stub_session, prepped)
 
     assert "Unexpected request error: <class 'Exception'>" in str(exc.value)
+
+
+def test_query_timeout_retry(stub_session, caplog):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError):
+        Query(stub_session, prepped)
+
+    assert "Retry(total=0, " in caplog.records[2].message
+    assert "Retry(total=1, " in caplog.records[1].message
+    assert "Retry(total=2, " in caplog.records[0].message

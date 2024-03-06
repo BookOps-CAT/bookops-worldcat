@@ -122,6 +122,11 @@ class MockConnectionError:
         raise requests.exceptions.ConnectionError
 
 
+class MockRetryError:
+    def __init__(self, *args, **kwargs):
+        raise requests.exceptions.RetryError
+
+
 class MockHTTPSessionResponse(Response):
     def __init__(self, http_code):
         self.status_code = http_code
@@ -198,6 +203,13 @@ def mock_connection_error(monkeypatch):
     monkeypatch.setattr("requests.post", MockConnectionError)
     monkeypatch.setattr("requests.get", MockConnectionError)
     monkeypatch.setattr("requests.Session.send", MockConnectionError)
+
+
+@pytest.fixture
+def mock_retry_error(monkeypatch):
+    monkeypatch.setattr("requests.post", MockRetryError)
+    monkeypatch.setattr("requests.get", MockRetryError)
+    monkeypatch.setattr("requests.Session.send", MockRetryError)
 
 
 @pytest.fixture

@@ -8,9 +8,7 @@ from typing import Optional, Union, Tuple, TYPE_CHECKING
 import sys
 
 from requests.models import PreparedRequest
-from requests.exceptions import ConnectionError, HTTPError, Timeout
-from requests.adapters import HTTPAdapter
-from urllib3.util import Retry
+from requests.exceptions import ConnectionError, HTTPError, Timeout, RetryError
 from .errors import WorldcatRequestError
 
 
@@ -50,12 +48,6 @@ class Query:
         if not isinstance(prepared_request, PreparedRequest):
             raise TypeError("Invalid type for argument 'prepared_request'.")
 
-        # allow session to retry a request up to 3 times
-        retries = Retry(
-            total=3, backoff_factor=0.5, status_forcelist=[429, 500, 502, 503, 504]
-        )
-        session.mount("https://", HTTPAdapter(max_retries=retries))
-
         # make sure access token is still valid and if not request a new one
         if session.authorization.is_expired():
             session._get_new_access_token()
@@ -69,7 +61,7 @@ class Query:
                 f"{exc}. Server response: "  # type: ignore
                 f"{self.response.content.decode('utf-8')}"
             )
-        except (Timeout, ConnectionError):
+        except (Timeout, ConnectionError, RetryError):
             raise WorldcatRequestError(f"Connection Error: {sys.exc_info()[0]}")
 
         except Exception:

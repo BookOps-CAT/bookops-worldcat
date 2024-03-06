@@ -8,6 +8,7 @@ and others.
 from typing import Optional, Tuple, Union
 
 import requests
+from urllib3.util import Retry
 
 from . import __title__, __version__
 from .authorize import WorldcatAccessToken
@@ -34,6 +35,12 @@ class WorldcatSession(requests.Session):
                                     before giving up
         """
         super().__init__()
+
+        # allow session to retry a request up to 3 times
+        retries = Retry(
+            total=3, backoff_factor=0.5, status_forcelist=[406, 429, 500, 502, 503, 504]
+        )
+        self.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries))
 
         self.authorization = authorization
 

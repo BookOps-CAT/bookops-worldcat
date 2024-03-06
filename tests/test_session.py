@@ -5,6 +5,7 @@ import pytest
 
 from bookops_worldcat._session import WorldcatSession
 from bookops_worldcat.__version__ import __title__, __version__
+from requests.adapters import HTTPAdapter
 
 
 class TestWorldcatSession:
@@ -38,3 +39,7 @@ class TestWorldcatSession:
     def test_custom_timeout(self, mock_token):
         with WorldcatSession(mock_token, timeout=1) as session:
             assert session.timeout == 1
+
+    def test_adapter(self, mock_token):
+        with WorldcatSession(mock_token) as session:
+            assert isinstance(session.adapters["https://"], HTTPAdapter)
