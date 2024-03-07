@@ -224,6 +224,18 @@ def stub_session(mock_token):
 
 
 @pytest.fixture
+def stub_retry_session(mock_token):
+    with MetadataSession(
+        authorization=mock_token,
+        total_retries=3,
+        backoff_factor=0.5,
+        status_forcelist=[500, 502, 503, 504],
+        allowed_methods=["GET", "POST", "PUT"],
+    ) as session:
+        yield session
+
+
+@pytest.fixture
 def mock_400_response(monkeypatch):
     def mock_api_response(*args, **kwargs):
         msg = {

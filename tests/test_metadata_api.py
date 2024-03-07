@@ -1194,3 +1194,37 @@ class TestLiveMetadataSession:
                 == "https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull"
             )
             assert sorted(response.json().keys()) == sorted(["httpStatus", "status"])
+
+    def test_default_retries(self, live_keys, stub_marc21):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            with pytest.raises(WorldcatRequestError) as exc:
+                session.validate_bib(stub_marc21, recordFormat="foo/bar")
+            assert "406 Client Error: Not Acceptable for url: " in (str(exc.value))
+            assert session.adapters["https://"].max_retries.total == 0
+
+    def test_custom_retries(self, live_keys, stub_marc21):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(
+            authorization=token,
+            total_retries=3,
+            backoff_factor=0.5,
+            status_forcelist=[406],
+            allowed_methods=["GET", "POST"],
+        ) as session:
+            with pytest.raises(WorldcatRequestError) as exc:
+                session.validate_bib(stub_marc21, recordFormat="foo/bar")
+            assert "Connection Error: <class 'requests.exceptions.RetryError'>" in (
+                str(exc.value)
+            )
+            assert session.adapters["https://"].max_retries.total == 3

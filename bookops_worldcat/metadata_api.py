@@ -24,6 +24,10 @@ class MetadataSession(WorldcatSession):
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
         timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = None,
+        total_retries: int = 0,
+        backoff_factor: float = 0,
+        status_forcelist: Optional[List[int]] = [],
+        allowed_methods: Optional[List[str]] = None,
     ) -> None:
         """
         Args:
@@ -32,8 +36,34 @@ class MetadataSession(WorldcatSession):
                                     header; usage strongly encouraged
             timeout:                how long to wait for server to send data before
                                     giving up; default value is 5 seconds
+            total_retries:          optional number of times to retry a request that
+                                    failed or timed out. if total_retries argument is
+                                    not passed, any arguments passed to
+                                    backoff_factor, status_forcelist, and
+                                    allowed_methods will be ignored. default is 0
+            backoff_factor:         if total_retries is not 0, the backoff
+                                    factor as a float to use to calculate amount of
+                                    time session will sleep before attempting request
+                                    again. default is 0
+            status_forcelist:       if total_retries is not 0, a list of HTTP
+                                    status codes to automatically retry requests on.
+                                    if not specified, all failed requests will be
+                                    retried up to number of total_retries.
+                                    example: [500, 502, 503, 504]
+            allowed_methods:        if total_retries is not 0, set of HTTP methods that
+                                    requests should be retried on. if not specified,
+                                    requests using any HTTP method verbs will be
+                                    retried. example: ["GET", "POST"]
         """
-        super().__init__(authorization, agent=agent, timeout=timeout)
+        super().__init__(
+            authorization,
+            agent=agent,
+            timeout=timeout,
+            total_retries=total_retries,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist,
+            allowed_methods=allowed_methods,
+        )
 
     def _split_into_legal_volume(
         self, oclc_numbers: List[str] = [], n: int = 50

@@ -161,11 +161,11 @@ def test_query_unexpected_exception(stub_session, mock_unexpected_error):
     assert "Unexpected request error: <class 'Exception'>" in str(exc.value)
 
 
-def test_query_timeout_retry(stub_session, caplog):
+def test_query_timeout_retry(stub_retry_session, caplog):
     req = Request("GET", "https://foo.org")
-    prepped = stub_session.prepare_request(req)
+    prepped = stub_retry_session.prepare_request(req)
     with pytest.raises(WorldcatRequestError):
-        Query(stub_session, prepped)
+        Query(stub_retry_session, prepped)
 
     assert "Retry(total=0, " in caplog.records[2].message
     assert "Retry(total=1, " in caplog.records[1].message
