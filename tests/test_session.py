@@ -38,3 +38,22 @@ class TestWorldcatSession:
     def test_custom_timeout(self, mock_token):
         with WorldcatSession(mock_token, timeout=1) as session:
             assert session.timeout == 1
+
+    def test_default_adapter(self, mock_token):
+        with WorldcatSession(mock_token) as session:
+            assert session.adapters["https://"].max_retries.total == 0
+
+    def test_adapter_retries(self, mock_token):
+        with WorldcatSession(
+            authorization=mock_token,
+            total_retries=3,
+            backoff_factor=0.5,
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=["GET", "POST", "PUT"],
+        ) as session:
+            assert session.adapters["https://"].max_retries.status_forcelist == [
+                500,
+                502,
+                503,
+                504,
+            ]

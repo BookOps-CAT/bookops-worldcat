@@ -122,6 +122,11 @@ class MockConnectionError:
         raise requests.exceptions.ConnectionError
 
 
+class MockRetryError:
+    def __init__(self, *args, **kwargs):
+        raise requests.exceptions.RetryError
+
+
 class MockHTTPSessionResponse(Response):
     def __init__(self, http_code):
         self.status_code = http_code
@@ -201,6 +206,13 @@ def mock_connection_error(monkeypatch):
 
 
 @pytest.fixture
+def mock_retry_error(monkeypatch):
+    monkeypatch.setattr("requests.post", MockRetryError)
+    monkeypatch.setattr("requests.get", MockRetryError)
+    monkeypatch.setattr("requests.Session.send", MockRetryError)
+
+
+@pytest.fixture
 def mock_token(mock_credentials, mock_successful_post_token_response):
     return WorldcatAccessToken(**mock_credentials)
 
@@ -208,6 +220,18 @@ def mock_token(mock_credentials, mock_successful_post_token_response):
 @pytest.fixture
 def stub_session(mock_token):
     with MetadataSession(authorization=mock_token) as session:
+        yield session
+
+
+@pytest.fixture
+def stub_retry_session(mock_token):
+    with MetadataSession(
+        authorization=mock_token,
+        total_retries=3,
+        backoff_factor=0.5,
+        status_forcelist=[500, 502, 503, 504],
+        allowed_methods=["GET", "POST", "PUT"],
+    ) as session:
         yield session
 
 

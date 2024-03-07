@@ -21,7 +21,7 @@ def test_query_live(live_keys):
     )
     with MetadataSession(authorization=token) as session:
         header = {"Accept": "application/json"}
-        url = "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
+        url = "https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045"
         req = Request(
             "GET",
             url,
@@ -95,9 +95,7 @@ def test_query_http_207_response(stub_session, mock_session_response):
 @pytest.mark.http_code(404)
 def test_query_http_404_response(stub_session, mock_session_response):
     header = {"Accept": "application/json"}
-    url = (
-        "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
-    )
+    url = "https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045"
     req = Request("GET", url, headers=header, hooks=None)
     prepped = stub_session.prepare_request(req)
 
@@ -143,6 +141,17 @@ def test_query_connection_exception(stub_session, mock_connection_error):
     )
 
 
+def test_query_retry_exception(stub_session, mock_retry_error):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError) as exc:
+        Query(stub_session, prepped)
+
+    assert "Connection Error: <class 'requests.exceptions.RetryError'>" in str(
+        exc.value
+    )
+
+
 def test_query_unexpected_exception(stub_session, mock_unexpected_error):
     req = Request("GET", "https://foo.org")
     prepped = stub_session.prepare_request(req)
@@ -150,3 +159,23 @@ def test_query_unexpected_exception(stub_session, mock_unexpected_error):
         Query(stub_session, prepped)
 
     assert "Unexpected request error: <class 'Exception'>" in str(exc.value)
+
+
+def test_query_timeout_retry(stub_retry_session, caplog):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_retry_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError):
+        Query(stub_retry_session, prepped)
+
+    assert "Retry(total=0, " in caplog.records[2].message
+    assert "Retry(total=1, " in caplog.records[1].message
+    assert "Retry(total=2, " in caplog.records[0].message
+
+
+def test_query_timeout_no_retry(stub_session, caplog):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError):
+        Query(stub_session, prepped)
+
+    assert "Retry" not in caplog.records
