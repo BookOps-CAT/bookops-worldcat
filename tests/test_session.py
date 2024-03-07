@@ -5,7 +5,6 @@ import pytest
 
 from bookops_worldcat._session import WorldcatSession
 from bookops_worldcat.__version__ import __title__, __version__
-from requests.adapters import HTTPAdapter
 
 
 class TestWorldcatSession:
@@ -40,6 +39,17 @@ class TestWorldcatSession:
         with WorldcatSession(mock_token, timeout=1) as session:
             assert session.timeout == 1
 
-    def test_adapter(self, mock_token):
+    def test_adapter_retry_total(self, mock_token):
         with WorldcatSession(mock_token) as session:
-            assert isinstance(session.adapters["https://"], HTTPAdapter)
+            assert session.adapters["https://"].max_retries.total == 3
+
+    def test_adapter_force_list_pass(self, mock_token):
+        with WorldcatSession(mock_token) as session:
+            assert session.adapters["https://"].max_retries.status_forcelist == [
+                406,
+                429,
+                500,
+                502,
+                503,
+                504,
+            ]
