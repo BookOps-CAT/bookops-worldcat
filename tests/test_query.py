@@ -170,3 +170,12 @@ def test_query_timeout_retry(stub_retry_session, caplog):
     assert "Retry(total=0, " in caplog.records[2].message
     assert "Retry(total=1, " in caplog.records[1].message
     assert "Retry(total=2, " in caplog.records[0].message
+
+
+def test_query_timeout_no_retry(stub_session, caplog):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError):
+        Query(stub_session, prepped)
+
+    assert "Retry" not in caplog.records
