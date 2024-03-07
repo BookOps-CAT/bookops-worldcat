@@ -73,18 +73,13 @@ class WorldcatSession(requests.Session):
 
         self.timeout = timeout
 
-        self.total_retries = total_retries
-        self.backoff_factor = backoff_factor
-        self.status_forcelist = status_forcelist
-        self.allowed_methods = allowed_methods
-
         # if user provides retry args, create Retry object and mount adapter to session
-        if self.total_retries != 0:
+        if total_retries != 0:
             retries = Retry(
-                total=self.total_retries,
-                backoff_factor=self.backoff_factor,
-                status_forcelist=self.status_forcelist,
-                allowed_methods=self.allowed_methods,
+                total=total_retries,
+                backoff_factor=backoff_factor,
+                status_forcelist=status_forcelist,
+                allowed_methods=allowed_methods,
             )
             self.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries))
 
