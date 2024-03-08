@@ -27,7 +27,7 @@ class WorldcatSession(requests.Session):
         ),
         total_retries: int = 0,
         backoff_factor: float = 0,
-        status_forcelist: Optional[List[int]] = [],
+        status_forcelist: Optional[List[int]] = None,
         allowed_methods: Optional[List[str]] = None,
     ) -> None:
         """
@@ -75,12 +75,28 @@ class WorldcatSession(requests.Session):
 
         # if user provides retry args, create Retry object and mount adapter to session
         if total_retries != 0:
-            retries = Retry(
-                total=total_retries,
-                backoff_factor=backoff_factor,
-                status_forcelist=status_forcelist,
-                allowed_methods=allowed_methods,
-            )
+            if status_forcelist is None:
+                retries = Retry(
+                    total=total_retries,
+                    backoff_factor=backoff_factor,
+                    status_forcelist=Retry.RETRY_AFTER_STATUS_CODES,
+                    allowed_methods=allowed_methods,
+                )
+            elif (
+                isinstance(status_forcelist, List)
+                and all(isinstance(x, int) for x in status_forcelist)
+                and len(status_forcelist) > 0
+            ):
+                retries = Retry(
+                    total=total_retries,
+                    backoff_factor=backoff_factor,
+                    status_forcelist=status_forcelist,
+                    allowed_methods=allowed_methods,
+                )
+            else:
+                raise ValueError(
+                    "Argument 'status_forcelist' must be a list of integers."
+                )
             self.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries))
 
         self._update_authorization()

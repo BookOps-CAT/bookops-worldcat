@@ -85,70 +85,6 @@ class TestMockedMetadataSession:
     def test_url_base(self, stub_session):
         assert stub_session.BASE_URL == "https://metadata.api.oclc.org/worldcat"
 
-    def test_url_search_shared_print_holdings(self, stub_session):
-        assert (
-            stub_session._url_search_shared_print_holdings()
-            == "https://metadata.api.oclc.org/worldcat/search/bibs-retained-holdings"
-        )
-
-    def test_url_search_general_holdings(self, stub_session):
-        assert (
-            stub_session._url_search_general_holdings()
-            == "https://metadata.api.oclc.org/worldcat/search/bibs-summary-holdings"
-        )
-
-    def test_url_search_brief_bibs(self, stub_session):
-        assert (
-            stub_session._url_search_brief_bibs()
-            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs"
-        )
-
-    @pytest.mark.parametrize(
-        "argm",
-        ["12345", 12345],
-    )
-    def test_url_search_brief_bibs_oclc_number(self, argm, stub_session):
-        assert (
-            stub_session._url_search_brief_bibs_oclc_number(oclcNumber=argm)
-            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs/12345"
-        )
-
-    def test_url_search_brief_bibs_other_editions(self, stub_session):
-        assert (
-            stub_session._url_search_brief_bibs_other_editions(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs/12345/other-editions"
-        )
-
-    def test_url_manage_bib(self, stub_session):
-        assert (
-            stub_session._url_manage_bibs(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/bibs/12345"
-        )
-
-    def test_url_manage_bib_current_oclc_number(self, stub_session):
-        assert (
-            stub_session._url_manage_bibs_current_oclc_number()
-            == "https://metadata.api.oclc.org/worldcat/manage/bibs/current"
-        )
-
-    def test_url_manage_ih_set(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_set(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/set"
-        )
-
-    def test_url_manage_ih_unset(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_unset(oclcNumber="12345")
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/unset"
-        )
-
-    def test_url_manage_ih_current(self, stub_session):
-        assert (
-            stub_session._url_manage_ih_current()
-            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current"
-        )
-
     @pytest.mark.parametrize(
         "validationLevel",
         ["vaidateFull", "validateAdd", "validateReplace"],
@@ -159,7 +95,7 @@ class TestMockedMetadataSession:
             == f"https://metadata.api.oclc.org/worldcat/manage/bibs/validate/{validationLevel}"
         )
 
-    def test_url_manage_bibs_current_oclc_number(self, stub_session):
+    def test_url_manage_bib_current_oclc_number(self, stub_session):
         assert (
             stub_session._url_manage_bibs_current_oclc_number()
             == "https://metadata.api.oclc.org/worldcat/manage/bibs/current"
@@ -183,15 +119,33 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/manage/bibs/match"
         )
 
-    def test_url_manage_ih_set_on_record(self, stub_session):
+    def test_url_manage_ih_current(self, stub_session):
         assert (
-            stub_session._url_manage_ih_set_on_record()
+            stub_session._url_manage_ih_current()
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current"
+        )
+
+    def test_url_manage_ih_set(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_set(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/set"
+        )
+
+    def test_url_manage_ih_unset(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_unset(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/unset"
+        )
+
+    def test_url_manage_ih_set_on_bib(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_set_on_bib()
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/set"
         )
 
-    def test_url_manage_ih_unset_on_record(self, stub_session):
+    def test_url_manage_ih_unset_on_bib(self, stub_session):
         assert (
-            stub_session._url_manage_ih_unset_on_record()
+            stub_session._url_manage_ih_unset_on_bib()
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset"
         )
 
@@ -233,10 +187,44 @@ class TestMockedMetadataSession:
             == f"https://metadata.api.oclc.org/worldcat/manage/lhrs/{controlNumber}"
         )
 
+    def test_url_search_shared_print_holdings(self, stub_session):
+        assert (
+            stub_session._url_search_shared_print_holdings()
+            == "https://metadata.api.oclc.org/worldcat/search/bibs-retained-holdings"
+        )
+
+    def test_url_search_general_holdings(self, stub_session):
+        assert (
+            stub_session._url_search_general_holdings()
+            == "https://metadata.api.oclc.org/worldcat/search/bibs-summary-holdings"
+        )
+
     def test_url_search_general_holdings_summary(self, stub_session):
         assert (
             stub_session._url_search_general_holdings_summary()
             == "https://metadata.api.oclc.org/worldcat/search/summary-holdings"
+        )
+
+    def test_url_search_brief_bibs(self, stub_session):
+        assert (
+            stub_session._url_search_brief_bibs()
+            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs"
+        )
+
+    @pytest.mark.parametrize(
+        "argm",
+        ["12345", 12345],
+    )
+    def test_url_search_brief_bibs_oclc_number(self, argm, stub_session):
+        assert (
+            stub_session._url_search_brief_bibs_oclc_number(oclcNumber=argm)
+            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs/12345"
+        )
+
+    def test_url_search_brief_bibs_other_editions(self, stub_session):
+        assert (
+            stub_session._url_search_brief_bibs_other_editions(oclcNumber="12345")
+            == "https://metadata.api.oclc.org/worldcat/search/brief-bibs/12345/other-editions"
         )
 
     @pytest.mark.parametrize(
@@ -294,503 +282,121 @@ class TestMockedMetadataSession:
         )
 
     @pytest.mark.http_code(200)
-    def test_get_brief_bib(self, stub_session, mock_session_response):
-        assert stub_session.get_brief_bib(12345).status_code == 200
-
-    def test_get_brief_bib_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_brief_bib()
-
-    def test_get_brief_bib_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(InvalidOclcNumber):
-            stub_session.get_brief_bib(oclcNumber=None)
-
-    @pytest.mark.http_code(206)
-    def test_get_brief_bib_odd_206_http_code(self, stub_session, mock_session_response):
-        with does_not_raise():
-            response = stub_session.get_brief_bib(12345)
-        assert response.status_code == 206
-
-    @pytest.mark.http_code(404)
-    def test_get_brief_bib_404_error_response(
-        self, stub_session, mock_session_response
-    ):
-        with pytest.raises(WorldcatRequestError) as exc:
-            stub_session.get_brief_bib(12345)
-
+    def test_bib_create(self, stub_session, mock_session_response, stub_marc_xml):
         assert (
-            "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: spam"
-            in (str(exc.value))
+            stub_session.bib_create(
+                stub_marc_xml, recordFormat="application/marcxml+xml"
+            ).status_code
+            == 200
         )
 
-    @pytest.mark.http_code(200)
-    def test_get_full_bib(self, stub_session, mock_session_response):
-        assert stub_session.get_full_bib(12345).status_code == 200
-
-    def test_get_full_bib_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_full_bib()
-
-    def test_get_full_bib_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(InvalidOclcNumber):
-            stub_session.get_full_bib(oclcNumber=None)
-
-    @pytest.mark.http_code(200)
-    def test_get_institution_holding_codes(self, stub_session, mock_session_response):
-        assert stub_session.get_institution_holding_codes().status_code == 200
-
-    @pytest.mark.http_code(200)
-    def test_get_institution_holdings(self, stub_session, mock_session_response):
-        assert stub_session.get_institution_holdings("12345")[0].status_code == 200
-
-    def test_get_institution_holdings_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_institution_holdings()
-
-    def test_get_institution_holdings_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(InvalidOclcNumber):
-            stub_session.get_institution_holdings(oclcNumbers=None)
-
-    @pytest.mark.http_code(201)
-    def test_holding_set(self, stub_session, mock_session_response):
-        assert stub_session.holding_set(850940548).status_code == 201
-
-    def test_holding_set_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.holding_set()
-
-    def test_holding_set_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(InvalidOclcNumber):
-            stub_session.holding_set(oclcNumber=None)
-
-    @pytest.mark.http_code(200)
-    def test_holding_unset(self, stub_session, mock_session_response):
-        assert stub_session.holding_unset(850940548).status_code == 200
-
-    def test_holding_unset_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.holding_unset()
-
-    def test_holding_unset_None_oclcNumber_passed(self, stub_session):
-        with pytest.raises(InvalidOclcNumber):
-            stub_session.holding_unset(oclcNumber=None)
-
-    @pytest.mark.http_code(200)
-    def test_search_brief_bibs_other_editions(
-        self, stub_session, mock_session_response
-    ):
-        assert stub_session.search_brief_bibs_other_editions(12345).status_code == 200
-
-    def test_search_brief_bibs_other_editions_invalid_oclc_number(self, stub_session):
-        msg = "Argument 'oclcNumber' does not look like real OCLC #."
-        with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.search_brief_bibs_other_editions("odn12345")
-        assert msg in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_search_brief_bibs(self, stub_session, mock_session_response):
-        assert stub_session.search_brief_bibs(q="ti:Zendegi").status_code == 200
-
-    @pytest.mark.parametrize("argm", [(None), ("")])
-    def test_search_brief_bibs_missing_query(self, stub_session, argm):
+    def test_bib_create_no_record_passed(self, stub_session):
         with pytest.raises(TypeError) as exc:
-            stub_session.search_brief_bibs(argm)
-        assert "Argument 'q' is requried to construct query." in str(exc.value)
+            stub_session.bib_create(recordFormat="application/marcxml+xml")
+        assert "Argument 'record' is missing." in str(exc.value)
+
+    def test_bib_create_no_recordFormat_passed(
+        self, stub_session, mock_session_response, stub_marc_xml
+    ):
+        with pytest.raises(TypeError) as exc:
+            stub_session.bib_create(stub_marc_xml)
+        assert "Argument 'recordFormat' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_bib_get(self, stub_session, mock_session_response):
+        assert stub_session.bib_get(12345).status_code == 200
+
+    def test_bib_get_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.bib_get()
+
+    def test_bib_get_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.bib_get(oclcNumber=None)
+
+    @pytest.mark.http_code(200)
+    def test_bib_get_classification(self, stub_session, mock_session_response):
+        assert stub_session.bib_get_classification(12345).status_code == 200
+
+    def test_bib_get_classification_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.bib_get_classification()
 
     @pytest.mark.http_code(207)
-    def test_get_current_oclc_number(self, stub_session, mock_session_response):
+    def test_bib_get_current_oclc_number(self, stub_session, mock_session_response):
         assert (
-            stub_session.get_current_oclc_number(
+            stub_session.bib_get_current_oclc_number(
                 oclcNumbers=["12345", "65891"]
             ).status_code
             == 207
         )
 
     @pytest.mark.http_code(207)
-    def test_get_current_oclc_number_passed_as_str(
+    def test_bib_get_current_oclc_number_passed_as_str(
         self, stub_session, mock_session_response
     ):
         assert (
-            stub_session.get_current_oclc_number(oclcNumbers="12345,65891").status_code
+            stub_session.bib_get_current_oclc_number(
+                oclcNumbers="12345,65891"
+            ).status_code
             == 207
         )
 
     @pytest.mark.parametrize("argm", [(None), (""), ([])])
-    def test_get_current_oclc_number_missing_numbers(self, stub_session, argm):
+    def test_bib_get_current_oclc_number_missing_numbers(self, stub_session, argm):
         err_msg = "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s."
         with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.get_current_oclc_number(argm)
+            stub_session.bib_get_current_oclc_number(argm)
         assert err_msg in str(exc.value)
 
     @pytest.mark.http_code(200)
-    def test_search_bibs_holdings(self, stub_session, mock_session_response):
-        assert stub_session.search_bibs_holdings(oclcNumber=12345).status_code == 200
-
-    def test_search_bibs_holdings_missing_arguments(self, stub_session):
-        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
-        with pytest.raises(TypeError) as exc:
-            stub_session.search_bibs_holdings(holdingsAllEditions=True)
-        assert msg in str(exc.value)
-
-    def test_search_bibs_holdings_invalid_oclc_number(self, stub_session):
-        msg = "Argument 'oclcNumber' does not look like real OCLC #."
-        with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.search_bibs_holdings(oclcNumber="odn12345")
-        assert msg in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_search_shared_print_holdings(self, stub_session, mock_session_response):
+    def test_bib_match(self, stub_session, mock_session_response, stub_marc_xml):
         assert (
-            stub_session.search_shared_print_holdings(oclcNumber=12345).status_code
-            == 200
-        )
-
-    def test_search_shared_print_holdings_missing_arguments(self, stub_session):
-        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
-        with pytest.raises(TypeError) as exc:
-            stub_session.search_shared_print_holdings(heldInState="NY")
-        assert msg in str(exc.value)
-
-    def test_search_shared_print_holdings_with_invalid_oclc_number_passsed(
-        self, stub_session
-    ):
-        msg = "Argument 'oclcNumber' does not look like real OCLC #."
-        with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.search_shared_print_holdings(oclcNumber="odn12345")
-        assert msg in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_browse_my_holdings(self, stub_session, mock_session_response):
-        assert (
-            stub_session.browse_my_holdings(
-                oclcNumber="12345", holdingLocation="foo", shelvingLocation="bar"
-            ).status_code
-            == 200
-        )
-
-    @pytest.mark.http_code(200)
-    def test_browse_my_holdings_no_oclc_number(
-        self, stub_session, mock_session_response
-    ):
-        assert (
-            stub_session.browse_my_holdings(
-                holdingLocation="foo", shelvingLocation="bar"
-            ).status_code
-            == 200
-        )
-
-    def test_browse_my_holdings_no_holdingLocation_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.browse_my_holdings(shelvingLocation="bar")
-        assert "Argument 'holdingLocation' is missing." in str(exc.value)
-
-    def test_browse_my_holdings_no_shelvingLocation_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.browse_my_holdings(holdingLocation="foo")
-        assert "Argument 'shelvingLocation' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_create_bib(self, stub_session, mock_session_response, stub_marc_xml):
-        assert (
-            stub_session.create_bib(
+            stub_session.bib_match(
                 stub_marc_xml, recordFormat="application/marcxml+xml"
             ).status_code
             == 200
         )
 
-    def test_create_bib_no_record_passed(self, stub_session):
+    def test_bib_match_no_record_passed(self, stub_session):
         with pytest.raises(TypeError) as exc:
-            stub_session.create_bib(recordFormat="application/marcxml+xml")
+            stub_session.bib_match(recordFormat="application/marcxml+xml")
         assert "Argument 'record' is missing." in str(exc.value)
 
-    def test_create_bib_no_recordFormat_passed(
+    def test_bib_match_no_recordFormat_passed(
         self, stub_session, mock_session_response, stub_marc_xml
     ):
         with pytest.raises(TypeError) as exc:
-            stub_session.create_bib(stub_marc_xml)
+            stub_session.bib_match(stub_marc_xml)
         assert "Argument 'recordFormat' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
-    def test_create_lbd(self, stub_session, mock_session_response, stub_marc_xml):
+    def test_bib_replace(self, stub_session, mock_session_response, stub_marc_xml):
         assert (
-            stub_session.create_lbd(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            ).status_code
-            == 200
-        )
-
-    def test_create_lbd_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.create_lbd(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_create_lbd_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.create_lbd(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_create_lhr(self, stub_session, mock_session_response, stub_holding_xml):
-        assert (
-            stub_session.create_lhr(
-                stub_holding_xml, recordFormat="application/marcxml+xml"
-            ).status_code
-            == 200
-        )
-
-    def test_create_lhr_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.create_lhr(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_create_lhr_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_holding_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.create_lhr(stub_holding_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_delete_lbd(self, stub_session, mock_session_response):
-        assert stub_session.delete_lbd("12345").status_code == 200
-
-    @pytest.mark.http_code(200)
-    def test_delete_lhr(self, stub_session, mock_session_response):
-        assert stub_session.delete_lhr("12345").status_code == 200
-
-    @pytest.mark.http_code(200)
-    def test_get_bib_classification(self, stub_session, mock_session_response):
-        assert stub_session.get_bib_classification(12345).status_code == 200
-
-    def test_get_bib_classification_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_bib_classification()
-
-    @pytest.mark.http_code(200)
-    def test_get_bib_holdings(self, stub_session, mock_session_response):
-        assert stub_session.get_bib_holdings(oclcNumber=12345).status_code == 200
-
-    def test_get_bib_holdings_no_oclcNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_bib_holdings(holdingsAllVariantRecords=True)
-
-    @pytest.mark.http_code(200)
-    def test_get_lbd_data(self, stub_session, mock_session_response):
-        assert stub_session.get_lbd_data(12345).status_code == 200
-
-    def test_get_lbd_data_no_controlNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_lbd_data()
-
-    @pytest.mark.http_code(200)
-    def test_get_lhr_data(self, stub_session, mock_session_response):
-        assert stub_session.get_lhr_data(12345).status_code == 200
-
-    def test_get_lhr_data_no_controlNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_lhr_data()
-
-    @pytest.mark.http_code(200)
-    def test_get_lbd_record(self, stub_session, mock_session_response):
-        assert stub_session.get_lbd_record(12345).status_code == 200
-
-    def test_get_lbd_record_no_controlNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_lbd_record()
-
-    @pytest.mark.http_code(200)
-    def test_get_lhr_record(self, stub_session, mock_session_response):
-        assert stub_session.get_lhr_record(12345).status_code == 200
-
-    def test_get_lhr_record_no_controlNumber_passed(self, stub_session):
-        with pytest.raises(TypeError):
-            stub_session.get_lhr_record()
-
-    @pytest.mark.http_code(200)
-    def test_holding_set_on_record(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        assert (
-            stub_session.holding_set_on_record(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            ).status_code
-            == 200
-        )
-
-    def test_holding_set_on_record_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.holding_set_on_record(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_holding_set_on_record_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.holding_set_on_record(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_holding_unset_on_record(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        assert (
-            stub_session.holding_unset_on_record(
-                record=stub_marc_xml, recordFormat="application/marcxml+xml"
-            ).status_code
-            == 200
-        )
-
-    def test_holding_unset_on_record_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.holding_unset_on_record(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_holding_unset_on_record_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.holding_unset_on_record(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_match_bib(self, stub_session, mock_session_response, stub_marc_xml):
-        assert (
-            stub_session.match_bib(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            ).status_code
-            == 200
-        )
-
-    def test_match_bib_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.match_bib(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_match_bib_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.match_bib(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_replace_bib(self, stub_session, mock_session_response, stub_marc_xml):
-        assert (
-            stub_session.replace_bib(
+            stub_session.bib_replace(
                 "12345", stub_marc_xml, recordFormat="application/marcxml+xml"
             ).status_code
             == 200
         )
 
     @pytest.mark.http_code(200)
-    def test_replace_bib_no_record_passed(self, stub_session):
+    def test_bib_replace_no_record_passed(self, stub_session):
         with pytest.raises(TypeError) as exc:
-            stub_session.replace_bib("12345", recordFormat="application/marcxml+xml")
+            stub_session.bib_replace("12345", recordFormat="application/marcxml+xml")
         assert "Argument 'record' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
-    def test_replace_bib_no_recordFormat_passed(
+    def test_bib_replace_no_recordFormat_passed(
         self, stub_session, mock_session_response, stub_marc_xml
     ):
         with pytest.raises(TypeError) as exc:
-            stub_session.replace_bib("12345", stub_marc_xml)
+            stub_session.bib_replace("12345", stub_marc_xml)
         assert "Argument 'recordFormat' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
-    def test_replace_lbd(self, stub_session, mock_session_response, stub_marc_xml):
+    def test_bib_validate(self, stub_session, mock_session_response, stub_marc_xml):
         assert (
-            stub_session.replace_lbd(
-                "12345", stub_marc_xml, recordFormat="application/marcxml+xml"
-            ).status_code
-            == 200
-        )
-
-    @pytest.mark.http_code(200)
-    def test_replace_lbd_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.replace_lbd("12345", recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_replace_lbd_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.replace_lbd("12345", stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_replace_lhr(self, stub_session, mock_session_response, stub_holding_xml):
-        assert (
-            stub_session.replace_lhr(
-                "12345", stub_holding_xml, recordFormat="application/marcxml+xml"
-            ).status_code
-            == 200
-        )
-
-    @pytest.mark.http_code(200)
-    def test_replace_lhr_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.replace_lhr("12345", recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_replace_lhr_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_holding_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.replace_lhr("12345", stub_holding_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_search_my_holdings(self, stub_session, mock_session_response):
-        assert stub_session.search_my_holdings(oclcNumber=12345).status_code == 200
-
-    def test_search_my_holdings_no_oclcNumber_passed(
-        self, stub_session, mock_session_response
-    ):
-        assert stub_session.search_my_holdings(barcode=12345).status_code == 200
-
-    def test_search_my_holdings_invalid_oclc_number(self, stub_session):
-        msg = "Argument 'oclcNumber' does not look like real OCLC #."
-        with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.search_my_holdings(oclcNumber="odn12345")
-        assert msg in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_search_my_local_bibs(self, stub_session, mock_session_response):
-        assert stub_session.search_my_local_bibs(q="ti:foo").status_code == 200
-
-    @pytest.mark.parametrize("argm", [(None), ("")])
-    def test_search_my_local_bibs_missing_query(self, stub_session, argm):
-        with pytest.raises(TypeError) as exc:
-            stub_session.search_my_local_bibs(argm)
-        assert "Argument 'q' is requried to construct query." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_search_shared_print_lhr(self, stub_session, mock_session_response):
-        assert stub_session.search_shared_print_lhr(oclcNumber=12345).status_code == 200
-
-    @pytest.mark.http_code(200)
-    def test_search_shared_print_lhr_no_oclcNumber_passed(
-        self, stub_session, mock_session_response
-    ):
-        assert stub_session.search_shared_print_lhr(barcode=12345).status_code == 200
-
-    def test_search_shared_print_lhr_with_invalid_oclc_number_passsed(
-        self, stub_session
-    ):
-        msg = "Argument 'oclcNumber' does not look like real OCLC #."
-        with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.search_shared_print_lhr(oclcNumber="odn12345")
-        assert msg in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_validate_bib(self, stub_session, mock_session_response, stub_marc_xml):
-        assert (
-            stub_session.validate_bib(
+            stub_session.bib_validate(
                 stub_marc_xml,
                 recordFormat="application/marcxml+xml",
                 validationLevel="validateFull",
@@ -799,34 +405,538 @@ class TestMockedMetadataSession:
         )
 
     @pytest.mark.http_code(200)
-    def test_validate_bib_default(
+    def test_bib_validate_default(
         self, stub_session, mock_session_response, stub_marc_xml
     ):
         assert (
-            stub_session.validate_bib(
+            stub_session.bib_validate(
                 stub_marc_xml, recordFormat="application/marcxml+xml"
             ).status_code
             == 200
         )
 
-    def test_validate_bib_no_record_passed(self, stub_session):
+    def test_bib_validate_no_record_passed(self, stub_session):
         with pytest.raises(TypeError) as exc:
-            stub_session.validate_bib(recordFormat="application/marcxml+xml")
+            stub_session.bib_validate(recordFormat="application/marcxml+xml")
         assert "Argument 'record' is missing." in str(exc.value)
 
-    def test_validate_bib_no_recordFormat_passed(
+    def test_bib_validate_no_recordFormat_passed(
         self, stub_session, mock_session_response, stub_marc_xml
     ):
         with pytest.raises(TypeError) as exc:
-            stub_session.validate_bib(stub_marc_xml)
+            stub_session.bib_validate(stub_marc_xml)
         assert "Argument 'recordFormat' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_brief_bibs_get(self, stub_session, mock_session_response):
+        assert stub_session.brief_bibs_get(12345).status_code == 200
+
+    def test_brief_bibs_get_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.brief_bibs_get()
+
+    def test_brief_bibs_get_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.brief_bibs_get(oclcNumber=None)
+
+    @pytest.mark.http_code(206)
+    def test_brief_bibs_get_odd_206_http_code(
+        self, stub_session, mock_session_response
+    ):
+        with does_not_raise():
+            response = stub_session.brief_bibs_get(12345)
+        assert response.status_code == 206
+
+    @pytest.mark.http_code(404)
+    def test_brief_bibs_get_404_error_response(
+        self, stub_session, mock_session_response
+    ):
+        with pytest.raises(WorldcatRequestError) as exc:
+            stub_session.brief_bibs_get(12345)
+
+        assert (
+            "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: spam"
+            in (str(exc.value))
+        )
+
+    @pytest.mark.http_code(200)
+    def test_brief_bibs_search(self, stub_session, mock_session_response):
+        assert stub_session.brief_bibs_search(q="ti:Zendegi").status_code == 200
+
+    @pytest.mark.parametrize("argm", [(None), ("")])
+    def test_brief_bibs_search_missing_query(self, stub_session, argm):
+        with pytest.raises(TypeError) as exc:
+            stub_session.brief_bibs_search(argm)
+        assert "Argument 'q' is requried to construct query." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_brief_bibs_search_other_editions(
+        self, stub_session, mock_session_response
+    ):
+        assert stub_session.brief_bibs_search_other_editions(12345).status_code == 200
+
+    def test_brief_bibs_search_other_editions_invalid_oclc_number(self, stub_session):
+        msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
+            stub_session.brief_bibs_search_other_editions("odn12345")
+        assert msg in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_holdings_get_codes(self, stub_session, mock_session_response):
+        assert stub_session.holdings_get_codes().status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_holdings_get_current(self, stub_session, mock_session_response):
+        assert stub_session.holdings_get_current("12345")[0].status_code == 200
+
+    def test_holdings_get_current_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_get_current()
+
+    def test_holdings_get_current_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.holdings_get_current(oclcNumbers=None)
+
+    @pytest.mark.http_code(201)
+    def test_holdings_set(self, stub_session, mock_session_response):
+        assert stub_session.holdings_set(850940548).status_code == 201
+
+    def test_holdings_set_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_set()
+
+    def test_holdings_set_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.holdings_set(oclcNumber=None)
+
+    @pytest.mark.http_code(200)
+    def test_holdings_unset(self, stub_session, mock_session_response):
+        assert stub_session.holdings_unset(850940548).status_code == 200
+
+    def test_holdings_unset_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_unset()
+
+    def test_holdings_unset_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.holdings_unset(oclcNumber=None)
+
+    @pytest.mark.http_code(200)
+    def test_holdings_set_on_bib(
+        self, stub_session, mock_session_response, stub_marc_xml
+    ):
+        assert (
+            stub_session.holdings_set_on_bib(
+                stub_marc_xml, recordFormat="application/marcxml+xml"
+            ).status_code
+            == 200
+        )
+
+    def test_holdings_set_on_bib_no_record_passed(self, stub_session):
+        with pytest.raises(TypeError) as exc:
+            stub_session.holdings_set_on_bib(recordFormat="application/marcxml+xml")
+        assert "Argument 'record' is missing." in str(exc.value)
+
+    def test_holdings_set_on_bib_no_recordFormat_passed(
+        self, stub_session, mock_session_response, stub_marc_xml
+    ):
+        with pytest.raises(TypeError) as exc:
+            stub_session.holdings_set_on_bib(stub_marc_xml)
+        assert "Argument 'recordFormat' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_holdings_unset_on_bib(
+        self, stub_session, mock_session_response, stub_marc_xml
+    ):
+        assert (
+            stub_session.holdings_unset_on_bib(
+                record=stub_marc_xml, recordFormat="application/marcxml+xml"
+            ).status_code
+            == 200
+        )
+
+    def test_holdings_unset_on_bib_no_record_passed(self, stub_session):
+        with pytest.raises(TypeError) as exc:
+            stub_session.holdings_unset_on_bib(recordFormat="application/marcxml+xml")
+        assert "Argument 'record' is missing." in str(exc.value)
+
+    def test_holdings_unset_on_bib_no_recordFormat_passed(
+        self, stub_session, mock_session_response, stub_marc_xml
+    ):
+        with pytest.raises(TypeError) as exc:
+            stub_session.holdings_unset_on_bib(stub_marc_xml)
+        assert "Argument 'recordFormat' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_lbd_create(self, stub_session, mock_session_response, stub_marc_xml):
+        assert (
+            stub_session.lbd_create(
+                stub_marc_xml, recordFormat="application/marcxml+xml"
+            ).status_code
+            == 200
+        )
+
+    def test_lbd_create_no_record_passed(self, stub_session):
+        with pytest.raises(TypeError) as exc:
+            stub_session.lbd_create(recordFormat="application/marcxml+xml")
+        assert "Argument 'record' is missing." in str(exc.value)
+
+    def test_lbd_create_no_recordFormat_passed(
+        self, stub_session, mock_session_response, stub_marc_xml
+    ):
+        with pytest.raises(TypeError) as exc:
+            stub_session.lbd_create(stub_marc_xml)
+        assert "Argument 'recordFormat' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_lbd_delete(self, stub_session, mock_session_response):
+        assert stub_session.lbd_delete("12345").status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_lbd_get(self, stub_session, mock_session_response):
+        assert stub_session.lbd_get(12345).status_code == 200
+
+    def test_lbd_get_no_controlNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.lbd_get()
+
+    @pytest.mark.http_code(200)
+    def test_lbd_replace(self, stub_session, mock_session_response, stub_marc_xml):
+        assert (
+            stub_session.lbd_replace(
+                "12345", stub_marc_xml, recordFormat="application/marcxml+xml"
+            ).status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_lbd_replace_no_record_passed(self, stub_session):
+        with pytest.raises(TypeError) as exc:
+            stub_session.lbd_replace("12345", recordFormat="application/marcxml+xml")
+        assert "Argument 'record' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_lbd_replace_no_recordFormat_passed(
+        self, stub_session, mock_session_response, stub_marc_xml
+    ):
+        with pytest.raises(TypeError) as exc:
+            stub_session.lbd_replace("12345", stub_marc_xml)
+        assert "Argument 'recordFormat' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_lhr_create(self, stub_session, mock_session_response, stub_holding_xml):
+        assert (
+            stub_session.lhr_create(
+                stub_holding_xml, recordFormat="application/marcxml+xml"
+            ).status_code
+            == 200
+        )
+
+    def test_lhr_create_no_record_passed(self, stub_session):
+        with pytest.raises(TypeError) as exc:
+            stub_session.lhr_create(recordFormat="application/marcxml+xml")
+        assert "Argument 'record' is missing." in str(exc.value)
+
+    def test_lhr_create_no_recordFormat_passed(
+        self, stub_session, mock_session_response, stub_holding_xml
+    ):
+        with pytest.raises(TypeError) as exc:
+            stub_session.lhr_create(stub_holding_xml)
+        assert "Argument 'recordFormat' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_lhr_delete(self, stub_session, mock_session_response):
+        assert stub_session.lhr_delete("12345").status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_lhr_get(self, stub_session, mock_session_response):
+        assert stub_session.lhr_get(12345).status_code == 200
+
+    def test_lhr_get_no_controlNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.lhr_get()
+
+    @pytest.mark.http_code(200)
+    def test_lhr_replace(self, stub_session, mock_session_response, stub_holding_xml):
+        assert (
+            stub_session.lhr_replace(
+                "12345", stub_holding_xml, recordFormat="application/marcxml+xml"
+            ).status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_lhr_replace_no_record_passed(self, stub_session):
+        with pytest.raises(TypeError) as exc:
+            stub_session.lhr_replace("12345", recordFormat="application/marcxml+xml")
+        assert "Argument 'record' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_lhr_replace_no_recordFormat_passed(
+        self, stub_session, mock_session_response, stub_holding_xml
+    ):
+        with pytest.raises(TypeError) as exc:
+            stub_session.lhr_replace("12345", stub_holding_xml)
+        assert "Argument 'recordFormat' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_local_bibs_get(self, stub_session, mock_session_response):
+        assert stub_session.local_bibs_get(12345).status_code == 200
+
+    def test_local_bibs_get_no_controlNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.local_bibs_get()
+
+    @pytest.mark.http_code(200)
+    def test_local_bibs_search(self, stub_session, mock_session_response):
+        assert stub_session.local_bibs_search(q="ti:foo").status_code == 200
+
+    @pytest.mark.parametrize("argm", [(None), ("")])
+    def test_local_bibs_search_missing_query(self, stub_session, argm):
+        with pytest.raises(TypeError) as exc:
+            stub_session.local_bibs_search(argm)
+        assert "Argument 'q' is requried to construct query." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_local_holdings_browse(self, stub_session, mock_session_response):
+        assert (
+            stub_session.local_holdings_browse(
+                oclcNumber="12345", holdingLocation="foo", shelvingLocation="bar"
+            ).status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_local_holdings_browse_no_oclc_number(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.local_holdings_browse(
+                holdingLocation="foo", shelvingLocation="bar"
+            ).status_code
+            == 200
+        )
+
+    def test_local_holdings_browse_no_holdingLocation_passed(self, stub_session):
+        with pytest.raises(TypeError) as exc:
+            stub_session.local_holdings_browse(shelvingLocation="bar")
+        assert "Argument 'holdingLocation' is missing." in str(exc.value)
+
+    def test_local_holdings_browse_no_shelvingLocation_passed(self, stub_session):
+        with pytest.raises(TypeError) as exc:
+            stub_session.local_holdings_browse(holdingLocation="foo")
+        assert "Argument 'shelvingLocation' is missing." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_local_holdings_get(self, stub_session, mock_session_response):
+        assert stub_session.local_holdings_get(12345).status_code == 200
+
+    def test_local_holdings_get_no_controlNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.local_holdings_get()
+
+    @pytest.mark.http_code(200)
+    def test_local_holdings_search(self, stub_session, mock_session_response):
+        assert stub_session.local_holdings_search(oclcNumber=12345).status_code == 200
+
+    def test_local_holdings_search_no_oclcNumber_passed(
+        self, stub_session, mock_session_response
+    ):
+        assert stub_session.local_holdings_search(barcode=12345).status_code == 200
+
+    def test_local_holdings_search_invalid_oclc_number(self, stub_session):
+        msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
+            stub_session.local_holdings_search(oclcNumber="odn12345")
+        assert msg in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_local_holdings_search_shared_print(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.local_holdings_search_shared_print(
+                oclcNumber=12345
+            ).status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_local_holdings_search_shared_print_no_oclcNumber_passed(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.local_holdings_search_shared_print(barcode=12345).status_code
+            == 200
+        )
+
+    def test_local_holdings_search_shared_print_with_invalid_oclc_number_passsed(
+        self, stub_session
+    ):
+        msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
+            stub_session.local_holdings_search_shared_print(oclcNumber="odn12345")
+        assert msg in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_summary_holdings_get(self, stub_session, mock_session_response):
+        assert stub_session.summary_holdings_get(oclcNumber=12345).status_code == 200
+
+    def test_summary_holdings_get_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.summary_holdings_get(holdingsAllVariantRecords=True)
+
+    @pytest.mark.http_code(200)
+    def test_summary_holdings_search(self, stub_session, mock_session_response):
+        assert stub_session.summary_holdings_search(oclcNumber=12345).status_code == 200
+
+    def test_summary_holdings_search_missing_arguments(self, stub_session):
+        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
+        with pytest.raises(TypeError) as exc:
+            stub_session.summary_holdings_search(holdingsAllEditions=True)
+        assert msg in str(exc.value)
+
+    def test_summary_holdings_search_invalid_oclc_number(self, stub_session):
+        msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
+            stub_session.summary_holdings_search(oclcNumber="odn12345")
+        assert msg in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_shared_print_holdings_search(self, stub_session, mock_session_response):
+        assert (
+            stub_session.shared_print_holdings_search(oclcNumber=12345).status_code
+            == 200
+        )
+
+    def test_shared_print_holdings_search_missing_arguments(self, stub_session):
+        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
+        with pytest.raises(TypeError) as exc:
+            stub_session.shared_print_holdings_search(heldInState="NY")
+        assert msg in str(exc.value)
+
+    def test_shared_print_holdings_search_with_invalid_oclc_number_passsed(
+        self, stub_session
+    ):
+        msg = "Argument 'oclcNumber' does not look like real OCLC #."
+        with pytest.raises(InvalidOclcNumber) as exc:
+            stub_session.shared_print_holdings_search(oclcNumber="odn12345")
+        assert msg in str(exc.value)
 
 
 @pytest.mark.webtest
 class TestLiveMetadataSession:
     """Runs rudimentary tests against live Metadata API"""
 
-    def test_get_brief_bib_print_mat_request(self, live_keys):
+    def test_bib_get(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.bib_get(41266045)
+
+            assert (
+                response.url
+                == "https://metadata.api.oclc.org/worldcat/manage/bibs/41266045"
+            )
+            assert response.status_code == 200
+
+    def test_bib_get_classification(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.bib_get_classification(41266045)
+
+            assert (
+                response.url
+                == "https://metadata.api.oclc.org/worldcat/search/classification-bibs/41266045"
+            )
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == [
+                "dewey",
+                "lc",
+            ]
+
+    def test_bib_get_current_oclc_number(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.bib_get_current_oclc_number([41266045, 519740398])
+
+            assert response.status_code == 200
+            assert (
+                response.request.url
+                == "https://metadata.api.oclc.org/worldcat/manage/bibs/current?oclcNumbers=41266045%2C519740398"
+            )
+            jres = response.json()
+            assert sorted(jres.keys()) == ["controlNumbers"]
+            assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
+
+    def test_bib_get_current_oclc_number_str(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.bib_get_current_oclc_number("41266045")
+
+            assert response.status_code == 200
+            assert (
+                response.request.url
+                == "https://metadata.api.oclc.org/worldcat/manage/bibs/current?oclcNumbers=41266045"
+            )
+            jres = response.json()
+            assert sorted(jres.keys()) == ["controlNumbers"]
+            assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
+
+    def test_bib_match_marcxml(self, live_keys, stub_marc_xml):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.bib_match(
+                stub_marc_xml, recordFormat="application/marcxml+xml"
+            )
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == sorted(
+                ["numberOfRecords", "briefRecords"]
+            )
+
+    def test_bib_validate(self, live_keys, stub_marc21):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.bib_validate(
+                stub_marc21, recordFormat="application/marc"
+            )
+            assert response.status_code == 200
+            assert (
+                response.url
+                == "https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull"
+            )
+            assert sorted(response.json().keys()) == sorted(["httpStatus", "status"])
+
+    def test_brief_bibs_get(self, live_keys):
         fields = sorted(
             [
                 "catalogingInfo",
@@ -853,12 +963,12 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.get_brief_bib(41266045)
+            response = session.brief_bibs_get(41266045)
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
 
-    def test_get_brief_bib_401_error(self, live_keys):
+    def test_brief_bibs_get_401_error(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -869,11 +979,12 @@ class TestLiveMetadataSession:
         with MetadataSession(authorization=token) as session:
             session.headers.update({"Authorization": "Bearer invalid-token"})
             with pytest.raises(WorldcatRequestError) as exc:
-                session.get_brief_bib(41266045)
+                session.brief_bibs_get(41266045)
 
             assert err_msg in str(exc.value)
 
-    def test_get_full_bib(self, live_keys):
+    def test_brief_bibs_search(self, live_keys):
+        fields = sorted(["briefRecords", "numberOfRecords"])
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -881,15 +992,25 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.get_full_bib(41266045)
-
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/41266045"
+            response = session.brief_bibs_search(
+                "ti:zendegi AND au:egan",
+                inLanguage="eng",
+                inCatalogLanguage="eng",
+                itemType="book",
+                itemSubType=["book-printbook", "book-digital"],
+                catalogSource="dlc",
+                orderBy="mostWidelyHeld",
+                limit=5,
             )
             assert response.status_code == 200
+            assert sorted(response.json().keys()) == fields
+            assert (
+                response.request.url
+                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&itemSubType=book-digital&orderBy=mostWidelyHeld&limit=5"
+            )
 
-    def test_get_institution_holdings(self, live_keys):
+    def test_brief_bibs_search_other_editions(self, live_keys):
+        fields = sorted(["briefRecords", "numberOfRecords"])
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -897,7 +1018,20 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.get_institution_holdings("982651100")[0]
+            response = session.brief_bibs_search_other_editions(41266045)
+
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == fields
+
+    def test_holdings_get_current(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.holdings_get_current("982651100")[0]
 
             assert (
                 response.url
@@ -915,7 +1049,7 @@ class TestLiveMetadataSession:
             )
 
     @pytest.mark.holdings
-    def test_holding_set_unset(self, live_keys):
+    def test_holdings_set_unset(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -923,14 +1057,14 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.get_institution_holdings("850940548")[0]
+            response = session.holdings_get_current("850940548")[0]
             holdings = response.json()["holdings"]
 
             # make sure no holdings are set initially
             if len(holdings) > 0:
-                response = session.holding_unset(850940548)
+                response = session.holdings_unset(850940548)
 
-            response = session.holding_set(850940548)
+            response = session.holdings_set(850940548)
             assert (
                 response.url
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/set"
@@ -939,7 +1073,7 @@ class TestLiveMetadataSession:
             assert response.json()["action"] == "Set Holdings"
 
             # test deleting holdings
-            response = session.holding_unset(850940548)
+            response = session.holdings_unset(850940548)
             assert response.status_code == 200
             assert (
                 response.request.url
@@ -947,8 +1081,8 @@ class TestLiveMetadataSession:
             )
             assert response.json()["action"] == "Unset Holdings"
 
-    def test_brief_bibs_other_editions(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
+    @pytest.mark.holdings
+    def test_holdings_set_unset_marcxml(self, live_keys, stub_marc_xml):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -956,111 +1090,36 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.search_brief_bibs_other_editions(41266045)
+            response = session.holdings_get_current("850940548")[0]
+            holdings = response.json()["holdings"]
 
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
+            # make sure no holdings are set initially
+            if len(holdings) > 0:
+                response = session.holdings_unset_on_bib(
+                    stub_marc_xml, recordFormat="application/marcxml+xml"
+                )
 
-    def test_search_brief_bibs(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.search_brief_bibs(
-                "ti:zendegi AND au:egan",
-                inLanguage="eng",
-                inCatalogLanguage="eng",
-                itemType="book",
-                itemSubType=["book-printbook", "book-digital"],
-                catalogSource="dlc",
-                orderBy="mostWidelyHeld",
-                limit=5,
+            response = session.holdings_set_on_bib(
+                stub_marc_xml, recordFormat="application/marcxml+xml"
             )
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&itemSubType=book-digital&orderBy=mostWidelyHeld&limit=5"
-            )
-
-    def test_search_bibs_holdings(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.search_bibs_holdings(isbn="9781597801744")
-
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-
-    def test_get_current_oclc_number(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.get_current_oclc_number([41266045, 519740398])
-
-            assert response.status_code == 200
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/current?oclcNumbers=41266045%2C519740398"
-            )
-            jres = response.json()
-            assert sorted(jres.keys()) == ["controlNumbers"]
-            assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
-
-    def test_get_bib_classification(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.get_bib_classification(41266045)
-
             assert (
                 response.url
-                == "https://metadata.api.oclc.org/worldcat/search/classification-bibs/41266045"
+                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/set"
             )
             assert response.status_code == 200
-            assert sorted(response.json().keys()) == [
-                "dewey",
-                "lc",
-            ]
+            assert response.json()["action"] == "Set Holdings"
 
-    def test_get_current_oclc_number_str(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.get_current_oclc_number("41266045")
-
+            response = session.holdings_unset_on_bib(
+                stub_marc_xml, recordFormat="application/marcxml+xml"
+            )
             assert response.status_code == 200
             assert (
                 response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/current?oclcNumbers=41266045"
+                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset"
             )
-            jres = response.json()
-            assert sorted(jres.keys()) == ["controlNumbers"]
-            assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
+            assert response.json()["action"] == "Unset Holdings"
 
-    @pytest.mark.holdings
-    def test_get_institution_holding_codes(self, live_keys):
+    def test_holdings_get_codes(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -1068,7 +1127,7 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.get_institution_holding_codes()
+            response = session.holdings_get_codes()
 
             assert (
                 response.url
@@ -1080,62 +1139,7 @@ class TestLiveMetadataSession:
                 "holdingLibraryCodes"
             ]
 
-    @pytest.mark.holdings
-    def test_holding_set_unset_marcxml(self, live_keys, stub_marc_xml):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.get_institution_holdings("850940548")[0]
-            holdings = response.json()["holdings"]
-
-            # make sure no holdings are set initially
-            if len(holdings) > 0:
-                response = session.holding_unset_on_record(
-                    stub_marc_xml, recordFormat="application/marcxml+xml"
-                )
-
-            response = session.holding_set_on_record(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/set"
-            )
-            assert response.status_code == 200
-            assert response.json()["action"] == "Set Holdings"
-
-            response = session.holding_unset_on_record(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            assert response.status_code == 200
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset"
-            )
-            assert response.json()["action"] == "Unset Holdings"
-
-    def test_match_bib_marcxml(self, live_keys, stub_marc_xml):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.match_bib(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == sorted(
-                ["numberOfRecords", "briefRecords"]
-            )
-
-    @pytest.mark.holdings
-    def test_search_bibs_holdings_oclc(self, live_keys):
+    def test_summary_holdings_search_oclc(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
@@ -1144,12 +1148,12 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.search_bibs_holdings(oclcNumber="41266045")
+            response = session.summary_holdings_search(oclcNumber="41266045")
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
 
-    def test_search_bibs_holdings_isbn(self, live_keys):
+    def test_summary_holdings_search_isbn(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
@@ -1158,42 +1162,10 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.search_bibs_holdings(isbn="9781597801744")
+            response = session.summary_holdings_search(isbn="9781597801744")
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
-
-    def test_search_brief_bibs_other_editions(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.search_brief_bibs_other_editions(41266045)
-
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-
-    def test_validate_bib(self, live_keys, stub_marc21):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.validate_bib(
-                stub_marc21, recordFormat="application/marc"
-            )
-            assert response.status_code == 200
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull"
-            )
-            assert sorted(response.json().keys()) == sorted(["httpStatus", "status"])
 
     def test_default_retries(self, live_keys, stub_marc21):
         token = WorldcatAccessToken(
@@ -1204,7 +1176,7 @@ class TestLiveMetadataSession:
 
         with MetadataSession(authorization=token) as session:
             with pytest.raises(WorldcatRequestError) as exc:
-                session.validate_bib(stub_marc21, recordFormat="foo/bar")
+                session.bib_validate(stub_marc21, recordFormat="foo/bar")
             assert "406 Client Error: Not Acceptable for url: " in (str(exc.value))
             assert session.adapters["https://"].max_retries.total == 0
 
@@ -1223,7 +1195,7 @@ class TestLiveMetadataSession:
             allowed_methods=["GET", "POST"],
         ) as session:
             with pytest.raises(WorldcatRequestError) as exc:
-                session.validate_bib(stub_marc21, recordFormat="foo/bar")
+                session.bib_validate(stub_marc21, recordFormat="foo/bar")
             assert "Connection Error: <class 'requests.exceptions.RetryError'>" in (
                 str(exc.value)
             )
