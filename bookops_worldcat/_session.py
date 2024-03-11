@@ -27,7 +27,7 @@ class WorldcatSession(requests.Session):
         ),
         total_retries: int = 0,
         backoff_factor: float = 0,
-        status_forcelist: Optional[List[int]] = [],
+        status_forcelist: Optional[List[int]] = None,
         allowed_methods: Optional[List[str]] = None,
     ) -> None:
         """
@@ -48,8 +48,9 @@ class WorldcatSession(requests.Session):
                                     again. default is 0
             status_forcelist:       if total_retries is not 0, a list of HTTP
                                     status codes to automatically retry requests on.
-                                    if not specified, all failed requests will be
-                                    retried up to number of total_retries.
+                                    if not specified, failed requests with status codes
+                                    413, 429, and 503 will be retried up to number of
+                                    total_retries.
                                     example: [500, 502, 503, 504]
             allowed_methods:        if total_retries is not 0, set of HTTP methods that
                                     requests should be retried on. if not specified,
@@ -75,12 +76,28 @@ class WorldcatSession(requests.Session):
 
         # if user provides retry args, create Retry object and mount adapter to session
         if total_retries != 0:
-            retries = Retry(
-                total=total_retries,
-                backoff_factor=backoff_factor,
-                status_forcelist=status_forcelist,
-                allowed_methods=allowed_methods,
-            )
+            if status_forcelist is None:
+                retries = Retry(
+                    total=total_retries,
+                    backoff_factor=backoff_factor,
+                    status_forcelist=Retry.RETRY_AFTER_STATUS_CODES,
+                    allowed_methods=allowed_methods,
+                )
+            elif (
+                isinstance(status_forcelist, List)
+                and all(isinstance(x, int) for x in status_forcelist)
+                and len(status_forcelist) > 0
+            ):
+                retries = Retry(
+                    total=total_retries,
+                    backoff_factor=backoff_factor,
+                    status_forcelist=status_forcelist,
+                    allowed_methods=allowed_methods,
+                )
+            else:
+                raise ValueError(
+                    "Argument 'status_forcelist' must be a list of integers."
+                )
             self.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries))
 
         self._update_authorization()
