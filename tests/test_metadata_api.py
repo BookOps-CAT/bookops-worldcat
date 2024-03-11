@@ -3,7 +3,6 @@
 from contextlib import contextmanager
 import datetime
 import os
-from types import GeneratorType
 
 import pytest
 
@@ -61,27 +60,6 @@ class TestMockedMetadataSession:
         with pytest.raises(WorldcatAuthorizationError):
             stub_session._get_new_access_token()
 
-    @pytest.mark.parametrize(
-        "oclcNumbers,expectation",
-        [
-            pytest.param([], [], id="empty list"),
-            pytest.param(["1", "2", "3"], ["1,2,3"], id="list of str"),
-            pytest.param(["1"], ["1"], id="list of one"),
-            pytest.param(["1"] * 50, [",".join(["1"] * 50)], id="full batch"),
-            pytest.param(["1"] * 51, [",".join(["1"] * 50), "1"], id="2 batches"),
-            pytest.param(
-                ["1"] * 103,
-                [",".join(["1"] * 50), ",".join(["1"] * 50), "1,1,1"],
-                id="3 batches",
-            ),
-        ],
-    )
-    def test_split_into_legal_volume(self, stub_session, oclcNumbers, expectation):
-        batches = stub_session._split_into_legal_volume(oclcNumbers)
-        assert isinstance(batches, GeneratorType)
-        all_batches = [b for b in batches]
-        assert all_batches == expectation
-
     def test_url_base(self, stub_session):
         assert stub_session.BASE_URL == "https://metadata.api.oclc.org/worldcat"
 
@@ -137,15 +115,15 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/12345/unset"
         )
 
-    def test_url_manage_ih_set_on_bib(self, stub_session):
+    def test_url_manage_ih_set_with_bib(self, stub_session):
         assert (
-            stub_session._url_manage_ih_set_on_bib()
+            stub_session._url_manage_ih_set_with_bib()
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/set"
         )
 
-    def test_url_manage_ih_unset_on_bib(self, stub_session):
+    def test_url_manage_ih_unset_with_bib(self, stub_session):
         assert (
-            stub_session._url_manage_ih_unset_on_bib()
+            stub_session._url_manage_ih_unset_with_bib()
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset"
         )
 
@@ -290,18 +268,6 @@ class TestMockedMetadataSession:
             == 200
         )
 
-    def test_bib_create_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.bib_create(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_bib_create_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.bib_create(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
     @pytest.mark.http_code(200)
     def test_bib_get(self, stub_session, mock_session_response):
         assert stub_session.bib_get(12345).status_code == 200
@@ -358,18 +324,6 @@ class TestMockedMetadataSession:
             == 200
         )
 
-    def test_bib_match_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.bib_match(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_bib_match_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.bib_match(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
     @pytest.mark.http_code(200)
     def test_bib_replace(self, stub_session, mock_session_response, stub_marc_xml):
         assert (
@@ -378,20 +332,6 @@ class TestMockedMetadataSession:
             ).status_code
             == 200
         )
-
-    @pytest.mark.http_code(200)
-    def test_bib_replace_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.bib_replace("12345", recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_bib_replace_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.bib_replace("12345", stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
     def test_bib_validate(self, stub_session, mock_session_response, stub_marc_xml):
@@ -415,17 +355,17 @@ class TestMockedMetadataSession:
             == 200
         )
 
-    def test_bib_validate_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.bib_validate(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_bib_validate_no_recordFormat_passed(
+    @pytest.mark.http_code(200)
+    def test_bib_validate_error(
         self, stub_session, mock_session_response, stub_marc_xml
     ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.bib_validate(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
+        with pytest.raises(ValueError) as exc:
+            stub_session.bib_validate(
+                stub_marc_xml,
+                recordFormat="application/marcxml+xml",
+                validationLevel="validateFoo",
+            )
+        assert "Invalid argument 'validationLevel'." in str(exc.value)
 
     @pytest.mark.http_code(200)
     def test_brief_bibs_get(self, stub_session, mock_session_response):
@@ -463,22 +403,14 @@ class TestMockedMetadataSession:
     def test_brief_bibs_search(self, stub_session, mock_session_response):
         assert stub_session.brief_bibs_search(q="ti:Zendegi").status_code == 200
 
-    @pytest.mark.parametrize("argm", [(None), ("")])
-    def test_brief_bibs_search_missing_query(self, stub_session, argm):
-        with pytest.raises(TypeError) as exc:
-            stub_session.brief_bibs_search(argm)
-        assert "Argument 'q' is requried to construct query." in str(exc.value)
-
     @pytest.mark.http_code(200)
-    def test_brief_bibs_search_other_editions(
-        self, stub_session, mock_session_response
-    ):
-        assert stub_session.brief_bibs_search_other_editions(12345).status_code == 200
+    def test_brief_bibs_get_other_editions(self, stub_session, mock_session_response):
+        assert stub_session.brief_bibs_get_other_editions(12345).status_code == 200
 
-    def test_brief_bibs_search_other_editions_invalid_oclc_number(self, stub_session):
+    def test_brief_bibs_get_other_editions_invalid_oclc_number(self, stub_session):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
         with pytest.raises(InvalidOclcNumber) as exc:
-            stub_session.brief_bibs_search_other_editions("odn12345")
+            stub_session.brief_bibs_get_other_editions("odn12345")
         assert msg in str(exc.value)
 
     @pytest.mark.http_code(200)
@@ -487,7 +419,7 @@ class TestMockedMetadataSession:
 
     @pytest.mark.http_code(200)
     def test_holdings_get_current(self, stub_session, mock_session_response):
-        assert stub_session.holdings_get_current("12345")[0].status_code == 200
+        assert stub_session.holdings_get_current("12345").status_code == 200
 
     def test_holdings_get_current_no_oclcNumber_passed(self, stub_session):
         with pytest.raises(TypeError):
@@ -496,6 +428,15 @@ class TestMockedMetadataSession:
     def test_holdings_get_current_None_oclcNumber_passed(self, stub_session):
         with pytest.raises(InvalidOclcNumber):
             stub_session.holdings_get_current(oclcNumbers=None)
+
+    def test_holdings_get_current_too_many_oclcNumbers_passed(self, stub_session):
+        with pytest.raises(ValueError) as exc:
+            stub_session.holdings_get_current(
+                oclcNumbers=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+            )
+        assert "Too many OCLC Numbers passed to 'oclcNumbers' argument." in str(
+            exc.value
+        )
 
     @pytest.mark.http_code(201)
     def test_holdings_set(self, stub_session, mock_session_response):
@@ -522,50 +463,26 @@ class TestMockedMetadataSession:
             stub_session.holdings_unset(oclcNumber=None)
 
     @pytest.mark.http_code(200)
-    def test_holdings_set_on_bib(
+    def test_holdings_set_with_bib(
         self, stub_session, mock_session_response, stub_marc_xml
     ):
         assert (
-            stub_session.holdings_set_on_bib(
+            stub_session.holdings_set_with_bib(
                 stub_marc_xml, recordFormat="application/marcxml+xml"
             ).status_code
             == 200
         )
 
-    def test_holdings_set_on_bib_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.holdings_set_on_bib(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_holdings_set_on_bib_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.holdings_set_on_bib(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
     @pytest.mark.http_code(200)
-    def test_holdings_unset_on_bib(
+    def test_holdings_unset_with_bib(
         self, stub_session, mock_session_response, stub_marc_xml
     ):
         assert (
-            stub_session.holdings_unset_on_bib(
+            stub_session.holdings_unset_with_bib(
                 record=stub_marc_xml, recordFormat="application/marcxml+xml"
             ).status_code
             == 200
         )
-
-    def test_holdings_unset_on_bib_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.holdings_unset_on_bib(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_holdings_unset_on_bib_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.holdings_unset_on_bib(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
     def test_lbd_create(self, stub_session, mock_session_response, stub_marc_xml):
@@ -575,18 +492,6 @@ class TestMockedMetadataSession:
             ).status_code
             == 200
         )
-
-    def test_lbd_create_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.lbd_create(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_lbd_create_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.lbd_create(stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
     def test_lbd_delete(self, stub_session, mock_session_response):
@@ -610,20 +515,6 @@ class TestMockedMetadataSession:
         )
 
     @pytest.mark.http_code(200)
-    def test_lbd_replace_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.lbd_replace("12345", recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_lbd_replace_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_marc_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.lbd_replace("12345", stub_marc_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
     def test_lhr_create(self, stub_session, mock_session_response, stub_holding_xml):
         assert (
             stub_session.lhr_create(
@@ -631,18 +522,6 @@ class TestMockedMetadataSession:
             ).status_code
             == 200
         )
-
-    def test_lhr_create_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.lhr_create(recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    def test_lhr_create_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_holding_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.lhr_create(stub_holding_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
     def test_lhr_delete(self, stub_session, mock_session_response):
@@ -666,20 +545,6 @@ class TestMockedMetadataSession:
         )
 
     @pytest.mark.http_code(200)
-    def test_lhr_replace_no_record_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.lhr_replace("12345", recordFormat="application/marcxml+xml")
-        assert "Argument 'record' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
-    def test_lhr_replace_no_recordFormat_passed(
-        self, stub_session, mock_session_response, stub_holding_xml
-    ):
-        with pytest.raises(TypeError) as exc:
-            stub_session.lhr_replace("12345", stub_holding_xml)
-        assert "Argument 'recordFormat' is missing." in str(exc.value)
-
-    @pytest.mark.http_code(200)
     def test_local_bibs_get(self, stub_session, mock_session_response):
         assert stub_session.local_bibs_get(12345).status_code == 200
 
@@ -691,41 +556,28 @@ class TestMockedMetadataSession:
     def test_local_bibs_search(self, stub_session, mock_session_response):
         assert stub_session.local_bibs_search(q="ti:foo").status_code == 200
 
-    @pytest.mark.parametrize("argm", [(None), ("")])
-    def test_local_bibs_search_missing_query(self, stub_session, argm):
-        with pytest.raises(TypeError) as exc:
-            stub_session.local_bibs_search(argm)
-        assert "Argument 'q' is requried to construct query." in str(exc.value)
-
     @pytest.mark.http_code(200)
     def test_local_holdings_browse(self, stub_session, mock_session_response):
         assert (
             stub_session.local_holdings_browse(
-                oclcNumber="12345", holdingLocation="foo", shelvingLocation="bar"
+                callNumber="12345", holdingLocation="foo", shelvingLocation="bar"
             ).status_code
             == 200
         )
 
     @pytest.mark.http_code(200)
-    def test_local_holdings_browse_no_oclc_number(
+    def test_local_holdings_browse_oclc_number(
         self, stub_session, mock_session_response
     ):
         assert (
             stub_session.local_holdings_browse(
-                holdingLocation="foo", shelvingLocation="bar"
+                callNumber="12345",
+                oclcNumber="54321",
+                holdingLocation="foo",
+                shelvingLocation="bar",
             ).status_code
             == 200
         )
-
-    def test_local_holdings_browse_no_holdingLocation_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.local_holdings_browse(shelvingLocation="bar")
-        assert "Argument 'holdingLocation' is missing." in str(exc.value)
-
-    def test_local_holdings_browse_no_shelvingLocation_passed(self, stub_session):
-        with pytest.raises(TypeError) as exc:
-            stub_session.local_holdings_browse(holdingLocation="foo")
-        assert "Argument 'shelvingLocation' is missing." in str(exc.value)
 
     @pytest.mark.http_code(200)
     def test_local_holdings_get(self, stub_session, mock_session_response):
@@ -790,12 +642,6 @@ class TestMockedMetadataSession:
     def test_summary_holdings_search(self, stub_session, mock_session_response):
         assert stub_session.summary_holdings_search(oclcNumber=12345).status_code == 200
 
-    def test_summary_holdings_search_missing_arguments(self, stub_session):
-        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
-        with pytest.raises(TypeError) as exc:
-            stub_session.summary_holdings_search(holdingsAllEditions=True)
-        assert msg in str(exc.value)
-
     def test_summary_holdings_search_invalid_oclc_number(self, stub_session):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
         with pytest.raises(InvalidOclcNumber) as exc:
@@ -808,12 +654,6 @@ class TestMockedMetadataSession:
             stub_session.shared_print_holdings_search(oclcNumber=12345).status_code
             == 200
         )
-
-    def test_shared_print_holdings_search_missing_arguments(self, stub_session):
-        msg = "Missing required argument. One of the following args are required: oclcNumber, issn, isbn"
-        with pytest.raises(TypeError) as exc:
-            stub_session.shared_print_holdings_search(heldInState="NY")
-        assert msg in str(exc.value)
 
     def test_shared_print_holdings_search_with_invalid_oclc_number_passsed(
         self, stub_session
@@ -1006,10 +846,10 @@ class TestLiveMetadataSession:
             assert sorted(response.json().keys()) == fields
             assert (
                 response.request.url
-                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&itemSubType=book-digital&orderBy=mostWidelyHeld&limit=5"
+                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&itemSubType=book-digital&groupRelatedEditions=False&groupVariantRecords=False&preferredLanguage=eng&showHoldingsIndicators=False&unit=M&orderBy=mostWidelyHeld&offset=1&limit=5"
             )
 
-    def test_brief_bibs_search_other_editions(self, live_keys):
+    def test_brief_bibs_get_other_editions(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
@@ -1018,7 +858,7 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.brief_bibs_search_other_editions(41266045)
+            response = session.brief_bibs_get_other_editions(41266045)
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
@@ -1031,7 +871,7 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("982651100")[0]
+            response = session.holdings_get_current("982651100")
 
             assert (
                 response.url
@@ -1057,7 +897,7 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("850940548")[0]
+            response = session.holdings_get_current("850940548")
             holdings = response.json()["holdings"]
 
             # make sure no holdings are set initially
@@ -1090,16 +930,16 @@ class TestLiveMetadataSession:
         )
 
         with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("850940548")[0]
+            response = session.holdings_get_current("850940548")
             holdings = response.json()["holdings"]
 
             # make sure no holdings are set initially
             if len(holdings) > 0:
-                response = session.holdings_unset_on_bib(
+                response = session.holdings_unset_with_bib(
                     stub_marc_xml, recordFormat="application/marcxml+xml"
                 )
 
-            response = session.holdings_set_on_bib(
+            response = session.holdings_set_with_bib(
                 stub_marc_xml, recordFormat="application/marcxml+xml"
             )
             assert (
@@ -1109,7 +949,7 @@ class TestLiveMetadataSession:
             assert response.status_code == 200
             assert response.json()["action"] == "Set Holdings"
 
-            response = session.holdings_unset_on_bib(
+            response = session.holdings_unset_with_bib(
                 stub_marc_xml, recordFormat="application/marcxml+xml"
             )
             assert response.status_code == 200

@@ -48,8 +48,9 @@ class WorldcatSession(requests.Session):
                                     again. default is 0
             status_forcelist:       if total_retries is not 0, a list of HTTP
                                     status codes to automatically retry requests on.
-                                    if not specified, all failed requests will be
-                                    retried up to number of total_retries.
+                                    if not specified, failed requests with status codes
+                                    413, 429, and 503 will be retried up to number of
+                                    total_retries.
                                     example: [500, 502, 503, 504]
             allowed_methods:        if total_retries is not 0, set of HTTP methods that
                                     requests should be retried on. if not specified,
