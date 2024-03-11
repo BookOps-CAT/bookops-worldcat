@@ -477,7 +477,7 @@ class MetadataSession(WorldcatSession):
         catalogSource: Optional[str] = None,
         itemType: Optional[Union[str, List[str]]] = None,
         itemSubType: Optional[Union[str, List[str]]] = None,
-        retentionCommitments: Optional[bool] = None,
+        retentionCommitments: bool = False,
         spProgram: Optional[str] = None,
         genre: Optional[str] = None,
         topic: Optional[str] = None,
@@ -495,7 +495,7 @@ class MetadataSession(WorldcatSession):
         lon: Optional[float] = None,
         distance: Optional[int] = None,
         unit: str = "M",
-        orderBy: str = "mostWidelyHeld",
+        orderBy: str = "bestMatch",
         offset: int = 1,
         limit: int = 10,
         hooks: Optional[Dict[str, Callable]] = None,
@@ -548,7 +548,8 @@ class MetadataSession(WorldcatSession):
             itemSubType:            restricts responses to single specified OCLC
                                     sub facet type, example: 'digital'
             retentionCommitments:   restricts responses to bibliographic records
-                                    with retention commitment; True or False
+                                    with retention commitment; options: True, False,
+                                    (default is False)
             spProgram:              restricts responses to bibliographic records
                                     associated with particular shared print
                                     program
@@ -567,7 +568,7 @@ class MetadataSession(WorldcatSession):
             groupVariantRecords:    whether or not to group variant records.
                                     options: False, True (default is False)
             preferredLanguage:      language of metadata description,
-                                    default value "en" (English)
+                                    default value "eng" (English)
             showHoldingsIndicators: whether or not to show holdings indicators in
                                     response. options: True, False, (default is False)
             lat:                    limit to latitude, example: 37.502508
@@ -585,7 +586,7 @@ class MetadataSession(WorldcatSession):
                                         'publicationDateDesc'
                                         'mostWidelyHeld'
                                         'title'
-                                    default is 'mostWidelyHeld'
+                                    default is 'bestMatch'
             offset:                 start position of bibliographic records to
                                     return; default is 1
             limit:                  maximum number of records to return;
@@ -652,7 +653,7 @@ class MetadataSession(WorldcatSession):
         heldBySymbol: Optional[Union[str, List[str]]] = None,
         heldByInstitutionID: Optional[Union[str, int, List[Union[str, int]]]] = None,
         inLanguage: Optional[Union[str, List[str]]] = None,
-        inCatalogLanguage: Optional[str] = None,
+        inCatalogLanguage: str = "eng",
         materialType: Optional[str] = None,
         catalogSource: Optional[str] = None,
         itemType: Optional[Union[str, List[str]]] = None,
@@ -669,10 +670,10 @@ class MetadataSession(WorldcatSession):
         facets: Optional[Union[str, List[str]]] = None,
         groupVariantRecords: bool = False,
         preferredLanguage: str = "eng",
-        showHoldingsIndicators: Optional[bool] = None,
+        showHoldingsIndicators: bool = False,
         offset: int = 1,
         limit: int = 10,
-        orderBy: str = "mostWidelyHeld",
+        orderBy: str = "publicationDateDesc",
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
@@ -737,7 +738,7 @@ class MetadataSession(WorldcatSession):
                                     options: False, True (default is False)
             preferredLanguage:      language of metadata description, default is 'eng'
             showHoldingsIndicators: whether or not to show holdings indicators in
-                                    response. options: True, False
+                                    response. options: True, False (default is False)
             offset:                 start position of bibliographic records to
                                     return; default is 1
             limit:                  maximum number of records to return;
@@ -752,7 +753,7 @@ class MetadataSession(WorldcatSession):
                                         'publicationDateDesc'
                                         'mostWidelyHeld'
                                         'title'
-                                    default is 'mostWidelyHeld'
+                                    default is 'publicationDateDesc'
             hooks:                  Requests library hook system that can be
                                     used for signal event handling, see more at:
                                     https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
@@ -1670,7 +1671,7 @@ class MetadataSession(WorldcatSession):
         issn: Optional[str] = None,
         holdingsAllEditions: Optional[bool] = None,
         holdingsAllVariantRecords: Optional[bool] = None,
-        preferredLanguage: str = "en",
+        preferredLanguage: str = "eng",
         holdingsFilterFormat: Optional[List[str]] = None,
         heldInCountry: Optional[str] = None,
         heldInState: Optional[str] = None,
@@ -1704,7 +1705,7 @@ class MetadataSession(WorldcatSession):
             holdingsAllVariantRecords:  get holdings for specific edition across
                                         variant records; options: False, True
             preferredLanguage:          language of metadata description;
-                                        default 'en' (English)
+                                        default 'eng' (English)
             holdingsFilterFormat:       get holdings for specific itemSubType,
                                         example: book-digital
             heldInCountry:              restricts to holdings held by institutions
