@@ -112,7 +112,7 @@ with MetadataSession(authorization=token) as session:
 >>>200
 >>>"https://metadata.api.oclc.org/worldcat/manage/bibs/321339"
 ```
-Additional examples are provided under the [Basic Usage](basic.md) and [Advanced](advanced.md) tabs at the top of this page.
+Additional examples are provided under the [Usage](auth.md) tab at the top of this page.
 
 ## Supported OCLC web services
 
@@ -132,12 +132,12 @@ The [WorldCat Metadata API](https://www.oclc.org/developer/develop/web-services/
     + Set institution holding with MARC record `/manage/institution/holdings`
     + Unset institution holding with MARC record `/manage/institution/holdings`
     + Retrieve institution holding codes `/manage/institution/holdings/current`
-+ [Manage Local Bibliographic Data](local_data.md)
++ [Manage Local Bibliographic Data](local.md)
     + Create local bib data record `/manage/lbds`
     + Retrieve local bib data record `/manage/lbds/{controlNumber}`
     + Replace local bib data record `/manage/lbds/{controlNumber}`
     + Delete local bib data record `/manage/lbds/{controlNumber}`
-+ [Manage Local Holdings Records](local_data.md)
++ [Manage Local Holdings Records](local.md)
     + Create local holdings record `/manage/lhrs`
     + Retrieve local holdings record `/manage/lhrs/{controlNumber}`
     + Replace local holdings record `/manage/lhrs/{controlNumber}`
@@ -151,12 +151,12 @@ The [WorldCat Metadata API](https://www.oclc.org/developer/develop/web-services/
     + Retrieve specific brief bib resource `/search/brief-bibs/{oclcNumber}`
     + Retrieve other editions related to a particular bib resource `/search/brief-bibs/{oclcNumber}/other-editions`
     + Retrieve classification recommendations for an OCLC Number `/search/classification-bibs/{oclcNumber}`
-+ [Search Local Holdings Resources](local_data.md)
++ [Search Local Holdings Resources](local.md)
     + Search shared print local holdings resources `/search/retained-holdings`
     + Retrieve local holdings resource `/search/my-holdings/{controlNumber}`
     + Search local holdings resources `/search/my-holdings`
     + Browse my local holdings resources `/browse/my-holdings`
-+ [Search Local Bibliographic Resources](local_data.md)
++ [Search Local Bibliographic Resources](local.md)
     + Retrieve local bibliographic resource `/search/my-local-bib-data/{controlNumber}`
     + Search local bibliographic resources `/search/my-local-bib-data`
 

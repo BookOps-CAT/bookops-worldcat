@@ -4,20 +4,7 @@ site_description: Documentation of BookOps-Worldcat library
 theme:
   name: 'material'
   palette:
-  - media: "(prefers-color-scheme: light)"
-    scheme: default
-    primary: red
-    accent: red
-    toggle:
-      icon: material/lightbulb-outline
-      name: "Switch to dark mode"
-  - media: "(prefers-color-scheme: dark)"
-    scheme: slate
-    primary: red
-    accent: red
-    toggle:
-      icon: material/lightbulb
-      name: "Switch to light mode"
+    scheme: NYPL
   features:
     - content.tabs.link
     - content.code.annotate
@@ -25,7 +12,6 @@ theme:
     - navigation.tabs
 
 nav:
-
 - BookOps-WorldCat:
   - Overview: index.md
   - Contributing: contributing.md
@@ -65,3 +51,6 @@ plugins:
       javascript_dir: js       # the directory to put the version selector's JS
       canonical_version: null  # the version for <link rel="canonical">; `null`
                                # uses the version specified via `mike deploy`
+
+extra_css:
+  - stylesheets/extra.css

@@ -1,20 +1,6 @@
-
-
-A `MetadataSession` is authenticated using the `WorldcatAccessToken` object. The session allows users to send requests to the Metadata API and initiating a session allows users to use the same parameters and configuration for each request.
+Querying the WorldCat Metadata API is a two step process. Users must first pass their API credentials to the WorldCat Authorization Server to obtain an Access Token. Users can then query the Metadata API using that Access Token.
 
 ## Authorization
-Querying the WorldCat Metadata API is a two step process. First users must pass their API credentials to the WorldCat Authorization Server to obtain an Access Token. Then users can query the Metadata API using their newly obtained Access Token.
-
-In order to access any of OCLC's web services, users must authenticate against OCLC's servers and obtain an Access Token. Within Bookops-Worldcat, you can send the servers your credentials and will be returned a `WorldcatAccessToken`. A Worldcat Access Token can be obtained by passing credential parameters into the `WorldcatAccessToken` object.
-
-
-Basic usage:
-```python 
-with MetadataSession(authorization=token) as session:
-    response = session.brief_bibs_search(q="ti:The Power Broker AND au: Caro, Robert")
-    print(response.json())
-```
-
 A Worldcat Access Token can be obtained by passing credential parameters into the `WorldcatAccessToken` object.
 
 ```python
@@ -36,13 +22,14 @@ This `token` object can be passed directly into `MetadataSession` to authorize r
 >>> from bookops_worldcat import MetadataSession
 >>> session = MetadataSession(authorization=token)
 ```
+
 ### MetadataSession as Context Manager
-A `MetadataSession` can also be used as a context manager. `MetadataSession` inherits all `requests.Session` methods and properties. 
+A `MetadataSession` can also be used as a context manager. This allows users to use the same parameters and configuration for each request they send to the Metadata API. `MetadataSession` inherits all `requests.Session` methods and properties (see [Advanced Usage > MetadataSession](auth.md#metadatasession)) for more information. 
 
 ```python title="Metadata Session as context manager"
 with MetadataSession(authorization=token) as session:
-    response = session.bib_get("12345")
-    print(response.text)
+    response = session.brief_bibs_search(q="ti:The Power Broker AND au: Caro, Robert")
+    print(response.json())
 ```
 
 ## Advanced Usage
