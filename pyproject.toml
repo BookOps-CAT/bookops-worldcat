@@ -45,6 +45,7 @@ mike = "^2.0.0"
 mkapi = "^1.0.14"
 mypy = "^1.8"
 types-requests = "^2.31.0.20240125"
+mkdocs-material = "^9.5.13"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

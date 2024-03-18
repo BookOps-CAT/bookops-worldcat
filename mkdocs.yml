@@ -1,14 +1,61 @@
 site_name: BookOps-Worldcat Documentation
 site_description: Documentation of BookOps-Worldcat library
+
+theme:
+  name: 'material'
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: red
+    accent: red
+    toggle:
+      icon: material/lightbulb-outline
+      name: "Switch to dark mode"
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: red
+    accent: red
+    toggle:
+      icon: material/lightbulb
+      name: "Switch to light mode"
+  features:
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - navigation.tabs
+
 nav:
-  - Home: index.md
+
+- BookOps-WorldCat:
+  - Overview: index.md
+  - Contributing: contributing.md
   - Changelog: changelog.md
   - Source Code: https://github.com/BookOps-CAT/bookops-worldcat
   - Issue Tracker: https://github.com/BookOps-CAT/bookops-worldcat/issues
-  - Tutorials: tutorials.md
-  - About: about.md
-  - API: mkapi/api/bookops_worldcat
-theme: readthedocs
+- Usage: 
+  - Authentication: auth.md
+  - Search WorldCat: search.md
+  - Manage Bibliographic Records: manage_bibs.md
+  - Manage Institution Holdings: manage_holdings.md
+  - Search and Manage Local Data: local.md
+- API Documentation: mkapi/api/bookops_worldcat
+- Tutorials: tutorials.md
+- About: about.md
+
+
+markdown_extensions:
+- admonition
+- pymdownx.details
+- pymdownx.superfences
+- pymdownx.highlight:
+    pygments_lang_class: true
+- pymdownx.extra
+- pymdownx.tabbed:
+    alternate_style: true
+
+watch:
+- bookops_worldcat
+
 plugins:
   - search
   - mkapi

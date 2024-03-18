@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.0] - (3/5/2024)
+### Added
+
+
+### Changed
+
+
+### Fixed
+
+
 ## [0.5.0] - (3/11/2022)
 ### Added
 + feature to set and unset holdings for individual record for multiple institutions (/ih/institutionlist endpoint)
@@ -27,10 +37,10 @@
 ### Changed
 + Changes to `MetadataSession.search_brief_bibs` method due to /brief-bibs endpoint changes:
     + removed deprecated argument `heldBy`
-    + added `groupVariantRecord` and `preferredLanuage` argument
+    + added `groupVariantRecord` and `preferredLanguage` argument
     + modified `groupRelatedEditions` to allow boolean arguments
 + Changes to `MetadataSession.search_general_holdings` method due to API changes:
-    + added following arguements: `holdingsAllVariantRecords`, `preferredLanguage`
+    + added following arguments: `holdingsAllVariantRecords`, `preferredLanguage`
     + removed deprecated `heldBy` argument
 + Changes to `MetadataSession.search_brief_bib_other_editions`:
     + added `deweyNumber`, `datePublished`, `heldByGroup`, `heldBySymbol`, 
@@ -56,7 +66,7 @@
 ## [0.3.3] - (12/28/2020)
 ### Added
 + Type hints
-+ Default timeout in the MetadataSesssion extended to 5 seconds
++ Default timeout in the MetadataSession extended to 5 seconds
 
 ### Changed
 + Dependencies:
@@ -65,7 +75,7 @@
 
 ## [0.3.2] - (11/25/2020)
 ### Fixed
-+ MetadataSession timeout paramerter correctly passed into every session request
++ MetadataSession timeout parameter correctly passed into every session request
 
 
 ## [0.3.1] - (11/24/2020)
@@ -77,7 +87,7 @@
 + Dependencies bump
     + certifi from 2020.6.20 to 2020.11.8
     + requests from 2.24.0 to 2.25.0
-    + urlib3 from 1.25.10 to 1.26.2
+    + urllib3 from 1.25.10 to 1.26.2
 
 ### Added
 + Added Python 3.9 testing to CI
@@ -88,7 +98,7 @@
 + Introduces multiple breaking changes compared to the previous version!
 + Dropped features related to the WorldCat Search API
 + Support for Worldcat Metadata API v.1.1 introduced in May 2020
-+ Supported Metdata API endpoints:
++ Supported Metadata API endpoints:
     + /bibs-retained-holdings
     + /bibs-summary-holdings
     + /brief-bibs
