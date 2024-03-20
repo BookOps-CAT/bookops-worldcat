@@ -4,7 +4,7 @@
 This module provides MetadataSession class for requests to WorldCat Metadata API.
 """
 
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union, BinaryIO
 
 from requests import Request, Response
 
@@ -152,7 +152,7 @@ class MetadataSession(WorldcatSession):
 
     def bib_create(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
         hooks: Optional[Dict[str, Callable]] = None,
@@ -299,7 +299,7 @@ class MetadataSession(WorldcatSession):
 
     def bib_match(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
@@ -337,7 +337,7 @@ class MetadataSession(WorldcatSession):
     def bib_replace(
         self,
         oclcNumber: Union[int, str],
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
         hooks: Optional[Dict[str, Callable]] = None,
@@ -382,7 +382,7 @@ class MetadataSession(WorldcatSession):
 
     def bib_validate(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         validationLevel: str = "validateFull",
         hooks: Optional[Dict[str, Callable]] = None,
@@ -534,16 +534,16 @@ class MetadataSession(WorldcatSession):
                                     institution symbol
             heldByInstitutionID:    restricts response to holdings held by specified
                                     institution registryId
-            inLanguage:             restrics the response to the single
+            inLanguage:             restricts the response to the single
                                     specified language, example: 'fre'
-            inCataloglanguage:      restrics the response to specified
+            inCataloglanguage:      restricts the response to specified
                                     cataloging language, example: 'eng';
                                     default 'eng'
             materialType:           restricts responses to specified material type,
                                     example: 'bks', 'vis'
             catalogSource:          restrict to responses to single OCLC symbol as
                                     the cataloging source, example: 'DLC'
-            itemType:               restricts reponses to single specified OCLC
+            itemType:               restricts responses to single specified OCLC
                                     top-level facet type, example: 'book'
             itemSubType:            restricts responses to single specified OCLC
                                     sub facet type, example: 'digital'
@@ -700,16 +700,16 @@ class MetadataSession(WorldcatSession):
             heldBySymbol:           restricts to holdings with specified intitution
                                     symbol
             heldByInstitutionID:    restrict to specified institution registryId
-            inLanguage:             restrics the response to the single
+            inLanguage:             restricts the response to the single
                                     specified language, example: 'fre'
-            inCataloglanguage:      restrics the response to specified
+            inCataloglanguage:      restricts the response to specified
                                     cataloging language, example: 'eng';
                                     default 'eng'
             materialType:           restricts responses to specified material type,
                                     example: 'bks', 'vis'
             catalogSource:          restrict to responses to single OCLC symbol as
                                     the cataloging source, example: 'DLC'
-            itemType:               restricts reponses to single specified OCLC
+            itemType:               restricts responses to single specified OCLC
                                     top-level facet type, example: 'book'
             itemSubType:            restricts responses to single specified OCLC
                                     sub facet type, example: 'digital'
@@ -1358,8 +1358,8 @@ class MetadataSession(WorldcatSession):
         """
         Search LBD Resources using WorldCat query syntax.
         See https://help.oclc.org/Librarian_Toolbox/Searching_WorldCat_Indexes/
-        Bibliographic_records/Bibliographic_record_indexes for more information on
-        available indexes.
+        Local_bibliographic_data_records/Local_bibliographic_data_record_indexes_A-Z
+        for more information on available indexes.
         Uses /search/my-local-bib-data endpoint.
 
         Args:
@@ -1628,7 +1628,7 @@ class MetadataSession(WorldcatSession):
             isbn:                   ISBN without any dashes, example: '978149191646x'
             issn:                   ISSN hyphenated, example: '0099-1234'
             heldByGroup:            restricts to holdings held by group symbol
-            heldInState:            restricts to holings held by institutions
+            heldInState:            restricts to holdings held by institutions
                                     in requested state, example: "NY"
             itemType:               restricts results to specified item type (example
                                     'book' or 'vis')
