@@ -227,10 +227,10 @@ def stub_session(mock_token):
 def stub_retry_session(mock_token):
     with MetadataSession(
         authorization=mock_token,
-        total_retries=3,
-        backoff_factor=0.5,
-        status_forcelist=[500, 502, 503, 504],
-        allowed_methods=["GET", "POST", "PUT"],
+        totalRetries=3,
+        backoffFactor=0.5,
+        statusForcelist=[500, 502, 503, 504],
+        allowedMethods=["GET", "POST", "PUT"],
     ) as session:
         yield session
 

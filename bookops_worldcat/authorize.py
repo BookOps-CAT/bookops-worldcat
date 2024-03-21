@@ -105,7 +105,7 @@ class WorldcatAccessToken:
         else:
             raise TypeError("Argument 'agent' must be a string.")
 
-        # asure passed arguments are valid
+        # ensure passed arguments are valid
         if isinstance(self.key, str):
             if not self.key.strip():
                 raise ValueError("Argument 'key' cannot be an empty string.")

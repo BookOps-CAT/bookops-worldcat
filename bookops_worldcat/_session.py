@@ -25,10 +25,10 @@ class WorldcatSession(requests.Session):
             5,
             5,
         ),
-        total_retries: int = 0,
-        backoff_factor: float = 0,
-        status_forcelist: Optional[List[int]] = None,
-        allowed_methods: Optional[List[str]] = None,
+        totalRetries: int = 0,
+        backoffFactor: float = 0,
+        statusForcelist: Optional[List[int]] = None,
+        allowedMethods: Optional[List[str]] = None,
     ) -> None:
         """
         Args:
@@ -37,22 +37,22 @@ class WorldcatSession(requests.Session):
                                     request in the session
             timeout:                how long to wait for server to send data
                                     before giving up
-            total_retries:          optional number of times to retry a request that
-                                    failed or timed out. if total_retries argument is
+            totalRetries:           optional number of times to retry a request that
+                                    failed or timed out. if totalRetries argument is
                                     not passed, any arguments passed to
-                                    backoff_factor, status_forcelist, and
-                                    allowed_methods will be ignored. default is 0
-            backoff_factor:         if total_retries is not 0, the backoff
+                                    backoffFactor, statusForcelist, and
+                                    allowedMethods will be ignored. default is 0
+            backoffFactor:          if totalRetries is not 0, the backoff
                                     factor as a float to use to calculate amount of
                                     time session will sleep before attempting request
                                     again. default is 0
-            status_forcelist:       if total_retries is not 0, a list of HTTP
+            statusForcelist:        if totalRetries is not 0, a list of HTTP
                                     status codes to automatically retry requests on.
                                     if not specified, failed requests with status codes
                                     413, 429, and 503 will be retried up to number of
-                                    total_retries.
+                                    totalRetries.
                                     example: [500, 502, 503, 504]
-            allowed_methods:        if total_retries is not 0, set of HTTP methods that
+            allowedMethods:         if totalRetries is not 0, set of HTTP methods that
                                     requests should be retried on. if not specified,
                                     requests using any HTTP method verbs will be
                                     retried. example: ["GET", "POST"]
@@ -75,28 +75,28 @@ class WorldcatSession(requests.Session):
         self.timeout = timeout
 
         # if user provides retry args, create Retry object and mount adapter to session
-        if total_retries != 0:
-            if status_forcelist is None:
+        if totalRetries != 0:
+            if statusForcelist is None:
                 retries = Retry(
-                    total=total_retries,
-                    backoff_factor=backoff_factor,
+                    total=totalRetries,
+                    backoff_factor=backoffFactor,
                     status_forcelist=Retry.RETRY_AFTER_STATUS_CODES,
-                    allowed_methods=allowed_methods,
+                    allowed_methods=allowedMethods,
                 )
             elif (
-                isinstance(status_forcelist, List)
-                and all(isinstance(x, int) for x in status_forcelist)
-                and len(status_forcelist) > 0
+                isinstance(statusForcelist, List)
+                and all(isinstance(x, int) for x in statusForcelist)
+                and len(statusForcelist) > 0
             ):
                 retries = Retry(
-                    total=total_retries,
-                    backoff_factor=backoff_factor,
-                    status_forcelist=status_forcelist,
-                    allowed_methods=allowed_methods,
+                    total=totalRetries,
+                    backoff_factor=backoffFactor,
+                    status_forcelist=statusForcelist,
+                    allowed_methods=allowedMethods,
                 )
             else:
                 raise ValueError(
-                    "Argument 'status_forcelist' must be a list of integers."
+                    "Argument 'statusForcelist' must be a list of integers."
                 )
             self.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries))
 

@@ -37,7 +37,7 @@ class TestMockedMetadataSession:
         with pytest.raises(TypeError):
             MetadataSession()
 
-    def test_invalid_authorizaiton(self):
+    def test_invalid_authorization(self):
         err_msg = "Argument 'authorization' must be 'WorldcatAccessToken' object."
         with pytest.raises(TypeError) as exc:
             MetadataSession(authorization="my_token")
@@ -65,7 +65,7 @@ class TestMockedMetadataSession:
 
     @pytest.mark.parametrize(
         "validationLevel",
-        ["vaidateFull", "validateAdd", "validateReplace"],
+        ["vaildateFull", "validateAdd", "validateReplace"],
     )
     def test_url_manage_bibs_validate(self, validationLevel, stub_session):
         assert (
@@ -622,7 +622,7 @@ class TestMockedMetadataSession:
             == 200
         )
 
-    def test_local_holdings_search_shared_print_with_invalid_oclc_number_passsed(
+    def test_local_holdings_search_shared_print_with_invalid_oclc_number_passed(
         self, stub_session
     ):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
@@ -655,7 +655,7 @@ class TestMockedMetadataSession:
             == 200
         )
 
-    def test_shared_print_holdings_search_with_invalid_oclc_number_passsed(
+    def test_shared_print_holdings_search_with_invalid_oclc_number_passed(
         self, stub_session
     ):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
@@ -1029,10 +1029,10 @@ class TestLiveMetadataSession:
 
         with MetadataSession(
             authorization=token,
-            total_retries=3,
-            backoff_factor=0.5,
-            status_forcelist=[406],
-            allowed_methods=["GET", "POST"],
+            totalRetries=3,
+            backoffFactor=0.5,
+            statusForcelist=[406],
+            allowedMethods=["GET", "POST"],
         ) as session:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.bib_validate(stub_marc21, recordFormat="foo/bar")
