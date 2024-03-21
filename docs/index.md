@@ -59,7 +59,7 @@ with MetadataSession(authorization=token) as session:
     )
     print(response.json())
 ```
-```json title="Brief Bib JSON Response"
+```{ .json title="Brief Bib JSON Response" .no-copy}
 {
   "numberOfRecords": 89,
   "briefRecords": [
@@ -109,7 +109,7 @@ with MetadataSession(authorization=token) as session:
     result = session.bib_get("1631862")
     print(result.text) 
 ```
-```xml title="Full Bib MARC/XML Response"
+```{ .xml title="Full Bib MARCXML Response" .no-copy}
 <?xml version='1.0' encoding='UTF-8'?>
   <record xmlns="http://www.loc.gov/MARC21/slim">
     <leader>00000cam a2200000 i 4500</leader>
@@ -149,51 +149,51 @@ with MetadataSession(authorization=token) as session:
 </record>
 
 ```
-Additional examples and a full outline of the functionality available in Bookops-Worldcat are available in the [Get Started](usage/index.md) section.
+Additional examples and a full outline of the functionality available in Bookops-Worldcat are available in the [Get Started](start.md) section.
 
 ## Supported OCLC web services
 
-The [WorldCat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows users to add and update records in WorldCat; maintain institution holdings; search WorldCat using the full suite of bibliographic record indexes; retrieve MARC records in MARC/XML or MARC21; and work with local bibliographic and holdings data. Access to the Metadata API requires OCLC credentials. The BookOps-Worldcat wrapper supports requests to all endpoints of the WorldCat Metadata API:
+The [WorldCat Metadata API](https://www.oclc.org/developer/develop/web-services/worldcat-metadata-api.en.html) is a read-write service for WorldCat. It allows users to add and update records in WorldCat; maintain institution holdings; search WorldCat using the full suite of bibliographic record indexes; retrieve MARC records in MARCXML or MARC21; and work with local bibliographic and holdings data. Access to the Metadata API requires OCLC credentials. The BookOps-Worldcat wrapper supports requests to all endpoints of the WorldCat Metadata API:
 
-+ [Manage Bibliographic Records](usage/manage_bibs.md)
++ [Manage Bibliographic Records](manage_bibs.md)
     + Validate bib record `/manage/bibs/validate/{validationLevel}`
     + Get current OCLC number `/manage/bibs/current`
     + Create bib record `/manage/bibs`
     + Retrieve full bib record `/manage/bibs/{oclcNumber}`
     + Replace bib record `/manage/bibs/{oclcNumber}`
     + Find match for a bib record in WorldCat `/manage/bibs/match`
-+ [Manage Institution Holdings](usage/manage_holdings.md)
++ [Manage Institution Holdings](manage_holdings.md)
     + Retrieve status of institution holdings `/manage/institution/holdings/current`
     + Set institution holding with OCLC Number `/manage/institution/holdings/set/{oclcNumber}/set`
     + Unset institution holding with OCLC Number `/manage/institution/holdings/unset/{oclcNumber}/unset`
     + Set institution holding with MARC record `/manage/institution/holdings`
     + Unset institution holding with MARC record `/manage/institution/holdings`
     + Retrieve institution holding codes `/manage/institution/holdings/current`
-+ [Manage Local Bibliographic Data](usage/local.md)
++ [Manage Local Bibliographic Data](local.md)
     + Create local bib data record `/manage/lbds`
     + Retrieve local bib data record `/manage/lbds/{controlNumber}`
     + Replace local bib data record `/manage/lbds/{controlNumber}`
     + Delete local bib data record `/manage/lbds/{controlNumber}`
-+ [Manage Local Holdings Records](usage/local.md)
++ [Manage Local Holdings Records](local.md)
     + Create local holdings record `/manage/lhrs`
     + Retrieve local holdings record `/manage/lhrs/{controlNumber}`
     + Replace local holdings record `/manage/lhrs/{controlNumber}`
     + Delete local holdings record `/manage/lhrs/{controlNumber}`
-+ [Search Member Shared Print Holdings](usage/search.md) `/search/bibs-retained-holdings`
-+ [Search Member General Holdings](usage/search.md)
++ [Search Member Shared Print Holdings](search.md) `/search/bibs-retained-holdings`
++ [Search Member General Holdings](search.md)
     + Get summary of holdings for known items `/search/bibs-summary-holdings`
     + Search and retrieve summary of holdings `/search/summary-holdings`
-+ [Search Bibliographic Resources](usage/search.md)
++ [Search Bibliographic Resources](search.md)
     + Search brief bib resources `/search/brief-bibs`
     + Retrieve specific brief bib resource `/search/brief-bibs/{oclcNumber}`
     + Retrieve other editions related to a particular bib resource `/search/brief-bibs/{oclcNumber}/other-editions`
     + Retrieve classification recommendations for an OCLC Number `/search/classification-bibs/{oclcNumber}`
-+ [Search Local Holdings Resources](usage/local.md)
++ [Search Local Holdings Resources](local.md)
     + Search shared print local holdings resources `/search/retained-holdings`
     + Retrieve local holdings resource `/search/my-holdings/{controlNumber}`
     + Search local holdings resources `/search/my-holdings`
     + Browse my local holdings resources `/browse/my-holdings`
-+ [Search Local Bibliographic Resources](usage/local.md)
++ [Search Local Bibliographic Resources](local.md)
     + Retrieve local bibliographic resource `/search/my-local-bib-data/{controlNumber}`
     + Search local bibliographic resources `/search/my-local-bib-data`
 
@@ -209,4 +209,4 @@ New functionality available in version 1.0:
 + Authenticate and authorize for multiple institutions within `MetadataSession`
 + Support for Python 3.11 and 3.12
 
-See the [Changelog page](about/changelog.md) for a full outline of fixes and enhancements with each version.
+See the [Changelog page](changelog.md) for a full outline of fixes and enhancements with each version.

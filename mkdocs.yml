@@ -10,30 +10,27 @@ theme:
     scheme: NYPL
   features:
     - content.tabs.link
-    - content.code.annotate
     - content.code.copy
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.footer
     - navigation.sections
     - navigation.expand
-    - navigation.indexes
-    - navigation.top
 
 nav:
 - BookOps-WorldCat:
   - Overview: index.md
-  - Get Started: 
-    - usage/index.md
-    - Search WorldCat: usage/search.md
-    - Manage Bibliographic Records: usage/manage_bibs.md
-    - Manage Institution Holdings: usage/manage_holdings.md
-    - Search and Manage Local Data: usage/local.md
-    - Advanced Usage: usage/advanced.md
+  - How To:
+    - Get Started: start.md
+    - Search WorldCat: search.md
+    - Manage Bibliographic Records: manage_bibs.md
+    - Manage Institution Holdings: manage_holdings.md
+    - Search and Manage Local Data: local.md
+    - Advanced Usage: advanced.md
   - About:
-    - about/index.md
-    - Contributing: about/contributing.md
-    - Changelog: about/changelog.md
+    - About BookOps: about.md
+    - Contributing: contributing.md
+    - Changelog: changelog.md
     - Issue Tracker: https://github.com/BookOps-CAT/bookops-worldcat/issues
 - API Documentation: mkapi/api/bookops_worldcat
 - Tutorials: tutorials.md

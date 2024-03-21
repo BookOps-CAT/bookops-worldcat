@@ -1,7 +1,7 @@
 
 # Advanced Usage
 
-## OCLC numbers in methods' arguments
+## OCLC Number Formatting
 `MetadataSession` accepts OCLC numbers in methods' arguments as integers or strings with or without a prefix ("ocm", "ocn", "on"). The following are all acceptable:
 
 ```python title="Acceptable oclcNumber arguments"
@@ -36,7 +36,7 @@ print(token.server_response.elapsed):
 #>0:00:00.650108
 ```
 Detailed information can be accessed using the `.json()` method.
-```json title="token.server_response.json()"
+```{ .json title="token.server_response.json()" .no-copy}
 {
   "access_token": "tk_TokenString", 
   "expires_at": "2024-03-14 19:52:37Z", 
@@ -72,7 +72,7 @@ print(token)
 #### Identifying your institution
 Though uncommon, users can request that OCLC set up their WSKeys to allow them to work on behalf of multiple institutions. The user can then authenticate on behalf of any of the institutions associated with that WSKey. 
 
-To identify your institution, pass the Registry ID for your institution to the scopes parameter as context when initiating a `WorldcatAccessToken` object
+If your WSKey is set up to work on behalf of multiple institutions, you can identify your institution when initiating a `WorldcatAccessToken` object. Pass the Registry ID for the institution you wish to work on behalf of to the scopes parameter as context.
 
 ```python title="Access Token with Context"
 token = WorldcatAccessToken(
@@ -93,17 +93,18 @@ def print_url(response, *args, **kwargs):
 
 hooks = {'response': print_url}
 session.brief_bibs_get(850939579, hooks=hooks)
+#>https://metadata.api.oclc.org/worldcat/search/brief-bibs/850939579
 ```
 
 #### Identifying your application
 BookOps-Worldcat provides a default `user-agent` value in the headers of all requests to OCLC web services: `bookops-worldcat/{version}`. Users are encouraged to update the `user-agent` value to properly identify your application to OCLC servers. This will provide a useful piece of information for OCLC staff if they need to assist with any troubleshooting problems that may arise.
 
-To set a custom `user-agent` in a session simply pass is as an argument when initiating the session:
+To set a custom `user-agent` in a session simply pass it as an argument when initiating the session:
 ```python title="Custom user-agent"
 session = MetadataSession(authorization=token, agent="my_client_name")
 ```
 
-... or update its `.headers` attribute after initializing the session:
+Alternatively, users can update the `.headers` attribute after initializing the session:
 ```python title="Update MetadataSession headers"
 session.headers.update({"user-agent": "my-app/version 1.0"})
 ```
@@ -135,4 +136,4 @@ with MetadataSession(
 ) as session:
     session.bib_get("12334")
 ```
-Bookops-Worldcat will return a `RetryError` if a request is attempted up to the maximum number of retries passed to `totalRetries` and still fails.
+Bookops-Worldcat will return a `RetryError` if a request is attempted up to the value of `totalRetries` and still fails.
