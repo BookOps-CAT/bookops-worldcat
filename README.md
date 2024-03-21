@@ -50,7 +50,6 @@ print(token)
 #>"access_token: 'tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW', expires_at: '2024-01-01 12:00:00Z'"
 print(token.is_expired())
 #>False
->>>session = MetadataSession(authorization=token)
 ```
 
 Search for brief bibliographic resources
