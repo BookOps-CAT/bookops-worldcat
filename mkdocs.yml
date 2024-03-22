@@ -31,7 +31,6 @@ nav:
     - About BookOps: about.md
     - Contributing: contributing.md
     - Changelog: changelog.md
-    - Issue Tracker: https://github.com/BookOps-CAT/bookops-worldcat/issues
 - API Documentation: mkapi/api/bookops_worldcat
 - Tutorials: tutorials.md
 
