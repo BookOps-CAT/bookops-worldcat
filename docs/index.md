@@ -197,7 +197,10 @@ The [WorldCat Metadata API](https://www.oclc.org/developer/develop/web-services/
     + Retrieve local bibliographic resource `/search/my-local-bib-data/{controlNumber}`
     + Search local bibliographic resources `/search/my-local-bib-data`
 
-## What's new in Bookops-Worldcat 1.0
+## What's new in Bookops-Worldcat
+See the [Changelog page](changelog.md) for a full outline of fixes and enhancements with each version.
+
+### Features in Version 1.0
 
 New functionality available in version 1.0:
 
@@ -209,4 +212,38 @@ New functionality available in version 1.0:
 + Authenticate and authorize for multiple institutions within `MetadataSession`
 + Support for Python 3.11 and 3.12
 
-See the [Changelog page](changelog.md) for a full outline of fixes and enhancements with each version.
+### Migration Information
+Bookops-Worldcat 1.0 introduces many breaking changes for users of previous versions. Due to a complete refactor of the Metadata API, the methods from Bookops-Worldcat 0.5.0 have been rewritten. Most of the functionality from previous versions of the Metadata API is still available in Version 2.0. For a comparison of the functionality available in Versions 1.0, 1.1, and 2.0 of the Metadata API, see [OCLC's documentation](https://www.oclc.org/developer/api/oclc-apis/worldcat-metadata-api.en.html) and their [functionality comparison table](https://www.oclc.org/content/dam/developer-network/worldcat-metadata-api/worldcat-metadata-api-functionality-comparison.pdf). 
+
+Versions 1.0 and 1.1 of the Metadata API will be sunset after April 30, 2024 at which point Bookops-Worldcat 0.5.0 will no longer work.
+
+
+##### Similar functionality, new method names
+Certain functionality has been retained from Bookops-Worldcat Version 0.5 but the methods have been renamed. See below for changes:
+
+
+|Functionality| Bookops-Worldcat 0.5 | Bookops-Worldcat 1.0  |
+|-----------| ----------- | ------------ |
+|get brief bib resource| `get_brief_bib` | `brief_bibs_get` |
+|get full bib record| `get_full_bib` | `bib_get` |
+|get current holdings for record| `holding_get_status` | `holdings_get_current` |
+|set holdings on a record| `holding_set` | `holdings_set` |
+|unset holdings on a record| `holding_unset` | `holdings_unset` |
+|search for brief bibs| `search_brief_bibs` | `brief_bibs_search` |
+|get other editions of brief bibs| `search_brief_bib_other_editions` |`brief_bibs_get_other_editions` |
+|get current oclc number| `search_current_control_numbers` | `bib_get_current_oclc_number` |
+|search member holdings| `search_general_holdings` | `summary_holdings_search` |
+|search shared print holdings| `search_shared_print_holdings` | `shared_print_holdings_search` |
+
+##### Deprecated functionality
+Certain functionality has been deprecated within Version 2.0 of the Metadata API in including the following methods from Bookops-Worldcat 0.5:  
+
++ `holdings_set` and `holdings_unset`
+    + Users are no longer able to set holdings on multiple records in a single request and should instead send separate requests for each record.
++ `holdings_set_multi_institutions` and `holdings_unset_multi_institutions`
+    + Users are no longer able to set holdings for multiple institutions with one request.
+    + If your WSKey is valid for multiple institutions, see section on [Identifying Your Institution](https://bookops-cat.github.io/bookops-worldcat/advanced/#identifying-your-institution) for an explanation of how to pass your RegistryID to the OCLC Authentication Server and obtain an Access Token.
+
+
+
+

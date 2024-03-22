@@ -1,14 +1,78 @@
 # Changelog
 
-## [1.0.0] - (3/5/2024)
+## [1.0.0] - (3/22/2024)
 ### Added
-
++ Support for OCLC Metadata API Version 2.0
+    + `MetadataSession` methods to support new functionality released in Metadata API 2.0
+        + `bib_match`
+        + `bib_get_classification`
+        + `holdings_set_with_bib` and `holdings_unset_with_bib`
+    + New `MetadataSession` methods to support existing Metadata API functionality
+        + Bib Record Management and Validation
+            + `bib_create`
+            + `bib_replace`
+            + `bib_validate`
+        + Local Holdings Records
+            + `lhr_create`
+            + `lhr_delete`
+            + `lhr_get`
+            + `lhr_replace`
+        + Local Bibliographic Data
+            + `lbd_create`
+            + `lbd_delete`
+            + `lbd_get`
+            + `lbd_replace`
+        + Holdings Management
+            + `holdings_get_codes`
++ Support for [automatic retries of failed requests](https://bookops-cat.github.io/bookops-worldcat/advanced/#token-refresh-and-request-retries)
++ Support for [multi-institution WSKeys](https://bookops-cat.github.io/bookops-worldcat/advanced/#identifying-your-institution)
++ Support for Python 3.11 and 3.12
++ New dev dependencies:
+    + types-requests (2.31.0.20240125)
+    + mkdocs-material (9.5.13)
 
 ### Changed
-
++ `MetadataSession` methods that have been renamed and updated (replacing existing functionality in Bookops-Worldcat): 
+    + `get_brief_bib` is now `brief_bibs_get`
+    + `get_full_bib` is now `bib_get`
+    + `holding_get_status` is now `holdings_get_current`
+    + `holding_set` is now `holdings_set`
+    + `holding_unset` is now `holdings_unset`
+    + `search_brief_bib_other_editions` is now `brief_bibs_get_other_editions`
+    + `search_brief_bibs` is now `brief_bibs_search`
+    + `search_current_control_numbers` is now `bib_get_current_oclc_number`
+    + `search_general_holdings` is now `summary_holdings_search`
+    + `search_shared_print_holdings` is now `shared_print_holdings_search` 
++ `WorldcatAccessToken` 
+    + `scopes` arg now only accepts strings. A `TypeError` is raised if `scopes` arg is passed a list
+    + `token_expires_at` attribute is now an aware `datetime` object (change made due to [`datetime.utcnow()`] deprecation(https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow))
++ Error handling:
+    + `TypeError` and `ValueError` replace `WorldcatAuthorizationError` when `WorldcatAccessToken` is passed an invalid arg
+    + Removed `InvalidOclcNumber` errors from `metadata_api.py`; errors are now handled by functions in `utils.py`
++ `pytest` configuration moved from `pytest.ini` to `pyproject.toml`
++ Updated dependencies:
+    + requests: (2.31)
++ Updated dev dependencies:
+    + black (23.3.0)
+    + mike (2.0.0)
+    + mypy (1.0.14)
++ Documentation on https://bookops-cat.github.io/bookops-worldcat/ has been rewritten and reorganized
 
 ### Fixed
++ `AttributeError` changed to `TypeError` if arg passed to `Query.prepared_request` is not a `PreparedRequest`
++ All args for methods within `MetadataSession` have been changes to camel case from snake case in order to be consisted with Metadata API documentation
++ Type hints clarified and made more explict
 
+### Removed
++ `principalID` and `principalIDNS` as args for `WorldcatAccessToken`
++ Automatic handling of large sets of oclcNumbers
+  + `_split_into_legal_volume` removed from `MetadataSession`; a `ValueError` is now raised if a method is passed too many oclcNumbers
+
+
+### Deprecated
++ Support for Python 3.7
++ 409 error handling for requests to set holdings on a record that already has holdings
++ `WorldcatSessionError` has been replaced with `TypeError` or `ValueError` in `WorldcatSession`
 
 ## [0.5.0] - (3/11/2022)
 ### Added
