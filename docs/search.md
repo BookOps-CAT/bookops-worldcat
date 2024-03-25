@@ -7,7 +7,7 @@ Requests made to any `/search/` endpoints return server responses in JSON format
 ### Search Brief Bibs
 The `brief_bibs_search` method allows users to query WorldCat using WorldCat's [bibliographic record indexes](https://help.oclc.org/Librarian_Toolbox/Searching_WorldCat_Indexes/Bibliographic_records/Bibliographic_record_indexes).
 
-The Metadata API has a number of limiters that one can use to restrict query results. A full list of available parameters for the `brief_bibs_search` method is available in the [API Documentation](bookops_worldcat.metadata_api/#bookops_worldcatmetadata_apimetadatasessionbrief_bibs_search). Additional search examples are also available in the [Advanced Search Functionality](#advanced-search-functionality) section of this page.
+The Metadata API many limiters that one can use to restrict query results. A full list of available parameters for the `brief_bibs_search` method is available in the [API Documentation](bookops_worldcat.metadata_api/#bookops_worldcatmetadata_apimetadatasessionbrief_bibs_search). Additional search examples are also available in the [Advanced Search Functionality](#advanced-search-functionality) section of this page.
 
 Basic usage:
 ```python title="brief_bibs_search Request"

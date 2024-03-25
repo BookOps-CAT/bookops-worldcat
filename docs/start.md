@@ -33,4 +33,4 @@ A `MetadataSession` can also be used as a context manager. This allows users to 
 with MetadataSession(authorization=token) as session:
     response = session.brief_bibs_get("321339")
 ```
-A `MetadataSession` has methods that allow users to interact with each endpoints of the OCLC Metadata API. See the tabs on the left of this page for more information about `MetadataSession` methods and examples of their usage.
+A `MetadataSession` has methods that allow users to interact with each endpoint of the OCLC Metadata API. See the tabs on the left of this page for more information about `MetadataSession` methods and examples of their usage.

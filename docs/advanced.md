@@ -2,14 +2,14 @@
 # Advanced Usage
 
 ## OCLC Number Formatting
-`MetadataSession` accepts OCLC numbers in methods' arguments as integers or strings with or without a prefix ("ocm", "ocn", "on"). The following are all acceptable:
+`MetadataSession` accepts OCLC numbers in methods' arguments as integers or strings with or without a prefix (eg. "ocm", "ocn", or "on"). The following are all acceptable:
 
 ```python title="Acceptable oclcNumber arguments"
 session.brief_bibs_get(oclcNumber="ocm00012345")
-session.brief_bibs_search(oclcNumber="00012345")
-session.bib_get_classification(oclcNumber=12345)
+session.brief_bibs_search(oclcNumber="00054321")
+session.bib_get_classification(oclcNumber=12121)
 ```
-The `bib_get_current_oclc_number` and `holdings_get_current` methods accept multiple OCLC Numbers as an argument. For these methods OCLC Numbers can be passed as a list of strings and/or integers or a string with the numbers separated by commas. The following are all acceptable
+The `bib_get_current_oclc_number` and `holdings_get_current` methods accept multiple OCLC Numbers passed to the `oclcNumbers` argument. For these methods OCLC Numbers can be passed as a list of strings and/or integers or a string with the numbers separated by commas. The following are all acceptable:
 
 ```python title="Acceptable oclcNumbers arguments"
 session.holdings_get_current(oclcNumbers=["ocm00012345", "00012346", "12347"])
@@ -19,7 +19,7 @@ session.bib_get_current_oclc_number(oclcNumbers="ocm00012345, 00012346, 12347")
 
 ## Authentication
 ### WorldcatAccessToken
-A `WorldcatAccessToken` object retains the underlying Requests object functionality (`requests.Request`) which can be accessed via the `.server_response` attribute:
+A `WorldcatAccessToken` object retains the underlying Requests object functionality ([`requests.Request`](https://requests.readthedocs.io/en/latest/api/#requests.request)) which can be accessed via the `.server_response` attribute:
 
 ```python title="Obtaining an Access Token"
 from bookops_worldcat import WorldcatAccessToken
@@ -118,13 +118,15 @@ token = WorldcatAccessToken(
     agent="my_app/1.0.0"
 )
 ```
-#### Token Refresh and Request Retries
+#### Automatic Token Refresh
 All requests made within a `MetadataSession` have a built-in access token auto-refresh feature. While a session is open, the current token will be checked for expiration before sending a request. If the token has expired, a new token will be obtained and the `MetadataSession` will continue to send requests.
 
-It is possible to configure a `MetadataSession` to automatically retry failed requests. This functionality is customizable with the `totalRetries`, `backoffFactor`, `statusForcelist`, and `allowedMethods` arguments. 
+
+#### Retry Failed Requests
+Users can configure a `MetadataSession` to automatically retry failed requests. This functionality is customizable with the `totalRetries`, `backoffFactor`, `statusForcelist`, and `allowedMethods` arguments. 
 
 !!! note 
-    It is recommended that users only allow for automatic retries on timeouts or other server errors and keep their automatic retries as low as possible. Users should not set up automatic retries for authentication or request errors.
+    It is recommended that users only allow for automatic retries on timeouts or other server errors. Users should also =keep their automatic retries as low as possible in order to not overburden the web service. Users should not set up automatic retries for authentication or request errors.
 
 ```python title="MetadataSession with Retries"
 with MetadataSession(

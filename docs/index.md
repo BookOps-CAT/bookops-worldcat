@@ -215,7 +215,7 @@ New functionality available in version 1.0:
 ### Migration Information
 Bookops-Worldcat 1.0 introduces many breaking changes for users of previous versions. Due to a complete refactor of the Metadata API, the methods from Bookops-Worldcat 0.5.0 have been rewritten. Most of the functionality from previous versions of the Metadata API is still available in Version 2.0. For a comparison of the functionality available in Versions 1.0, 1.1, and 2.0 of the Metadata API, see [OCLC's documentation](https://www.oclc.org/developer/api/oclc-apis/worldcat-metadata-api.en.html) and their [functionality comparison table](https://www.oclc.org/content/dam/developer-network/worldcat-metadata-api/worldcat-metadata-api-functionality-comparison.pdf). 
 
-Versions 1.0 and 1.1 of the Metadata API will be sunset after April 30, 2024 at which point Bookops-Worldcat 0.5.0 will no longer work.
+Versions 1.0 and 1.1 of the Metadata API will be sunset after April 30, 2024 at which point tools that rely on Bookops-Worldcat 0.5 will no longer be able to query the Metadata API.
 
 
 ##### Similar functionality, new method names
@@ -242,7 +242,7 @@ Certain functionality has been deprecated within Version 2.0 of the Metadata API
     + Users are no longer able to set holdings on multiple records in a single request and should instead send separate requests for each record.
 + `holdings_set_multi_institutions` and `holdings_unset_multi_institutions`
     + Users are no longer able to set holdings for multiple institutions with one request.
-    + If your WSKey is valid for multiple institutions, see section on [Identifying Your Institution](https://bookops-cat.github.io/bookops-worldcat/advanced/#identifying-your-institution) for an explanation of how to pass your RegistryID to the OCLC Authentication Server and obtain an Access Token.
+    + If your WSKey is valid for multiple institutions, see section on [Identifying Your Institution](advanced.md#identifying-your-application) for an explanation of how to pass your RegistryID to the OCLC Authentication Server and obtain an Access Token.
 
 
 

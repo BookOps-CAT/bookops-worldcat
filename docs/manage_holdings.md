@@ -54,7 +54,7 @@ with MetadataSession(authorization=token) as session:
 Users can set and/or unset holdings in WorldCat by passing an OCLC Number to the `holdings_set` and/or `holdings_unset` methods. 
 
 !!! info
-    In version 2.0 of the Metadata API, users are no longer able to set holdings on multiple records at the same time. Users should now pass one OCLC Number per request to `holdings_set` and `holdings_unset`.
+    In version 2.0 of the Metadata API, users are no longer able to set holdings on multiple records with one request. Users should now pass one OCLC Number per request to `holdings_set` and `holdings_unset`.
 
 Version 2.0 of the Metadata API provides new functionality to set and unset holdings in WorldCat by passing the Metadata API a MARC record in MARCXML or MARC21 format. The record must have an OCLC number in the 035 or 001 field in order to set holdings in WorldCat.
 

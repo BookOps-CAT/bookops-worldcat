@@ -45,34 +45,36 @@
     + `search_shared_print_holdings` is now `shared_print_holdings_search` 
 + `WorldcatAccessToken` 
     + `scopes` arg now only accepts strings. A `TypeError` is raised if `scopes` arg is passed a list
-    + `token_expires_at` attribute is now an aware `datetime` object (change made due to [`datetime.utcnow()`] deprecation(https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow))
+    + `token_expires_at` attribute is now an aware `datetime` object (change made due to [`datetime.utcnow()`](https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow) deprecation)
 + Error handling:
-    + `TypeError` and `ValueError` replace `WorldcatAuthorizationError` when `WorldcatAccessToken` is passed an invalid arg
-    + Removed `InvalidOclcNumber` errors from `metadata_api.py`; errors are now handled by functions in `utils.py`
+    + `TypeError` and `ValueError` replace `WorldcatAuthorizationError` when `WorldcatAccessToken` is passed an invalid arg.
+    + Removed `InvalidOclcNumber` errors from `metadata_api.py`. Errors are now handled by functions in `utils.py`.
 + `pytest` configuration moved from `pytest.ini` to `pyproject.toml`
++ Updated and clarified type annotations for `MetadataSession` methods
 + Updated dependencies:
     + requests: (2.31)
 + Updated dev dependencies:
     + black (23.3.0)
     + mike (2.0.0)
     + mypy (1.0.14)
-+ Documentation on https://bookops-cat.github.io/bookops-worldcat/ has been rewritten and reorganized
++ Documentation on [https://bookops-cat.github.io/bookops-worldcat/](https://bookops-cat.github.io/bookops-worldcat/) has been rewritten and reorganized
 
 ### Fixed
 + `AttributeError` changed to `TypeError` if arg passed to `Query.prepared_request` is not a `PreparedRequest`
-+ All args for methods within `MetadataSession` have been changes to camel case from snake case in order to be consisted with Metadata API documentation
-+ Type hints clarified and made more explict
++ All args for methods within `MetadataSession` have been changed to camel case to be consisted with Metadata API documentation
+
 
 ### Removed
 + `principalID` and `principalIDNS` as args for `WorldcatAccessToken`
 + Automatic handling of large sets of oclcNumbers
-  + `_split_into_legal_volume` removed from `MetadataSession`; a `ValueError` is now raised if a method is passed too many oclcNumbers
+    + `_split_into_legal_volume` removed from `MetadataSession`; a `ValueError` is now raised if a method is passed too many oclcNumbers
 
 
 ### Deprecated
 + Support for Python 3.7
-+ 409 error handling for requests to set holdings on a record that already has holdings
-+ `WorldcatSessionError` has been replaced with `TypeError` or `ValueError` in `WorldcatSession`
++ 409 error handling for holdings set/unset requests 
++ `WorldcatSessionError` 
+    + Replaced with `TypeError` or `ValueError` in `WorldcatSession`
 
 ## [0.5.0] - (3/11/2022)
 ### Added

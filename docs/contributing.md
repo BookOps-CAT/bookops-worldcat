@@ -31,7 +31,7 @@ For new code contributions, please use the tools and standards in place for Book
  + Tests written with [pytest](https://docs.pytest.org/en/8.0.x/)
 
 ??? tip
-    BookOps uses VS Code and if you do to there are certain extensions which may make your work easier while contributing to Bookops-Worldcat. The extensions support some of our code style requirements and automate code formatting. Similar extensions are available on other IDEs. Those extensions include:
+    If you use VS Code there are certain extensions which will automate code formatting and support some of our code style requirements which may make your work easier while contributing to Bookops-Worldcat. Similar extensions are available on other IDEs. Those extensions include:
 
     + [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)
     + [Flake8](https://marketplace.visualstudio.com/items?itemName=ms-python.flake8)

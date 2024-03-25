@@ -1,12 +1,12 @@
 # Manage Bibliographic Records
 
 !!! note
-    Users must have "WorldCatMetadataAPI:manage_bibs" in the list of scopes for their WSKeys in order to manage bib records using the Metadata API. To check if your WSKey has access to these endpoints, log into the [WSKey Management portal](https://platform.worldcat.org/wskey/). 
+    Users must have "WorldCatMetadataAPI:manage_bibs" in the list of scopes for their WSKeys in order to manage bib records using the Metadata API. To check if your WSKey has access to these endpoints, log into your [WSKey Management portal](https://platform.worldcat.org/wskey/). 
 
 ## Get Full MARC Records
-Users can retrieve full MARC records from WorldCat by passing the `bib_get` method an OCLC number. The Metadata API correctly matches OCLC numbers of records that have been merged together and returns the current master record. Records can be retrieved in MARCXML or MARC21 formats. The default format for is MARCXML.  
+Users can retrieve full MARC records from WorldCat by passing the `bib_get` method an OCLC number. The Metadata API correctly matches OCLC numbers of records that have been merged together and returns the current master record. Records can be retrieved in MARCXML or MARC21 formats. The default format is MARCXML.  
 
-```python title="get_bib"
+```python title="bib_get"
 from bookops_worldcat import MetadataSession
 
 with MetadataSession(authorization=token) as session:
