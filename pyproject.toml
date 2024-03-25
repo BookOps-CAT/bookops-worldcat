@@ -6,6 +6,11 @@ authors = ["Tomasz Kalata <klingaroo@gmail.com>", "Charlotte Kostelic <charlotte
 license = "MIT"
 exclude = ["bookops_worldcat/temp.py", "bookops_worldcat/temp/*"]
 
+packages = [
+    {include = "bookops_worldcat"},
+    {include = "bookops_worldcat/py.typed"},
+]
+
 readme = "README.md"
 repository = "https://github.com/BookOps-CAT/bookops-worldcat"
 homepage = "https://bookops-cat.github.io/bookops-worldcat/"
