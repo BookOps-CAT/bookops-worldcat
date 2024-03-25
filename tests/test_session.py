@@ -46,10 +46,10 @@ class TestWorldcatSession:
     def test_adapter_retries(self, mock_token):
         with WorldcatSession(
             authorization=mock_token,
-            total_retries=3,
-            backoff_factor=0.5,
-            status_forcelist=[500, 502, 503, 504],
-            allowed_methods=["GET", "POST", "PUT"],
+            totalRetries=3,
+            backoffFactor=0.5,
+            statusForcelist=[500, 502, 503, 504],
+            allowedMethods=["GET", "POST", "PUT"],
         ) as session:
             assert session.adapters["https://"].max_retries.status_forcelist == [
                 500,
@@ -58,27 +58,25 @@ class TestWorldcatSession:
                 504,
             ]
 
-    def test_no_status_forcelist(self, mock_token):
+    def test_no_statusForcelist(self, mock_token):
         with WorldcatSession(
             authorization=mock_token,
-            total_retries=2,
-            backoff_factor=0.1,
-            allowed_methods=["GET"],
+            totalRetries=2,
+            backoffFactor=0.1,
+            allowedMethods=["GET"],
         ) as session:
             assert session.adapters[
                 "https://"
             ].max_retries.status_forcelist == frozenset({413, 429, 503})
 
     @pytest.mark.parametrize("arg", [[], "", 123, {}, ["123", "234"]])
-    def test_status_forcelist_error(self, mock_token, arg):
+    def test_statusForcelist_error(self, mock_token, arg):
         with pytest.raises(ValueError) as exc:
             WorldcatSession(
                 authorization=mock_token,
-                total_retries=2,
-                backoff_factor=0.1,
-                status_forcelist=arg,
-                allowed_methods=["GET"],
+                totalRetries=2,
+                backoffFactor=0.1,
+                statusForcelist=arg,
+                allowedMethods=["GET"],
             )
-        assert "Argument 'status_forcelist' must be a list of integers" in str(
-            exc.value
-        )
+        assert "Argument 'statusForcelist' must be a list of integers" in str(exc.value)

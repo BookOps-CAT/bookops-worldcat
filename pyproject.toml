@@ -6,6 +6,11 @@ authors = ["Tomasz Kalata <klingaroo@gmail.com>", "Charlotte Kostelic <charlotte
 license = "MIT"
 exclude = ["bookops_worldcat/temp.py", "bookops_worldcat/temp/*"]
 
+packages = [
+    {include = "bookops_worldcat"},
+    {include = "bookops_worldcat/py.typed"},
+]
+
 readme = "README.md"
 repository = "https://github.com/BookOps-CAT/bookops-worldcat"
 homepage = "https://bookops-cat.github.io/bookops-worldcat/"
@@ -46,6 +51,7 @@ mike = "^2.0.0"
 mkapi = "^1.0.14"
 mypy = "^1.8"
 types-requests = "^2.31.0.20240125"
+mkdocs-material = "^9.5.13"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -62,7 +68,7 @@ source = ["."]
 
 [tool.black]
 line-length = 88
-target-version = ['py37']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
 include = '\.pyi?$'
 exclude = '''
 (
