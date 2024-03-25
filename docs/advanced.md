@@ -126,7 +126,7 @@ All requests made within a `MetadataSession` have a built-in access token auto-r
 Users can configure a `MetadataSession` to automatically retry failed requests. This functionality is customizable with the `totalRetries`, `backoffFactor`, `statusForcelist`, and `allowedMethods` arguments. 
 
 !!! note 
-    It is recommended that users only allow for automatic retries on timeouts or other server errors. Users should also =keep their automatic retries as low as possible in order to not overburden the web service. Users should not set up automatic retries for authentication or request errors.
+    It is recommended that users only allow for automatic retries on timeouts or other server errors. Users should also keep their automatic retries as low as possible in order to not overburden the web service. Users should not set up automatic retries for authentication (401, 403) or malformed request errors (400).
 
 ```python title="MetadataSession with Retries"
 with MetadataSession(

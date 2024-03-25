@@ -18,7 +18,7 @@ For full documentation please see https://bookops-cat.github.io/bookops-worldcat
 
 ## Features
 
-Bookops-Worldcat takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/en/master/) and interactions with OCLC's services are built around 'Requests' sessions. `MetadataSession` inherits all `requests.Session` properties. Server responses are `requests.Response` objects with [all of their properties and methods](https://requests.readthedocs.io/en/master/user/quickstart/#response-content).
+Bookops-Worldcat takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/) and interactions with OCLC's services are built around 'Requests' sessions. `MetadataSession` inherits all `requests.Session` properties. Server responses are `requests.Response` objects with [all of their properties and methods](https://requests.readthedocs.io/en/latest/user/quickstart/).
 
 Authorizing a web service session simply requires passing an access token to `MetadataSession`. Opening a session allows the user to call specific methods to facilitate communication between the user's script/client and a particular endpoint of the Metadata API. Many of the hurdles related to making valid requests are hidden under the hood of this package, making it as simple as possible.
 
@@ -140,6 +140,7 @@ New functionality available in version 1.0:
 + Add automatic retries to failed requests
 + Authenticate and authorize for multiple institutions within `MetadataSession`
 + Support for Python 3.11 and 3.12
++ Dropped support for Python 3.7 
 
 ### Migration Information
 Bookops-Worldcat 1.0 introduces many breaking changes for users of previous versions. Due to a complete refactor of the Metadata API, the methods from Bookops-Worldcat 0.5.0 have been rewritten. Most of the functionality from previous versions of the Metadata API is still available in Version 2.0. For a comparison of the functionality available in Versions 1.0, 1.1, and 2.0 of the Metadata API, see [OCLC's documentation](https://www.oclc.org/developer/api/oclc-apis/worldcat-metadata-api.en.html) and their [functionality comparison table](https://www.oclc.org/content/dam/developer-network/worldcat-metadata-api/worldcat-metadata-api-functionality-comparison.pdf). 

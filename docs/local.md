@@ -328,6 +328,8 @@ Users can manage local holdings records using Bookops-Worldcat in the same way t
         </datafield>
     </record>
     ```
+### Managing Shared Print Commitments
+Users can manage Shared Print collections using the Metadata API by adding Shared Print flags to their Local Holdings Records. More information on managing Shared Print commitments is available on [OCLC's Developer Network Site](https://www.oclc.org/developer/api/oclc-apis/worldcat-metadata-api/wcmetadata-faqs.en.html).
 
 ## Search Local Holdings Resources
 Users can browse, search for and retrieve brief local holdings data in JSON format using the `local_holdings_get`, `local_holdings_search`, `local_holdings_browse`, and `local_holdings_search_shared_print` methods:
