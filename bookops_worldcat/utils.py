@@ -71,8 +71,10 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[
                                 they can be integers or strings with or without
                                 OCLC # prefix;
                                 if str the numbers must be separated by comma
+
     Returns:
-        vetted_numbers:         list of vetted oclcNumbers
+        vetted_numbers as list
+
     """
     if isinstance(oclcNumbers, str):
         oclcNumbers_lst = _str2list(oclcNumbers)

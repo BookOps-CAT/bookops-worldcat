@@ -29,7 +29,8 @@ class MetadataSession(WorldcatSession):
         statusForcelist: Optional[List[int]] = None,
         allowedMethods: Optional[List[str]] = None,
     ) -> None:
-        """
+        """Initializes MetadataSession
+
         Args:
             authorization:          WorldcatAccessToken object
             agent:                  "User-agent" parameter to be passed in the request
@@ -163,14 +164,16 @@ class MetadataSession(WorldcatSession):
 
         Args:
             record:                 MARC record to be created
-            recordFormat:           format of MARC record, options:
-                                    'application/marcxml+xml', 'application/marc'
+            recordFormat:           format of MARC record; options:
+                                    'application/marcxml+xml'; 'application/marc'
             responseFormat:         format of returned record; options:
                                     'application/marcxml+xml', 'application/marc'
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -206,9 +209,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record, options:
                                     'application/marcxml+xml', 'application/marc',
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -240,9 +245,11 @@ class MetadataSession(WorldcatSession):
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer or string with or without OCLC Number
                                     prefix
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -274,9 +281,11 @@ class MetadataSession(WorldcatSession):
                                     to be checked; numbers can be integers or strings
                                     with or without OCLC Number prefix;
                                     if str, the numbers must be separated by a comma
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
 
         Returns:
             `requests.Response` instance
@@ -313,9 +322,11 @@ class MetadataSession(WorldcatSession):
             record:                 MARC record to be matched
             recordFormat:           format of MARC record, options:
                                     'application/marcxml+xml', 'application/marc'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -357,9 +368,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record; options:
                                     'application/marcxml+xml', 'application/marc'
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -399,9 +412,11 @@ class MetadataSession(WorldcatSession):
                                     available values: 'validateFull', 'validateAdd',
                                     'validateReplace'
                                     default is 'validateFull'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -443,9 +458,11 @@ class MetadataSession(WorldcatSession):
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer or string with or without OCLC Number
                                     prefix
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -472,7 +489,7 @@ class MetadataSession(WorldcatSession):
         heldBySymbol: Optional[Union[str, List[str]]] = None,
         heldByInstitutionID: Optional[Union[str, int, List[str], List[int]]] = None,
         inLanguage: Optional[Union[str, List[str]]] = None,
-        inCatalogLanguage: str = "eng",
+        inCatalogLanguage: Optional[str] = "eng",
         materialType: Optional[str] = None,
         catalogSource: Optional[str] = None,
         itemType: Optional[Union[str, List[str]]] = None,
@@ -536,7 +553,7 @@ class MetadataSession(WorldcatSession):
                                     institution registryId
             inLanguage:             restricts the response to the single
                                     specified language, example: 'fre'
-            inCataloglanguage:      restricts the response to specified
+            inCatalogLanguage:      restricts the response to specified
                                     cataloging language, example: 'eng';
                                     default 'eng'
             materialType:           restricts responses to specified material type,
@@ -591,9 +608,11 @@ class MetadataSession(WorldcatSession):
                                     return; default is 1
             limit:                  maximum number of records to return;
                                     maximum is 50, default is 10
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -653,7 +672,7 @@ class MetadataSession(WorldcatSession):
         heldBySymbol: Optional[Union[str, List[str]]] = None,
         heldByInstitutionID: Optional[Union[str, int, List[Union[str, int]]]] = None,
         inLanguage: Optional[Union[str, List[str]]] = None,
-        inCatalogLanguage: str = "eng",
+        inCatalogLanguage: Optional[str] = "eng",
         materialType: Optional[str] = None,
         catalogSource: Optional[str] = None,
         itemType: Optional[Union[str, List[str]]] = None,
@@ -702,7 +721,7 @@ class MetadataSession(WorldcatSession):
             heldByInstitutionID:    restrict to specified institution registryId
             inLanguage:             restricts the response to the single
                                     specified language, example: 'fre'
-            inCataloglanguage:      restricts the response to specified
+            inCatalogLanguage:      restricts the response to specified
                                     cataloging language, example: 'eng';
                                     default 'eng'
             materialType:           restricts responses to specified material type,
@@ -754,9 +773,11 @@ class MetadataSession(WorldcatSession):
                                         'mostWidelyHeld'
                                         'title'
                                     default is 'publicationDateDesc'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -812,9 +833,10 @@ class MetadataSession(WorldcatSession):
         Uses /manage/institution/holding-codes endpoint.
 
         Args:
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
         Returns:
             `requests.Response` instance
         """
@@ -846,9 +868,10 @@ class MetadataSession(WorldcatSession):
                                     to be checked; numbers can be integers or strings
                                     with or without OCLC Number prefix;
                                     if str, the numbers must be separated by a comma
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
 
         Returns:
             `requests.Response` instance
@@ -886,9 +909,10 @@ class MetadataSession(WorldcatSession):
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer or string with or without OCLC Number
                                     prefix
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
 
         Returns:
             `requests.Response` instance
@@ -920,9 +944,10 @@ class MetadataSession(WorldcatSession):
             oclcNumber:             OCLC bibliographic record number; can be an
                                     integer or string with or without OCLC Number
                                     prefix
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
 
         Returns:
             `requests.Response` instance
@@ -957,9 +982,11 @@ class MetadataSession(WorldcatSession):
             record:                 MARC record on which to set holdings
             recordFormat:           format of MARC record, options:
                                     'application/marcxml+xml', 'application/marc'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -994,9 +1021,11 @@ class MetadataSession(WorldcatSession):
             record:                 MARC record on which to unset holdings
             recordFormat:           format of MARC record, options:
                                     'application/marcxml+xml', 'application/marc'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1032,9 +1061,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record; options:
                                     'application/marcxml+xml', 'application/marc'
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1069,9 +1100,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record, options:
                                     'application/marcxml+xml', 'application/marc',
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1103,9 +1136,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record, options:
                                     'application/marcxml+xml', 'application/marc',
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1145,9 +1180,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record; options:
                                     'application/marcxml+xml', 'application/marc'
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1184,9 +1221,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record; options:
                                     'application/marcxml+xml', 'application/marc'
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1221,9 +1260,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record, options:
                                     'application/marcxml+xml', 'application/marc',
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1255,9 +1296,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record, options:
                                     'application/marcxml+xml', 'application/marc',
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1297,9 +1340,11 @@ class MetadataSession(WorldcatSession):
             responseFormat:         format of returned record; options:
                                     'application/marcxml+xml', 'application/marc'
                                     default is 'application/marcxml+xml'
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1330,9 +1375,11 @@ class MetadataSession(WorldcatSession):
         Args:
             controlNumber:          control number associated with Local Bibliographic
                                     Data record; can be an integer or string
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1377,8 +1424,10 @@ class MetadataSession(WorldcatSession):
             limit:                  maximum number of records to return;
                                     maximum is 50, default is 10
             hooks:                  Requests library hook system that can be used for
-                                    signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1420,9 +1469,11 @@ class MetadataSession(WorldcatSession):
                                     record should be, default is 0
             limit:                  maximum number of records to return;
                                     maximum is 50, default is 10
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1461,9 +1512,11 @@ class MetadataSession(WorldcatSession):
         Args:
             controlNumber:          control number associated with Local Holdings
                                     record; can be an integer or string
-            hooks:                  Requests library hook system that can be
-                                    used for signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                  Requests library hook system that can be used for
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1509,8 +1562,10 @@ class MetadataSession(WorldcatSession):
             limit:                  maximum number of records to return;
                                     maximum is 50, default is 10
             hooks:                  Requests library hook system that can be used for
-                                    signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1575,8 +1630,10 @@ class MetadataSession(WorldcatSession):
             limit:                  maximum number of records to return;
                                     maximum is 50, default is 10
             hooks:                  Requests library hook system that can be used for
-                                    signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1635,8 +1692,10 @@ class MetadataSession(WorldcatSession):
             itemSubType:            restricts results to specified item sub type
                                     examples: 'book-digital' or 'audiobook-cd'
             hooks:                  Requests library hook system that can be used for
-                                    signal event handling, see more at:
-                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+                                    signal event handling. For more information see the
+                                    [Requests docs](https://requests.readthedocs.io/en/
+                                    master/user/advanced/#event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1725,9 +1784,12 @@ class MetadataSession(WorldcatSession):
             distance:                   distance from latitude and longitude
             unit:                       unit of distance param; options:
                                         'M' (miles) or 'K' (kilometers), default is 'M'
-            hooks:                      Requests library hook system that can be
-                                        used for signal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                      Requests library hook system that can be used
+                                        for signal event handling. For more information
+                                        see the [Requests docs](https://requests.
+                                        readthedocs.io/en/master/user/advanced/
+                                        #event-hooks)
+
         Returns:
             `requests.Response` instance
         """
@@ -1817,9 +1879,12 @@ class MetadataSession(WorldcatSession):
             distance:                   distance from latitude and longitude
             unit:                       unit of distance param; options:
                                         'M' (miles) or 'K' (kilometers), default is 'M'
-            hooks:                      Requests library hook system that can be
-                                        used for signal event handling, see more at:
-                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks
+            hooks:                      Requests library hook system that can be used
+                                        for signal event handling. For more information
+                                        see the [Requests docs](https://requests.
+                                        readthedocs.io/en/master/user/advanced/
+                                        #event-hooks)
+
         Returns:
             `requests.Response` instance
         """

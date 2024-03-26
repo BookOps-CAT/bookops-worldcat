@@ -24,6 +24,7 @@ class Query:
 
     `Query.response` attribute is `requests.Response` instance that
     can be parsed to extract information received from the web service.
+
     """
 
     def __init__(
@@ -34,16 +35,17 @@ class Query:
             Union[int, float, Tuple[int, int], Tuple[float, float]]
         ] = None,
     ) -> None:
-        """
+        """Initializes Query object.
+
         Args:
             session:                        `metadata_api.MetadataSession` instance
             prepared_request:               `requests.models.PreparedRequest` instance
             timeout:                        how long to wait for server to send data
                                             before giving up
 
-        Raises:
-            WorldcatRequestError
 
+        Raises:
+            WorldcatRequestError: If the request encounters an error
         """
         if not isinstance(prepared_request, PreparedRequest):
             raise TypeError("Invalid type for argument 'prepared_request'.")
