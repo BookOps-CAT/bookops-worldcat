@@ -220,9 +220,10 @@ class WorldcatAccessToken:
         Returns:
             bool
 
-        Example:
-        >>> token.is_expired()
-        False
+        Examples:
+            >>> token.is_expired()
+            False
+
         """
         if isinstance(self.token_expires_at, datetime.datetime):
             if self.token_expires_at < datetime.datetime.now(datetime.timezone.utc):

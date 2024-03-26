@@ -31,7 +31,13 @@ nav:
     - About BookOps: about.md
     - Contributing: contributing.md
     - Changelog: changelog.md
-- API Documentation: mkapi/api/bookops_worldcat
+- API Documentation: 
+    - bookops_worldcat:
+      - bookops_worldcat.authorize: api/authorize.md
+      - bookops_worldcat.errors: api/errors.md
+      - bookops_worldcat.metadata_api: api/metadata_api.md
+      - bookops_worldcat.query: api/query.md
+      - bookops_worldcat.utils: api/utils.md
 - Tutorials: tutorials.md
 
 
@@ -51,7 +57,19 @@ watch:
 
 plugins:
   - search
-  - mkapi
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            separate_signature: true
+            filters: ["!^_"]
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_signature_annotations: true
+          import:
+            - https://docs.python.org/3/objects.inv
   - mike:
       version_selector: true   # set to false to leave out the version selector
       css_dir: css             # the directory to put the version selector's CSS
