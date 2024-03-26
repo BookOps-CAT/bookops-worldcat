@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>bookops_worldcat.metadata_api - BookOps-Worldcat Documentation</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" />
+        <link href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" rel="stylesheet" />
+        <link href="../../../css/mkapi-common.css" rel="stylesheet" />
+        <link href="../../../css/mkapi-readthedocs.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "bookops_worldcat.metadata_api";
+        var mkdocs_page_input_path = "api/source/bookops_worldcat.metadata_api.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> BookOps-Worldcat Documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../changelog/">Changelog</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/BookOps-CAT/bookops-worldcat">Source Code</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/BookOps-CAT/bookops-worldcat/issues">Issue Tracker</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../about/">About</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="#">bookops_worldcat</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat/">bookops_worldcat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.query/">bookops_worldcat.query</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.metadata_api/">bookops_worldcat.metadata_api</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.authorize/">bookops_worldcat.authorize</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.utils/">bookops_worldcat.utils</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.errors/">bookops_worldcat.errors</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">BookOps-Worldcat Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">bookops_worldcat.metadata_api</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <div class="mkapi-node">
+<h1 id="" class="mkapi-object mkapi-object-code plain">
+<span class="mkapi-object-kind mkapi-object-kind-code">SOURCE CODE</span>
+<span class="mkapi-object-prefix">bookops_worldcat.</span><span class="mkapi-object-name">metadata_api</span>
+<span id="bookops_worldcat.metadata_api"></span><a class="mkapi-docs-link" href="../../bookops_worldcat.metadata_api">DOCS</a>
+</h1>
+
+<div class="mkapi-code">
+<div class="codehilite"><pre><span></span><code><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides MetadataSession class for requests to WorldCat Metadata API.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
+
+<span class="kn">from</span> <span class="nn">._session</span> <span class="kn">import</span> <span class="n">WorldcatSession</span>
+<span class="kn">from</span> <span class="nn">.authorize</span> <span class="kn">import</span> <span class="n">WorldcatAccessToken</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">WorldcatSessionError</span><span class="p">,</span>
+    <span class="n">InvalidOclcNumber</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.query</span> <span class="kn">import</span> <span class="n">Query</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">verify_oclc_number</span><span class="p">,</span> <span class="n">verify_oclc_numbers</span>
+
+
+<span class="k">class</span> <span class="nc">MetadataSession</span><span class="p">(</span><span class="n">WorldcatSession</span><span class="p">):</span><span id="bookops_worldcat.metadata_api.MetadataSession"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession">DOCS</a>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;OCLC Metadata API wrapper session. Inherits `requests.Session` methods&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">authorization</span><span class="p">:</span> <span class="n">WorldcatAccessToken</span><span class="p">,</span>
+        <span class="n">agent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            authorization:          WorlcatAccessToken object</span>
+<span class="sd">            agent:                  &quot;User-agent&quot; parameter to be passed in the request</span>
+<span class="sd">                                    header; usage strongly encouraged</span>
+<span class="sd">            timeout:                how long to wait for server to send data before</span>
+<span class="sd">                                    giving up; default value is 5 seconds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">authorization</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="n">agent</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_split_into_legal_volume</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">oclc_numbers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        OCLC requries that no more than 50 numbers are passed for batch processing</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclc_numbers:           list of oclc numbers</span>
+<span class="sd">            n:                      batch size, default (max) 50</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            n-sized batch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">oclc_numbers</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">oclc_numbers</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_url_base</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;https://worldcat.org&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_search_base</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;https://americas.metadata.api.oclc.org/worldcat/search/v1&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_member_shared_print_holdings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_search_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/bibs-retained-holdings&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_member_general_holdings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_search_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/bibs-summary-holdings&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_brief_bib_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_search_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/brief-bibs&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_brief_bib_oclc_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oclcNumber</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_search_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/brief-bibs/</span><span class="si">{</span><span class="n">oclcNumber</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_brief_bib_other_editions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oclcNumber</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_search_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/brief-bibs/</span><span class="si">{</span><span class="n">oclcNumber</span><span class="si">}</span><span class="s2">/other-editions&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_lhr_control_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controlNumber</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_search_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/my-holdings/</span><span class="si">{</span><span class="n">controlNumber</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_lhr_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_search_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/my-holdings&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_lhr_shared_print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_search_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/retained-holdings&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_bib_oclc_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oclcNumber</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/bib/data/</span><span class="si">{</span><span class="n">oclcNumber</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_bib_check_oclc_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/bib/checkcontrolnumbers&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_bib_holding_libraries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/bib/holdinglibraries&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_bib_holdings_action</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/ih/data&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_bib_holdings_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/ih/checkholdings&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_bib_holdings_batch_action</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/ih/datalist&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_url_bib_holdings_multi_institution_batch_action</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_base</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/ih/institutionlist&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_brief_bib</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.get_brief_bib"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.get_brief_bib" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.get_brief_bib">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve specific brief bibliographic resource.</span>
+<span class="sd">        Uses /brief-bibs/{oclcNumber} endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be</span>
+<span class="sd">                                    an integer, or string that can include</span>
+<span class="sd">                                    OCLC # prefix</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="s2">&quot;Invalid OCLC # was passed as an argument&quot;</span><span class="p">)</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_brief_bib_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">get_full_bib</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.get_full_bib"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.get_full_bib" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.get_full_bib">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a GET request for a full bibliographic resource.</span>
+<span class="sd">        Uses /bib/data/{oclcNumber} endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be an</span>
+<span class="sd">                                    integer, or string with or without OCLC # prefix</span>
+<span class="sd">            response_format:        format of returned record</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="s2">&quot;Invalid OCLC # was passed as an argument.&quot;</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response_format</span><span class="p">:</span>
+            <span class="n">response_format</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;application/atom+xml;content=&quot;application/vnd.oclc.marc21+xml&quot;&#39;</span>
+            <span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">holding_get_status</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.holding_get_status"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.holding_get_status" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holding_get_status">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">inst</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instSymbol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;application/atom+json&quot;</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves Worlcat holdings status of a record with provided OCLC number.</span>
+<span class="sd">        The service automatically recognizes institution based on the issued access</span>
+<span class="sd">        token.</span>
+<span class="sd">        Uses /ih/checkholdings endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be an</span>
+<span class="sd">                                    integer, or string with or without OCLC # prefix</span>
+<span class="sd">            inst:                   registry ID of the institution whose holdings</span>
+<span class="sd">                                    are being checked</span>
+<span class="sd">            instSymbol:             optional; OCLC symbol of the institution whose</span>
+<span class="sd">                                    holdings are being checked</span>
+<span class="sd">            response_format:        &#39;application/atom+json&#39; (default) or</span>
+<span class="sd">                                    &#39;application/atom+xml&#39;</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_holdings_check</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;oclcNumber&quot;</span><span class="p">:</span> <span class="n">oclcNumber</span><span class="p">,</span> <span class="s2">&quot;inst&quot;</span><span class="p">:</span> <span class="n">inst</span><span class="p">,</span> <span class="s2">&quot;instSymbol&quot;</span><span class="p">:</span> <span class="n">instSymbol</span><span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">holding_set</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.holding_set"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.holding_set" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holding_set">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">inst</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instSymbol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">holdingLibraryCode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">classificationScheme</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;application/atom+json&quot;</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets institution&#39;s Worldcat holding on an individual record.</span>
+<span class="sd">        Uses /ih/data endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be an</span>
+<span class="sd">                                    integer, or string with or without OCLC # prefix</span>
+<span class="sd">            inst:                   registry ID of the institution whose holdings</span>
+<span class="sd">                                    are being checked</span>
+<span class="sd">            instSymbol:             optional; OCLC symbol of the institution whose</span>
+<span class="sd">                                    holdings are being checked</span>
+<span class="sd">            holdingLibraryCode:     four letter holding code to set the holing on</span>
+<span class="sd">            classificationScheme:   whether or not to return group availability</span>
+<span class="sd">                                    information</span>
+<span class="sd">            response_format:        &#39;application/atom+json&#39; (default) or</span>
+<span class="sd">                                    &#39;application/atom+xml&#39;</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_holdings_action</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;oclcNumber&quot;</span><span class="p">:</span> <span class="n">oclcNumber</span><span class="p">,</span>
+            <span class="s2">&quot;inst&quot;</span><span class="p">:</span> <span class="n">inst</span><span class="p">,</span>
+            <span class="s2">&quot;instSymbol&quot;</span><span class="p">:</span> <span class="n">instSymbol</span><span class="p">,</span>
+            <span class="s2">&quot;holdingLibraryCode&quot;</span><span class="p">:</span> <span class="n">holdingLibraryCode</span><span class="p">,</span>
+            <span class="s2">&quot;classificationScheme&quot;</span><span class="p">:</span> <span class="n">classificationScheme</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">holding_unset</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.holding_unset"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.holding_unset" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holding_unset">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">cascade</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+        <span class="n">inst</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instSymbol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">holdingLibraryCode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">classificationScheme</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;application/atom+json&quot;</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes institution&#39;s Worldcat holding on an individual record.</span>
+<span class="sd">        Uses /ih/data endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be an</span>
+<span class="sd">                                    integer, or string with or without OCLC # prefix</span>
+<span class="sd">                                    if str the numbers must be separated by comma</span>
+<span class="sd">            cascade:                0 or 1, default 0;</span>
+<span class="sd">                                    0 - don&#39;t remove holdings if local holding</span>
+<span class="sd">                                    record or local bibliographic records exists;</span>
+<span class="sd">                                    1 - remove holding and delete local holdings</span>
+<span class="sd">                                    record and local bibliographic record</span>
+<span class="sd">            inst:                   registry ID of the institution whose holdings</span>
+<span class="sd">                                    are being checked</span>
+<span class="sd">            instSymbol:             optional; OCLC symbol of the institution whose</span>
+<span class="sd">                                    holdings are being checked</span>
+<span class="sd">            holdingLibraryCode:     four letter holding code to set the holing on</span>
+<span class="sd">            classificationScheme:   whether or not to return group availability</span>
+<span class="sd">                                    information</span>
+<span class="sd">            response_format:        &#39;application/atom+json&#39; (default) or</span>
+<span class="sd">                                    &#39;application/atom+xml&#39;</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_holdings_action</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;oclcNumber&quot;</span><span class="p">:</span> <span class="n">oclcNumber</span><span class="p">,</span>
+            <span class="s2">&quot;cascade&quot;</span><span class="p">:</span> <span class="n">cascade</span><span class="p">,</span>
+            <span class="s2">&quot;inst&quot;</span><span class="p">:</span> <span class="n">inst</span><span class="p">,</span>
+            <span class="s2">&quot;instSymbol&quot;</span><span class="p">:</span> <span class="n">instSymbol</span><span class="p">,</span>
+            <span class="s2">&quot;holdingLibraryCode&quot;</span><span class="p">:</span> <span class="n">holdingLibraryCode</span><span class="p">,</span>
+            <span class="s2">&quot;classificationScheme&quot;</span><span class="p">:</span> <span class="n">classificationScheme</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">holdings_set</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.holdings_set"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.holdings_set" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holdings_set">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumbers</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
+        <span class="n">inst</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instSymbol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;application/atom+json&quot;</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Response</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set institution holdings for multiple OCLC numbers</span>
+<span class="sd">        Uses /ih/datalist endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumbers:            list of OCLC control numbers for which holdings</span>
+<span class="sd">                                    should be set;</span>
+<span class="sd">                                    they can be integers or strings with or</span>
+<span class="sd">                                    without OCLC # prefix;</span>
+<span class="sd">                                    if str the numbers must be separated by comma</span>
+<span class="sd">            inst:                   registry ID of the institution whose holdings</span>
+<span class="sd">                                    are being checked</span>
+<span class="sd">            instSymbol:             optional; OCLC symbol of the institution whose</span>
+<span class="sd">                                    holdings are being checked</span>
+<span class="sd">            response_format:        &#39;application/atom+json&#39; (default) or</span>
+<span class="sd">                                    &#39;application/atom+xml&#39;</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list of `requests.Response` objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">responses</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vetted_numbers</span> <span class="o">=</span> <span class="n">verify_oclc_numbers</span><span class="p">(</span><span class="n">oclcNumbers</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_holdings_batch_action</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+
+        <span class="c1"># split into batches of 50 and issue request for each batch</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_into_legal_volume</span><span class="p">(</span><span class="n">vetted_numbers</span><span class="p">):</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;oclcNumbers&quot;</span><span class="p">:</span> <span class="n">batch</span><span class="p">,</span>
+                <span class="s2">&quot;inst&quot;</span><span class="p">:</span> <span class="n">inst</span><span class="p">,</span>
+                <span class="s2">&quot;instSymbol&quot;</span><span class="p">:</span> <span class="n">instSymbol</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="c1"># prep request</span>
+            <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+            <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+            <span class="c1"># send request</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+            <span class="n">responses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">responses</span>
+
+    <span class="k">def</span> <span class="nf">holdings_unset</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.holdings_unset"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.holdings_unset" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holdings_unset">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumbers</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
+        <span class="n">cascade</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+        <span class="n">inst</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instSymbol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;application/atom+json&quot;</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Response</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set institution holdings for multiple OCLC numbers</span>
+<span class="sd">        Uses /ih/datalist endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumbers:            list of OCLC control numbers for which holdings</span>
+<span class="sd">                                    should be set;</span>
+<span class="sd">                                    they can be integers or strings with or</span>
+<span class="sd">                                    without OCLC # prefix;</span>
+<span class="sd">                                    if str the numbers must be separated by comma</span>
+<span class="sd">            cascade:                0 or 1, default 0;</span>
+<span class="sd">                                    0 - don&#39;t remove holdings if local holding</span>
+<span class="sd">                                    record or local bibliographic records exists;</span>
+<span class="sd">                                    1 - remove holding and delete local holdings</span>
+<span class="sd">                                    record and local bibliographic record</span>
+<span class="sd">            inst:                   registry ID of the institution whose holdings</span>
+<span class="sd">                                    are being checked</span>
+<span class="sd">            instSymbol:             optional; OCLC symbol of the institution whose</span>
+<span class="sd">                                    holdings are being checked</span>
+<span class="sd">            response_format:        &#39;application/atom+json&#39; (default) or</span>
+<span class="sd">                                    &#39;application/atom+xml&#39;</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list of `requests.Response` objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">responses</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vetted_numbers</span> <span class="o">=</span> <span class="n">verify_oclc_numbers</span><span class="p">(</span><span class="n">oclcNumbers</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_holdings_batch_action</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+
+        <span class="c1"># split into batches of 50 and issue request for each batch</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_into_legal_volume</span><span class="p">(</span><span class="n">vetted_numbers</span><span class="p">):</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;oclcNumbers&quot;</span><span class="p">:</span> <span class="n">batch</span><span class="p">,</span>
+                <span class="s2">&quot;cascade&quot;</span><span class="p">:</span> <span class="n">cascade</span><span class="p">,</span>
+                <span class="s2">&quot;inst&quot;</span><span class="p">:</span> <span class="n">inst</span><span class="p">,</span>
+                <span class="s2">&quot;instSymbol&quot;</span><span class="p">:</span> <span class="n">instSymbol</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="c1"># prep request</span>
+            <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+            <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+            <span class="c1"># send request</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+            <span class="n">responses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">responses</span>
+
+    <span class="k">def</span> <span class="nf">holdings_set_multi_institutions</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.holdings_set_multi_institutions"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.holdings_set_multi_institutions" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holdings_set_multi_institutions">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">instSymbols</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;application/atom+json&quot;</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Batch sets intitution holdings for multiple intitutions</span>
+
+<span class="sd">        Uses /ih/institutionlist endpoint</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be an</span>
+<span class="sd">                                    integer, or string with or without OCLC # prefix</span>
+<span class="sd">            instSymbols:            a comma-separated list of OCLC symbols of the</span>
+<span class="sd">                                    institution whose holdings are being set</span>
+<span class="sd">            response_format:        &#39;application/atom+json&#39; (default) or</span>
+<span class="sd">                                    &#39;application/atom+xml&#39;</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="s2">&quot;Invalid OCLC # was passed as an argument&quot;</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_holdings_multi_institution_batch_action</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;oclcNumber&quot;</span><span class="p">:</span> <span class="n">oclcNumber</span><span class="p">,</span>
+            <span class="s2">&quot;instSymbols&quot;</span><span class="p">:</span> <span class="n">instSymbols</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">holdings_unset_multi_institutions</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.holdings_unset_multi_institutions"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.holdings_unset_multi_institutions" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.holdings_unset_multi_institutions">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">instSymbols</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">cascade</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;application/atom+json&quot;</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Batch unsets intitution holdings for multiple intitutions</span>
+
+<span class="sd">        Uses /ih/institutionlist endpoint</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be an</span>
+<span class="sd">                                    integer, or string with or without OCLC # prefix</span>
+<span class="sd">            instSymbols:            a comma-separated list of OCLC symbols of the</span>
+<span class="sd">                                    institution whose holdings are being set</span>
+<span class="sd">            cascade:                0 or 1, default 0;</span>
+<span class="sd">                                    0 - don&#39;t remove holdings if local holding</span>
+<span class="sd">                                    record or local bibliographic records exists;</span>
+<span class="sd">                                    1 - remove holding and delete local holdings</span>
+<span class="sd">                                    record and local bibliographic record</span>
+<span class="sd">            response_format:        &#39;application/atom+json&#39; (default) or</span>
+<span class="sd">                                    &#39;application/atom+xml&#39;</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="s2">&quot;Invalid OCLC # was passed as an argument&quot;</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_holdings_multi_institution_batch_action</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;oclcNumber&quot;</span><span class="p">:</span> <span class="n">oclcNumber</span><span class="p">,</span>
+            <span class="s2">&quot;instSymbols&quot;</span><span class="p">:</span> <span class="n">instSymbols</span><span class="p">,</span>
+            <span class="s2">&quot;cascade&quot;</span><span class="p">:</span> <span class="n">cascade</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">search_brief_bib_other_editions</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.search_brief_bib_other_editions"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.search_brief_bib_other_editions" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.search_brief_bib_other_editions">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">deweyNumber</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">datePublished</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">heldByGroup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">heldBySymbol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">heldByInstitutionID</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">inLanguage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">inCatalogLanguage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">materialType</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">catalogSource</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">itemType</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">itemSubType</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retentionCommitments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">spProgram</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">genre</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">topic</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">subtopic</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">audience</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">content</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">openAccess</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">peerReviewed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">facets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">groupVariantRecords</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">preferredLanguage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">orderBy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve other editions related to bibliographic resource with provided</span>
+<span class="sd">        OCLC #.</span>
+<span class="sd">        Uses /brief-bibs/{oclcNumber}/other-editions endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be an</span>
+<span class="sd">                                    integer, or string with or without OCLC # prefix</span>
+<span class="sd">            deweyNumber:            limits the response to the</span>
+<span class="sd">                                    specified dewey classification number(s);</span>
+<span class="sd">                                    for multiple values repeat the parameter,</span>
+<span class="sd">                                    example:</span>
+<span class="sd">                                        &#39;794,180&#39;</span>
+<span class="sd">            datePublished:          restricts the response to one or</span>
+<span class="sd">                                    more dates, or to a range,</span>
+<span class="sd">                                    examples:</span>
+<span class="sd">                                        &#39;2000&#39;</span>
+<span class="sd">                                        &#39;2000-2005&#39;</span>
+<span class="sd">                                        &#39;2000,2005&#39;</span>
+<span class="sd">            heldByGroup:            restricts to holdings held by group symbol</span>
+<span class="sd">            heldBySymbol:           restricts to holdings with specified intitution</span>
+<span class="sd">                                    symbol</span>
+<span class="sd">            heldByInstitutionID:    restrict to specified institution regisgtryId</span>
+<span class="sd">            inLanguage:             restrics the response to the single</span>
+<span class="sd">                                    specified language, example: &#39;fre&#39;</span>
+<span class="sd">            inCataloglanguage:      restrics the response to specified</span>
+<span class="sd">                                    cataloging language, example: &#39;eng&#39;;</span>
+<span class="sd">                                    default &#39;eng&#39;</span>
+<span class="sd">            materialType:           restricts responses to specified material type,</span>
+<span class="sd">                                    example: &#39;bks&#39;, &#39;vis&#39;</span>
+<span class="sd">            catalogSource:          restrict to responses to single OCLC symbol as</span>
+<span class="sd">                                    the cataloging source, example: &#39;DLC&#39;</span>
+<span class="sd">            itemType:               restricts reponses to single specified OCLC</span>
+<span class="sd">                                    top-level facet type, example: &#39;book&#39;</span>
+<span class="sd">            itemSubType:            restricts responses to single specified OCLC</span>
+<span class="sd">                                    sub facet type, example: &#39;digital&#39;</span>
+<span class="sd">            retentionCommitments:   restricts responses to bibliographic records</span>
+<span class="sd">                                    with retention commitment; True or False,</span>
+<span class="sd">                                    default False</span>
+<span class="sd">            spProgram:              restricts responses to bibliographic records</span>
+<span class="sd">                                    associated with particular shared print</span>
+<span class="sd">                                    program</span>
+<span class="sd">            genre:                  genre to limit results to</span>
+<span class="sd">            topic:                  topic to limit results to</span>
+<span class="sd">            subtopic:               subtopic to limit results to</span>
+<span class="sd">            audience:               audience to limit results to,</span>
+<span class="sd">                                    example:</span>
+<span class="sd">                                        juv,</span>
+<span class="sd">                                        nonJuv</span>
+<span class="sd">            content:                content to limit resutls to,</span>
+<span class="sd">                                    example:</span>
+<span class="sd">                                        fic,</span>
+<span class="sd">                                        nonFic,</span>
+<span class="sd">                                        fic,bio</span>
+<span class="sd">            openAccess:             filter to only open access content, False or True</span>
+<span class="sd">            peerReviewed:           filter to only peer reviewed content, False or True</span>
+<span class="sd">            facets:                 list of facets to restrict responses</span>
+<span class="sd">            groupVariantRecords:    whether or not to group variant records.</span>
+<span class="sd">                                    options: False, True (default False)</span>
+<span class="sd">            preferredLanguage:      language of metadata description,</span>
+<span class="sd">            offset:                 start position of bibliographic records to</span>
+<span class="sd">                                    return; default 1</span>
+<span class="sd">            limit:                  maximum nuber of records to return;</span>
+<span class="sd">                                    maximum 50, default 10</span>
+<span class="sd">            orderBy:                sort of restuls;</span>
+<span class="sd">                                    available values:</span>
+<span class="sd">                                        +date, -date, +language, -language;</span>
+<span class="sd">                                    default value: -date</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="s2">&quot;Invalid OCLC # was passed as an argument&quot;</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_brief_bib_other_editions</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;deweyNumber&quot;</span><span class="p">:</span> <span class="n">deweyNumber</span><span class="p">,</span>
+            <span class="s2">&quot;datePublished&quot;</span><span class="p">:</span> <span class="n">datePublished</span><span class="p">,</span>
+            <span class="s2">&quot;heldByGroup&quot;</span><span class="p">:</span> <span class="n">heldByGroup</span><span class="p">,</span>
+            <span class="s2">&quot;heldBySymbol&quot;</span><span class="p">:</span> <span class="n">heldBySymbol</span><span class="p">,</span>
+            <span class="s2">&quot;heldByInstitutionID&quot;</span><span class="p">:</span> <span class="n">heldByInstitutionID</span><span class="p">,</span>
+            <span class="s2">&quot;inLanguage&quot;</span><span class="p">:</span> <span class="n">inLanguage</span><span class="p">,</span>
+            <span class="s2">&quot;inCatalogLanguage&quot;</span><span class="p">:</span> <span class="n">inCatalogLanguage</span><span class="p">,</span>
+            <span class="s2">&quot;catalogSource&quot;</span><span class="p">:</span> <span class="n">catalogSource</span><span class="p">,</span>
+            <span class="s2">&quot;itemType&quot;</span><span class="p">:</span> <span class="n">itemType</span><span class="p">,</span>
+            <span class="s2">&quot;itemSubType&quot;</span><span class="p">:</span> <span class="n">itemSubType</span><span class="p">,</span>
+            <span class="s2">&quot;retentionCommitments&quot;</span><span class="p">:</span> <span class="n">retentionCommitments</span><span class="p">,</span>
+            <span class="s2">&quot;spProgram&quot;</span><span class="p">:</span> <span class="n">spProgram</span><span class="p">,</span>
+            <span class="s2">&quot;genre&quot;</span><span class="p">:</span> <span class="n">genre</span><span class="p">,</span>
+            <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="n">topic</span><span class="p">,</span>
+            <span class="s2">&quot;subtopic&quot;</span><span class="p">:</span> <span class="n">subtopic</span><span class="p">,</span>
+            <span class="s2">&quot;audience&quot;</span><span class="p">:</span> <span class="n">audience</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">,</span>
+            <span class="s2">&quot;openAccess&quot;</span><span class="p">:</span> <span class="n">openAccess</span><span class="p">,</span>
+            <span class="s2">&quot;peerReviewed&quot;</span><span class="p">:</span> <span class="n">peerReviewed</span><span class="p">,</span>
+            <span class="s2">&quot;facets&quot;</span><span class="p">:</span> <span class="n">facets</span><span class="p">,</span>
+            <span class="s2">&quot;groupVariantRecords&quot;</span><span class="p">:</span> <span class="n">groupVariantRecords</span><span class="p">,</span>
+            <span class="s2">&quot;preferredLanguage&quot;</span><span class="p">:</span> <span class="n">preferredLanguage</span><span class="p">,</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="n">offset</span><span class="p">,</span>
+            <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="n">limit</span><span class="p">,</span>
+            <span class="s2">&quot;orderBy&quot;</span><span class="p">:</span> <span class="n">orderBy</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">search_brief_bibs</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.search_brief_bibs"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.search_brief_bibs" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.search_brief_bibs">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">q</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">deweyNumber</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">datePublished</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">heldByGroup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">inLanguage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">inCatalogLanguage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;eng&quot;</span><span class="p">,</span>
+        <span class="n">materialType</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">catalogSource</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">itemType</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">itemSubType</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retentionCommitments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">spProgram</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">facets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">groupRelatedEditions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">groupVariantRecords</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">preferredLanguage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">orderBy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mostWidelyHeld&quot;</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a GET request for brief bibliographic resources.</span>
+<span class="sd">        Uses /brief-bibs endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q:                      query in the form of a keyword search or</span>
+<span class="sd">                                    fielded search;</span>
+<span class="sd">                                    examples:</span>
+<span class="sd">                                        ti:Zendegi</span>
+<span class="sd">                                        ti:&quot;Czarne oceany&quot;</span>
+<span class="sd">                                        bn:9781680502404</span>
+<span class="sd">                                        kw:python databases</span>
+<span class="sd">                                        ti:Zendegi AND au:greg egan</span>
+<span class="sd">                                        (au:Okken OR au:Myers) AND su:python</span>
+<span class="sd">            deweyNumber:            limits the response to the</span>
+<span class="sd">                                    specified dewey classification number(s);</span>
+<span class="sd">                                    for multiple values repeat the parameter,</span>
+<span class="sd">                                    example:</span>
+<span class="sd">                                        &#39;794,180&#39;</span>
+<span class="sd">            datePublished:          restricts the response to one or</span>
+<span class="sd">                                    more dates, or to a range,</span>
+<span class="sd">                                    examples:</span>
+<span class="sd">                                        &#39;2000&#39;</span>
+<span class="sd">                                        &#39;2000-2005&#39;</span>
+<span class="sd">                                        &#39;2000,2005&#39;</span>
+<span class="sd">            heldByGroup:            restricts to holdings held by group symbol</span>
+<span class="sd">            inLanguage:             restrics the response to the single</span>
+<span class="sd">                                    specified language, example: &#39;fre&#39;</span>
+<span class="sd">            inCataloglanguage:      restrics the response to specified</span>
+<span class="sd">                                    cataloging language, example: &#39;eng&#39;;</span>
+<span class="sd">                                    default &#39;eng&#39;</span>
+<span class="sd">            materialType:           restricts responses to specified material type,</span>
+<span class="sd">                                    example: &#39;bks&#39;, &#39;vis&#39;</span>
+<span class="sd">            catalogSource:          restrict to responses to single OCLC symbol as</span>
+<span class="sd">                                    the cataloging source, example: &#39;DLC&#39;</span>
+<span class="sd">            itemType:               restricts reponses to single specified OCLC</span>
+<span class="sd">                                    top-level facet type, example: &#39;book&#39;</span>
+<span class="sd">            itemSubType:            restricts responses to single specified OCLC</span>
+<span class="sd">                                    sub facet type, example: &#39;digital&#39;</span>
+<span class="sd">            retentionCommitments:   restricts responses to bibliographic records</span>
+<span class="sd">                                    with retention commitment; True or False</span>
+<span class="sd">            spProgram:              restricts responses to bibliographic records</span>
+<span class="sd">                                    associated with particular shared print</span>
+<span class="sd">                                    program</span>
+<span class="sd">            facets:                 list of facets to restrict responses</span>
+<span class="sd">            groupRelatedEditions:   whether or not use FRBR grouping,</span>
+<span class="sd">                                    options: False, True (default is False)</span>
+<span class="sd">            groupVariantRecords:    whether or not to group variant records.</span>
+<span class="sd">                                    options: False, True (default False)</span>
+<span class="sd">            preferredLanguage:      language of metadata description,</span>
+<span class="sd">                                    default value &quot;en&quot; (English)</span>
+<span class="sd">            orderBy:                results sort key;</span>
+<span class="sd">                                    options:</span>
+<span class="sd">                                        &#39;recency&#39;</span>
+<span class="sd">                                        &#39;bestMatch&#39;</span>
+<span class="sd">                                        &#39;creator&#39;</span>
+<span class="sd">                                        &#39;library&#39;</span>
+<span class="sd">                                        &#39;publicationDateAsc&#39;</span>
+<span class="sd">                                        &#39;publicationDateDesc&#39;</span>
+<span class="sd">                                        &#39;mostWidelyHeld&#39;</span>
+<span class="sd">                                        &#39;title&#39;</span>
+<span class="sd">            offset:                 start position of bibliographic records to</span>
+<span class="sd">                                    return; default 1</span>
+<span class="sd">            limit:                  maximum nuber of records to return;</span>
+<span class="sd">                                    maximum 50, default 10</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">q</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;q&#39; is requried to construct query.&quot;</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_brief_bib_search</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="n">q</span><span class="p">,</span>
+            <span class="s2">&quot;deweyNumber&quot;</span><span class="p">:</span> <span class="n">deweyNumber</span><span class="p">,</span>
+            <span class="s2">&quot;datePublished&quot;</span><span class="p">:</span> <span class="n">datePublished</span><span class="p">,</span>
+            <span class="s2">&quot;heldByGroup&quot;</span><span class="p">:</span> <span class="n">heldByGroup</span><span class="p">,</span>
+            <span class="s2">&quot;inLanguage&quot;</span><span class="p">:</span> <span class="n">inLanguage</span><span class="p">,</span>
+            <span class="s2">&quot;inCatalogLanguage&quot;</span><span class="p">:</span> <span class="n">inCatalogLanguage</span><span class="p">,</span>
+            <span class="s2">&quot;materialType&quot;</span><span class="p">:</span> <span class="n">materialType</span><span class="p">,</span>
+            <span class="s2">&quot;catalogSource&quot;</span><span class="p">:</span> <span class="n">catalogSource</span><span class="p">,</span>
+            <span class="s2">&quot;itemType&quot;</span><span class="p">:</span> <span class="n">itemType</span><span class="p">,</span>
+            <span class="s2">&quot;itemSubType&quot;</span><span class="p">:</span> <span class="n">itemSubType</span><span class="p">,</span>
+            <span class="s2">&quot;retentionCommitments&quot;</span><span class="p">:</span> <span class="n">retentionCommitments</span><span class="p">,</span>
+            <span class="s2">&quot;spProgram&quot;</span><span class="p">:</span> <span class="n">spProgram</span><span class="p">,</span>
+            <span class="s2">&quot;facets&quot;</span><span class="p">:</span> <span class="n">facets</span><span class="p">,</span>
+            <span class="s2">&quot;groupRelatedEditions&quot;</span><span class="p">:</span> <span class="n">groupRelatedEditions</span><span class="p">,</span>
+            <span class="s2">&quot;groupVariantRecords&quot;</span><span class="p">:</span> <span class="n">groupVariantRecords</span><span class="p">,</span>
+            <span class="s2">&quot;preferredLanguage&quot;</span><span class="p">:</span> <span class="n">preferredLanguage</span><span class="p">,</span>
+            <span class="s2">&quot;orderBy&quot;</span><span class="p">:</span> <span class="n">orderBy</span><span class="p">,</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="n">offset</span><span class="p">,</span>
+            <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="n">limit</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">search_current_control_numbers</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.search_current_control_numbers"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.search_current_control_numbers" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.search_current_control_numbers">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumbers</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
+        <span class="n">response_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;application/atom+json&quot;</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve current OCLC control numbers</span>
+<span class="sd">        Uses /bib/checkcontrolnumbers endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumbers:            list of OCLC control numbers to be checked;</span>
+<span class="sd">                                    they can be integers or strings with or</span>
+<span class="sd">                                    without OCLC # prefix;</span>
+<span class="sd">                                    if str the numbers must be separated by comma</span>
+<span class="sd">            response_format:        &#39;application/atom+json&#39; (default) or</span>
+<span class="sd">                                    &#39;application/atom+xml&#39;</span>
+<span class="sd">            hooks:                  Requests library hook system that can be</span>
+<span class="sd">                                    used for signal event handling, see more at:</span>
+<span class="sd">                                    https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vetted_numbers</span> <span class="o">=</span> <span class="n">verify_oclc_numbers</span><span class="p">(</span><span class="n">oclcNumbers</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidOclcNumber</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="n">response_format</span><span class="p">}</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_bib_check_oclc_numbers</span><span class="p">()</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;oclcNumbers&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vetted_numbers</span><span class="p">)}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">search_general_holdings</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.search_general_holdings"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.search_general_holdings" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.search_general_holdings">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">isbn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">issn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">holdingsAllEditions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">holdingsAllVariantRecords</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">preferredLanguage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">heldInCountry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">heldByGroup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">lat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">lon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">distance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a known item gets summary of holdings.</span>
+<span class="sd">        Uses /bibs-summary-holdings endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:                 OCLC bibliographic record number; can be</span>
+<span class="sd">                                        an integer, or string that can include</span>
+<span class="sd">                                        OCLC # prefix</span>
+<span class="sd">            isbn:                       ISBN without any dashes,</span>
+<span class="sd">                                        example: &#39;978149191646x&#39;</span>
+<span class="sd">            issn:                       ISSN (hyphenated, example: &#39;0099-1234&#39;)</span>
+<span class="sd">            holdingsAllEditions:        get holdings for all editions;</span>
+<span class="sd">                                        options: True or False</span>
+<span class="sd">            holdingsAllVariantRecords:  get holdings for specific edition across variant</span>
+<span class="sd">                                        records; options: False, True</span>
+<span class="sd">            preferredLanguage:          language of metadata description;</span>
+<span class="sd">                                        default &#39;en&#39; (English)</span>
+<span class="sd">            heldInCountry:              restricts to holdings held by institutions</span>
+<span class="sd">                                        in requested country</span>
+<span class="sd">            heldByGroup:                limits to holdings held by indicated by</span>
+<span class="sd">                                        symbol group</span>
+<span class="sd">            lat:                        limit to latitude, example: 37.502508</span>
+<span class="sd">            lon:                        limit to longitute, example: -122.22702</span>
+<span class="sd">            distance:                   distance from latitude and longitude</span>
+<span class="sd">            unit:                       unit of distance param; options:</span>
+<span class="sd">                                        &#39;M&#39; (miles) or &#39;K&#39; (kilometers)</span>
+<span class="sd">            offset:                     start position of bibliographic records to</span>
+<span class="sd">                                        return; default 1</span>
+<span class="sd">            limit:                      maximum nuber of records to return;</span>
+<span class="sd">                                        maximum 50, default 10</span>
+<span class="sd">            hooks:                      Requests library hook system that can be</span>
+<span class="sd">                                        used for signal event handling, see more at:</span>
+<span class="sd">                                        https://requests.readthedocs.io/en/master/user/advanced/#event-hooks</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">oclcNumber</span><span class="p">,</span> <span class="n">isbn</span><span class="p">,</span> <span class="n">issn</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span>
+                <span class="s2">&quot;Missing required argument. &quot;</span>
+                <span class="s2">&quot;One of the following args are required: oclcNumber, issn, isbn&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">oclcNumber</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">InvalidOclcNumber</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="s2">&quot;Invalid OCLC # was passed as an argument&quot;</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_member_general_holdings</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;oclcNumber&quot;</span><span class="p">:</span> <span class="n">oclcNumber</span><span class="p">,</span>
+            <span class="s2">&quot;isbn&quot;</span><span class="p">:</span> <span class="n">isbn</span><span class="p">,</span>
+            <span class="s2">&quot;issn&quot;</span><span class="p">:</span> <span class="n">issn</span><span class="p">,</span>
+            <span class="s2">&quot;holdingsAllEditions&quot;</span><span class="p">:</span> <span class="n">holdingsAllEditions</span><span class="p">,</span>
+            <span class="s2">&quot;holdingsAllVariantRecords&quot;</span><span class="p">:</span> <span class="n">holdingsAllVariantRecords</span><span class="p">,</span>
+            <span class="s2">&quot;preferredLanguage&quot;</span><span class="p">:</span> <span class="n">preferredLanguage</span><span class="p">,</span>
+            <span class="s2">&quot;heldInCountry&quot;</span><span class="p">:</span> <span class="n">heldInCountry</span><span class="p">,</span>
+            <span class="s2">&quot;heldByGroup&quot;</span><span class="p">:</span> <span class="n">heldByGroup</span><span class="p">,</span>
+            <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="n">lat</span><span class="p">,</span>
+            <span class="s2">&quot;lon&quot;</span><span class="p">:</span> <span class="n">lon</span><span class="p">,</span>
+            <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">distance</span><span class="p">,</span>
+            <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="n">unit</span><span class="p">,</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="n">offset</span><span class="p">,</span>
+            <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="n">limit</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">search_shared_print_holdings</span><span class="p">(</span><span id="bookops_worldcat.metadata_api.MetadataSession.search_shared_print_holdings"></span><a class="mkapi-docs-link" title="bookops_worldcat.metadata_api.MetadataSession.search_shared_print_holdings" href="../../bookops_worldcat.metadata_api/#bookops_worldcat.metadata_api.MetadataSession.search_shared_print_holdings">DOCS</a>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">oclcNumber</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">isbn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">issn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">heldByGroup</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">heldInState</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">itemType</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">itemSubType</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hooks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds member shared print holdings for specified item.</span>
+<span class="sd">        Uses /bibs-retained-holdings endpoint.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            oclcNumber:             OCLC bibliographic record number; can be</span>
+<span class="sd">                                    an integer, or string that can include</span>
+<span class="sd">                                    OCLC # prefix</span>
+<span class="sd">            isbn:                   ISBN without any dashes,</span>
+<span class="sd">                                    example: &#39;978149191646x&#39;</span>
+<span class="sd">            issn:                   ISSN (hyphenated, example: &#39;0099-1234&#39;)</span>
+<span class="sd">            heldByGroup:            restricts to holdings held by group symbol</span>
+<span class="sd">            heldInState:            restricts to holings held by institutions</span>
+<span class="sd">                                    in requested state, example: &quot;NY&quot;</span>
+<span class="sd">            itemType:               restricts results to specified item type (example</span>
+<span class="sd">                                    &#39;book&#39; or &#39;vis&#39;)</span>
+<span class="sd">            itemSubType:            restricts results to specified item sub type</span>
+<span class="sd">                                    examples: &#39;book-digital&#39; or &#39;audiobook-cd&#39;</span>
+<span class="sd">            offset:                 start position of bibliographic records to</span>
+<span class="sd">                                    return; default 1</span>
+<span class="sd">            limit:                  maximum nuber of records to return;</span>
+<span class="sd">                                    maximum 50, default 10</span>
+<span class="sd">            &quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            `requests.Response` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">oclcNumber</span><span class="p">,</span> <span class="n">isbn</span><span class="p">,</span> <span class="n">issn</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span>
+                <span class="s2">&quot;Missing required argument. &quot;</span>
+                <span class="s2">&quot;One of the following args are required: oclcNumber, issn, isbn&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">oclcNumber</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">oclcNumber</span> <span class="o">=</span> <span class="n">verify_oclc_number</span><span class="p">(</span><span class="n">oclcNumber</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">InvalidOclcNumber</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">WorldcatSessionError</span><span class="p">(</span><span class="s2">&quot;Invalid OCLC # was passed as an argument&quot;</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_member_shared_print_holdings</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;oclcNumber&quot;</span><span class="p">:</span> <span class="n">oclcNumber</span><span class="p">,</span>
+            <span class="s2">&quot;isbn&quot;</span><span class="p">:</span> <span class="n">isbn</span><span class="p">,</span>
+            <span class="s2">&quot;issn&quot;</span><span class="p">:</span> <span class="n">issn</span><span class="p">,</span>
+            <span class="s2">&quot;heldByGroup&quot;</span><span class="p">:</span> <span class="n">heldByGroup</span><span class="p">,</span>
+            <span class="s2">&quot;heldInState&quot;</span><span class="p">:</span> <span class="n">heldInState</span><span class="p">,</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="n">offset</span><span class="p">,</span>
+            <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="n">limit</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># prep request</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">)</span>
+        <span class="n">prepared_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c1"># send request</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">response</span>
+</code></pre></div>
+</div>
+</div>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/mkapi.js"></script>
+      <script src="../../../js/version-select.js"></script>
+      <script src="../../../search/main.js"></script>
+      <script src="../../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
