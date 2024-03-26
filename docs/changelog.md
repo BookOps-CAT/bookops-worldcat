@@ -48,7 +48,7 @@
     + `token_expires_at` attribute is now an aware `datetime` object (change made due to [`datetime.utcnow()`](https://docs.python.org/3/library/datetime.html#datetime.datetime.utcnow) deprecation)
 + Error handling:
     + `TypeError` and `ValueError` replace `WorldcatAuthorizationError` when `WorldcatAccessToken` is passed an invalid arg.
-    + Removed `InvalidOclcNumber` errors from `metadata_api.py`. Errors are now handled by functions in `utils.py`.
+    + `MetadataSession` now raises `InvalidOclcNumber` exception when invalid OCLC identifiers are given
 + `pytest` configuration moved from `pytest.ini` to `pyproject.toml`
 + Updated and clarified type annotations for `MetadataSession` methods
 + Updated dependencies:
