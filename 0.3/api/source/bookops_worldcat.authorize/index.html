@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>bookops_worldcat.authorize - BookOps-Worldcat Documentation</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" />
+        <link href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" rel="stylesheet" />
+        <link href="../../../css/mkapi-common.css" rel="stylesheet" />
+        <link href="../../../css/mkapi-readthedocs.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "bookops_worldcat.authorize";
+        var mkdocs_page_input_path = "api/source/bookops_worldcat.authorize.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> BookOps-Worldcat Documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../changelog/">Changelog</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/BookOps-CAT/bookops-worldcat">Source Code</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="https://github.com/BookOps-CAT/bookops-worldcat/issues">Issue Tracker</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../about/">About</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="#">bookops_worldcat</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat/">bookops_worldcat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.metadata_api/">bookops_worldcat.metadata_api</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.authorize/">bookops_worldcat.authorize</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.utils/">bookops_worldcat.utils</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../bookops_worldcat.errors/">bookops_worldcat.errors</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">BookOps-Worldcat Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">bookops_worldcat.authorize</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <div class="mkapi-node">
+<h1 id="" class="mkapi-object mkapi-object-code plain">
+<span class="mkapi-object-kind mkapi-object-kind-code">SOURCE CODE</span>
+<span class="mkapi-object-prefix">bookops_worldcat.</span><span class="mkapi-object-name">authorize</span>
+<span id="bookops_worldcat.authorize"></span><a class="mkapi-docs-link" href="../../bookops_worldcat.authorize">DOCS</a>
+</h1>
+
+<div class="mkapi-code">
+<div class="codehilite"><pre><span></span><code><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides means to authenticate and obtain a WorldCat access token.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__title__</span><span class="p">,</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">WorldcatAuthorizationError</span>
+
+
+<span class="k">class</span> <span class="nc">WorldcatAccessToken</span><span class="p">:</span><span id="bookops_worldcat.authorize.WorldcatAccessToken"></span><a class="mkapi-docs-link" title="bookops_worldcat.authorize.WorldcatAccessToken" href="../../bookops_worldcat.authorize/#bookops_worldcat.authorize.WorldcatAccessToken">DOCS</a>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Requests Worldcat access token.</span>
+<span class="sd">    Authenticates and authorizes using Client Credentials Grant. Does not support</span>
+<span class="sd">    Explicit Authorization Code and Refresh Token flows. Token with correctly</span>
+<span class="sd">    bonded scopes can then be passed into a session of particular web service</span>
+<span class="sd">    to authorize requests for resources.</span>
+<span class="sd">    More on OCLC&#39;s web services authorization:</span>
+<span class="sd">    https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        key:                    your WSKey public client_id</span>
+<span class="sd">        secret:                 your WSKey secret</span>
+<span class="sd">        scopes:                 request scopes for the access token</span>
+<span class="sd">        principal_id:           principalID (required for read/write endpoints)</span>
+<span class="sd">        principal_idns:         principalIDNS (required for read/write endpoints)</span>
+<span class="sd">        agent:                  &quot;User-agent&quot; parameter to be passed in the request</span>
+<span class="sd">                                header; usage strongly encouraged</span>
+<span class="sd">        timeout:                how long to wait for server to send data before</span>
+<span class="sd">                                giving up; default value is 3 seconds</span>
+
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from bookops_worldcat import WorldcatAccessToken</span>
+<span class="sd">        &gt;&gt;&gt; token = WorldcatAccessToken(</span>
+<span class="sd">                key=&quot;my_WSKey_client_id&quot;,</span>
+<span class="sd">                secret=&quot;my_WSKey_secret&quot;,</span>
+<span class="sd">                scope=&quot;WorldCatMetadataAPI&quot;,</span>
+<span class="sd">                principal_id=&quot;your principalID here&quot;,</span>
+<span class="sd">                principal_idns=&quot;your principalIDNS here&quot;,</span>
+<span class="sd">                agent=&quot;my_app/1.0.0&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; token.token_str</span>
+<span class="sd">        &quot;tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW&quot;</span>
+<span class="sd">        &gt;&gt;&gt; token.is_expired()</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; token.server_response.json()</span>
+<span class="sd">        {&quot;token_token&quot;: &quot;tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW&quot;,</span>
+<span class="sd">         &quot;token_type&quot;: &quot;bearer&quot;,</span>
+<span class="sd">         &quot;expires_in&quot;: &quot;1199&quot;,</span>
+<span class="sd">         &quot;principalID&quot;: &quot;&quot;,</span>
+<span class="sd">         &quot;principalIDNS&quot;: &quot;&quot;,</span>
+<span class="sd">         &quot;scopes&quot;: &quot;WorldCatMetadataAPI&quot;,</span>
+<span class="sd">         &quot;contextInstitutionId&quot;: &quot;00001&quot;,</span>
+<span class="sd">         &quot;expires_at&quot;: &quot;2020-08-23 18:45:29Z&quot;}</span>
+<span class="sd">        &gt;&gt;&gt; token.server_response.request.headers</span>
+<span class="sd">        {&quot;User-Agent&quot;: &quot;my_app/1.0.0&quot;,</span>
+<span class="sd">         &quot;Accept-Encoding&quot;: &quot;gzip, deflate&quot;,</span>
+<span class="sd">         &quot;Accept&quot;: &quot;application/json&quot;,</span>
+<span class="sd">         &quot;Connection&quot;: &quot;keep-alive&quot;,</span>
+<span class="sd">         &quot;Content-Length&quot;: &quot;67&quot;,</span>
+<span class="sd">         &quot;Content-Type&quot;: &quot;application/x-www-form-urlencoded&quot;,</span>
+<span class="sd">         &quot;Authorization&quot;: &quot;Basic encoded_authorization_here=&quot;}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">scopes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
+        <span class="n">principal_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">principal_idns</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grant_type</span> <span class="o">=</span> <span class="s2">&quot;client_credentials&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oauth_server</span> <span class="o">=</span> <span class="s2">&quot;https://oauth.oclc.org&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">principal_id</span> <span class="o">=</span> <span class="n">principal_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">principal_idns</span> <span class="o">=</span> <span class="n">principal_idns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span> <span class="o">=</span> <span class="n">scopes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server_response</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_expires_at</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># default bookops-worldcat request header</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">__title__</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;agent&#39; must be a string.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># asure passed arguments are valid</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;key&#39; is required.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;key&#39; must be a string.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;secret&#39; is required.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;secret&#39; must be a string.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">principal_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span>
+                <span class="s2">&quot;Argument &#39;principal_id&#39; is required for read/write endpoint of Metadata API.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">principal_idns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span>
+                <span class="s2">&quot;Argument &#39;principal_idns&#39; is required for read/write endpoint of Metadata API.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># validate passed scopes</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span>
+                <span class="s2">&quot;Argument &#39;scope&#39; must a string or a list.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;scope&#39; is missing.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># assign default value for timout</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="c1"># initiate request</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_request_token</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_token_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">oauth_server</span><span class="si">}</span><span class="s2">/token&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_token_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="p">,</span> <span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_auth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;grant_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">grant_type</span><span class="p">,</span>
+            <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">,</span>
+            <span class="s2">&quot;principalID&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">principal_id</span><span class="p">,</span>
+            <span class="s2">&quot;principalIDNS&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">principal_idns</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_parse_server_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server_response</span> <span class="o">=</span> <span class="n">response</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">requests</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token_str</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token_expires_at</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;expires_at&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;token_type&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_post_token_request</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches Worldcat access token for specified scope (web service)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            server_response: instance of requests.Response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">token_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_url</span><span class="p">()</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token_headers</span><span class="p">()</span>
+        <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span><span class="p">()</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_payload</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="n">token_url</span><span class="p">,</span>
+                <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">except</span> <span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trouble connecting: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WorldcatAuthorizationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_request_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiates access token request and parses the response if successful.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_token_request</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_server_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span id="bookops_worldcat.authorize.WorldcatAccessToken.is_expired"></span><a class="mkapi-docs-link" title="bookops_worldcat.authorize.WorldcatAccessToken.is_expired" href="../../bookops_worldcat.authorize/#bookops_worldcat.authorize.WorldcatAccessToken.is_expired">DOCS</a>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the access token is expired.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">        &gt;&gt;&gt; token.is_expired()</span>
+<span class="sd">        False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token_expires_at</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%SZ&quot;</span><span class="p">)</span>
+            <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div>
+</div>
+</div>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/mkapi.js"></script>
+      <script src="../../../js/version-select.js"></script>
+      <script src="../../../search/main.js"></script>
+      <script src="../../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
