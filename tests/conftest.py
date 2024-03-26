@@ -21,18 +21,38 @@ def live_keys():
             os.environ["WCKey"] = data["key"]
             os.environ["WCSecret"] = data["secret"]
             os.environ["WCScopes"] = data["scopes"]
-            os.environ["WCPrincipalID"] = data["principal_id"]
-            os.environ["WCPrincipalIDNS"] = data["principal_idns"]
+
+
+@pytest.fixture
+def stub_marc_xml():
+    stub_marc_xml = "<record><leader>00000nam a2200000 a 4500</leader><controlfield tag='008'>120827s2012    nyua          000 0 eng d</controlfield><datafield tag='010' ind1=' ' ind2=' '><subfield code='a'>   63011276 </subfield></datafield><datafield tag='035' ind1=' ' ind2=' '><subfield code='a'>ocn850940548</subfield></datafield><datafield tag='040' ind1=' ' ind2=' '><subfield code='a'>OCWMS</subfield><subfield code='b'>eng</subfield><subfield code='c'>OCWMS</subfield></datafield><datafield tag='100' ind1='0' ind2=' '><subfield code='a'>OCLC Developer Network</subfield></datafield><datafield tag='245' ind1='1' ind2='0'><subfield code='a'>Test Record</subfield></datafield><datafield tag='500' ind1=' ' ind2=' '><subfield code='a'>FOR OCLC DEVELOPER NETWORK DOCUMENTATION</subfield></datafield></record>"
+    return stub_marc_xml
+
+
+@pytest.fixture
+def stub_holding_xml():
+    stub_holding_xml = "<record><leader>00000nx  a2200000zi 4500</leader><controlfield tag='004'>312010</controlfield><controlfield tag='007'>zu</controlfield><controlfield tag='008'>1103280p    0   4001uueng0210908</controlfield><datafield ind2=' ' ind1=' ' tag='852'><subfield code='a'>OCWMS</subfield><subfield code='b'>EAST</subfield><subfield code='c'>EAST-STACKS</subfield></datafield><datafield ind2=' ' ind1=' ' tag='876'><subfield code='p'>879456</subfield></datafield></record>"
+    return stub_holding_xml
+
+
+@pytest.fixture
+def stub_marc21():
+    fh = os.path.join(
+        os.environ["USERPROFILE"], "github/bookops-worldcat/temp/test.mrc"
+    )
+    with open(fh, "rb") as stub:
+        stub_marc21 = stub.read()
+    return stub_marc21
 
 
 class FakeUtcNow(datetime.datetime):
     @classmethod
-    def utcnow(cls):
-        return cls(2020, 1, 1, 17, 0, 0, 0)
+    def now(cls, tzinfo=datetime.timezone.utc):
+        return cls(2020, 1, 1, 17, 0, 0, 0, tzinfo=datetime.timezone.utc)
 
 
 @pytest.fixture
-def mock_utcnow(monkeypatch):
+def mock_now(monkeypatch):
     monkeypatch.setattr(datetime, "datetime", FakeUtcNow)
 
 
@@ -44,7 +64,7 @@ class MockAuthServerResponseSuccess:
 
     def json(self):
         expires_at = datetime.datetime.strftime(
-            datetime.datetime.utcnow() + datetime.timedelta(0, 1199),
+            datetime.datetime.now() + datetime.timedelta(0, 1199),
             "%Y-%m-%d %H:%M:%SZ",
         )
 
@@ -102,6 +122,11 @@ class MockConnectionError:
         raise requests.exceptions.ConnectionError
 
 
+class MockRetryError:
+    def __init__(self, *args, **kwargs):
+        raise requests.exceptions.RetryError
+
+
 class MockHTTPSessionResponse(Response):
     def __init__(self, http_code):
         self.status_code = http_code
@@ -134,19 +159,17 @@ def mock_credentials():
     return {
         "key": "my_WSkey",
         "secret": "my_WSsecret",
-        "scopes": ["scope1", "scope2"],
-        "principal_id": "my_principalID",
-        "principal_idns": "my_principalIDNS",
+        "scopes": "scope1 scope2",
     }
 
 
 @pytest.fixture
-def mock_oauth_server_response(mock_utcnow, *args, **kwargs):
+def mock_oauth_server_response(mock_now, *args, **kwargs):
     return MockAuthServerResponseSuccess()
 
 
 @pytest.fixture
-def mock_successful_post_token_response(mock_utcnow, monkeypatch):
+def mock_successful_post_token_response(mock_now, monkeypatch):
     def mock_oauth_server_response(*args, **kwargs):
         return MockAuthServerResponseSuccess()
 
@@ -183,6 +206,13 @@ def mock_connection_error(monkeypatch):
 
 
 @pytest.fixture
+def mock_retry_error(monkeypatch):
+    monkeypatch.setattr("requests.post", MockRetryError)
+    monkeypatch.setattr("requests.get", MockRetryError)
+    monkeypatch.setattr("requests.Session.send", MockRetryError)
+
+
+@pytest.fixture
 def mock_token(mock_credentials, mock_successful_post_token_response):
     return WorldcatAccessToken(**mock_credentials)
 
@@ -190,6 +220,18 @@ def mock_token(mock_credentials, mock_successful_post_token_response):
 @pytest.fixture
 def stub_session(mock_token):
     with MetadataSession(authorization=mock_token) as session:
+        yield session
+
+
+@pytest.fixture
+def stub_retry_session(mock_token):
+    with MetadataSession(
+        authorization=mock_token,
+        totalRetries=3,
+        backoffFactor=0.5,
+        statusForcelist=[500, 502, 503, 504],
+        allowedMethods=["GET", "POST", "PUT"],
+    ) as session:
         yield session
 
 

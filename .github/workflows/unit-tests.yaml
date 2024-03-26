@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version}}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version}}
@@ -29,4 +29,13 @@ jobs:
       - name: Send report to Coveralls
         uses: AndreMiras/coveralls-python-action@develop
         with:
+          parallel: true
           github-token: ${{ secrets.GITHUB_TOKEN}}
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: AndreMiras/coveralls-python-action@develop
+        with:
+          parallel-finished: true

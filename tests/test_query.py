@@ -18,12 +18,10 @@ def test_query_live(live_keys):
         key=os.getenv("WCKey"),
         secret=os.getenv("WCSecret"),
         scopes=os.getenv("WCScopes"),
-        principal_id=os.getenv("WCPrincipalID"),
-        principal_idns=os.getenv("WCPrincipalIDNS"),
     )
     with MetadataSession(authorization=token) as session:
         header = {"Accept": "application/json"}
-        url = "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
+        url = "https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045"
         req = Request(
             "GET",
             url,
@@ -38,18 +36,17 @@ def test_query_live(live_keys):
 
 
 def test_query_not_prepared_request(stub_session):
-    with pytest.raises(AttributeError) as exc:
+    with pytest.raises(TypeError) as exc:
         req = Request("GET", "https://foo.org")
         Query(stub_session, req, timeout=2)
     assert "Invalid type for argument 'prepared_request'." in str(exc.value)
 
 
 @pytest.mark.http_code(200)
-def test_query_with_stale_token(stub_session, mock_utcnow, mock_session_response):
-    stub_session.authorization.token_expires_at = datetime.datetime.strftime(
-        datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-        "%Y-%m-%d %H:%M:%SZ",
-    )
+def test_query_with_stale_token(stub_session, mock_now, mock_session_response):
+    stub_session.authorization.token_expires_at = datetime.datetime.now(
+        datetime.timezone.utc
+    ) - datetime.timedelta(0, 1)
     assert stub_session.authorization.is_expired() is True
 
     req = Request("GET", "http://foo.org")
@@ -98,16 +95,17 @@ def test_query_http_207_response(stub_session, mock_session_response):
 @pytest.mark.http_code(404)
 def test_query_http_404_response(stub_session, mock_session_response):
     header = {"Accept": "application/json"}
-    url = (
-        "https://americas.metadata.api.oclc.org/worldcat/search/v1/brief-bibs/41266045"
-    )
+    url = "https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045"
     req = Request("GET", url, headers=header, hooks=None)
     prepped = stub_session.prepare_request(req)
 
     with pytest.raises(WorldcatRequestError) as exc:
         Query(stub_session, prepped)
 
-    assert "404 Client Error: 'foo' for url: https://foo.bar?query" in str(exc.value)
+    assert (
+        "404 Client Error: 'foo' for url: https://foo.bar?query. Server response: spam"
+        in str(exc.value)
+    )
 
 
 @pytest.mark.http_code(500)
@@ -117,7 +115,10 @@ def test_query_http_500_response(stub_session, mock_session_response):
     with pytest.raises(WorldcatRequestError) as exc:
         Query(stub_session, prepped)
 
-    assert "500 Server Error: 'foo' for url: https://foo.bar?query" in str(exc.value)
+    assert (
+        "500 Server Error: 'foo' for url: https://foo.bar?query. Server response: spam"
+        in str(exc.value)
+    )
 
 
 def test_query_timeout_exception(stub_session, mock_timeout):
@@ -140,6 +141,17 @@ def test_query_connection_exception(stub_session, mock_connection_error):
     )
 
 
+def test_query_retry_exception(stub_session, mock_retry_error):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError) as exc:
+        Query(stub_session, prepped)
+
+    assert "Connection Error: <class 'requests.exceptions.RetryError'>" in str(
+        exc.value
+    )
+
+
 def test_query_unexpected_exception(stub_session, mock_unexpected_error):
     req = Request("GET", "https://foo.org")
     prepped = stub_session.prepare_request(req)
@@ -149,11 +161,21 @@ def test_query_unexpected_exception(stub_session, mock_unexpected_error):
     assert "Unexpected request error: <class 'Exception'>" in str(exc.value)
 
 
-@pytest.mark.http_code(409)
-def test_query_holding_endpoint_409_http_code(stub_session, mock_session_response):
-    req = Request("POST", "https://worldcat.org/ih/data", params={"foo": "bar"})
-    prepped = stub_session.prepare_request(req)
-    with does_not_raise():
-        query = Query(stub_session, prepped)
+def test_query_timeout_retry(stub_retry_session, caplog):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_retry_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError):
+        Query(stub_retry_session, prepped)
 
-    assert query.response.status_code == 409
+    assert "Retry(total=0, " in caplog.records[2].message
+    assert "Retry(total=1, " in caplog.records[1].message
+    assert "Retry(total=2, " in caplog.records[0].message
+
+
+def test_query_timeout_no_retry(stub_session, caplog):
+    req = Request("GET", "https://foo.org")
+    prepped = stub_session.prepare_request(req)
+    with pytest.raises(WorldcatRequestError):
+        Query(stub_session, prepped)
+
+    assert "Retry" not in caplog.records

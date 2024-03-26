@@ -19,17 +19,17 @@ class TestWorldcatAccessToken:
         [
             (
                 None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'key' is required.",
+                pytest.raises(TypeError),
+                "Argument 'key' must be a string.",
             ),
             (
                 "",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'key' is required.",
+                pytest.raises(ValueError),
+                "Argument 'key' cannot be an empty string.",
             ),
             (
                 124,
-                pytest.raises(WorldcatAuthorizationError),
+                pytest.raises(TypeError),
                 "Argument 'key' must be a string.",
             ),
         ],
@@ -40,27 +40,25 @@ class TestWorldcatAccessToken:
                 key=argm,
                 secret="my_secret",
                 scopes=["scope1"],
-                principal_id="my_principalID",
-                principal_idns="my_principalIDNS",
             )
-            assert msg in str(exp.value)
+        assert msg in str(exp.value)
 
     @pytest.mark.parametrize(
         "argm,expectation,msg",
         [
             (
                 None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'secret' is required.",
+                pytest.raises(TypeError),
+                "Argument 'secret' must be a string.",
             ),
             (
                 "",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'secret' is required.",
+                pytest.raises(ValueError),
+                "Argument 'secret' cannot be an empty string.",
             ),
             (
                 123,
-                pytest.raises(WorldcatAuthorizationError),
+                pytest.raises(TypeError),
                 "Argument 'secret' must be a string.",
             ),
         ],
@@ -71,107 +69,41 @@ class TestWorldcatAccessToken:
                 key="my_key",
                 secret=argm,
                 scopes=["scope1"],
-                principal_id="my_principalID",
-                principal_idns="my_principalIDNS",
             )
-            assert msg in str(exp.value)
+        assert msg in str(exp.value)
 
     def test_agent_exceptions(self):
-        with pytest.raises(WorldcatAuthorizationError) as exp:
+        with pytest.raises(TypeError) as exp:
             WorldcatAccessToken(
                 key="my_key",
                 secret="my_secret",
                 scopes="scope1",
-                principal_id="my_principalID",
-                principal_idns="my_principalIDNS",
                 agent=124,
             )
-            assert "Argument 'agent' must be a string." in str(exp.value)
-
-    def test_agent_default_values(self, mock_successful_post_token_response):
-        token = WorldcatAccessToken(
-            key="my_key",
-            secret="my_secret",
-            scopes="scope1",
-            principal_id="my_principalID",
-            principal_idns="my_principalIDNS",
-        )
-        assert token.agent == f"{__title__}/{__version__}"
-
-    @pytest.mark.parametrize(
-        "arg,expectation,msg",
-        [
-            (
-                None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'principal_id' is required for read/write endpoint of Metadata API.",
-            ),
-            (
-                "",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'principal_id' is required for read/write endpoint of Metadata API.",
-            ),
-        ],
-    )
-    def test_principal_id_exception(self, arg, expectation, msg):
-        with expectation as exc:
-            WorldcatAccessToken(
-                key="my_key",
-                secret="my_secret",
-                scopes="scope1",
-                principal_id=arg,
-                principal_idns="my_principalIDNS",
-            )
-            assert msg in str(exc.value)
-
-    @pytest.mark.parametrize(
-        "arg,expectation,msg",
-        [
-            (
-                None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'principal_idns' is required for read/write endpoint of Metadata API.",
-            ),
-            (
-                "",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'principal_idns' is required for read/write endpoint of Metadata API.",
-            ),
-        ],
-    )
-    def test_principal_idns_exception(self, arg, expectation, msg):
-        with expectation as exc:
-            WorldcatAccessToken(
-                key="my_key",
-                secret="my_secret",
-                scopes="scope1",
-                principal_id="my_principalID",
-                principal_idns=arg,
-            )
-            assert msg in str(exc.value)
+        assert "Argument 'agent' must be a string." in str(exp.value)
 
     @pytest.mark.parametrize(
         "argm,expectation,msg",
         [
             (
                 None,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scope' must a string or a list.",
+                pytest.raises(TypeError),
+                "Argument 'scopes' must a string.",
             ),
             (
                 123,
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scope' must a string or a list.",
+                pytest.raises(TypeError),
+                "Argument 'scopes' must a string.",
             ),
             (
                 " ",
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scope' is missing.",
+                pytest.raises(ValueError),
+                "Argument 'scopes' cannot be an empty string.",
             ),
             (
                 ["", ""],
-                pytest.raises(WorldcatAuthorizationError),
-                "Argument 'scope' is missing.",
+                pytest.raises(TypeError),
+                "Argument 'scopes' is required.",
             ),
         ],
     )
@@ -181,8 +113,6 @@ class TestWorldcatAccessToken:
                 key="my_key",
                 secret="my_secret",
                 scopes=argm,
-                principal_id="my_principalID",
-                principal_idns="my_principalIDNS",
             )
             assert msg in str(exp.value)
 
@@ -203,15 +133,13 @@ class TestWorldcatAccessToken:
             key="my_key",
             secret="my_secret",
             scopes="scope1",
-            principal_id="my_principalID",
-            principal_idns="my_principalIDNS",
             timeout=argm,
         )
         assert token.timeout == expectation
 
     @pytest.mark.parametrize(
         "argm,expectation",
-        [("scope1", "scope1"), (["scope1", "scope2"], "scope1 scope2")],
+        [("scope1 ", "scope1"), (" scope1 scope2 ", "scope1 scope2")],
     )
     def test_scope_manipulation(
         self, argm, expectation, mock_successful_post_token_response
@@ -220,8 +148,6 @@ class TestWorldcatAccessToken:
             key="my_key",
             secret="my_secret",
             scopes=argm,
-            principal_id="my_principalID",
-            principal_idns="my_principalIDNS",
         )
         assert token.scopes == expectation
 
@@ -230,8 +156,6 @@ class TestWorldcatAccessToken:
             key="my_key",
             secret="my_secret",
             scopes="scope1",
-            principal_id="my_principalID",
-            principal_idns="my_principalIDNS",
         )
         assert token._token_url() == "https://oauth.oclc.org/token"
 
@@ -240,8 +164,6 @@ class TestWorldcatAccessToken:
             key="my_key",
             secret="my_secret",
             scopes="scope1",
-            principal_id="my_principalID",
-            principal_idns="my_principalIDNS",
             agent="foo",
         )
         assert token._token_headers() == {
@@ -254,8 +176,6 @@ class TestWorldcatAccessToken:
             key="my_key",
             secret="my_secret",
             scopes="scope1",
-            principal_id="my_principalID",
-            principal_idns="my_principalIDNS",
             agent="foo",
         )
         assert token._auth() == ("my_key", "my_secret")
@@ -263,22 +183,22 @@ class TestWorldcatAccessToken:
     def test_hasten_expiration_time(self, mock_token):
         utc_stamp = "2020-01-01 17:19:59Z"
         token = mock_token
-        assert token._hasten_expiration_time(utc_stamp) == "2020-01-01 17:19:58Z"
+        timestamp = token._hasten_expiration_time(utc_stamp)
+        assert isinstance(timestamp, datetime.datetime)
+        assert timestamp == datetime.datetime(
+            2020, 1, 1, 17, 19, 58, 0, tzinfo=datetime.timezone.utc
+        )
 
     def test_payload(self, mock_successful_post_token_response):
         token = WorldcatAccessToken(
             key="my_key",
             secret="my_secret",
             scopes="scope1",
-            principal_id="my_principalID",
-            principal_idns="my_principalIDNS",
             agent="foo",
         )
         assert token._payload() == {
             "grant_type": "client_credentials",
             "scope": "scope1",
-            "principalID": "my_principalID",
-            "principalIDNS": "my_principalIDNS",
         }
 
     def test_post_token_request_timout(self, mock_credentials, mock_timeout):
@@ -288,8 +208,6 @@ class TestWorldcatAccessToken:
                 key=creds["key"],
                 secret=creds["secret"],
                 scopes=creds["scopes"],
-                principal_id=creds["principal_id"],
-                principal_idns=creds["principal_idns"],
             )
 
     def test_post_token_request_connectionerror(
@@ -301,8 +219,6 @@ class TestWorldcatAccessToken:
                 key=creds["key"],
                 secret=creds["secret"],
                 scopes=creds["scopes"],
-                principal_id=creds["principal_id"],
-                principal_idns=creds["principal_idns"],
             )
 
     def test_post_token_request_unexpectederror(
@@ -314,8 +230,6 @@ class TestWorldcatAccessToken:
                 key=creds["key"],
                 secret=creds["secret"],
                 scopes=creds["scopes"],
-                principal_id=creds["principal_id"],
-                principal_idns=creds["principal_idns"],
             )
 
     def test_invalid_post_token_request(
@@ -327,35 +241,30 @@ class TestWorldcatAccessToken:
                 key=creds["key"],
                 secret=creds["secret"],
                 scopes=creds["scopes"],
-                principal_id=creds["principal_id"],
-                principal_idns=creds["principal_idns"],
             )
 
     def test_is_expired_false(
-        self, mock_utcnow, mock_credentials, mock_successful_post_token_response
+        self, mock_now, mock_credentials, mock_successful_post_token_response
     ):
         creds = mock_credentials
         token = WorldcatAccessToken(
             key=creds["key"],
             secret=creds["secret"],
             scopes=creds["scopes"],
-            principal_id=creds["principal_id"],
-            principal_idns=creds["principal_idns"],
         )
         assert token.is_expired() is False
 
-    def test_is_expired_true(self, mock_utcnow, mock_token):
+    def test_is_expired_true(self, mock_now, mock_token):
         mock_token.is_expired() is False
-        mock_token.token_expires_at = datetime.datetime.strftime(
-            datetime.datetime.utcnow() - datetime.timedelta(0, 1),
-            "%Y-%m-%d %H:%M:%SZ",
-        )
+        mock_token.token_expires_at = datetime.datetime.now(
+            datetime.timezone.utc
+        ) - datetime.timedelta(0, 1)
 
         assert mock_token.is_expired() is True
 
     @pytest.mark.parametrize(
         "arg,expectation",
-        [(None, pytest.raises(TypeError)), ("20-01-01", pytest.raises(ValueError))],
+        [(None, pytest.raises(TypeError))],
     )
     def test_is_expired_exception(self, arg, expectation, mock_token):
         mock_token.token_expires_at = arg
@@ -373,8 +282,6 @@ class TestWorldcatAccessToken:
             key=creds["key"],
             secret=creds["secret"],
             scopes=creds["scopes"],
-            principal_id=creds["principal_id"],
-            principal_idns=creds["principal_idns"],
         )
         assert token.token_str == "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
         assert token.token_type == "bearer"
@@ -389,7 +296,7 @@ class TestWorldcatAccessToken:
     def test_token_repr(
         self,
         mock_token,
-        mock_utcnow,
+        mock_now,
     ):
         assert (
             str(mock_token)
@@ -401,8 +308,6 @@ class TestWorldcatAccessToken:
         assert os.getenv("WCKey") is not None
         assert os.getenv("WCSecret") is not None
         assert os.getenv("WCScopes") == "WorldCatMetadataAPI"
-        assert os.getenv("WCPrincipalID") is not None
-        assert os.getenv("WCPrincipalIDNS") is not None
 
     @pytest.mark.webtest
     def test_post_token_request_with_live_service(self, live_keys):
@@ -410,8 +315,6 @@ class TestWorldcatAccessToken:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
-            principal_id=os.getenv("WCPrincipalID"),
-            principal_idns=os.getenv("WCPrincipalIDNS"),
         )
 
         assert token.server_response.status_code == 200
@@ -436,5 +339,6 @@ class TestWorldcatAccessToken:
         assert sorted(params) == sorted(response.keys())
 
         # test if token looks right
-        assert token.token_str is not None
+        assert token.token_str.startswith("tk_")
         assert token.is_expired() is False
+        assert isinstance(token.token_expires_at, datetime.datetime)

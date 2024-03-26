@@ -6,13 +6,11 @@ This module provides means to authenticate and obtain a WorldCat access token.
 
 import datetime
 import sys
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple, Union
 
 import requests
-from requests import Response
 
-
-from . import __title__, __version__  # type: ignore
+from . import __title__, __version__
 from .errors import WorldcatAuthorizationError
 
 
@@ -23,15 +21,22 @@ class WorldcatAccessToken:
     Explicit Authorization Code and Refresh Token flows. Token with correctly
     bonded scopes can then be passed into a session of particular web service
     to authorize requests for resources.
-    More on OCLC's web services authorization:
-    https://www.oclc.org/developer/develop/authentication/oauth/client-credentials-grant.en.html
+    More on OCLC's client credentials grant:
+    https://www.oclc.org/developer/api/keys/oauth/client-credentials-grant.en.html
 
     Args:
         key:                    your WSKey public client_id
         secret:                 your WSKey secret
-        scopes:                 request scopes for the access token
-        principal_id:           principalID (required for read/write endpoints)
-        principal_idns:         principalIDNS (required for read/write endpoints)
+        scopes:                 request scopes for the access token as a string,
+                                separate different scopes with space
+                                users with WSKeys set up to act as multiple institutions
+                                should provide scope and registryID in the format
+                                "{scope} context:{registryID}"
+                                examples:
+                                    single institution WSKey:
+                                        "WorldCatMetadataAPI"
+                                    multi-institution WSKey:
+                                        "WorldCatMetadataAPI context:00001"
         agent:                  "User-agent" parameter to be passed in the request
                                 header; usage strongly encouraged
         timeout:                how long to wait for server to send data before
@@ -43,9 +48,7 @@ class WorldcatAccessToken:
         >>> token = WorldcatAccessToken(
                 key="my_WSKey_client_id",
                 secret="my_WSKey_secret",
-                scope="WorldCatMetadataAPI",
-                principal_id="your principalID here",
-                principal_idns="your principalIDNS here",
+                scopes="WorldCatMetadataAPI",
                 agent="my_app/1.0.0")
         >>> token.token_str
         "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
@@ -75,10 +78,8 @@ class WorldcatAccessToken:
         self,
         key: str,
         secret: str,
-        scopes: Union[str, List[str]],
-        principal_id: str,
-        principal_idns: str,
-        agent: Optional[str] = None,
+        scopes: str,
+        agent: str = "",
         timeout: Optional[
             Union[int, float, Tuple[int, int], Tuple[float, float]]
         ] = None,
@@ -89,55 +90,41 @@ class WorldcatAccessToken:
         self.grant_type = "client_credentials"
         self.key = key
         self.oauth_server = "https://oauth.oclc.org"
-        self.principal_id = principal_id
-        self.principal_idns = principal_idns
         self.scopes = scopes
         self.secret = secret
-        self.server_response = None
+        self.server_response: Optional[requests.Response] = None
         self.timeout = timeout
-        self.token_expires_at = None
-        self.token_str = None
-        self.token_type = None
+        self.token_expires_at: Optional[datetime.datetime] = None
+        self.token_str = ""
+        self.token_type = ""
 
         # default bookops-worldcat request header
-        if self.agent is None:
-            self.agent = f"{__title__}/{__version__}"
+        if isinstance(self.agent, str):
+            if not self.agent.strip():
+                self.agent = f"{__title__}/{__version__}"
         else:
-            if type(self.agent) is not str:
-                raise WorldcatAuthorizationError("Argument 'agent' must be a string.")
+            raise TypeError("Argument 'agent' must be a string.")
 
-        # asure passed arguments are valid
-        if not self.key:
-            raise WorldcatAuthorizationError("Argument 'key' is required.")
+        # ensure passed arguments are valid
+        if isinstance(self.key, str):
+            if not self.key.strip():
+                raise ValueError("Argument 'key' cannot be an empty string.")
         else:
-            if type(self.key) is not str:
-                raise WorldcatAuthorizationError("Argument 'key' must be a string.")
+            raise TypeError("Argument 'key' must be a string.")
 
-        if not self.secret:
-            raise WorldcatAuthorizationError("Argument 'secret' is required.")
+        if isinstance(self.secret, str):
+            if not self.secret.strip():
+                raise ValueError("Argument 'secret' cannot be an empty string.")
         else:
-            if type(self.secret) is not str:
-                raise WorldcatAuthorizationError("Argument 'secret' must be a string.")
-
-        if not self.principal_id:
-            raise WorldcatAuthorizationError(
-                "Argument 'principal_id' is required for read/write endpoint of Metadata API."
-            )
-        if not self.principal_idns:
-            raise WorldcatAuthorizationError(
-                "Argument 'principal_idns' is required for read/write endpoint of Metadata API."
-            )
+            raise TypeError("Argument 'secret' must be a string.")
 
         # validate passed scopes
-        if type(self.scopes) is list:
-            self.scopes = " ".join(self.scopes)
-        elif type(self.scopes) is not str:
-            raise WorldcatAuthorizationError(
-                "Argument 'scopes' must a string or a list."
-            )
-        self.scopes = self.scopes.strip()  # type: ignore
-        if self.scopes == "":
-            raise WorldcatAuthorizationError("Argument 'scope' is missing.")
+        if isinstance(self.scopes, str):
+            if not self.scopes.strip():
+                raise ValueError("Argument 'scopes' cannot be an empty string.")
+        else:
+            raise TypeError("Argument 'scopes' must a string.")
+        self.scopes = self.scopes.strip()
 
         # assign default value for timout
         if not self.timeout:
@@ -149,7 +136,7 @@ class WorldcatAccessToken:
     def _auth(self) -> Tuple[str, str]:
         return (self.key, self.secret)
 
-    def _hasten_expiration_time(self, utc_stamp_str: str) -> str:
+    def _hasten_expiration_time(self, utc_stamp_str: str) -> datetime.datetime:
         """
         Resets expiration time one second earlier to account
         for any delays between expiration check and request for
@@ -164,14 +151,15 @@ class WorldcatAccessToken:
         utcstamp = datetime.datetime.strptime(
             utc_stamp_str, "%Y-%m-%d %H:%M:%SZ"
         ) - datetime.timedelta(seconds=1)
-        return datetime.datetime.strftime(utcstamp, "%Y-%m-%d %H:%M:%SZ")
+        utcstamp = utcstamp.replace(tzinfo=datetime.timezone.utc)
+        return utcstamp
 
-    def _parse_server_response(self, response: Response) -> None:
+    def _parse_server_response(self, response: requests.Response) -> None:
         """Parses authorization server response"""
-        self.server_response = response  # type: ignore
+        self.server_response = response
         if response.status_code == requests.codes.ok:
             self.token_str = response.json()["access_token"]
-            self.token_expires_at = self._hasten_expiration_time(  # type: ignore
+            self.token_expires_at = self._hasten_expiration_time(
                 response.json()["expires_at"]
             )
             self.token_type = response.json()["token_type"]
@@ -182,12 +170,10 @@ class WorldcatAccessToken:
         """Preps requests params"""
         return {
             "grant_type": self.grant_type,
-            "scope": self.scopes,  # type: ignore
-            "principalID": self.principal_id,
-            "principalIDNS": self.principal_idns,
+            "scope": self.scopes,
         }
 
-    def _post_token_request(self) -> Response:
+    def _post_token_request(self) -> requests.Response:
         """
         Fetches Worldcat access token for specified scope (web service)
 
@@ -222,7 +208,7 @@ class WorldcatAccessToken:
         self._parse_server_response(response)
 
     def _token_headers(self) -> Dict[str, str]:
-        return {"User-Agent": self.agent, "Accept": "application/json"}  # type: ignore
+        return {"User-Agent": self.agent, "Accept": "application/json"}
 
     def _token_url(self) -> str:
         return f"{self.oauth_server}/token"
@@ -234,24 +220,24 @@ class WorldcatAccessToken:
         Returns:
             bool
 
-        Example:
-        >>> token.is_expired()
-        False
+        Examples:
+            >>> token.is_expired()
+            False
+
         """
-        try:
-            if (
-                datetime.datetime.strptime(self.token_expires_at, "%Y-%m-%d %H:%M:%SZ")  # type: ignore
-                < datetime.datetime.utcnow()
-            ):
+        if isinstance(self.token_expires_at, datetime.datetime):
+            if self.token_expires_at < datetime.datetime.now(datetime.timezone.utc):
                 return True
             else:
                 return False
-        except TypeError:
-            raise
-        except ValueError:
-            raise
+        else:
+            raise TypeError(
+                "Attribute 'WorldcatAccessToken.token_expires_at' is of invalid type. "
+                "Expected `datetime.datetime` object."
+            )
 
     def __repr__(self):
         return (
-            f"access_token: '{self.token_str}', expires_at: '{self.token_expires_at}'"
+            f"access_token: '{self.token_str}', "
+            f"expires_at: '{self.token_expires_at:%Y-%m-%d %H:%M:%SZ}'"
         )
