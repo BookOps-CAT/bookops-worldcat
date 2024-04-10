@@ -101,27 +101,27 @@ class TestUtils:
             (
                 None,
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
+                "Argument 'oclcNumbers' must be a single integer, a list or a comma separated string of valid OCLC #s.",
             ),
             (
                 "",
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
+                "Argument 'oclcNumbers' must be a single integer, a list or a comma separated string of valid OCLC #s.",
             ),
             (
                 [],
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
+                "Argument 'oclcNumbers' must be a single integer, a list or a comma separated string of valid OCLC #s.",
             ),
             (
                 ",,",
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
+                "Argument 'oclcNumbers' must be a single integer, a list or a comma separated string of valid OCLC #s.",
             ),
             (
                 12345.5,
                 pytest.raises(InvalidOclcNumber),
-                "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s.",
+                "Argument 'oclcNumbers' must be a single integer, a list or a comma separated string of valid OCLC #s.",
             ),
             (
                 "bt12345",
@@ -148,6 +148,7 @@ class TestUtils:
             ("ocm0012345, ocm67890", ["12345", "67890"]),
             ([12345, 67890], ["12345", "67890"]),
             (["ocn12345", "on67890"], ["12345", "67890"]),
+            (12345, ["12345"]),
         ],
     )
     def test_verify_oclc_numbers_parsing(self, argm, expectation):

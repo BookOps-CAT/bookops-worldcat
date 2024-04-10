@@ -61,7 +61,9 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
         raise InvalidOclcNumber("Argument 'oclcNumber' is of invalid type.")
 
 
-def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[str]:
+def verify_oclc_numbers(
+    oclcNumbers: Union[int, str, List[Union[str, int]]]
+) -> List[str]:
     """
     Parses and verifies list of oclcNumbers
 
@@ -70,7 +72,8 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[
                                 should be set;
                                 they can be integers or strings with or without
                                 OCLC # prefix;
-                                if str the numbers must be separated by comma
+                                if str, the numbers must be separated by comma
+                                if int, only one number will be parsed
 
     Returns:
         vetted_numbers as list
@@ -78,17 +81,19 @@ def verify_oclc_numbers(oclcNumbers: Union[str, List[Union[str, int]]]) -> List[
     """
     if isinstance(oclcNumbers, str):
         oclcNumbers_lst = _str2list(oclcNumbers)
+    elif isinstance(oclcNumbers, int):
+        oclcNumbers_lst = _str2list(str(oclcNumbers))
     elif isinstance(oclcNumbers, list):
         oclcNumbers_lst = oclcNumbers  # type: ignore
     else:
         raise InvalidOclcNumber(
-            "Argument 'oclcNumbers' must be a list or comma separated string "
-            "of valid OCLC #s."
+            "Argument 'oclcNumbers' must be a single integer, a list or a "
+            "comma separated string of valid OCLC #s."
         )
     if not oclcNumbers_lst:
         raise InvalidOclcNumber(
-            "Argument 'oclcNumbers' must be a list or comma separated string "
-            "of valid OCLC #s."
+            "Argument 'oclcNumbers' must be a single integer, a list or a "
+            "comma separated string of valid OCLC #s."
         )
 
     vetted_numbers = [verify_oclc_number(n) for n in oclcNumbers_lst]
