@@ -129,10 +129,6 @@ class WorldcatAccessToken:
             raise TypeError("Argument 'scopes' must a string.")
         self.scopes = self.scopes.strip()
 
-        # assign default value for timout
-        if not self.timeout:
-            self.timeout = (3, 3)
-
         # initiate request
         self._request_token()
 
