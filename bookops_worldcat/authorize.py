@@ -82,7 +82,7 @@ class WorldcatAccessToken:
         secret: str,
         scopes: str,
         agent: str = "",
-        timeout: Optional[Union[int, float, Tuple[int, int], Tuple[float, float]]] = (
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
             5,
             5,
         ),
