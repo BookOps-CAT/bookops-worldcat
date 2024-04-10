@@ -40,7 +40,9 @@ class WorldcatAccessToken:
         agent:                  "User-agent" parameter to be passed in the request
                                 header; usage strongly encouraged
         timeout:                how long to wait for server to send data before
-                                giving up; default value is 3 seconds
+                                giving up; can accept different values for connect
+                                and read timeouts. default value is 5 seconds for
+                                read and 5 seconds for connect timeouts
 
 
     Examples:
@@ -80,9 +82,10 @@ class WorldcatAccessToken:
         secret: str,
         scopes: str,
         agent: str = "",
-        timeout: Optional[
-            Union[int, float, Tuple[int, int], Tuple[float, float]]
-        ] = None,
+        timeout: Optional[Union[int, float, Tuple[int, int], Tuple[float, float]]] = (
+            5,
+            5,
+        ),
     ) -> None:
         """Constructor"""
 
