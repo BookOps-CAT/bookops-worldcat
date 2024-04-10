@@ -4,7 +4,7 @@
 Handles actual requests to OCLC services
 """
 from __future__ import annotations
-from typing import Optional, Union, Tuple, TYPE_CHECKING
+from typing import Union, Tuple, TYPE_CHECKING
 import sys
 
 from requests.models import PreparedRequest
@@ -31,17 +31,20 @@ class Query:
         self,
         session: MetadataSession,
         prepared_request: PreparedRequest,
-        timeout: Optional[
-            Union[int, float, Tuple[int, int], Tuple[float, float]]
-        ] = None,
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
+            5,
+            5,
+        ),
     ) -> None:
         """Initializes Query object.
 
         Args:
-            session:                        `metadata_api.MetadataSession` instance
-            prepared_request:               `requests.models.PreparedRequest` instance
-            timeout:                        how long to wait for server to send data
-                                            before giving up
+            session:                `metadata_api.MetadataSession` instance
+            prepared_request:       `requests.models.PreparedRequest` instance
+            timeout:                how long to wait for server to send data before
+                                    giving up; can accept different values for connect
+                                    and read timeouts. default value is 5 seconds for
+                                    read and 5 seconds for connect timeouts
 
 
         Raises:

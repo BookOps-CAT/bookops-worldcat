@@ -38,7 +38,7 @@ def stub_holding_xml():
 @pytest.fixture
 def stub_marc21():
     fh = os.path.join(
-        os.environ["USERPROFILE"], "github/bookops-worldcat/temp/test.mrc"
+        os.environ["USERPROFILE"], "github/bookops-worldcat/tests/test.mrc"
     )
     with open(fh, "rb") as stub:
         stub_marc21 = stub.read()
