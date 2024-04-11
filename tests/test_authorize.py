@@ -7,7 +7,6 @@ import pytest
 
 
 from bookops_worldcat.authorize import WorldcatAccessToken
-from bookops_worldcat import __version__, __title__
 from bookops_worldcat.errors import WorldcatAuthorizationError
 
 
@@ -119,7 +118,7 @@ class TestWorldcatAccessToken:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            (None, (3, 3)),
+            (None, None),
             (1, 1),
             (0.5, 0.5),
             ((5, 5), (5, 5)),
@@ -201,7 +200,7 @@ class TestWorldcatAccessToken:
             "scope": "scope1",
         }
 
-    def test_post_token_request_timout(self, mock_credentials, mock_timeout):
+    def test_post_token_request_timeout(self, mock_credentials, mock_timeout):
         creds = mock_credentials
         with pytest.raises(WorldcatAuthorizationError):
             WorldcatAccessToken(
@@ -291,7 +290,7 @@ class TestWorldcatAccessToken:
         assert token.oauth_server == "https://oauth.oclc.org"
         assert token.scopes == "scope1 scope2"
         assert token.server_response.json() == mock_oauth_server_response.json()
-        assert token.timeout == (3, 3)
+        assert token.timeout == (5, 5)
 
     def test_token_repr(
         self,
@@ -315,6 +314,41 @@ class TestWorldcatAccessToken:
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
             scopes=os.getenv("WCScopes"),
+        )
+
+        assert token.server_response.status_code == 200
+
+        # test presence of all returned parameters
+        response = token.server_response.json()
+        params = [
+            "access_token",
+            "expires_at",
+            "authenticating_institution_id",
+            "principalID",
+            "context_institution_id",
+            "scopes",
+            "token_type",
+            "expires_in",
+            "principalIDNS",
+        ]
+        for p in params:
+            assert p in response
+
+        # test if any new additions are present
+        assert sorted(params) == sorted(response.keys())
+
+        # test if token looks right
+        assert token.token_str.startswith("tk_")
+        assert token.is_expired() is False
+        assert isinstance(token.token_expires_at, datetime.datetime)
+
+    @pytest.mark.webtest
+    def test_post_token_request_with_live_service_no_timeout(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+            timeout=None,
         )
 
         assert token.server_response.status_code == 200

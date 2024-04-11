@@ -35,8 +35,10 @@ class WorldcatSession(requests.Session):
             authorization:          WorldcatAccessToken instance
             agent:                  "User-agent" parameter to attached to each
                                     request in the session
-            timeout:                how long to wait for server to send data
-                                    before giving up
+            timeout:                how long to wait for server to send data before
+                                    giving up; can accept different values for connect
+                                    and read timeouts. default value is 5 seconds for
+                                    read and 5 seconds for connect timeouts
             totalRetries:           optional number of times to retry a request that
                                     failed or timed out. if totalRetries argument is
                                     not passed, any arguments passed to

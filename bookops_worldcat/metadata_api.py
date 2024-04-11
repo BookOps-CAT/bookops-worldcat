@@ -23,7 +23,10 @@ class MetadataSession(WorldcatSession):
         self,
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = None,
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
+            5,
+            5,
+        ),
         totalRetries: int = 0,
         backoffFactor: float = 0,
         statusForcelist: Optional[List[int]] = None,
@@ -36,7 +39,9 @@ class MetadataSession(WorldcatSession):
             agent:                  "User-agent" parameter to be passed in the request
                                     header; usage strongly encouraged
             timeout:                how long to wait for server to send data before
-                                    giving up; default value is 5 seconds
+                                    giving up; can accept different values for connect
+                                    and read timeouts. default value is 5 seconds for
+                                    read and 5 seconds for connect timeouts
             totalRetries:           optional number of times to retry a request that
                                     failed or timed out. if totalRetries argument is
                                     not passed, any arguments passed to
