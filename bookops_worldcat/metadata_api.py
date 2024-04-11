@@ -274,7 +274,7 @@ class MetadataSession(WorldcatSession):
 
     def bib_get_current_oclc_number(
         self,
-        oclcNumbers: Union[str, List[Union[str, int]]],
+        oclcNumbers: Union[int, str, List[Union[str, int]]],
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
@@ -282,10 +282,11 @@ class MetadataSession(WorldcatSession):
         Uses /manage/bibs/current endpoint.
 
         Args:
-            oclcNumbers:            string or list containing one or more OCLC numbers
-                                    to be checked; numbers can be integers or strings
-                                    with or without OCLC Number prefix;
+            oclcNumbers:            int, string or list containing one or more
+                                    OCLC numbers to be checked; numbers can be integers
+                                    or strings with or without OCLC Number prefix;
                                     if str, the numbers must be separated by a comma
+                                    if int, only one number may be passed as an arg
             hooks:                  Requests library hook system that can be used for
                                     signal event handling. For more information see the
                                     [Requests docs](https://requests.readthedocs.io/en/
@@ -859,7 +860,7 @@ class MetadataSession(WorldcatSession):
 
     def holdings_get_current(
         self,
-        oclcNumbers: Union[str, List[Union[str, int]]],
+        oclcNumbers: Union[int, str, List[Union[str, int]]],
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
@@ -869,10 +870,11 @@ class MetadataSession(WorldcatSession):
         Uses /manage/institution/holdings/current endpoint.
 
         Args:
-            oclcNumbers:            string or list containing one or more OCLC numbers
-                                    to be checked; numbers can be integers or strings
-                                    with or without OCLC Number prefix;
+            oclcNumbers:            int, string or list containing one or more
+                                    OCLC numbers to be checked; numbers can be integers
+                                    or strings with or without OCLC Number prefix;
                                     if str, the numbers must be separated by a comma
+                                    if int, only one number may be passed as an arg
             hooks:                  Requests library hook system that can be used for
                                     signal event handling. For more information see the
                                     [Requests docs](https://requests.readthedocs.io/en/
