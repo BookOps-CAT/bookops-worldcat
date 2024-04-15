@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""WorldCat Metadata API web session.
+"""WorldCat Metadata API wrapper session."""
 
-The `MetadataSession` class supports interactions with the WorldCat Metadata API.
-The child methods of this class allow users to interact with each endpoint of the
-Metadata API.
-"""
 from typing import Callable, Dict, List, Optional, Tuple, Union, BinaryIO
 
 from requests import Request, Response
@@ -17,10 +13,14 @@ from .utils import verify_oclc_number, verify_oclc_numbers
 
 
 class MetadataSession(WorldcatSession):
-    """OCLC Metadata API wrapper session.
+    """
+    The `MetadataSession` class supports interactions with the WorldCat Metadata API
+    and the child methods of this class allow users to interact with each endpoint
+    of the API.
 
-    Inherits attributes and methods from `requests.Session` and `WorldcatSession`.
-    Contains specific functionality for interacting with the Metadata API.
+    `MetadataSession` inherits attributes and methods from `requests.Session`
+    and `WorldcatSession` and contains specific functionality for interacting
+    with the WorldCat Metadata API.
     """
 
     BASE_URL = "https://metadata.api.oclc.org/worldcat"
@@ -38,7 +38,7 @@ class MetadataSession(WorldcatSession):
         statusForcelist: Optional[List[int]] = None,
         allowedMethods: Optional[List[str]] = None,
     ) -> None:
-        """Initializes MetadataSession object.
+        """Initializes MetadataSession.
 
         Args:
             authorization:
