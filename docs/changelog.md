@@ -7,7 +7,7 @@
 + Updated dev dependencies:
   + black (24.3.0)
 + Updated dependencies:
-  + 
+  + idna (3.7)
 + Reformatted docstrings for better readability on https://bookops-cat.github.io/bookops-worldcat/
 + Fixed typos
 
