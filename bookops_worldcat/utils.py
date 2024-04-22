@@ -19,10 +19,14 @@ def prep_oclc_number_str(oclcNumber: str) -> str:
     Checks for OCLC prefixes and removes them.
 
     Args:
-        oclcNumber:                OCLC record as string
+        oclcNumber:
+            OCLC record number as string
 
     Returns:
-        oclcNumber as str
+        `oclcNumber` as str
+
+    Raises:
+        InvalidOclcNumber: If `oclcNumber` argument is not a str or int.
     """
 
     if oclcNumber.strip().startswith("ocm") or oclcNumber.strip().startswith("ocn"):
@@ -42,11 +46,14 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
     Verifies a valid looking OCLC number is passed and normalize it as integer.
 
     Args:
-        oclcNumber:                OCLC record number
+        oclcNumber:
+            OCLC record number as string
 
     Returns:
-        oclcNumber as str
+        `oclcNumber` as str
 
+    Raises:
+        InvalidOclcNumber: If `oclcNumber` argument is not a str or int or is missing.
     """
     if not oclcNumber:
         raise InvalidOclcNumber("Argument 'oclcNumber' is missing.")
@@ -68,16 +75,17 @@ def verify_oclc_numbers(
     Parses and verifies list of oclcNumbers
 
     Args:
-        oclcNumbers:            list of OCLC control numbers for which holdings
-                                should be set;
-                                they can be integers or strings with or without
-                                OCLC # prefix;
-                                if str, the numbers must be separated by comma
-                                if int, only one number will be parsed
+        oclcNumbers:
+            List of OCLC control numbers. Control numbers can be integers or strings
+            with or without OCLC # prefix. If str, the numbers must be separated
+            by commas. If int, only one number will be parsed. Lists may contain strings
+            or integers or a combination of both.
 
     Returns:
-        vetted_numbers as list
+        `oclcNumbers` as a list of strings
 
+    Raises:
+        InvalidOclcNumber: If `oclcNumbers` argument is not a list, str, or int.
     """
     if isinstance(oclcNumbers, str):
         oclcNumbers_lst = _str2list(oclcNumbers)

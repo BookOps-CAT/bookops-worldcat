@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.1] - (4/15/2024)
+### Fixed
++ Inconsistent default values for `timeout` arg for `MetadataSession`, `WorldcatAccessToken` and `Query` objects
+### Changed
++ Updated dev dependencies:
+  + black (24.3.0)
++ Updated dependencies:
+  + idna (3.7)
++ Reformatted docstrings for better readability on https://bookops-cat.github.io/bookops-worldcat/
++ Fixed typos
+
 ## [1.0.0] - (3/22/2024)
 ### Added
 + Support for OCLC Metadata API Version 2.0
@@ -195,6 +206,7 @@
 ### Fixed
 + fixed hooks info in docstrings in `SearchSession` and `MetadataSession`
 
+[1.0.1]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.5.0...v1.0.0
 [0.5.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.4.0...v0.4.1

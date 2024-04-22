@@ -57,6 +57,7 @@ watch:
 
 plugins:
   - search
+  - autorefs
   - mkdocstrings:
       handlers:
         python:
@@ -66,6 +67,7 @@ plugins:
             filters: ["!^_"]
             docstring_options:
               ignore_init_summary: true
+            docstring_section_style: spacy
             merge_init_into_class: true
             show_signature_annotations: true
           import:
