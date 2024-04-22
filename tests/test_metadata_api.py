@@ -307,6 +307,17 @@ class TestMockedMetadataSession:
             stub_session.bib_get_current_oclc_number(argm)
         assert err_msg in str(exc.value)
 
+    def test_bib_get_current_oclc_number_too_many_oclcNumbers_passed(
+        self, stub_session
+    ):
+        with pytest.raises(ValueError) as exc:
+            stub_session.bib_get_current_oclc_number(
+                oclcNumbers=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+            )
+        assert "Too many OCLC Numbers passed to 'oclcNumbers' argument." in str(
+            exc.value
+        )
+
     @pytest.mark.http_code(200)
     def test_bib_match(self, stub_session, mock_session_response, stub_marc_xml):
         assert (
