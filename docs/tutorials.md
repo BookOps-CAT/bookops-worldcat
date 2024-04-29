@@ -67,7 +67,7 @@ Three different approaches:
 #### 1. MARC file and bib_match
 Given minimal MARC records from a vendor, identify full MARC records for a set of books. Merge embedded order data (EOD) from vendor into the resulting full MARC records and save these records to a new file.
 
-Use data provided in a `.mrc` file and `/bibs/match` endpoint
+Use data provided in a `.mrc` file and `/manage/bibs/match` endpoint
 
 ??? info "Step-by-step instructions"
     This example uses the following steps. These steps are noted using in-line comments in the code:
@@ -83,9 +83,10 @@ Use data provided in a `.mrc` file and `/bibs/match` endpoint
       9. Write record to new `.mrc` file
 
 ```python title="MARC file and bib_match"
+import os
+
 from bookops_worldcat import MetadataSession
 from pymarc import MARCReader, MARCWriter, Record
-import os
 
 from utils import get_token  # (1)!
 
@@ -97,7 +98,7 @@ token = get_token(
 with MetadataSession(authorization=token) as session:
 
   # Step 2.  Read records from .mrc file one-by-one
-  with open("data/test_vendor_data.mrc", "rb") as file: # (2)!
+  with open("data/get_bibs_tutorial_1.mrc", "rb") as file: # (2)!
       reader = MARCReader(file)
       for record in reader:
 
@@ -125,7 +126,7 @@ with MetadataSession(authorization=token) as session:
           pymarc_record.add_field(order_data)
 
           # Step 9. Write record to new .mrc file
-          writer = MARCWriter(open("data/Example1_output.mrc", "ab"))
+          writer = MARCWriter(open("data/get_bibs_tutorial_1_output.mrc", "ab"))
           writer.write(pymarc_record)
           writer.close()
 ```
@@ -147,10 +148,11 @@ Search for records using data provided in a spreadsheet and `/search/brief-bibs/
       5. Retrieve full MARC records
 
 ```python title="Spreadsheet data and brief_bibs_search"
-from bookops_worldcat import MetadataSession
-from pymarc import MARCWriter, Record, Field, Subfield
 import os
 import csv
+
+from bookops_worldcat import MetadataSession
+from pymarc import MARCWriter, Record, Field, Subfield
 
 from utils import get_token # (1)!
 
@@ -162,7 +164,7 @@ token = get_token(
 with MetadataSession(authorization=token) as session:
 
     # Step 2.  Read data from spreadsheet
-    with open("data/test_vendor_data.csv", "r", encoding="utf-8") as csvfile: # (2)!
+    with open("data/get_bibs_tutorial_2.csv", "r", encoding="utf-8") as csvfile: # (2)!
         reader = csv.reader(csvfile, delimiter="\t")
         next(reader)
 
@@ -204,7 +206,7 @@ with MetadataSession(authorization=token) as session:
             )
 
             # Step 9. Write record to new .mrc file
-            writer = MARCWriter(open("data/Example2_output.mrc", "ab"))
+            writer = MARCWriter(open("data/get_bibs_tutorial_2_output.mrc", "ab"))
             print(pymarc_record)
             writer.write(pymarc_record)
             writer.close()
@@ -217,12 +219,12 @@ with MetadataSession(authorization=token) as session:
 5. 949$p is the item price
 
 #### 3. Converted spreadsheet data and bib_match
-Convert data from spreadsheet into MARC records and match records using /bibs/match endpoint. Retrieve resulting records, add local fields, and save records to new file.
+Convert data from spreadsheet into MARC records and match records using /manage/bibs/match endpoint. Retrieve resulting records, add local fields, and save records to new file.
 
 ??? info "Step-by-step instructions"
     This example uses the following steps. These steps are noted using in-line comments in the code:
     
-      1. Initiate MetadataSession
+      1. Initiate `MetadataSession`
       2. Read data from spreadsheet
       3. Iterate through each row in spreadsheet
       4. Create record from row of spreadsheet data
@@ -234,10 +236,11 @@ Convert data from spreadsheet into MARC records and match records using /bibs/ma
       10. Write record to new .mrc file
 
 ```python title="Converted spreadsheet data and bib_match"
-from bookops_worldcat import MetadataSession
-from pymarc import MARCWriter, Record, Field, Subfield
 import os
 import csv
+
+from bookops_worldcat import MetadataSession
+from pymarc import MARCWriter, Record, Field, Subfield
 
 from utils import get_token # (1)!
 
@@ -249,7 +252,7 @@ token = get_token(
 with MetadataSession(authorization=token) as session:
 
     # Step 2.  Read data from spreadsheet
-    with open("data/test_vendor_data.csv", "r", encoding="utf-8") as csvfile:  # (2)!
+    with open("data/get_bibs_tutorial_3.csv", "r", encoding="utf-8") as csvfile:  # (2)!
         reader = csv.reader(csvfile, delimiter="\t")
         next(reader)
 
@@ -315,7 +318,7 @@ with MetadataSession(authorization=token) as session:
             )
 
             # Step 10. Write record to new .mrc file
-            writer = MARCWriter(open("data/Example3_output.mrc", "ab"))
+            writer = MARCWriter(open("data/get_bibs_tutorial_3_output.mrc", "ab"))
             writer.write(pymarc_record)
             writer.close()
 
@@ -340,7 +343,7 @@ Read OCLC Numbers from a text file and check if holdings are set. Set holdings u
     This example uses the following steps. These steps are noted using in-line comments in the code:
     
       1. Read OCLC Numbers from file
-      2. Initiate MetadataSession
+      2. Initiate `MetadataSession`
       3. Loop through OCLC Numbers
       4. Check if holdings are set using OCLC Number
       5. Set holdings using OCLC Number
@@ -348,6 +351,7 @@ Read OCLC Numbers from a text file and check if holdings are set. Set holdings u
 
 ```python title="Using OCLC Numbers"
 import os
+
 from bookops_worldcat import MetadataSession
 
 from utils import get_token, get_oclc_numbers  # (1)!
@@ -358,7 +362,7 @@ token = get_token(
 )
 
 # 1. Read OCLC Numbers from file
-oclc_numbers = get_oclc_numbers("data/NYPLtestOclcNumbers.txt")  # (2)!
+oclc_numbers = get_oclc_numbers("data/holdings_tutorial_1.txt")  # (2)!
 # 2. Initiate MetadataSession
 with MetadataSession(authorization=token) as session:
     # 3. Loop through OCLC Numbers
@@ -385,7 +389,7 @@ Read MARC records from a .mrc file, extract the OCLC number from the records and
 ??? info "Step-by-step instructions"
     This example uses the following steps. These steps are noted using in-line comments in the code:
     
-      1. Initiate MetadataSession
+      1. Initiate `MetadataSession`
       2. Read MARC records from file
       3. Get OCLC Number for record
       4. Check if holdings are set for record
@@ -394,6 +398,7 @@ Read MARC records from a .mrc file, extract the OCLC number from the records and
 
 ```python title="Using MARC records"
 import os
+
 from bookops_worldcat import MetadataSession
 from pymarc import MARCReader
 
@@ -407,7 +412,7 @@ token = get_token(
 # 1. Initiate MetadataSession
 with MetadataSession(authorization=token) as session:
     # 2. Read MARC records from file
-    with open("data/test_records.mrc", "rb") as marc_file:  # (2)!
+    with open("data/holdings_tutorial_2.mrc", "rb") as marc_file:  # (2)!
         reader = MARCReader(marc_file)
         for record in reader:
             # 3. Get OCLC Number for record
@@ -435,7 +440,7 @@ Read data from a .mrc file and query WorldCat to retrieve classification recomme
 ??? info "Step-by-step instructions"
     This example uses the following steps. These steps are noted using in-line comments in the code:
     
-      1. Initiate MetadataSession
+      1. Initiate `MetadataSession`
       2. Read MARC records from file
       3. Get OCLC Number for record
       4. Get classification recommendations based on record
@@ -445,6 +450,7 @@ Read data from a .mrc file and query WorldCat to retrieve classification recomme
 
 ```python title="Get classification recommendations"
 import os
+
 from bookops_worldcat import MetadataSession
 from pymarc import MARCReader, Field, Subfield, MARCWriter
 
