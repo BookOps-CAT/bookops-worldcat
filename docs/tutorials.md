@@ -386,7 +386,48 @@ Read MARC records from a .mrc file, extract the OCLC number from the records and
     This example uses the following steps. These steps are noted using in-line comments in the code:
     
       1. Initiate MetadataSession
+      2. Read MARC records from file
+      3. Get OCLC Number for record
+      4. Check if holdings are set for record
+      5. Set holdings with record
+      6. Unset holdings with record
 
+```python title="Using MARC records"
+import os
+from bookops_worldcat import MetadataSession
+from pymarc import MARCReader
+
+from utils import get_token  # (1)!
+
+
+token = get_token(
+    f"{os.path.join(os.environ['USERPROFILE'], '.oclc/tutorial_creds.json')}"
+)
+
+# 1. Initiate MetadataSession
+with MetadataSession(authorization=token) as session:
+    # 2. Read MARC records from file
+    with open("data/test_records.mrc", "rb") as marc_file:  # (2)!
+        reader = MARCReader(marc_file)
+        for record in reader:
+            # 3. Get OCLC Number for record
+            oclc_number = record.get("001").data
+
+            # 4. Check if holdings are set for record
+            response = session.holdings_get_current(oclc_number)
+            print(response.json())
+
+            # Set holdings with record
+            response = session.holdings_set_with_bib(record)
+            print(response.json())
+
+            # Unset holdings with record
+            response = session.holdings_unset_with_bib(record)
+            print(response.json())
+```
+
+1. The helper function, `get_token`, is mentioned at the top of this page. In this example we are importing it from another module, `utils.py`
+2. Enter the name of the file with your MARC records here.
 
 ### Get classification recommendations for vendor records
 Read data from a .mrc file and query WorldCat to retrieve classification recommendations. Add the resulting call numbers to the MARC records and write the records to a new .mrc file.
@@ -395,6 +436,65 @@ Read data from a .mrc file and query WorldCat to retrieve classification recomme
     This example uses the following steps. These steps are noted using in-line comments in the code:
     
       1. Initiate MetadataSession
+      2. Read MARC records from file
+      3. Get OCLC Number for record
+      4. Get classification recommendations based on record
+      5. Parse API response
+      6. Add classification to records
+      7. Write records to new file
 
-### Manage Retention Commitments with Local Holdings Records
+```python title="Get classification recommendations"
+import os
+from bookops_worldcat import MetadataSession
+from pymarc import MARCReader, Field, Subfield, MARCWriter
+
+from utils import get_token  # (1)!
+
+
+token = get_token(
+    f"{os.path.join(os.environ['USERPROFILE'], '.oclc/tutorial_creds.json')}"
+)
+
+# 1. Initiate MetadataSession
+with MetadataSession(authorization=token) as session:
+    # 2. Read MARC records from file
+    with open("data/classification_tutorial.mrc", "rb") as marc_file:  # (2)!
+        reader = MARCReader(marc_file)
+        for record in reader:
+            # 3. Get OCLC Number for record
+            oclc_number = record.get("001").data
+
+            # 4. Get classification recommendations based on record
+            response = session.bib_get_classification(oclc_number)
+            print(response.json())
+
+            # 5. Parse API response
+            dewey = response.json()["dewey"]["mostPopular"][0]
+            lcc = response.json()["lc"]["mostPopular"][0]
+
+            # 6. Add classification to records
+            record.add_field(
+                Field(
+                    tag="050",
+                    indicators=[" ", "0"],
+                    subfields=[Subfield(code="a", value=f"{lcc}")],
+                )
+            )
+            record.add_field(
+                Field(
+                    tag="082",
+                    indicators=["0", " "],
+                    subfields=[Subfield(code="a", value=f"{dewey}")],
+                )
+            )
+
+            # 7. Write records to new file
+            writer = MARCWriter(open("data/classification_tutorial_output.mrc", "ab"))
+            writer.write(record)
+            writer.close()
+```
+
+1. The helper function, `get_token`, is mentioned at the top of this page. In this example we are importing it from another module, `utils.py`
+2. Enter the name of the file with your MARC records here.
+
 
