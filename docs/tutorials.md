@@ -1,10 +1,8 @@
 # Tutorials
-The following tutorials are based on use cases in which a cataloger or metadata librarian may choose to employ bookops-worldcat in their day-to-day work. The code 
-
-Depending on the example, the code may also employ [pymarc](https://pymarc.readthedocs.io/en/latest/), and/or modules from the Python standard library. All modules or libraries used in an example will be listed as imports at the top of the code snippet. 
+The following tutorials illustrate how bookops-worldcat can be used for specific use cases in technical services workflows. These examples use [pymarc](https://pymarc.readthedocs.io/en/latest/) and modules from the Python standard library in addition to bookops-worldcat. All modules or libraries used in an example are be listed as imports at the top of the code snippet. 
 
 ??? note "Tutorial helper functions" 
-    All sections of this tutorial use the following helper functions:
+    This tutorial uses the following helper functions:
 
     === "get_token"
 
@@ -60,10 +58,10 @@ Depending on the example, the code may also employ [pymarc](https://pymarc.readt
 ### Get Full MARC records from minimal vendor data
 This use case shows how to use vendor data to query WorldCat and retrieve full bibliographic records. The resulting records are saved to a new file. 
 
-Three possible approaches:
+Three different approaches:
 
-1. Given MARC records in a .mrc file, query WorldCat using the `bib_match` method.
-2. Given vendor data in a spreadsheet, form queries using the vendor data and query WorldCat using the `brief_bibs_search` method. Then retrieve full MARC records with the `bib_get` method.
+1. Given MARC records, query WorldCat using the `bib_match` method.
+2. Given vendor data in a spreadsheet, form queries using the vendor data and query WorldCat using the `brief_bibs_search` method. Retrieve full MARC records using the resulting OCLC Numbers with the `bib_get` method.
 3. Given vendor data in a spreadsheet, create generate MARC21 records and query WorldCat with these records using the `bib_match` method.
 
 #### 1. MARC file and bib_match
@@ -137,16 +135,16 @@ with MetadataSession(authorization=token) as session:
 3. Change MARC tag for EOD (or add additional fields) based on local practices
 
 #### 2. Spreadsheet data and brief_bibs_search
-Using data provided in a spreadsheet and `/search/brief-bibs/` endpoint
+Search for records using data provided in a spreadsheet and `/search/brief-bibs/` endpoint. Retrieve full MARC records with the resulting OCLC numbers. 
 
 ??? info "Step-by-step instructions"
     This example uses the following steps. These steps are noted using in-line comments in the code:
 
       1. Initiate `MetadataSession`
       2. Read data from spreadsheet
-      3. Form query using data from spreadsheet. Use `brief_bibs_search` and whatever data is available: title, author, pub date, ISBN, etc.
-      5. Parse response and identify OCLC Numbers to use to retrieve records
-      6. Retrieve full MARC records
+      3. Form query using data from spreadsheet. Use `brief_bibs_search` and provided data: title, author, pub date, ISBN, etc.
+      4. Parse response and identify OCLC Numbers to use to retrieve records
+      5. Retrieve full MARC records
 
 ```python title="Spreadsheet data and brief_bibs_search"
 from bookops_worldcat import MetadataSession
@@ -171,8 +169,8 @@ with MetadataSession(authorization=token) as session:
         # Step 3. Iterate through each row in spreadsheet
         for row in reader:
 
-            # Step 4. Form query using spreadsheet data. Use brief_bibs_search
-            # and whatever data is available: title, author, pub date, ISBN, etc.
+            # Step 4. Form query using spreadsheet data including title, author, pub 
+            # date, and ISBN. Use brief_bibs_search search for records.
             brief_bib_response = session.brief_bibs_search(
                 q=f"ti:{row[0]} AND au:{row[1]} AND bn:{row[2]}",
                 inCatalogLanguage="eng",
@@ -219,13 +217,13 @@ with MetadataSession(authorization=token) as session:
 5. 949$p is the item price
 
 #### 3. Converted spreadsheet data and bib_match
-Converting data from spreadsheet into .mrc file and, using /bibs/match endpoint, retrieve records, add local fields, and save records to new file
+Convert data from spreadsheet into MARC records and match records using /bibs/match endpoint. Retrieve resulting records, add local fields, and save records to new file.
 
 ??? info "Step-by-step instructions"
     This example uses the following steps. These steps are noted using in-line comments in the code:
     
       1. Initiate MetadataSession
-      2.  Read data from spreadsheet
+      2. Read data from spreadsheet
       3. Iterate through each row in spreadsheet
       4. Create record from row of spreadsheet data
       5. Match record using bib_match
@@ -334,9 +332,55 @@ with MetadataSession(authorization=token) as session:
 9. Add the barcode from the spreadsheet
 10. Add the price from the spreadsheet
 
+### Check and Set/Unset Holdings
+#### 1. Using OCLC Numbers
+Read OCLC Numbers from a text file and check if holdings are set. Set holdings using OCLC Number. 
 
-### Get classification recommendations for vendor records
-This use case will read data from a .mrc file, and query WorldCat to retrieve classification recommendations. The call numbers are then written to the records and the records are written to a new .mrc file.
+??? info "Step-by-step instructions"
+    This example uses the following steps. These steps are noted using in-line comments in the code:
+    
+      1. Read OCLC Numbers from file
+      2. Initiate MetadataSession
+      3. Loop through OCLC Numbers
+      4. Check if holdings are set using OCLC Number
+      5. Set holdings using OCLC Number
+      6. Unset holdings using OCLC Number
+
+```python title="Using OCLC Numbers"
+import os
+from bookops_worldcat import MetadataSession
+
+from utils import get_token, get_oclc_numbers  # (1)!
+
+
+token = get_token(
+    f"{os.path.join(os.environ['USERPROFILE'], '.oclc/tutorial_creds.json')}"
+)
+
+# 1. Read OCLC Numbers from file
+oclc_numbers = get_oclc_numbers("data/NYPLtestOclcNumbers.txt")  # (2)!
+# 2. Initiate MetadataSession
+with MetadataSession(authorization=token) as session:
+    # 3. Loop through OCLC Numbers
+    for number in oclc_numbers:
+        # 4. Check if holdings are set using OCLC Number
+        response = session.holdings_get_current(number)
+        print(response.json())
+
+        # 5. Set holdings using OCLC Number
+        response = session.holdings_set(number)
+        print(response.json())
+
+        # 6. Unset holdings using OCLC Number
+        response = session.holdings_unset(number)
+        print(response.json())
+```
+
+1. The helper functions, `get_token` and `get_oclc_numbers`, are mentioned at the top of this page. In this example we are importing them from another module, `utils.py`
+2. Enter the name of the .txt file with your OCLC numbers here.
+
+#### 2. Using MARC records
+Read MARC records from a .mrc file, extract the OCLC number from the records and check if holdings are set. Set holdings using the MARC record. 
 
 ??? info "Step-by-step instructions"
     This example uses the following steps. These steps are noted using in-line comments in the code:
@@ -344,9 +388,13 @@ This use case will read data from a .mrc file, and query WorldCat to retrieve cl
       1. Initiate MetadataSession
 
 
-### Check and Set/Unset Holdings
-#### Using OCLC Numbers
+### Get classification recommendations for vendor records
+Read data from a .mrc file and query WorldCat to retrieve classification recommendations. Add the resulting call numbers to the MARC records and write the records to a new .mrc file.
 
-#### Using MARC records
+??? info "Step-by-step instructions"
+    This example uses the following steps. These steps are noted using in-line comments in the code:
+    
+      1. Initiate MetadataSession
 
-#### LHRs and Retention Commitments
+### Manage Retention Commitments with Local Holdings Records
+
