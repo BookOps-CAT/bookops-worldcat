@@ -1,13 +1,16 @@
 # Tutorials
-The following tutorials illustrate how bookops-worldcat can be used for specific use cases in technical services workflows. These examples use [pymarc](https://pymarc.readthedocs.io/en/latest/) and modules from the Python standard library in addition to bookops-worldcat. All modules or libraries used in an example are be listed as imports at the top of the code snippet. 
+The following tutorials illustrate how bookops-worldcat can be used in technical services workflows. These examples use [pymarc](https://pymarc.readthedocs.io/en/latest/) (version 5.1.2) and modules from the Python standard library in addition to bookops-worldcat. All modules or libraries used in an example are listed as imports at the top of the code snippet. 
 
 ### Setup
 #### Create and activate a virtual environment
-To try the examples in this tutorial, first create and activate a virtual environment. Then install the required packages.
+To try the examples in this tutorial, first create and activate a virtual environment. Then install the required packages in your virtual environment. 
 
-On PC (Git Bash):
+??? info "Virtual environments"
+    Using a virtual environment can help users manage dependencies. For more information about virtual environments see [PyPA's guide to virtual environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) and [Real Python's Virtual Environments primer](https://realpython.com/python-virtual-environments-a-primer/).
 
-1. Create a virtual environment
+Windows (Git Bash):
+
+1. Create your virtual environment
 
     `python -m venv .venv`
 
@@ -18,9 +21,10 @@ On PC (Git Bash):
 3. Install tutorial packages
    
     `pip -m install bookops-worldcat`
+
     `pip -m install pymarc`
 
-On Mac: 
+MacOS: 
 
 1. Create a virtual environment
     
@@ -33,61 +37,41 @@ On Mac:
 3. Install tutorial packages
 
     `pip3 -m install bookops-worldcat`
+
     `pip3 -m install pymarc`
 
 
- This tutorial uses the following helper functions. In the examples below these functions are imported from a separate `utils.py` module:
+### Obtain an Access Token
+The scripts in the examples below use the following helper function to get an Access Token:
 
-=== "get_token"
+```python title="get_token helper function"
+def get_token(filepath: str) -> WorldcatAccessToken:
+   """
+   Retrieves user's WSKey credentials from .json file.
+   The format of the credentials in the .json file should be:
+       {
+           "key": "my_key",
+           "secret": "my_secret",
+           "scopes": "WorldcatMetadataAPI",
+           "agent": "MyApp/1.0"
+       } 
 
-      ```python
-      def get_token(filepath: str) -> WorldcatAccessToken:
-         """
-         Retrieves user's WSKey credentials from .json file.
-         The format of the credentials in the .json file should be:
-             {
-                 "key": "my_key",
-                 "secret": "my_secret",
-                 "scopes": "WorldcatMetadataAPI",
-                 "agent": "MyApp/1.0"
-             } 
+   Args:
+       filepath: path to location of json file with credentials
 
-         Args:
-             filepath: path to location of json file with credentials
+   Returns:
+       WorldcatAccessToken
+   """
+   with open(filepath, "r") as file:
+       data = json.load(file)
+       return WorldcatAccessToken(
+           key=data["key"],
+           secret=data["secret"],
+           scopes=data["scopes"],
+           agent=data["agent"],
+       )
+```
 
-         Returns:
-             WorldcatAccessToken
-         """
-         with open(filepath, "r") as file:
-             data = json.load(file)
-             return WorldcatAccessToken(
-                 key=data["key"],
-                 secret=data["secret"],
-                 scopes=data["scopes"],
-                 agent=data["agent"],
-             )
-      ```
-
-=== "get_oclc_numbers"
-
-      ```python
-      def get_oclc_numbers(filepath: str) -> List:
-         """
-         Reads a file of OCLC Numbers and adds each one to a list.
-
-         Args:
-             filepath: path to location of file with OCLC Numbers
-
-         Returns:
-             oclc_numbers: a list of OCLC Numbers
-         """
-         oclc_numbers = []
-         with open(filepath, "r") as numbers:
-             for number in numbers:
-                 oclc_numbers.append(number.strip("\n"))
-         return oclc_numbers
-
-      ```
 
 ### Match minimal vendor records to full WorldCat records 
 Given minimal MARC records from a vendor, identify matches in WorldCat using the `/manage/bibs/match` endpoint. Parse the API response and retrieve full MARC records using the `/manage/bibs` endpoint. Merge the resulting records with the original records and save them to a new file. 
@@ -113,20 +97,18 @@ from pymarc import MARCReader, MARCWriter, Record
 
 from utils import get_token  # (1)!
 
-token = get_token(
-  f"{os.path.join(os.environ['USERPROFILE'], '.oclc/tutorial_creds.json')}"
-)
+token = get_token("C:/Users/username/credentials/tutorial_creds.json") # (2)!
 
 # Step 1. Initiate MetadataSession
 with MetadataSession(authorization=token) as session:
 
   # Step 2.  Read records from .mrc file one-by-one
-  with open("data/match_bibs_tutorial.mrc", "rb") as file: # (2)!
+  with open("data/tutorial_input_1.mrc", "rb") as file: # (3)!
       reader = MARCReader(file)
       for record in reader:
 
           # Step 3. Extract EOD from vendor record
-          order_data = record.get("960") # (3)! 
+          order_data = record.get("960") # (4)! 
 
           # Step 4. Match record using bib_match
           match_response = session.bib_match(
@@ -149,14 +131,15 @@ with MetadataSession(authorization=token) as session:
           pymarc_record.add_field(order_data)
 
           # Step 9. Write record to new .mrc file
-          writer = MARCWriter(open("data/match_bibs_output.mrc", "ab"))
+          writer = MARCWriter(open("data/tutorial_output_1.mrc", "ab"))
           writer.write(pymarc_record)
           writer.close()
 ```
 
-1. The helper function, `get_token`, is mentioned at the top of this page. In this example we are importing it from another module, `utils.py`
-2. Enter the name of your vendor MARC file here
-3. Change MARC tag for EOD (or add additional fields) based on local practices
+1. The helper function, `get_token`, is mentioned at the top of this page. In this example we are importing it from another module, `utils.py`.
+2. The filepath for the .json file where your WSKey is stored.
+3. The name of your vendor MARC file.
+4. Change MARC tag for EOD (or add additional fields) based on local practices.
 
 
 ### Search brief bibliographic resources
@@ -180,15 +163,13 @@ from pymarc import MARCWriter, Record, Field, Subfield
 
 from utils import get_token # (1)!
 
-token = get_token(
-    f"{os.path.join(os.environ['USERPROFILE'], '.oclc/tutorial_creds.json')}"
-)
+token = get_token("C:/Users/username/credentials/tutorial_creds.json") # (2)!
 
 # Step 1. Initiate MetadataSession
 with MetadataSession(authorization=token) as session:
 
     # Step 2.  Read data from spreadsheet
-    with open("data/brief_bibs_tutorial.csv", "r", encoding="utf-8") as csvfile: # (2)!
+    with open("data/tutorial_input_2.csv", "r", encoding="utf-8") as csvfile:  # (3)!
         reader = csv.reader(csvfile, delimiter="\t")
         next(reader)
 
@@ -202,12 +183,11 @@ with MetadataSession(authorization=token) as session:
                 q=f"ti:{row[0]} AND au:{row[1]} AND bn:{row[2]}",
                 inCatalogLanguage="eng",
                 itemSubType="book-printbook",
-                datePublished=row[3], # (3)!
+                datePublished=row[3], # (4)!
             )
 
-            # Step 5. Parse .json response and extract OCLC Number
+            # Step 5. Parse json response and extract OCLC Number
             brief_bib_json = brief_bib_response.json()
-            print(brief_bib_json)
             matched_oclc_number = brief_bib_json["briefRecords"][0]["oclcNumber"]
 
             # Step 6. Retrieve full MARC record using OCLC Number
@@ -224,28 +204,28 @@ with MetadataSession(authorization=token) as session:
                     tag="949",
                     indicators=["", ""],
                     subfields=[
-                        Subfield(code="i", value=f"{row[4]}"), # (4)!
-                        Subfield(code="p", value=f"{row[5]}"), # (5)!
+                        Subfield(code="i", value=f"{row[4]}"), # (5)!
+                        Subfield(code="p", value=f"{row[5]}"), # (6)!
                     ],
                 )
             )
 
             # Step 9. Write record to new .mrc file
-            writer = MARCWriter(open("data/brief_bibs_tutorial_output.mrc", "ab"))
-            print(pymarc_record)
+            writer = MARCWriter(open("data/tutorial_output_2.mrc", "ab"))
             writer.write(pymarc_record)
             writer.close()
 ```
 
 1. The helper function, `get_token`, is mentioned at the top of this page. In this example we are importing it from another module, `utils.py`
-2. Enter the name of your vendor spreadsheet file here.
-3. The spreadsheet contains the the following fields: TITLE, AUTHOR, ISBN, PUB_DATE, BARCODE, ITEM_PRICE
-4. 949$i is the barcode
-5. 949$p is the item price
+2. The filepath for the .json file where your WSKey is stored.
+3. The name of your vendor spreadsheet file.
+4. The spreadsheet contains the the following fields: TITLE, AUTHOR, ISBN, PUB_DATE, BARCODE, ITEM_PRICE
+5. 949$i is the barcode
+6. 949$p is the item price
 
 ### Check and Set Holdings
 
-#### 1. Using MARC records
+#### Using MARC records
 Read MARC records from a .mrc file, extract the OCLC number from the records and check if holdings are set. Set holdings using the MARC record. 
 
 ??? info "Step-by-step instructions"
@@ -267,42 +247,42 @@ from pymarc import MARCReader
 from utils import get_token  # (1)!
 
 
-token = get_token(
-    f"{os.path.join(os.environ['USERPROFILE'], '.oclc/tutorial_creds.json')}"
-)
+token = get_token("C:/Users/username/credentials/tutorial_creds.json") # (2)!
 
 # 1. Initiate MetadataSession
 with MetadataSession(authorization=token) as session:
     # 2. Read MARC records from file
-    with open("data/holdings_tutorial_1.mrc", "rb") as marc_file:  # (2)!
+    with open("data/tutorial_input_3.mrc", "rb") as marc_file:  # (3)!
         reader = MARCReader(marc_file)
         for record in reader:
             # 3. Get OCLC Number for record
-            oclc_number = record.get("001").data
+            oclc_number = record.get("035").value()
 
             # 4. Check if holdings are set for record
-            response = session.holdings_get_current(oclc_number)
-            print(response.json())
+            get_response = session.holdings_get_current(oclc_number)
 
-            # Set holdings with record
-            response = session.holdings_set_with_bib(record)
-            print(response.json())
+            # 5. Set holdings with record
+            set_response = session.holdings_set_with_bib(
+                record.as_marc(), recordFormat="application/marc"
+            )
 
-            # Unset holdings with record
-            response = session.holdings_unset_with_bib(record)
-            print(response.json())
+            # 6. Unset holdings with record
+            unset_response = session.holdings_unset_with_bib(
+                record.as_marc(), recordFormat="application/marc"
+            )
 ```
 
 1. The helper function, `get_token`, is mentioned at the top of this page. In this example we are importing it from another module, `utils.py`
-2. Enter the name of the file with your MARC records here.
+2. The filepath for the .json file where your WSKey is stored.
+3. The name of the file with your MARC records.
 
-#### 2. Using OCLC Numbers
+#### Using OCLC Numbers
 Read OCLC Numbers from a text file and check if holdings are set. Set holdings using OCLC Number. 
 
 ??? info "Step-by-step instructions"
     This example uses the following steps. These steps are noted using in-line comments in the code:
     
-      1. Read OCLC Numbers from file
+      1. Read a file of OCLC Numbers and add them to a list
       2. Initiate `MetadataSession`
       3. Loop through OCLC Numbers
       4. Check if holdings are set using OCLC Number
@@ -314,34 +294,33 @@ import os
 
 from bookops_worldcat import MetadataSession
 
-from utils import get_token, get_oclc_numbers  # (1)!
+from utils import get_token  # (1)!
 
 
-token = get_token(
-    f"{os.path.join(os.environ['USERPROFILE'], '.oclc/tutorial_creds.json')}"
-)
+token = get_token("C:/Users/username/credentials/tutorial_creds.json") # (2)!
 
-# 1. Read OCLC Numbers from file
-oclc_numbers = get_oclc_numbers("data/holdings_tutorial_2.txt")  # (2)!
+# 1. Read a file of OCLC Numbers and add them to a list
+oclc_numbers = []
+with open("data/tutorial_input_3.txt", "r") as numbers:  # (3)!
+    for number in numbers:
+        oclc_numbers.append(number.strip("\n"))
 # 2. Initiate MetadataSession
 with MetadataSession(authorization=token) as session:
     # 3. Loop through OCLC Numbers
     for number in oclc_numbers:
         # 4. Check if holdings are set using OCLC Number
-        response = session.holdings_get_current(number)
-        print(response.json())
+        get_response = session.holdings_get_current(number)
 
         # 5. Set holdings using OCLC Number
-        response = session.holdings_set(number)
-        print(response.json())
+        set_response = session.holdings_set(number)
 
         # 6. Unset holdings using OCLC Number
-        response = session.holdings_unset(number)
-        print(response.json())
+        unset_response = session.holdings_unset(number)
 ```
 
-1. The helper functions, `get_token` and `get_oclc_numbers`, are mentioned at the top of this page. In this example we are importing them from another module, `utils.py`
-2. Enter the name of the .txt file with your OCLC numbers here.
+1. The helper function, `get_token`, is mentioned at the top of this page. In this example we are importing it from another module, `utils.py`
+2. The filepath for the .json file where your WSKey is stored.
+3. The name of the .txt file with your OCLC numbers.
 
 
 ### Get classification recommendations for vendor records
@@ -367,22 +346,19 @@ from pymarc import MARCReader, Field, Subfield, MARCWriter
 from utils import get_token  # (1)!
 
 
-token = get_token(
-    f"{os.path.join(os.environ['USERPROFILE'], '.oclc/tutorial_creds.json')}"
-)
+token = get_token("C:/Users/username/credentials/tutorial_creds.json") # (2)!
 
 # 1. Initiate MetadataSession
 with MetadataSession(authorization=token) as session:
     # 2. Read MARC records from file
-    with open("data/classification_tutorial.mrc", "rb") as marc_file:  # (2)!
+    with open("data/classification_tutorial.mrc", "rb") as marc_file:  # (3)!
         reader = MARCReader(marc_file)
         for record in reader:
             # 3. Get OCLC Number for record
-            oclc_number = record.get("001").data
+            oclc_number = record.get("035").value()
 
             # 4. Get classification recommendations based on record
             response = session.bib_get_classification(oclc_number)
-            print(response.json())
 
             # 5. Parse API response
             dewey = response.json()["dewey"]["mostPopular"][0]
@@ -405,10 +381,11 @@ with MetadataSession(authorization=token) as session:
             )
 
             # 7. Write records to new file
-            writer = MARCWriter(open("data/classification_tutorial_output.mrc", "ab"))
+            writer = MARCWriter(open("data/tutorial_output_4.mrc", "ab"))
             writer.write(record)
             writer.close()
 ```
 
 1. The helper function, `get_token`, is mentioned at the top of this page. In this example we are importing it from another module, `utils.py`
-2. Enter the name of the file with your MARC records here.
+2. The filepath for the .json file where your WSKey is stored.
+3. The name of the file with your MARC records.
