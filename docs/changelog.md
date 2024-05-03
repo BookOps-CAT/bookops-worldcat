@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.1] - (4/15/2024)
+## [1.0.1] - (5/1/2024)
 ### Fixed
 + Inconsistent default values for `timeout` arg for `MetadataSession`, `WorldcatAccessToken` and `Query` objects
 ### Changed
@@ -10,6 +10,8 @@
   + idna (3.7)
 + Reformatted docstrings for better readability on https://bookops-cat.github.io/bookops-worldcat/
 + Fixed typos
+### Added
++ Tutorials to `tutorials.md`
 
 ## [1.0.0] - (3/22/2024)
 ### Added

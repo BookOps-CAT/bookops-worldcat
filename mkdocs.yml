@@ -11,6 +11,7 @@ theme:
   features:
     - content.tabs.link
     - content.code.copy
+    - content.code.annotate
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.footer
@@ -51,6 +52,8 @@ markdown_extensions:
 - pymdownx.tabbed:
     alternate_style: true
 - tables
+- md_in_html
+- attr_list
 
 watch:
 - bookops_worldcat
