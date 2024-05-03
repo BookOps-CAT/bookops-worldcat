@@ -26,7 +26,8 @@ def prep_oclc_number_str(oclcNumber: str) -> str:
         `oclcNumber` as str
 
     Raises:
-        InvalidOclcNumber: If `oclcNumber` argument is not a str or int.
+        InvalidOclcNumber: If `oclcNumber` argument does not match
+        OCLC number formatting rules.
     """
 
     if re.match(r"^ocm[0-9]{,8}$", oclcNumber.strip()) or re.match(
@@ -102,7 +103,7 @@ def verify_oclc_numbers(
     elif isinstance(oclcNumbers, int):
         oclcNumbers_lst = _str2list(str(oclcNumbers))
     elif isinstance(oclcNumbers, list):
-        oclcNumbers_lst = oclcNumbers  # type: ignore
+        oclcNumbers_lst = [str(n) for n in oclcNumbers]
     else:
         raise InvalidOclcNumber(
             "Argument 'oclcNumbers' must be a single integer, a list or a "
