@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.1] - (4/15/2024)
+## [1.0.1] - (5/1/2024)
 ### Fixed
 + Inconsistent default values for `timeout` arg for `MetadataSession`, `WorldcatAccessToken` and `Query` objects
 ### Changed
@@ -11,6 +11,8 @@
 + Reformatted docstrings for better readability on https://bookops-cat.github.io/bookops-worldcat/
 + Fixed typos
 + `prep_oclc_number_str` now parses OCLC Numbers with "(OCoLC)" prefix. Parsing rules match [OCLC documentation](https://help.oclc.org/Metadata_Services/WorldShare_Collection_Manager/Data_sync_collections/Prepare_your_data/30035_field_and_OCLC_control_numbers)
+### Added
++ Tutorials to `tutorials.md`
 
 ## [1.0.0] - (3/22/2024)
 ### Added
