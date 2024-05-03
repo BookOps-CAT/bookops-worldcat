@@ -7,9 +7,7 @@
 session.brief_bibs_get(oclcNumber="ocm00012345")
 session.brief_bibs_search(oclcNumber="00054321")
 session.bib_get_classification(oclcNumber=12121)
-session.brief_bibs_get(oclcNumber="(OCoLC)ocm00012345")
 session.brief_bibs_search(oclcNumber="(OCoLC)00054321")
-session.bib_get_classification(oclcNumber="(OCoLC)on1234567890")
 ```
 The `bib_get_current_oclc_number` and `holdings_get_current` methods accept multiple OCLC Numbers passed to the `oclcNumbers` argument. For these methods OCLC Numbers can be passed as a list of strings and/or integers or a string with the numbers separated by commas. The `oclcNumbers` argument will also accept a single integer as a valid arguement. The following are all acceptable:
 
