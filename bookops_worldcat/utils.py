@@ -3,7 +3,7 @@
 """
 Shared utilities module.
 """
-
+import re
 from typing import List, Union
 
 from .errors import InvalidOclcNumber
@@ -29,10 +29,20 @@ def prep_oclc_number_str(oclcNumber: str) -> str:
         InvalidOclcNumber: If `oclcNumber` argument is not a str or int.
     """
 
-    if oclcNumber.strip().startswith("ocm") or oclcNumber.strip().startswith("ocn"):
+    if re.match(r"^ocm[0-9]{,8}$", oclcNumber.strip()) or re.match(
+        r"^ocn[0-9]{9}$", oclcNumber.strip()
+    ):
         oclcNumber = oclcNumber.strip()[3:]
-    elif oclcNumber.strip().startswith("on"):
+    elif re.match(r"^on[0-9]{10,}$", oclcNumber.strip()):
         oclcNumber = oclcNumber.strip()[2:]
+    elif re.match(r"^\(OCoLC\)ocm[0-9]{,8}$", oclcNumber.strip()) or re.match(
+        r"^\(OCoLC\)ocn[0-9]{9}$", oclcNumber.strip()
+    ):
+        oclcNumber = oclcNumber.strip()[10:]
+    elif re.match(r"^\(OCoLC\)on[0-9]{10,}$", oclcNumber.strip()):
+        oclcNumber = oclcNumber.strip()[9:]
+    elif re.match(r"^\(OCoLC\)[0-9]{8,}$", oclcNumber.strip()):
+        oclcNumber = oclcNumber.strip()[7:]
 
     try:
         oclcNumber = str(int(oclcNumber))
@@ -47,7 +57,7 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
 
     Args:
         oclcNumber:
-            OCLC record number as string
+            OCLC record number as string or integer
 
     Returns:
         `oclcNumber` as str
