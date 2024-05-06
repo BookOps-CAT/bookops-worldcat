@@ -1,0 +1,1766 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation of BookOps-Worldcat library">
+      
+      
+      
+        <link rel="canonical" href="https://bookops-cat.github.io/bookops-worldcat/latest/search/">
+      
+      
+        <link rel="prev" href="../start/">
+      
+      
+        <link rel="next" href="../manage_bibs/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.13">
+    
+    
+      
+        <title>Search WorldCat - BookOps-Worldcat Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e359304.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="NYPL" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#search-worldcat" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="BookOps-Worldcat Documentation" class="md-header__button md-logo" aria-label="BookOps-Worldcat Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            BookOps-Worldcat Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Search WorldCat
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/BookOps-CAT/bookops-worldcat" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    bookops-worldcat
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href=".." class="md-tabs__link">
+          
+  
+  BookOps-WorldCat
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/authorize/" class="md-tabs__link">
+          
+  
+  API Documentation
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tutorials/" class="md-tabs__link">
+        
+  
+    
+  
+  Tutorials
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="BookOps-Worldcat Documentation" class="md-nav__button md-logo" aria-label="BookOps-Worldcat Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    BookOps-Worldcat Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/BookOps-CAT/bookops-worldcat" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    bookops-worldcat
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    BookOps-WorldCat
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            BookOps-WorldCat
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_2" id="__nav_1_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    How To
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            How To
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Get Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Search WorldCat
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Search WorldCat
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#brief-bib-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Brief Bib Resources
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Brief Bib Resources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search-brief-bibs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Search Brief Bibs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-brief-bibs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Brief Bibs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-brief-bibs-for-other-editions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Brief Bibs for Other Editions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#member-holdings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Member Holdings
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Member Holdings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-holdings-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Holdings Summary
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-general-holdings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Search General Holdings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-shared-print-holdings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Search Shared Print Holdings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#classification-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classification Recommendations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-search-functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Search Functionality
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Search Functionality">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keyword-and-fielded-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keyword and Fielded Queries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Keyword and Fielded Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced-search-for-brief-bib-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Search for Brief Bib Resources
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-search-for-local-bib-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Search for Local Bib Resources
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manage_bibs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Manage Bibliographic Records
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manage_holdings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Manage Institution Holdings
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Search and Manage Local Data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced Usage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_3" id="__nav_1_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    About
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            About
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../about/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About BookOps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API Documentation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            API Documentation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    bookops_worldcat
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            bookops_worldcat
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/authorize/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    bookops_worldcat.authorize
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/errors/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    bookops_worldcat.errors
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/metadata_api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    bookops_worldcat.metadata_api
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/query/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    bookops_worldcat.query
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    bookops_worldcat.utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#brief-bib-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Brief Bib Resources
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Brief Bib Resources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search-brief-bibs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Search Brief Bibs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-brief-bibs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Brief Bibs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-brief-bibs-for-other-editions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Brief Bibs for Other Editions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#member-holdings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Member Holdings
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Member Holdings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-holdings-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Holdings Summary
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-general-holdings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Search General Holdings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-shared-print-holdings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Search Shared Print Holdings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#classification-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classification Recommendations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-search-functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Search Functionality
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Search Functionality">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keyword-and-fielded-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keyword and Fielded Queries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Keyword and Fielded Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced-search-for-brief-bib-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Search for Brief Bib Resources
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-search-for-local-bib-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Search for Local Bib Resources
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="search-worldcat">Search WorldCat</h1>
+<p>Bookops-Worldcat provides functionality that allows users to search WorldCat for brief bibliographic resources, holdings data, and classification recommendations. </p>
+<p>Requests made to any <code>/search/</code> endpoints return server responses in JSON format. These responses can be accessed and parsed with the <code>.json()</code> method.</p>
+<h2 id="brief-bib-resources">Brief Bib Resources</h2>
+<h3 id="search-brief-bibs">Search Brief Bibs</h3>
+<p>The <code>brief_bibs_search</code> method allows users to query WorldCat using WorldCat's <a href="https://help.oclc.org/Librarian_Toolbox/Searching_WorldCat_Indexes/Bibliographic_records/Bibliographic_record_indexes">bibliographic record indexes</a>.</p>
+<p>The Metadata API has many limiters that one can use to restrict query results. A full list of available parameters for the <code>brief_bibs_search</code> method is available in the <a href="../api/metadata_api/#bookops_worldcat.metadata_api.MetadataSession.brief_bibs_search">API Documentation</a>. Additional search examples are also available in the <a href="#advanced-search-functionality">Advanced Search Functionality</a> section of this page.</p>
+<p>Basic usage:
+<div class="language-python highlight"><span class="filename">brief_bibs_search Request</span><pre><span></span><code><span class="kn">from</span> <span class="nn">bookops_worldcat</span> <span class="kn">import</span> <span class="n">MetadataSession</span>
+
+<span class="k">with</span> <span class="n">MetadataSession</span><span class="p">(</span><span class="n">authorization</span><span class="o">=</span><span class="n">token</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">brief_bibs_search</span><span class="p">(</span>
+        <span class="n">q</span><span class="o">=</span><span class="s2">&quot;ti: My brilliant friend AND au: Ferrante, Elena&quot;</span><span class="p">,</span>
+        <span class="n">inCatalogLanguage</span><span class="o">=</span><span class="s2">&quot;eng&quot;</span><span class="p">,</span>
+        <span class="n">itemSubType</span><span class="o">=</span><span class="s2">&quot;book-printbook&quot;</span><span class="p">,</span>
+        <span class="n">orderBy</span><span class="o">=</span><span class="s2">&quot;mostWidelyHeld&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+<div class="language-json no-copy highlight"><span class="filename">brief_bibs_search Response</span><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;numberOfRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">79</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">&quot;briefRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;oclcNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;778419313&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My brilliant friend&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;creator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Elena Ferrante&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;machineReadableDate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;language&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;generalFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Book&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;specificFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PrintBook&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Europa Editions&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publicationPlace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New York, New York&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;isbns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;9781609450786&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1609450787&quot;</span>
+<span class="w">      </span><span class="p">],</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;mergedOclcNumbers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;811639683&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;818678733&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;824701856&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;829903719&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;830036387&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1302347443&quot;</span>
+<span class="w">      </span><span class="p">],</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;catalogingInfo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;catalogingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BTCTA&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;catalogingLanguage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;levelOfCataloging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;transcribingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BTCTA&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h3 id="get-brief-bibs">Get Brief Bibs</h3>
+<p>Users can retrieve a brief bib resource for a known item by passing the OCLC Number for the resource to the <code>brief_bibs_get</code> method.</p>
+<p>Basic usage:
+<div class="language-python highlight"><span class="filename">brief_bibs_get Request</span><pre><span></span><code><span class="kn">from</span> <span class="nn">bookops_worldcat</span> <span class="kn">import</span> <span class="n">MetadataSession</span>
+
+<span class="k">with</span> <span class="n">MetadataSession</span><span class="p">(</span><span class="n">authorization</span><span class="o">=</span><span class="n">token</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">brief_bibs_get</span><span class="p">(</span><span class="mi">778419313</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+<div class="language-json no-copy highlight"><span class="filename">brief_bibs_get Response</span><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;oclcNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;778419313&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My brilliant friend&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;creator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Elena Ferrante&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;machineReadableDate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;language&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;generalFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Book&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;specificFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PrintBook&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Europa Editions&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;publicationPlace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New York, New York&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;isbns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;9781609450786&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;1609450787&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;mergedOclcNumbers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;811639683&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;818678733&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;824701856&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;829903719&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;830036387&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;1302347443&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;catalogingInfo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;catalogingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BTCTA&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;catalogingLanguage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;levelOfCataloging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;transcribingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BTCTA&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h3 id="get-brief-bibs-for-other-editions">Get Brief Bibs for Other Editions</h3>
+<p>Users can retrieve brief bib resources for other editions of a title by passing an OCLC Number to the <code>brief_bibs_get_other_editions</code> method.</p>
+<p>Basic usage:
+<div class="language-python highlight"><span class="filename">brief_bibs_get_other_editions Request</span><pre><span></span><code><span class="kn">from</span> <span class="nn">bookops_worldcat</span> <span class="kn">import</span> <span class="n">MetadataSession</span>
+
+<span class="k">with</span> <span class="n">MetadataSession</span><span class="p">(</span><span class="n">authorization</span><span class="o">=</span><span class="n">token</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">brief_bibs_get_other_editions</span><span class="p">(</span>
+        <span class="n">oclcNumber</span><span class="o">=</span><span class="s2">&quot;321339&quot;</span><span class="p">,</span> 
+        <span class="n">itemSubType</span><span class="o">=</span><span class="s2">&quot;book-digital&quot;</span><span class="p">,</span> 
+        <span class="n">inCatalogLanguage</span><span class="o">=</span><span class="s2">&quot;eng&quot;</span><span class="p">,</span> 
+        <span class="n">orderBy</span><span class="o">=</span><span class="s2">&quot;bestMatch&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+<div class="language-json no-copy highlight"><span class="filename">brief_bibs_get_other_editions Response</span><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;numberOfRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">&quot;briefRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;oclcNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;859323121&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My brilliant friend. book one : childhood, adolescence&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;creator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Elena Ferrante&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;machineReadableDate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;language&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;generalFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Book&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;specificFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Digital&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Europa Editions&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publicationPlace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New York&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;isbns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;9781609458638&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;160945863X&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;9781787701151&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1787701158&quot;</span>
+<span class="w">      </span><span class="p">],</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;mergedOclcNumbers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;883320518&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;907236505&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1030261956&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1031563997&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1032076035&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1052184907&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1124391373&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1155208541&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1191036210&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1196835133&quot;</span>
+<span class="w">      </span><span class="p">],</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;catalogingInfo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;catalogingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEFOD&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;catalogingLanguage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;levelOfCataloging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;transcribingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEFOD&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span><span class="w"> </span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h2 id="member-holdings">Member Holdings</h2>
+<p>Users can query WorldCat for holdings data and return holdings summaries using Bookops-Worldcat and the Metadata API. Requests made using the <code>summary_holdings_search</code> and <code>shared_print_holdings_search</code> methods return brief bib resources with the holdings summaries in their responses, while requests made using the <code>summary_holdings_get</code> method only return holdings summaries. </p>
+<h3 id="get-holdings-summary">Get Holdings Summary</h3>
+<p>Users can retrieve a summary of holdings data from WorldCat for a known item by passing an OCLC Number to the <code>summary_holdings_get</code> method. </p>
+<p>Basic Usage:
+<div class="language-python highlight"><span class="filename">Basic summary_holdings_get Request</span><pre><span></span><code><span class="kn">from</span> <span class="nn">bookops_worldcat</span> <span class="kn">import</span> <span class="n">MetadataSession</span>
+
+<span class="k">with</span> <span class="n">MetadataSession</span><span class="p">(</span><span class="n">authorization</span><span class="o">=</span><span class="n">token</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">summary_holdings_get</span><span class="p">(</span><span class="s2">&quot;778419313&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+<div class="language-json no-copy highlight"><span class="filename">Basic summary_holdings_get Response</span><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;totalHoldingCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1626</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;totalSharedPrintCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;totalEditions&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="p">}</span>
+</code></pre></div>
+Users can limit their search results to specific institutions, library types, or geographic areas.</p>
+<p>Limit holdings search by state:
+<div class="language-python highlight"><span class="filename">summary_holdings_get Request with heldInState limiter</span><pre><span></span><code><span class="kn">from</span> <span class="nn">bookops_worldcat</span> <span class="kn">import</span> <span class="n">MetadataSession</span>
+
+<span class="k">with</span> <span class="n">MetadataSession</span><span class="p">(</span><span class="n">authorization</span><span class="o">=</span><span class="n">token</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+  <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">summary_holdings_get</span><span class="p">(</span><span class="s2">&quot;778419313&quot;</span><span class="p">,</span> <span class="n">heldInState</span><span class="o">=</span><span class="s2">&quot;US-NY&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+<div class="language-json no-copy highlight"><span class="filename">summary_holdings_get Response with heldInState limiter</span><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;totalHoldingCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">56</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;totalSharedPrintCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h3 id="search-general-holdings">Search General Holdings</h3>
+<p>Users can pass either an OCLC Number, ISBN, or ISSN to the <code>summary_holdings_search</code> method to search for bibliographic resources their holdings.</p>
+<p>Basic Usage:
+<div class="language-python highlight"><span class="filename">summary_holdings_search Request</span><pre><span></span><code><span class="kn">from</span> <span class="nn">bookops_worldcat</span> <span class="kn">import</span> <span class="n">MetadataSession</span>
+
+<span class="k">with</span> <span class="n">MetadataSession</span><span class="p">(</span><span class="n">authorization</span><span class="o">=</span><span class="n">token</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">summary_holdings_search</span><span class="p">(</span>
+        <span class="n">isbn</span><span class="o">=</span><span class="s2">&quot;9781609458638&quot;</span><span class="p">,</span> 
+        <span class="n">heldInCountry</span><span class="o">=</span><span class="s2">&quot;US&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+<div class="language-json no-copy highlight"><span class="filename">summary_holdings_search Response</span><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;numberOfRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">&quot;briefRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;oclcNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;859323121&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My brilliant friend. book one : childhood, adolescence&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;creator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Elena Ferrante&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;machineReadableDate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;language&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;generalFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Book&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;specificFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Digital&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Europa Editions&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publicationPlace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New York&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;isbns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;9781609458638&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;160945863X&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;9781787701151&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1787701158&quot;</span>
+<span class="w">      </span><span class="p">],</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;mergedOclcNumbers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;883320518&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;907236505&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1030261956&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1031563997&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1032076035&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1052184907&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1124391373&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1155208541&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1191036210&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1196835133&quot;</span>
+<span class="w">      </span><span class="p">],</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;catalogingInfo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;catalogingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEFOD&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;catalogingLanguage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;levelOfCataloging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;transcribingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEFOD&quot;</span>
+<span class="w">      </span><span class="p">},</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;institutionHolding&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;totalHoldingCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">159</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h3 id="search-shared-print-holdings">Search Shared Print Holdings</h3>
+<p>To search just for holdings with retention commitments, users can pass an OCLC Number, ISBN, or ISSN to the <code>shared_print_holdings_search</code> method. The response includes the brief bib resource, a summary of shared print holdings for that resource, and data about the institutions with retention commitments for the resource.  </p>
+<p><div class="language-python highlight"><span class="filename">shared_print_holdings_search Request</span><pre><span></span><code><span class="kn">from</span> <span class="nn">bookops_worldcat</span> <span class="kn">import</span> <span class="n">MetadataSession</span>
+
+<span class="k">with</span> <span class="n">MetadataSession</span><span class="p">(</span><span class="n">authorization</span><span class="o">=</span><span class="n">token</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+  <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">shared_print_holdings_search</span><span class="p">(</span><span class="mi">321339</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+<div class="language-json no-copy highlight"><span class="filename">shared_print_holdings_search Response</span><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;numberOfRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">&quot;briefRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;oclcNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;778419313&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My brilliant friend&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;creator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Elena Ferrante&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;machineReadableDate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;language&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;generalFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Book&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;specificFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PrintBook&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Europa Editions&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publicationPlace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New York, New York&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;isbns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;9781609450786&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1609450787&quot;</span>
+<span class="w">      </span><span class="p">],</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;mergedOclcNumbers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;811639683&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;818678733&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;824701856&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;829903719&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;830036387&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="s2">&quot;1302347443&quot;</span>
+<span class="w">      </span><span class="p">],</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;catalogingInfo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;catalogingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BTCTA&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;catalogingLanguage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;levelOfCataloging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;transcribingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BTCTA&quot;</span>
+<span class="w">      </span><span class="p">},</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;institutionHolding&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;totalHoldingCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;briefHoldings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;country&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;US&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;state&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;US-ME&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;oclcSymbol&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CBY&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;registryId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1233</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;institutionNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">90</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;institutionName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Colby College&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;alsoCalled&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Miller Library&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;hasOPACLink&quot;</span><span class="p">:</span><span class="w"> </span><span class="err">True</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;self&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://worldcat.org/oclc-config/institution/data/1233&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;address&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;street1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Miller Library&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">              </span><span class="nt">&quot;street2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5124 Mayflower Hill&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">              </span><span class="nt">&quot;city&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Waterville&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;state&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;US-ME&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;postalCode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;04901-8851&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">              </span><span class="nt">&quot;country&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;US&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">              </span><span class="nt">&quot;lat&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">44.564102</span><span class="p">,</span><span class="w"> </span>
+<span class="w">              </span><span class="nt">&quot;lon&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-69.66333</span>
+<span class="w">            </span><span class="p">},</span><span class="w"> </span>
+<span class="w">            </span><span class="nt">&quot;institutionType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ACADEMIC&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h2 id="classification-recommendations">Classification Recommendations</h2>
+<p>Version 2.0 of the Metadata API added a new endpoint that users can query to retrieve classification recommendations for known items. With Bookops-Worldcat, users can pass an OCLC Number to the <code>bib_get_classification</code> method and the response will contain the most popular classification for that item in both Dewey and LC. </p>
+<p><div class="language-python highlight"><span class="filename">bib_get_classification Request</span><pre><span></span><code><span class="kn">from</span> <span class="nn">bookops_worldcat</span> <span class="kn">import</span> <span class="n">MetadataSession</span>
+
+<span class="k">with</span> <span class="n">MetadataSession</span><span class="p">(</span><span class="n">authorization</span><span class="o">=</span><span class="n">token</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+  <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">bib_get_classification</span><span class="p">(</span><span class="s2">&quot;778419313&quot;</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+<div class="language-json no-copy highlight"><span class="filename">bib_get_classification Response</span><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;dewey&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;mostPopular&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;853/.92&quot;</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;lc&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;mostPopular&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;PQ4866.E6345 A8113 2012&quot;</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h2 id="advanced-search-functionality">Advanced Search Functionality</h2>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>While most arguments passed to <code>/search/</code> endpoints (such as <code>brief_bibs_search</code>, <code>local_bibs_search</code>, and <code>summary_holdings_search</code>) are joined using the 'AND' operator, when both <code>itemType</code> and <code>itemSubType</code> are used in a query, they are joined using the 'OR' operator. </p>
+</div>
+<h3 id="keyword-and-fielded-queries">Keyword and Fielded Queries</h3>
+<p>The Metadata API provides robust search functionality for bib resources. In addition to a flexible query string that supports keyword and fielded searches, it is possible to set further limits using various elements such as item type, language, and publishing date. Users can specify the order of returned records by using the <code>orderBy</code> argument. </p>
+<p>The query syntax is case-insensitive and allows keyword and phrase search (use quotation marks around phrases), boolean operators (AND, OR, NOT), wildcards (# - single character, ? - any number of additional characters), and truncation (use * character).</p>
+<h4 id="advanced-search-for-brief-bib-resources">Advanced Search for Brief Bib Resources</h4>
+<p>More about the query syntax available for brief bib resource searches can be found in <a href="https://help.oclc.org/Librarian_Toolbox/Searching_WorldCat_Indexes/Bibliographic_records/Bibliographic_record_indexes/Bibliographic_record_index_lists">OCLC's documentation</a>.</p>
+<details class="info">
+<summary>Info</summary>
+<p>Queries with the following indexes are not allowed without additional indexes: 
+  dd: Dewey Decimal Class Number
+  yr: Year
+  li: Holdings Library
+  ln: Language
+  ll: Language of cataloging
+  mt: Material Type
+  cs: Cataloging Source
+  x0: Format/Document Type word index
+  x4: Format/Document Type word index
+  l8: Shared Print word index
+  zu: Holding Library Group</p>
+</details>
+<p>Two equivalent <code>brief_bibs_search</code> examples with item type and language limiters:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Keyword Search</label><label for="__tabbed_1_2">Fielded Search</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-python highlight"><pre><span></span><code>  <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">brief_bibs_search</span><span class="p">(</span>
+      <span class="n">q</span><span class="o">=</span><span class="s2">&quot;ti=my brilliant friend&quot;</span><span class="p">,</span>
+        <span class="n">itemType</span><span class="o">=</span><span class="s2">&quot;video&quot;</span><span class="p">,</span>
+        <span class="n">inLanguage</span><span class="o">=</span><span class="s2">&quot;eng&quot;</span><span class="p">,</span>
+        <span class="n">orderBy</span><span class="o">=</span><span class="s2">&quot;bestMatch&quot;</span><span class="p">,</span>
+      <span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-python highlight"><pre><span></span><code>  <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">brief_bibs_search</span><span class="p">(</span>
+      <span class="n">q</span><span class="o">=</span><span class="s1">&#39;ti=&quot;my brilliant friend&quot; AND x0: video AND ln: eng&#39;</span><span class="p">,</span>
+      <span class="n">orderBy</span><span class="o">=</span><span class="s2">&quot;bestMatch&quot;</span>
+      <span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<div class="language-json no-copy highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;numberOfRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">37</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">&quot;briefRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;oclcNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1091307669&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My Brilliant Friend&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2019&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;machineReadableDate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2019&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;language&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;generalFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Video&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;specificFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DVD&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;edition&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Widescreen ed&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Home Box Office&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;publicationPlace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[United States]&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="nt">&quot;catalogingInfo&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;catalogingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CNWPU&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;catalogingLanguage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eng&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;levelOfCataloging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;M&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="nt">&quot;transcribingAgency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CNWPU&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="advanced-search-for-local-bib-resources">Advanced Search for Local Bib Resources</h4>
+<p>The <code>local_bibs_search</code> method also allows for fielded queries. The available indexes are slightly different from those available for brief bib resource searches. For more information about the query syntax for local bib resources see <a href="https://help.oclc.org/Librarian_Toolbox/Searching_WorldCat_Indexes/Local_bibliographic_data_records/Local_bibliographic_data_record_indexes_A-Z">OCLC's documentation</a>.</p>
+<p><code>local_bibs_search</code> with language and date created as MARC limiters:
+<div class="language-python highlight"><span class="filename">local_bibs_search Fielded Query</span><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">local_bibs_search</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="s2">&quot;ti=My Local Bib Record AND dc=2024? AND ln=eng&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../start/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Get Started">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Get Started
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../manage_bibs/" class="md-footer__link md-footer__link--next" aria-label="Next: Manage Bibliographic Records">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Manage Bibliographic Records
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "content.code.copy", "content.code.annotate", "navigation.tabs", "navigation.tabs.sticky", "navigation.footer", "navigation.sections", "navigation.expand"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8d2eff1.min.js"></script>
+      
+    
+  </body>
+</html>
