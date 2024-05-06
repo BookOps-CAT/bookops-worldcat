@@ -17,10 +17,16 @@ class TestUtils:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            ("ocm00012345", "12345"),
-            ("ocn00012346", "12346"),
-            ("on000012347", "12347"),
-            (" ocm00012348", "12348"),
+            ("ocm00054321", "54321"),
+            ("ocm11111", "11111"),
+            ("ocn123456789", "123456789"),
+            ("on1234567890", "1234567890"),
+            ("on12345678901", "12345678901"),
+            (" ocn000111111", "111111"),
+            ("00012345", "12345"),
+            ("11111", "11111"),
+            ("(OCoLC)00012345", "12345"),
+            (" (OCoLC)00012349", "12349"),
         ],
     )
     def test_prep_oclc_number_str(self, argm, expectation):
@@ -84,12 +90,15 @@ class TestUtils:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            ("000012345", "12345"),
-            (12345, "12345"),
-            ("ocm00012345", "12345"),
-            ("ocn00012345", "12345"),
-            ("ocn12345", "12345"),
-            (" on12345 \n", "12345"),
+            ("00011111", "11111"),
+            (12345678901, "12345678901"),
+            (2222, "2222"),
+            ("ocm00001234", "1234"),
+            ("ocm12345678", "12345678"),
+            ("ocn123456789", "123456789"),
+            (" on1111111111 \n", "1111111111"),
+            ("(OCoLC)00012345", "12345"),
+            ("(OCoLC)00012345", "12345"),
         ],
     )
     def test_verify_oclc_number_success(self, argm, expectation):
@@ -133,6 +142,26 @@ class TestUtils:
                 pytest.raises(InvalidOclcNumber),
                 "Argument 'oclcNumber' does not look like real OCLC #.",
             ),
+            (
+                "ocm123456789",
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclcNumber' does not look like real OCLC #.",
+            ),
+            (
+                "ocn1",
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclcNumber' does not look like real OCLC #.",
+            ),
+            (
+                "ocn1234567890",
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclcNumber' does not look like real OCLC #.",
+            ),
+            (
+                "on1",
+                pytest.raises(InvalidOclcNumber),
+                "Argument 'oclcNumber' does not look like real OCLC #.",
+            ),
         ],
     )
     def test_verify_oclc_numbers_exceptions(self, argm, expectation, msg):
@@ -143,12 +172,24 @@ class TestUtils:
     @pytest.mark.parametrize(
         "argm,expectation",
         [
-            ("12345", ["12345"]),
-            ("12345,67890", ["12345", "67890"]),
-            ("ocm0012345, ocm67890", ["12345", "67890"]),
-            ([12345, 67890], ["12345", "67890"]),
-            (["ocn12345", "on67890"], ["12345", "67890"]),
-            (12345, ["12345"]),
+            ("1111", ["1111"]),
+            ("1111, ocm00002222", ["1111", "2222"]),
+            (
+                "ocm00012345, ocn123456789, on1234567890, (OCoLC)00067890",
+                ["12345", "123456789", "1234567890", "67890"],
+            ),
+            (123456789, ["123456789"]),
+            ([11111, "(OCoLC)00022222"], ["11111", "22222"]),
+            (
+                [
+                    "ocm11111",
+                    "ocm10000001",
+                    "ocm01111111",
+                    "ocn100000001",
+                    "on1000000001",
+                ],
+                ["11111", "10000001", "1111111", "100000001", "1000000001"],
+            ),
         ],
     )
     def test_verify_oclc_numbers_parsing(self, argm, expectation):

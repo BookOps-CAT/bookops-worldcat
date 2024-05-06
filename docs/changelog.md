@@ -10,6 +10,7 @@
   + idna (3.7)
 + Reformatted docstrings for better readability on https://bookops-cat.github.io/bookops-worldcat/
 + Fixed typos
++ `prep_oclc_number_str` now parses OCLC Numbers with "(OCoLC)" prefix. Parsing rules match [OCLC documentation](https://help.oclc.org/Metadata_Services/WorldShare_Collection_Manager/Data_sync_collections/Prepare_your_data/30035_field_and_OCLC_control_numbers)
 ### Added
 + Tutorials to `tutorials.md`
 
