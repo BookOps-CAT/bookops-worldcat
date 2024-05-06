@@ -1,20 +1,21 @@
-
 # Advanced Usage
 
 ## OCLC Number Formatting
-`MetadataSession` accepts OCLC numbers in methods' arguments as integers or strings with or without a prefix (eg. "ocm", "ocn", or "on"). The following are all acceptable:
+`MetadataSession` accepts OCLC numbers in methods' arguments as integers or strings. OCLC numbers will be parsed with or without a prefix (eg. "(OCoLC)", "ocm", "ocn", or "on") to ensure they correspond to [OCLC's formatting rules](https://help.oclc.org/Metadata_Services/WorldShare_Collection_Manager/Data_sync_collections/Prepare_your_data/30035_field_and_OCLC_control_numbers) for OCLC control numbers. The following are all acceptable:
 
 ```python title="Acceptable oclcNumber arguments"
 session.brief_bibs_get(oclcNumber="ocm00012345")
 session.brief_bibs_search(oclcNumber="00054321")
 session.bib_get_classification(oclcNumber=12121)
+session.brief_bibs_search(oclcNumber="(OCoLC)00054321")
 ```
-The `bib_get_current_oclc_number` and `holdings_get_current` methods accept multiple OCLC Numbers passed to the `oclcNumbers` argument. For these methods OCLC Numbers can be passed as a list of strings and/or integers or a string with the numbers separated by commas. The following are all acceptable:
+The `bib_get_current_oclc_number` and `holdings_get_current` methods accept multiple OCLC Numbers passed to the `oclcNumbers` argument. For these methods OCLC Numbers can be passed as a list of strings and/or integers or a string with the numbers separated by commas. The `oclcNumbers` argument will also accept a single integer as a valid arguement. The following are all acceptable:
 
 ```python title="Acceptable oclcNumbers arguments"
 session.holdings_get_current(oclcNumbers=["ocm00012345", "00012346", "12347"])
 session.holdings_get_current(oclcNumbers=["ocm00012345", "00012346", 12347])
 session.bib_get_current_oclc_number(oclcNumbers="ocm00012345, 00012346, 12347")
+session.bib_get_current_oclc_number(oclcNumbers=12347)
 ```
 
 ## Authentication

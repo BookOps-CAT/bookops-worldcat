@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Base session class to allow extention of functionality to Worldcat Search API
-and others.
+Base session class to be subclassed for use with individual OCLC APIs.
 """
 
 from typing import Optional, Tuple, Union, List
@@ -15,7 +14,7 @@ from .authorize import WorldcatAccessToken
 
 
 class WorldcatSession(requests.Session):
-    """Base class, inherits all requests.Session methods"""
+    """Base class for WorldCat API sessions. Inherits all `requests.Session` methods."""
 
     def __init__(
         self,
@@ -32,30 +31,35 @@ class WorldcatSession(requests.Session):
     ) -> None:
         """
         Args:
-            authorization:          WorldcatAccessToken instance
-            agent:                  "User-agent" parameter to attached to each
-                                    request in the session
-            timeout:                how long to wait for server to send data
-                                    before giving up
-            totalRetries:           optional number of times to retry a request that
-                                    failed or timed out. if totalRetries argument is
-                                    not passed, any arguments passed to
-                                    backoffFactor, statusForcelist, and
-                                    allowedMethods will be ignored. default is 0
-            backoffFactor:          if totalRetries is not 0, the backoff
-                                    factor as a float to use to calculate amount of
-                                    time session will sleep before attempting request
-                                    again. default is 0
-            statusForcelist:        if totalRetries is not 0, a list of HTTP
-                                    status codes to automatically retry requests on.
-                                    if not specified, failed requests with status codes
-                                    413, 429, and 503 will be retried up to number of
-                                    totalRetries.
-                                    example: [500, 502, 503, 504]
-            allowedMethods:         if totalRetries is not 0, set of HTTP methods that
-                                    requests should be retried on. if not specified,
-                                    requests using any HTTP method verbs will be
-                                    retried. example: ["GET", "POST"]
+            authorization:
+                `WorldcatAccessToken` instance.
+            agent:
+                `User-agent` parameter to attached to each request in the session.
+            timeout:
+                How long to wait for server to send data before giving up. Accepts
+                separate values for connect and read timeouts or a single value.
+            totalRetries:
+                Optional number of times to retry a request that has failed or timed
+                out. If `totalRetries` argument is not passed, all arguments passed
+                to `backoffFactor`, `statusForcelist`, and `allowedMethods`
+                will be ignored.
+            backoffFactor:
+                If `totalRetries` is not `0`, the backoff factor as a float to use to
+                calculate amount of time session will sleep before attempting request
+                again.
+            statusForcelist:
+                If `totalRetries` is not `0`, a list of HTTP status codes to
+                automatically retry requests on. If not specified, failed requests with
+                status codes 413, 429, and 503 will be retried up to number of
+                `totalRetries`.
+
+                **EXAMPLE:** `[500, 502, 503, 504]`
+            allowedMethods:
+                If `totalRetries` is not `0`, set of HTTP methods that requests should
+                be retried on. If not specified, requests using any HTTP method verbs
+                will be retried.
+
+                **EXAMPLE:** `["GET", "POST"]`
         """
         super().__init__()
         self.authorization = authorization

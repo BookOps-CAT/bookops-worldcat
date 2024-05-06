@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This module provides means to authenticate and obtain a WorldCat access token.
+Provides means to authenticate and authorize interactions with OCLC web services.
 """
 
 import datetime
@@ -16,63 +16,49 @@ from .errors import WorldcatAuthorizationError
 
 class WorldcatAccessToken:
     """
-    Requests Worldcat access token.
-    Authenticates and authorizes using Client Credentials Grant. Does not support
-    Explicit Authorization Code and Refresh Token flows. Token with correctly
-    bonded scopes can then be passed into a session of particular web service
-    to authorize requests for resources.
-    More on OCLC's client credentials grant:
-    https://www.oclc.org/developer/api/keys/oauth/client-credentials-grant.en.html
+    Requests a WorldCat access token.
 
-    Args:
-        key:                    your WSKey public client_id
-        secret:                 your WSKey secret
-        scopes:                 request scopes for the access token as a string,
-                                separate different scopes with space
-                                users with WSKeys set up to act as multiple institutions
-                                should provide scope and registryID in the format
-                                "{scope} context:{registryID}"
-                                examples:
-                                    single institution WSKey:
-                                        "WorldCatMetadataAPI"
-                                    multi-institution WSKey:
-                                        "WorldCatMetadataAPI context:00001"
-        agent:                  "User-agent" parameter to be passed in the request
-                                header; usage strongly encouraged
-        timeout:                how long to wait for server to send data before
-                                giving up; default value is 3 seconds
+    Authenticates and authorizes using
+    [Client Credentials Grant](https://www.oclc.org/developer/api/keys/oauth/client-credentials-grant.en.html)
+    flow. A token with correctly bonded scopes can be passed into a session of an
+    OCLC web service to authorize requests for resources.
 
+    Example:
+        ```py
+        from bookops_worldcat import WorldcatAccessToken
 
-    Examples:
-        >>> from bookops_worldcat import WorldcatAccessToken
-        >>> token = WorldcatAccessToken(
-                key="my_WSKey_client_id",
-                secret="my_WSKey_secret",
-                scopes="WorldCatMetadataAPI",
-                agent="my_app/1.0.0")
-        >>> token.token_str
-        "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
-        >>> token.is_expired()
-        False
-        >>> token.server_response.json()
-        {"token_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
-         "token_type": "bearer",
-         "expires_in": "1199",
-         "principalID": "",
-         "principalIDNS": "",
-         "scopes": "WorldCatMetadataAPI",
-         "contextInstitutionId": "00001",
-         "expires_at": "2020-08-23 18:45:29Z"}
-        >>> token.server_response.request.headers
-        {"User-Agent": "my_app/1.0.0",
-         "Accept-Encoding": "gzip, deflate",
-         "Accept": "application/json",
-         "Connection": "keep-alive",
-         "Content-Length": "67",
-         "Content-Type": "application/x-www-form-urlencoded",
-         "Authorization": "Basic encoded_authorization_here="}
-
-    """
+        token = WorldcatAccessToken(
+            key="my_WSKey_client_id",
+            secret="my_WSKey_secret",
+            scopes="WorldCatMetadataAPI",
+            agent="my_app/1.0.0")
+        print(token.token_str)
+        #>"tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW"
+        print(token.is_expired())
+        #>False
+        print(token.server_response.json())
+        {
+            "token_token": "tk_Yebz4BpEp9dAsghA7KpWx6dYD1OZKWBlHjqW",
+            "token_type": "bearer",
+            "expires_in": "1199",
+            "principalID": "",
+            "principalIDNS": "",
+            "scopes": "WorldCatMetadataAPI",
+            "contextInstitutionId": "00001",
+            "expires_at": "2020-08-23 18:45:29Z"
+        }
+        print(token.server_response.request.headers)
+        {
+            "User-Agent": "my_app/1.0.0",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept": "application/json",
+            "Connection": "keep-alive",
+            "Content-Length": "67",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": "Basic encoded_authorization_here="
+        }
+        ```
+    """  # noqa: E501
 
     def __init__(
         self,
@@ -80,11 +66,51 @@ class WorldcatAccessToken:
         secret: str,
         scopes: str,
         agent: str = "",
-        timeout: Optional[
-            Union[int, float, Tuple[int, int], Tuple[float, float]]
-        ] = None,
+        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
+            5,
+            5,
+        ),
     ) -> None:
-        """Constructor"""
+        """Initializes WorldcatAccessToken object.
+
+
+        info: Usage Documentation:
+            - [Basic Usage](../start.md#authentication-and-authorization)
+            - [Advanced Usage](../advanced.md#WorldcatAccessToken)
+
+        Args:
+            key:
+                Your WSKey public client_id
+            secret:
+                Your WSKey secret
+            scopes:
+                Request scopes for the access token as a string. Multiple scopes
+                should be separated with a space. Users with WSKeys set up to act on
+                behalf of multiple institutions should provide scope and registryID
+                in the format:
+                `{scope} context:{registryID}`
+
+                **EXAMPLES:**
+
+                - Single institution WSKey: `"WorldCatMetadataAPI"`
+                - Multi-institution WSKey: `"WorldCatMetadataAPI context:00001"`
+
+            agent:
+                `User-agent` parameter to be passed in the request header. Usage is
+                strongly encouraged.
+            timeout:
+                How long to wait for server to send data before giving up. Accepts
+                separate values for connect and read timeouts or a single value.
+
+        Raises:
+            TypeError:
+                If `agent`, `key`, `secret`, or `scopes` args are passed
+                anything other than a str.
+            ValueError:
+                If an empty str is passed to `key`, `secret` or `scopes` arg.
+            WorldcatAuthorizationError:
+                If request for token encounters any errors.
+        """
 
         self.agent = agent
         self.grant_type = "client_credentials"
@@ -126,10 +152,6 @@ class WorldcatAccessToken:
             raise TypeError("Argument 'scopes' must a string.")
         self.scopes = self.scopes.strip()
 
-        # assign default value for timout
-        if not self.timeout:
-            self.timeout = (3, 3)
-
         # initiate request
         self._request_token()
 
@@ -143,10 +165,10 @@ class WorldcatAccessToken:
         new token in session setting.
 
         Args:
-            utcstamp:               utc timestamp string
+            utcstamp: utc timestamp string
 
         Returns:
-            utcstamp
+            UTC timestamp as `datetime.datetime` object
         """
         utcstamp = datetime.datetime.strptime(
             utc_stamp_str, "%Y-%m-%d %H:%M:%SZ"
@@ -155,7 +177,11 @@ class WorldcatAccessToken:
         return utcstamp
 
     def _parse_server_response(self, response: requests.Response) -> None:
-        """Parses authorization server response"""
+        """Parses authorization server response
+
+        Raises:
+            WorldcatAuthorizationError: If server returns an error code.
+        """
         self.server_response = response
         if response.status_code == requests.codes.ok:
             self.token_str = response.json()["access_token"]
@@ -178,8 +204,12 @@ class WorldcatAccessToken:
         Fetches Worldcat access token for specified scope (web service)
 
         Returns:
-            requests.models.Response
-        """
+            [`requests.Response`](https://requests.readthedocs.io/en/latest/api/#requests.Response)
+            instance
+
+        Raises:
+            WorldcatAuthorizationError: If access token POST request encounters any errors.
+        """  # noqa: E501
 
         token_url = self._token_url()
         headers = self._token_headers()
@@ -218,12 +248,23 @@ class WorldcatAccessToken:
         Checks if the access token is expired.
 
         Returns:
-            bool
+            bool: Whether or not the token is expired.
 
-        Examples:
-            >>> token.is_expired()
-            False
+        Raises:
+            TypeError:
+                If `WorldcatAccessToken.token_expires_at` is not a
+                `datetime.datetime` object.
 
+        Example:
+            ```py
+            token = WorldcatAccessToken(
+                key="my_WSKey_client_id",
+                secret="my_WSKey_secret",
+                scopes="WorldCatMetadataAPI",
+                agent="my_app/1.0.0")
+            print(token.is_expired())
+            #>False
+            ```
         """
         if isinstance(self.token_expires_at, datetime.datetime):
             if self.token_expires_at < datetime.datetime.now(datetime.timezone.utc):

@@ -288,32 +288,35 @@ class TestMockedMetadataSession:
         with pytest.raises(TypeError):
             stub_session.bib_get_classification()
 
-    @pytest.mark.http_code(207)
-    def test_bib_get_current_oclc_number(self, stub_session, mock_session_response):
-        assert (
-            stub_session.bib_get_current_oclc_number(
-                oclcNumbers=["12345", "65891"]
-            ).status_code
-            == 207
-        )
-
-    @pytest.mark.http_code(207)
-    def test_bib_get_current_oclc_number_passed_as_str(
-        self, stub_session, mock_session_response
+    @pytest.mark.parametrize(
+        "argm", ["12345, 65891", ["12345", "65891"], 12345, ["12345", 12345]]
+    )
+    @pytest.mark.http_code(200)
+    def test_bib_get_current_oclc_number(
+        self, argm, stub_session, mock_session_response
     ):
         assert (
-            stub_session.bib_get_current_oclc_number(
-                oclcNumbers="12345,65891"
-            ).status_code
-            == 207
+            stub_session.bib_get_current_oclc_number(oclcNumbers=argm).status_code
+            == 200
         )
 
     @pytest.mark.parametrize("argm", [(None), (""), ([])])
     def test_bib_get_current_oclc_number_missing_numbers(self, stub_session, argm):
-        err_msg = "Argument 'oclcNumbers' must be a list or comma separated string of valid OCLC #s."
+        err_msg = "Argument 'oclcNumbers' must be a single integer, a list or a comma separated string of valid OCLC #s."
         with pytest.raises(InvalidOclcNumber) as exc:
             stub_session.bib_get_current_oclc_number(argm)
         assert err_msg in str(exc.value)
+
+    def test_bib_get_current_oclc_number_too_many_oclcNumbers_passed(
+        self, stub_session
+    ):
+        with pytest.raises(ValueError) as exc:
+            stub_session.bib_get_current_oclc_number(
+                oclcNumbers=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+            )
+        assert "Too many OCLC Numbers passed to 'oclcNumbers' argument." in str(
+            exc.value
+        )
 
     @pytest.mark.http_code(200)
     def test_bib_match(self, stub_session, mock_session_response, stub_marc_xml):
@@ -417,9 +420,13 @@ class TestMockedMetadataSession:
     def test_holdings_get_codes(self, stub_session, mock_session_response):
         assert stub_session.holdings_get_codes().status_code == 200
 
+    @pytest.mark.parametrize(
+        "argm",
+        ["12345", 12345, ["12345", 12345], "12345, 67890"],
+    )
     @pytest.mark.http_code(200)
-    def test_holdings_get_current(self, stub_session, mock_session_response):
-        assert stub_session.holdings_get_current("12345").status_code == 200
+    def test_holdings_get_current(self, argm, stub_session, mock_session_response):
+        assert stub_session.holdings_get_current(argm).status_code == 200
 
     def test_holdings_get_current_no_oclcNumber_passed(self, stub_session):
         with pytest.raises(TypeError):

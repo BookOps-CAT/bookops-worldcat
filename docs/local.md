@@ -329,7 +329,32 @@ Users can manage local holdings records using Bookops-Worldcat in the same way t
     </record>
     ```
 ### Managing Shared Print Commitments
-Users can manage Shared Print collections using the Metadata API by adding Shared Print flags to their Local Holdings Records. More information on managing Shared Print commitments is available on [OCLC's Developer Network Site](https://www.oclc.org/developer/api/oclc-apis/worldcat-metadata-api/wcmetadata-faqs.en.html).
+Users can manage Shared Print collections using the Metadata API by adding Shared Print flags to their Local Holdings Records. More information on managing Shared Print collections is available on [OCLC's website](https://help.oclc.org/Metadata_Services/Shared_Print) and information about managing Shared Print collections via the Metadata API is available on [OCLC's Developer Network Site](https://www.oclc.org/developer/api/oclc-apis/worldcat-metadata-api/wcmetadata-faqs.en.html).
+
+```{ .xml title="MARC/XML with retention commitment in MARC 583 field" .no-copy}
+<record>
+    <leader>00000nx  a2200000zi 4500</leader>
+    <controlfield tag='004'>00001</controlfield>
+    <controlfield tag='005'>20240320085741.4</controlfield>
+    <controlfield tag='007'>ta</controlfield>
+    <controlfield tag='008'>2403200c    8   4001aaeng0240401</controlfield>
+    <datafield ind2='1' ind1=' ' tag='583'>
+        <subfield code='a'>committed to retain</subfield>
+        <subfield code='c'>20240101</subfield>
+        <subfield code='d'>in perpetuity</subfield>
+        <subfield code='f'>Test Program</subfield>
+        <subfield code='5'>NYP</subfield>                
+    </datafield>    
+    <datafield ind2=' ' ind1=' ' tag='852'>
+        <subfield code='a'>NYP</subfield>
+        <subfield code='b'>TEST</subfield>
+        <subfield code='c'>TEST-STACKS</subfield>
+    </datafield>
+    <datafield ind2=' ' ind1=' ' tag='876'>
+        <subfield code='p'>00001</subfield>
+    </datafield>
+</record>
+```
 
 ## Search Local Holdings Resources
 Users can browse, search for and retrieve brief local holdings data in JSON format using the `local_holdings_get`, `local_holdings_search`, `local_holdings_browse`, and `local_holdings_search_shared_print` methods:

@@ -7,7 +7,7 @@ Requests made to any `/search/` endpoints return server responses in JSON format
 ### Search Brief Bibs
 The `brief_bibs_search` method allows users to query WorldCat using WorldCat's [bibliographic record indexes](https://help.oclc.org/Librarian_Toolbox/Searching_WorldCat_Indexes/Bibliographic_records/Bibliographic_record_indexes).
 
-The Metadata API many limiters that one can use to restrict query results. A full list of available parameters for the `brief_bibs_search` method is available in the [API Documentation](api/metadata_api.md#bookops_worldcat.metadata_api.MetadataSession.brief_bibs_search). Additional search examples are also available in the [Advanced Search Functionality](#advanced-search-functionality) section of this page.
+The Metadata API has many limiters that one can use to restrict query results. A full list of available parameters for the `brief_bibs_search` method is available in the [API Documentation](api/metadata_api.md#bookops_worldcat.metadata_api.MetadataSession.brief_bibs_search). Additional search examples are also available in the [Advanced Search Functionality](#advanced-search-functionality) section of this page.
 
 Basic usage:
 ```python title="brief_bibs_search Request"
@@ -370,6 +370,20 @@ The query syntax is case-insensitive and allows keyword and phrase search (use q
 #### Advanced Search for Brief Bib Resources
 
 More about the query syntax available for brief bib resource searches can be found in [OCLC's documentation](https://help.oclc.org/Librarian_Toolbox/Searching_WorldCat_Indexes/Bibliographic_records/Bibliographic_record_indexes/Bibliographic_record_index_lists).
+
+??? info
+    Queries with the following indexes are not allowed without additional indexes: 
+      dd: Dewey Decimal Class Number
+      yr: Year
+      li: Holdings Library
+      ln: Language
+      ll: Language of cataloging
+      mt: Material Type
+      cs: Cataloging Source
+      x0: Format/Document Type word index
+      x4: Format/Document Type word index
+      l8: Shared Print word index
+      zu: Holding Library Group
 
 Two equivalent `brief_bibs_search` examples with item type and language limiters:
 

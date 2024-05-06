@@ -11,6 +11,7 @@ theme:
   features:
     - content.tabs.link
     - content.code.copy
+    - content.code.annotate
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.footer
@@ -51,12 +52,15 @@ markdown_extensions:
 - pymdownx.tabbed:
     alternate_style: true
 - tables
+- md_in_html
+- attr_list
 
 watch:
 - bookops_worldcat
 
 plugins:
   - search
+  - autorefs
   - mkdocstrings:
       handlers:
         python:
@@ -66,6 +70,7 @@ plugins:
             filters: ["!^_"]
             docstring_options:
               ignore_init_summary: true
+            docstring_section_style: spacy
             merge_init_into_class: true
             show_signature_annotations: true
           import:
