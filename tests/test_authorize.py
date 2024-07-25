@@ -326,6 +326,7 @@ class TestWorldcatAccessToken:
             "authenticating_institution_id",
             "principalID",
             "context_institution_id",
+            "scope",
             "scopes",
             "token_type",
             "expires_in",
@@ -361,6 +362,7 @@ class TestWorldcatAccessToken:
             "authenticating_institution_id",
             "principalID",
             "context_institution_id",
+            "scope",
             "scopes",
             "token_type",
             "expires_in",
@@ -374,5 +376,6 @@ class TestWorldcatAccessToken:
 
         # test if token looks right
         assert token.token_str.startswith("tk_")
+        assert response["scopes"] == response["scope"]
         assert token.is_expired() is False
         assert isinstance(token.token_expires_at, datetime.datetime)

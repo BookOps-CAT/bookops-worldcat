@@ -43,6 +43,7 @@ class WorldcatAccessToken:
             "expires_in": "1199",
             "principalID": "",
             "principalIDNS": "",
+            "scope": "WorldCatMetadataAPI",
             "scopes": "WorldCatMetadataAPI",
             "contextInstitutionId": "00001",
             "expires_at": "2020-08-23 18:45:29Z"

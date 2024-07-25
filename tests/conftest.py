@@ -74,6 +74,7 @@ class MockAuthServerResponseSuccess:
             "expires_in": "1199",
             "principalID": "",
             "principalIDNS": "",
+            "scope": "scope1",
             "scopes": "scope1",
             "contextInstitutionId": "00001",
             "expires_at": expires_at,
