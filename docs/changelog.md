@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.2] - (7/25/2024)
+### Changed
++ Updated dependencies:
+  + certifi (2024.7.4)
+  + jinja2 (3.1.4)
+  + requests (2.32.3)
+  + urllib3 (2.2.2)
+  + zipp (3.19.2)
++ Documentation and tests to account for `scope` as available parameter for OCLC Authorization Server
+
 ## [1.0.1] - (5/1/2024)
 ### Fixed
 + Inconsistent default values for `timeout` arg for `MetadataSession`, `WorldcatAccessToken` and `Query` objects
