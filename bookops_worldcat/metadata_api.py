@@ -1060,6 +1060,7 @@ class MetadataSession(WorldcatSession):
     def holdings_unset(
         self,
         oclcNumber: Union[int, str],
+        cascadeDelete: bool = True,
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
@@ -1071,6 +1072,11 @@ class MetadataSession(WorldcatSession):
             oclcNumber:
                 OCLC bibliographic record number. Can be an integer or string
                 with or without OCLC Number prefix.
+            cascadeDelete:
+                Whether or not to remove any LBDs and/or LHRs associated with
+                the bib record on which holdings are being removed. If `False`,
+                associated local records will remain in WorldCat. If `True`,
+                local records will be removed from WorldCat.
             hooks:
                 Requests library hook system that can be used for signal event
                 handling. For more information see the [Requests docs](https://requests.
@@ -1084,8 +1090,10 @@ class MetadataSession(WorldcatSession):
         url = self._url_manage_ih_unset(oclcNumber)
         header = {"Accept": "application/json"}
 
+        payload = {"cascadeDelete": cascadeDelete}
+
         # prep request
-        req = Request("POST", url, headers=header, hooks=hooks)
+        req = Request("POST", url, params=payload, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request
@@ -1140,6 +1148,7 @@ class MetadataSession(WorldcatSession):
         self,
         record: str,
         recordFormat: str,
+        cascadeDelete: bool = True,
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Optional[Response]:
         """
@@ -1156,6 +1165,11 @@ class MetadataSession(WorldcatSession):
                 Format of MARC record.
 
                 **OPTIONS:** `'application/marcxml+xml'` or `'application/marc'`
+            cascadeDelete:
+                Whether or not to remove any LBDs and/or LHRs associated with
+                the bib record on which holdings are being removed. If `False`,
+                associated local records will remain in WorldCat. If `True`,
+                local records will be removed from WorldCat.
             hooks:
                 Requests library hook system that can be used for signal event
                 handling. For more information see the [Requests docs](https://requests.
@@ -1164,14 +1178,24 @@ class MetadataSession(WorldcatSession):
         Returns:
             `requests.Response` instance
         """
+
         url = self._url_manage_ih_unset_with_bib()
         header = {
             "Accept": "application/json",
             "content-type": recordFormat,
         }
 
+        payload = {"cascadeDelete": cascadeDelete}
+
         # prep request
-        req = Request("POST", url, data=record, headers=header, hooks=hooks)
+        req = Request(
+            "POST",
+            url,
+            data=record,
+            params=payload,
+            headers=header,
+            hooks=hooks,
+        )
         prepared_request = self.prepare_request(req)
 
         # send request

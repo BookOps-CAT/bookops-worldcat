@@ -461,6 +461,15 @@ class TestMockedMetadataSession:
     def test_holdings_unset(self, stub_session, mock_session_response):
         assert stub_session.holdings_unset(850940548).status_code == 200
 
+    @pytest.mark.http_code(200)
+    def test_holdings_unset_cascadeDelete_false(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.holdings_unset(850940548, cascadeDelete=False).status_code
+            == 200
+        )
+
     def test_holdings_unset_no_oclcNumber_passed(self, stub_session):
         with pytest.raises(TypeError):
             stub_session.holdings_unset()
@@ -924,7 +933,40 @@ class TestLiveMetadataSession:
             assert response.status_code == 200
             assert (
                 response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/unset"
+                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/unset?cascadeDelete=True"
+            )
+            assert response.json()["action"] == "Unset Holdings"
+
+    @pytest.mark.holdings
+    def test_holdings_set_unset_cascadeDelete_False(self, live_keys, stub_marc_xml):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.holdings_get_current("850940548")
+            holdings = response.json()["holdings"]
+
+            # make sure no holdings are set initially
+            if len(holdings) > 0:
+                response = session.holdings_unset(850940548)
+
+            response = session.holdings_set(850940548)
+            assert (
+                response.url
+                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/set"
+            )
+            assert response.status_code == 200
+            assert response.json()["action"] == "Set Holdings"
+
+            # test deleting holdings
+            response = session.holdings_unset(850940548, cascadeDelete=False)
+            assert response.status_code == 200
+            assert (
+                response.request.url
+                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/unset?cascadeDelete=False"
             )
             assert response.json()["action"] == "Unset Holdings"
 
@@ -962,7 +1004,50 @@ class TestLiveMetadataSession:
             assert response.status_code == 200
             assert (
                 response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset"
+                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset?cascadeDelete=True"
+            )
+            assert response.json()["action"] == "Unset Holdings"
+
+    @pytest.mark.holdings
+    def test_holdings_set_unset_marcxml_cascadeDelete_False(
+        self, live_keys, stub_marc_xml
+    ):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+
+        with MetadataSession(authorization=token) as session:
+            response = session.holdings_get_current("850940548")
+            holdings = response.json()["holdings"]
+
+            # make sure no holdings are set initially
+            if len(holdings) > 0:
+                response = session.holdings_unset_with_bib(
+                    stub_marc_xml, recordFormat="application/marcxml+xml"
+                )
+
+            response = session.holdings_set_with_bib(
+                stub_marc_xml, recordFormat="application/marcxml+xml"
+            )
+            assert (
+                response.url
+                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/set"
+            )
+            assert response.status_code == 200
+            assert response.json()["action"] == "Set Holdings"
+
+            # test deleting holdings
+            response = session.holdings_unset_with_bib(
+                stub_marc_xml,
+                recordFormat="application/marcxml+xml",
+                cascadeDelete=False,
+            )
+            assert response.status_code == 200
+            assert (
+                response.request.url
+                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset?cascadeDelete=False"
             )
             assert response.json()["action"] == "Unset Holdings"
 
