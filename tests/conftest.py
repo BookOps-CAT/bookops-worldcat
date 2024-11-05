@@ -11,8 +11,8 @@ from bookops_worldcat import WorldcatAccessToken, MetadataSession
 
 
 @pytest.fixture
-def live_keys() -> None:
-    if os.name == "nt":
+def live_keys():
+    if os.name == "nt" and not os.getenv("GITHUB_ACTIONS"):
         fh = os.path.join(os.environ["USERPROFILE"], ".oclc/nyp_wc_test.json")
         with open(fh, "r") as file:
             data = json.load(file)
