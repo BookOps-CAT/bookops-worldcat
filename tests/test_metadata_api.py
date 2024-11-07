@@ -703,8 +703,9 @@ class TestMockedMetadataSession:
 
 
 @pytest.mark.webtest
-class TestLiveMetadataSession:
-    """Runs rudimentary tests against live Metadata API"""
+@pytest.mark.usefixtures("live_keys")
+class TestLiveMetadataSessionResponses:
+    """Runs tests against live Metadata API and tests responses"""
 
     def test_bib_get(self, live_keys):
         token = WorldcatAccessToken(
@@ -880,21 +881,6 @@ class TestLiveMetadataSession:
 
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
-
-    def test_brief_bibs_get_401_error(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-        token.token_str = "invalid-token"
-        err_msg = "401 Client Error: Unauthorized for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045"
-        with MetadataSession(authorization=token) as session:
-            session.headers.update({"Authorization": "Bearer invalid-token"})
-            with pytest.raises(WorldcatRequestError) as exc:
-                session.brief_bibs_get(41266045)
-
-            assert err_msg in str(exc.value)
 
     def test_brief_bibs_search(self, live_keys):
         fields = sorted(["briefRecords", "numberOfRecords"])
@@ -1156,7 +1142,58 @@ class TestLiveMetadataSession:
             assert response.status_code == 200
             assert sorted(response.json().keys()) == fields
 
-    def test_default_retries(self, live_keys, stub_marc21):
+
+@pytest.mark.webtest
+@pytest.mark.usefixtures("live_keys")
+class TestLiveMetadataSessionErrors:
+    """Tests error responses from live Metadata API"""
+
+    def test_400_invalid_query_param(self):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+        with MetadataSession(authorization=token) as session:
+            with pytest.raises(WorldcatRequestError) as exc:
+                session.brief_bibs_get(-41266045)
+            assert (
+                '400 Client Error:  for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/-41266045. Server response: {"type":"INVALID_QUERY_PARAMETER_VALUE","title":"Validation Failure","detail":"oclcNumber must be a positive whole number","invalid-params":[{"reason":"Invalid Value: -41266045"}]}'
+                == str(exc.value)
+            )
+
+    def test_401_invalid_token_error(self):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+        token.token_str = "invalid-token"
+        with MetadataSession(authorization=token) as session:
+            session.headers.update({"Authorization": "Bearer invalid-token"})
+            with pytest.raises(WorldcatRequestError) as exc:
+                session.brief_bibs_get(41266045)
+
+            assert (
+                '401 Client Error: Unauthorized for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045. Server response: {"message":"Unauthorized"}'
+                == str(exc.value)
+            )
+
+    def test_404_failed_resource_not_found(self):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+        with MetadataSession(authorization=token) as session:
+            with pytest.raises(WorldcatRequestError) as exc:
+                session.lbd_get(12345)
+            assert (
+                '404 Client Error:  for url: https://metadata.api.oclc.org/worldcat/manage/lbds/12345. Server response: {"type":"NOT_FOUND","title":"Unable to perform the lbd read operation.","detail":{"summary":"NOT_FOUND","description":"Not able to find the requested LBD"}}'
+                == str(exc.value)
+            )
+
+    def test_406_unacceptable_header_error(self, stub_marc21):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -1166,10 +1203,13 @@ class TestLiveMetadataSession:
         with MetadataSession(authorization=token) as session:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.bib_validate(stub_marc21, recordFormat="foo/bar")
-            assert "406 Client Error: Not Acceptable for url: " in (str(exc.value))
+            assert (
+                '406 Client Error:  for url: https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull. Server response: {"type":"NOT_ACCEPTABLE","title":"Invalid \'Content-Type\' header.","detail":"A request with an invalid \'Content-Type\' header was attempted: foo/bar"}'
+                == (str(exc.value))
+            )
             assert session.adapters["https://"].max_retries.total == 0
 
-    def test_custom_retries(self, live_keys, stub_marc21):
+    def test_retry_error(self, stub_marc21):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
