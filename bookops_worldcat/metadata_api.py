@@ -433,7 +433,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumber: Union[int, str],
         hooks: Optional[Dict[str, Callable]] = None,
-    ) -> Optional[Response]:
+    ) -> Response:
         """
         Send a GET request for a full bib record in JSON format.
 
