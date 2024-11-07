@@ -1,6 +1,7 @@
 # Search and Manage Local Data
 New functionality available in Version 1.0 of Bookops-Worldcat allows users to search and manage local bibliographic and holdings data via the Metadata API. 
 
+Users can also manage local bibliographic and holdings data when managing institution holdings. When unsetting holdings on a record in OCLC, users can remove associated LBDs and/or LHRs. See[Manage Institution Holdings > Set and Unset Holdings](manage_holdings.md#set-and-unset-holdings) for more information.
 
 ### Manage Local Bib Records
 Users can manage local bib records in WorldCat in the same way that they manage WorldCat records (see [Managing Bibliographic Records](manage_bibs.md) for more information). Records can be retrieved in MARCXML or MARC21 formats. The default format for records is MARCXML.  
