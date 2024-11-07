@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from collections.abc import Callable
 import inspect
 import os
+from typing import Generator
 import yaml
 import pytest
 import requests
@@ -9,20 +11,20 @@ from bookops_worldcat import WorldcatAccessToken
 
 
 @pytest.fixture
-def live_token():
+def live_token() -> Generator[WorldcatAccessToken, None, None]:
     """
     Gets live token from environment variables. For use with live tests so that
     the service does not need to request a new token for each test.
     """
     yield WorldcatAccessToken(
-        key=os.getenv("WCKey"),
-        secret=os.getenv("WCSecret"),
-        scopes=os.getenv("WCScopes"),
+        key=os.environ["WCKey"],
+        secret=os.environ["WCSecret"],
+        scopes=os.environ["WCScopes"],
     )
 
 
 @pytest.fixture
-def method_params():
+def method_params() -> Callable:
     """
     Inspects signature of `MetadataSession` method and and returns list
     of parameters. Filters "responseFormat", "hooks", and "Accept" parameters
@@ -52,7 +54,7 @@ def metadata_session_open_api_spec() -> dict:
 
 
 @pytest.fixture
-def endpoint_params(metadata_session_open_api_spec):
+def endpoint_params(metadata_session_open_api_spec) -> Callable:
     """
     Reads yaml file from OCLC API documentation (available here:
     https://developer.api.oclc.org/wc-metadata-v2) and returns list of
