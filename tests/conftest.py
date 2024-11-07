@@ -279,7 +279,7 @@ def metadata_session_open_api_spec() -> dict:
 
 
 @pytest.fixture
-def yaml_params(metadata_session_open_api_spec):
+def endpoint_params(metadata_session_open_api_spec):
     """
     Reads yaml file from OCLC API documentation (available here:
     https://developer.api.oclc.org/wc-metadata-v2) and returns list of
@@ -287,60 +287,44 @@ def yaml_params(metadata_session_open_api_spec):
     .yaml file with up-to-date information about the API endpoints, parameters
     and responses. This fixture does not account for endpoints that retrieve
     data related to local holdings or bib records as these are not tested
-    during the monthly API tests.
+    during the monthly API tests. Function removes "Accept" param as it is not
+    part of the API and "heldBy" as it is deprecated.
     """
 
     def get_params_from_yaml(url: str, method: str) -> list:
-        yaml_data = metadata_session_open_api_spec
+        data = metadata_session_open_api_spec
         split_url = url.split("https://metadata.api.oclc.org")[1].split("?")[0]
-        if split_url.startswith("/worldcat/manage/bibs/validate/"):
+        if "bibs/validate/" in split_url:
             endpoint = "/worldcat/manage/bibs/validate/{validationLevel}"
-        elif "worldcat/manage/institution/holdings" in split_url and any(
-            i.isdigit() for i in split_url
-        ):
-            endpoint = f"/worldcat/manage/institution/holdings/{{oclcNumber}}/{split_url.split('/')[-1]}"
-        elif "worldcat/manage/institution/holdings" in split_url and not any(
-            i.isdigit() for i in split_url
-        ):
-            endpoint = (
-                f"/worldcat/manage/institution/holdings/{split_url.split('/')[-1]}"
-            )
-        elif split_url.endswith("other-editions"):
-            endpoint = "/worldcat/search/brief-bibs/{oclcNumber}/other-editions"
-        elif all(i.isdigit() is False for i in split_url.split("/")[-1].split()):
+        elif all(i.isdigit() is False for i in split_url):
             endpoint = split_url
+        elif "institution" in split_url:
+            base = "/worldcat/manage/institution/holdings/{oclcNumber}"
+            endpoint = f"{base}/{split_url.split('/')[-1]}"
+        elif "other-editions" in split_url:
+            endpoint = "/worldcat/search/brief-bibs/{oclcNumber}/other-editions"
         elif "manage/bibs" in split_url:
             endpoint = "/worldcat/manage/bibs/{oclcNumber}"
         elif "search" in split_url and "bibs" in split_url:
             endpoint = f"{split_url.rsplit('/', 1)[0]}/{{oclcNumber}}"
         else:
             endpoint = split_url
-
-        if "parameters" in yaml_data["paths"][endpoint][method.lower()]:
-            param_list = [
-                i for i in yaml_data["paths"][endpoint][method.lower()]["parameters"]
-            ]
+        method = method.lower()
+        if "parameters" in data["paths"][endpoint][method]:
+            param_list = [i for i in data["paths"][endpoint][method]["parameters"]]
             if any("$ref" in i.keys() for i in param_list):
                 params = [
-                    yaml_data["components"]["parameters"][i["$ref"].split("/")[-1]][
-                        "name"
-                    ]
+                    data["components"]["parameters"][i["$ref"].split("/")[-1]]["name"]
                     for i in param_list
-                    if "deprecated"
-                    not in yaml_data["components"]["parameters"][
-                        i["$ref"].split("/")[-1]
-                    ].keys()
                 ]
             elif any("name" in i.keys() for i in param_list):
                 params = [
-                    i["name"]
-                    for i in yaml_data["paths"][endpoint][method.lower()]["parameters"]
-                    if "deprecated" not in i.keys()
+                    i["name"] for i in data["paths"][endpoint][method]["parameters"]
                 ]
             else:
                 params = param_list
         else:
             params = []
-        return [i for i in params if i != "Accept"]
+        return [i for i in params if i != "Accept" and i != "heldBy"]
 
     return get_params_from_yaml
