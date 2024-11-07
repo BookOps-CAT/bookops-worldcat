@@ -162,6 +162,71 @@ with MetadataSession(authorization=token) as session:
   ]
 }
 ```
+## Full Bib Resources
+### Search Bibs
+Users can retrieve full bib records in `.json` format by passing an OCLC Number to the `bibs_search` method.
+
+Basic usage:
+```python title="bibs_search Request"
+from bookops_worldcat import MetadataSession
+
+with MetadataSession(authorization=token) as session:
+    response = session.bibs_search(oclcNumber=778419313)
+    print(response.json())
+```
+```{ .json title="bibs_search Response" .no-copy}
+{
+  'identifier': {
+    'oclcNumber': '778419313', 
+    'isbns': [
+      '9781609450786', '1609450787', '9781609455064', '1609455061'
+    ]
+  }, 
+  'title': {
+    'mainTitles': [
+      {
+        'text': 'My brilliant friend / Elena Ferrante ; translated from the Italian by Ann Goldstein'
+        }
+      ]
+    }, 
+  'contributor': {
+    'creators': [
+      {
+        'firstName': {'text': 'Elena'}, 'secondName': {'text': 'Ferrante'}
+        }
+      ]
+    },
+  'subjects': [
+    {
+      'subjectName': {'text': 'Female friendship Fiction'}, 
+      'vocabulary': 'Library of Congress Subject Headings', 
+      'subjectType': 'topic'
+      }, 
+    {
+      'subjectName': {'text': 'Naples (Italy) History 20th century Fiction'}, 
+      'vocabulary': 'Library of Congress Subject Headings', 
+      'subjectType': 'geographicalTerm'
+      },
+    ], 
+  'publishers': [
+    {
+      'publisherName': {'text': 'Europa Editions'}, 
+      'publicationPlace': 'New York, New York'
+      }
+    ], 
+  'date': {
+    'publicationDate': '2012', 
+    }, 
+  'language': {
+    'itemLanguage': 'eng', 
+    'catalogingLanguage': 'eng'
+    }, 
+  'description': {
+    'physicalDescription': '331 pages ; 21 cm', 
+    }
+  }
+```
+
 ## Member Holdings
 Users can query WorldCat for holdings data and return holdings summaries using Bookops-Worldcat and the Metadata API. Requests made using the `summary_holdings_search` and `shared_print_holdings_search` methods return brief bib resources with the holdings summaries in their responses, while requests made using the `summary_holdings_get` method only return holdings summaries. 
 

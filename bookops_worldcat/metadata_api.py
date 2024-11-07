@@ -136,6 +136,9 @@ class MetadataSession(WorldcatSession):
     def _url_search_general_holdings_summary(self) -> str:
         return f"{self.BASE_URL}/search/summary-holdings"
 
+    def _url_search_bibs(self, oclcNumber: str) -> str:
+        return f"{self.BASE_URL}/search/bibs/{oclcNumber}"
+
     def _url_search_brief_bibs(self) -> str:
         return f"{self.BASE_URL}/search/brief-bibs"
 
@@ -419,6 +422,42 @@ class MetadataSession(WorldcatSession):
 
         # prep request
         req = Request("PUT", url, data=record, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def bib_search(
+        self,
+        oclcNumber: Union[int, str],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Response:
+        """
+        Send a GET request for a full bib record in JSON format.
+
+        Uses /search/bibs/{oclcNumber} endpoint.
+
+        Args:
+            oclcNumber:
+                OCLC bibliographic record number. Can be an integer or string
+                with or without OCLC Number prefix.
+            hooks:
+                Requests library hook system that can be used for signal event
+                handling. For more information see the [Requests docs](https://requests.
+                readthedocs.io/en/master/user/advanced/#event-hooks)
+
+        Returns:
+            `requests.Response` instance
+        """
+        oclcNumber = verify_oclc_number(oclcNumber)
+
+        url = self._url_search_bibs(oclcNumber)
+        header = {"Accept": "application/json"}
+
+        # prep request
+        req = Request("GET", url, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request

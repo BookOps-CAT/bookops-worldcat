@@ -183,6 +183,16 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/search/summary-holdings"
         )
 
+    @pytest.mark.parametrize(
+        "argm",
+        ["12345", 12345],
+    )
+    def test_url_search_bibs(self, argm, stub_session):
+        assert (
+            stub_session._url_search_bibs(oclcNumber=argm)
+            == "https://metadata.api.oclc.org/worldcat/search/bibs/12345"
+        )
+
     def test_url_search_brief_bibs(self, stub_session):
         assert (
             stub_session._url_search_brief_bibs()
@@ -335,6 +345,18 @@ class TestMockedMetadataSession:
             ).status_code
             == 200
         )
+
+    @pytest.mark.http_code(200)
+    def test_bib_search(self, stub_session, mock_session_response):
+        assert stub_session.bib_search(12345).status_code == 200
+
+    def test_bib_search_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.bib_search()
+
+    def test_bib_search_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.bib_search(oclcNumber=None)
 
     @pytest.mark.http_code(200)
     def test_bib_validate(self, stub_session, mock_session_response, stub_marc_xml):
@@ -763,6 +785,41 @@ class TestLiveMetadataSession:
             assert response.status_code == 200
             assert sorted(response.json().keys()) == sorted(
                 ["numberOfRecords", "briefRecords"]
+            )
+
+    def test_bib_search(self, live_keys):
+        token = WorldcatAccessToken(
+            key=os.getenv("WCKey"),
+            secret=os.getenv("WCSecret"),
+            scopes=os.getenv("WCScopes"),
+        )
+        with MetadataSession(authorization=token) as session:
+            response = session.bib_search(41266045)
+            assert (
+                response.url
+                == "https://metadata.api.oclc.org/worldcat/search/bibs/41266045"
+            )
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == sorted(
+                [
+                    "identifier",
+                    "title",
+                    "contributor",
+                    "subjects",
+                    "classification",
+                    "publishers",
+                    "date",
+                    "language",
+                    "edition",
+                    "note",
+                    "format",
+                    "description",
+                    "related",
+                    "work",
+                    "editionCluster",
+                    "database",
+                    "digitalAccessAndLocations",
+                ]
             )
 
     def test_bib_validate(self, live_keys, stub_marc21):
