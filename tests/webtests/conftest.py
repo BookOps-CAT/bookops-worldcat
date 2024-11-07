@@ -12,7 +12,7 @@ from bookops_worldcat import WorldcatAccessToken
 def live_token():
     """
     Gets live token from environment variables. For use with live tests so that
-    the service do not need to request a new token each time it runs a test.
+    the service does not need to request a new token for each test.
     """
     yield WorldcatAccessToken(
         key=os.getenv("WCKey"),
@@ -26,7 +26,7 @@ def method_params():
     """
     Inspects signature of `MetadataSession` method and and returns list
     of parameters. Filters "responseFormat", "hooks", and "Accept" parameters
-    as they are specific to `bookops-worldcat` or the `requests` library and
+    as they are specific to bookops-worldcat or the `requests` library and
     not part of the OCLC API. Filters "record" and "recordFormat" parameters as
     they are passed to the API in the request body and not as query parameters.
     """
@@ -44,7 +44,7 @@ def method_params():
 
 @pytest.fixture
 def metadata_session_open_api_spec() -> dict:
-    """retrieves OpenAPI spec from OCLC API documentation"""
+    """Retrieves OpenAPI spec from Metadata API documentation"""
     yaml_response = requests.get(
         "https://developer.api.oclc.org/docs/wc-metadata/openapi-external-prod.yaml"
     )
