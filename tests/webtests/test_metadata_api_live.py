@@ -21,10 +21,10 @@ class TestLiveMetadataSession:
         "levelOfCataloging",
     ]
 
-    def test_bib_get_response(self, live_token):
+    def test_bib_get(self, live_token):
         with MetadataSession(authorization=live_token) as session:
             response = session.bib_get(850940461)
-            endpoint = response.url.strip("https://metadata.api.oclc.org/")
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             headers = response.headers
             assert endpoint == "worldcat/manage/bibs/850940461"
             assert response.status_code == 200
@@ -32,10 +32,10 @@ class TestLiveMetadataSession:
             assert isinstance(response.content, bytes)
             assert response.content.decode().startswith("<?xml version=")
 
-    def test_bib_get_classification_response(self, live_token):
+    def test_bib_get_classification(self, live_token):
         with MetadataSession(authorization=live_token) as session:
             response = session.bib_get_classification(850940461)
-            endpoint = response.url.strip("https://metadata.api.oclc.org/")
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert endpoint == "worldcat/search/classification-bibs/850940461"
             assert response.status_code == 200
             assert response.headers["Content-Type"] == "application/json;charset=UTF-8"
@@ -43,72 +43,71 @@ class TestLiveMetadataSession:
             assert sorted(response.json()["dewey"].keys()) == ["mostPopular"]
             assert sorted(response.json()["lc"].keys()) == ["mostPopular"]
 
-    def test_bib_get_current_oclc_number(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_bib_get_current_oclc_number(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             response = session.bib_get_current_oclc_number([41266045, 519740398])
-
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
             assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/current?oclcNumbers=41266045%2C519740398"
+                endpoint
+                == "worldcat/manage/bibs/current?oclcNumbers=41266045%2C519740398"
             )
-            jres = response.json()
-            assert sorted(jres.keys()) == ["controlNumbers"]
-            assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
+            assert sorted(response.json().keys()) == ["controlNumbers"]
+            assert sorted(response.json()["controlNumbers"][0].keys()) == sorted(
+                ["requested", "current"]
+            )
 
-    def test_bib_get_current_oclc_number_str(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_bib_get_current_oclc_number_str(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             response = session.bib_get_current_oclc_number("41266045")
-
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/current?oclcNumbers=41266045"
+            assert endpoint == "worldcat/manage/bibs/current?oclcNumbers=41266045"
+            assert sorted(response.json().keys()) == ["controlNumbers"]
+            assert sorted(response.json()["controlNumbers"][0].keys()) == sorted(
+                ["requested", "current"]
             )
-            jres = response.json()
-            assert sorted(jres.keys()) == ["controlNumbers"]
-            assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
 
-    def test_bib_match_marcxml(self, live_keys, stub_marc_xml):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_bib_match(self, live_token, stub_marc_xml):
+        with MetadataSession(authorization=live_token) as session:
             response = session.bib_match(
                 stub_marc_xml, recordFormat="application/marcxml+xml"
             )
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
+            assert endpoint == "worldcat/manage/bibs/match"
             assert response.status_code == 200
+            assert response.headers["Content-Type"] == "application/json;charset=UTF-8"
             assert sorted(response.json().keys()) == sorted(
-                ["numberOfRecords", "briefRecords"]
+                self.BRIEF_BIB_RESPONSE_KEYS
             )
+            assert sorted(response.json()["briefRecords"][0].keys()) == sorted(
+                [
+                    "oclcNumber",
+                    "title",
+                    "creator",
+                    "date",
+                    "language",
+                    "edition",
+                    "publisher",
+                    "isbns",
+                    "publicationPlace",
+                    "catalogingInfo",
+                    "specificFormat",
+                    "generalFormat",
+                    "machineReadableDate",
+                    "mergedOclcNumbers",
+                    "issns",
+                ]
+            )
+            assert sorted(
+                response.json()["briefRecords"][0]["catalogingInfo"].keys()
+            ) == sorted(self.CAT_INFO_KEYS)
 
-    def test_bib_search(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-        with MetadataSession(authorization=token) as session:
+    def test_bib_search(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             response = session.bib_search(41266045)
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/search/bibs/41266045"
-            )
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
+            assert endpoint == "worldcat/search/bibs/41266045"
             assert response.status_code == 200
             assert sorted(response.json().keys()) == sorted(
                 [
@@ -132,109 +131,136 @@ class TestLiveMetadataSession:
                 ]
             )
 
-    def test_bib_validate(self, live_keys, stub_marc21):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_bib_validate(self, live_token, stub_marc21):
+        with MetadataSession(authorization=live_token) as session:
             response = session.bib_validate(
                 stub_marc21, recordFormat="application/marc"
             )
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull"
+            assert endpoint == "worldcat/manage/bibs/validate/validateFull"
+            assert response.headers["Content-Type"] == "application/json;charset=UTF-8"
+            assert sorted(response.json().keys()) == sorted(["status", "httpStatus"])
+            assert sorted(response.json()["status"].keys()) == sorted(
+                ["description", "summary"]
             )
-            assert sorted(response.json().keys()) == sorted(["httpStatus", "status"])
 
-    def test_brief_bibs_get(self, live_keys):
-        fields = sorted(
-            [
-                "catalogingInfo",
-                "creator",
-                "date",
-                "edition",
-                "generalFormat",
-                "isbns",
-                "language",
-                "machineReadableDate",
-                "mergedOclcNumbers",
-                "oclcNumber",
-                "publicationPlace",
-                "publisher",
-                "specificFormat",
-                "title",
-            ]
-        )
-
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_brief_bibs_get(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             response = session.brief_bibs_get(41266045)
-
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
+            assert endpoint == "worldcat/search/brief-bibs/41266045"
             assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
+            assert "numberOfRecords" not in response.json().keys()
+            assert sorted(response.json().keys()) == sorted(
+                [
+                    "oclcNumber",
+                    "title",
+                    "creator",
+                    "date",
+                    "language",
+                    "edition",
+                    "publisher",
+                    "isbns",
+                    "publicationPlace",
+                    "catalogingInfo",
+                    "specificFormat",
+                    "generalFormat",
+                    "machineReadableDate",
+                    "mergedOclcNumbers",
+                ]
+            )
+            assert sorted(response.json()["catalogingInfo"].keys()) == sorted(
+                self.CAT_INFO_KEYS
+            )
 
-    def test_brief_bibs_search(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_brief_bibs_search(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             response = session.brief_bibs_search(
-                "ti:zendegi AND au:egan",
-                inLanguage="eng",
-                inCatalogLanguage="eng",
-                itemType="book",
-                itemSubType=["book-printbook", "book-digital"],
-                catalogSource="dlc",
-                orderBy="mostWidelyHeld",
-                limit=5,
+                q="ti:Zendegi", inLanguage="eng", inCatalogLanguage="eng"
             )
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&itemSubType=book-digital&retentionCommitments=False&groupRelatedEditions=False&groupVariantRecords=False&preferredLanguage=eng&showHoldingsIndicators=False&unit=M&orderBy=mostWidelyHeld&offset=1&limit=5"
+            assert endpoint.split("?")[0] == "worldcat/search/brief-bibs"
+            assert sorted(response.json().keys()) == sorted(
+                ["briefRecords", "numberOfRecords"]
             )
+            assert sorted(response.json()["briefRecords"][0].keys()) == sorted(
+                [
+                    "oclcNumber",
+                    "title",
+                    "creator",
+                    "date",
+                    "language",
+                    "edition",
+                    "publisher",
+                    "isbns",
+                    "publicationPlace",
+                    "catalogingInfo",
+                    "specificFormat",
+                    "generalFormat",
+                    "machineReadableDate",
+                    "mergedOclcNumbers",
+                ]
+            )
+            assert sorted(
+                response.json()["briefRecords"][0]["catalogingInfo"].keys()
+            ) == sorted(self.CAT_INFO_KEYS)
 
-    def test_brief_bibs_get_other_editions(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_brief_bibs_get_other_editions(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             response = session.brief_bibs_get_other_editions(41266045)
-
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-
-    def test_holdings_get_current(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("982651100")
-
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current?oclcNumbers=982651100"
+                endpoint.split("?")[0]
+                == "worldcat/search/brief-bibs/41266045/other-editions"
+            )
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == sorted(
+                ["briefRecords", "numberOfRecords"]
+            )
+            assert sorted(response.json()["briefRecords"][0].keys()) == sorted(
+                [
+                    "oclcNumber",
+                    "title",
+                    "creator",
+                    "date",
+                    "language",
+                    "publisher",
+                    "isbns",
+                    "publicationPlace",
+                    "catalogingInfo",
+                    "specificFormat",
+                    "generalFormat",
+                    "machineReadableDate",
+                ]
+            )
+            assert sorted(
+                response.json()["briefRecords"][0]["catalogingInfo"].keys()
+            ) == sorted(self.CAT_INFO_KEYS)
+
+    def test_holdings_get_codes(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
+            response = session.holdings_get_codes()
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
+            assert endpoint == "worldcat/manage/institution/holding-codes"
+            assert response.status_code == 200
+            assert sorted(response.json().keys()) == ["holdingLibraryCodes"]
+            assert all(
+                sorted(list(i.keys())) == sorted(["code", "name"])
+                for i in response.json()["holdingLibraryCodes"]
+            )
+            assert {"code": "Print Collection", "name": "NYPC"} in response.json()[
+                "holdingLibraryCodes"
+            ]
+
+    def test_holdings_get_current(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
+            response = session.holdings_get_current("982651100")
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
+            assert (
+                endpoint
+                == "worldcat/manage/institution/holdings/current?oclcNumbers=982651100"
             )
             assert response.status_code == 200
             assert sorted(response.json().keys()) == ["holdings"]
@@ -248,80 +274,62 @@ class TestLiveMetadataSession:
             )
 
     @pytest.mark.holdings
-    def test_holdings_set_unset(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("850940548")
-            holdings = response.json()["holdings"]
+    def test_holdings_set_unset(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
+            get_resp = session.holdings_get_current("850940548")
+            holdings = get_resp.json()["holdings"]
 
             # make sure no holdings are set initially
             if len(holdings) > 0:
-                response = session.holdings_unset(850940548)
+                session.holdings_unset(850940548)
 
-            response = session.holdings_set(850940548)
+            set_resp = session.holdings_set(850940548)
             assert (
-                response.url
+                set_resp.url
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/set"
             )
-            assert response.status_code == 200
-            assert response.json()["action"] == "Set Holdings"
+            assert set_resp.status_code == 200
+            assert set_resp.json()["action"] == "Set Holdings"
 
             # test deleting holdings
-            response = session.holdings_unset(850940548)
-            assert response.status_code == 200
+            unset_resp = session.holdings_unset(850940548)
+            assert unset_resp.status_code == 200
             assert (
-                response.request.url
+                unset_resp.url
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/unset?cascadeDelete=True"
             )
-            assert response.json()["action"] == "Unset Holdings"
+            assert unset_resp.json()["action"] == "Unset Holdings"
 
     @pytest.mark.holdings
-    def test_holdings_set_unset_cascadeDelete_False(self, live_keys, stub_marc_xml):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("850940548")
-            holdings = response.json()["holdings"]
+    def test_holdings_set_unset_cascadeDelete(self, live_token, stub_marc_xml):
+        with MetadataSession(authorization=live_token) as session:
+            get_resp = session.holdings_get_current("850940548")
+            holdings = get_resp.json()["holdings"]
 
             # make sure no holdings are set initially
             if len(holdings) > 0:
-                response = session.holdings_unset(850940548)
+                session.holdings_unset(850940548)
 
-            response = session.holdings_set(850940548)
+            set_resp = session.holdings_set(850940548)
             assert (
-                response.url
+                set_resp.url
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/set"
             )
-            assert response.status_code == 200
-            assert response.json()["action"] == "Set Holdings"
+            assert set_resp.status_code == 200
+            assert set_resp.json()["action"] == "Set Holdings"
 
             # test deleting holdings
-            response = session.holdings_unset(850940548, cascadeDelete=False)
-            assert response.status_code == 200
+            unset_resp = session.holdings_unset(850940548, cascadeDelete=False)
+            assert unset_resp.status_code == 200
             assert (
-                response.request.url
+                unset_resp.url
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/unset?cascadeDelete=False"
             )
-            assert response.json()["action"] == "Unset Holdings"
+            assert unset_resp.json()["action"] == "Unset Holdings"
 
     @pytest.mark.holdings
-    def test_holdings_set_unset_marcxml(self, live_keys, stub_marc_xml):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_holdings_set_unset_xml(self, live_token, stub_marc_xml):
+        with MetadataSession(authorization=live_token) as session:
             response = session.holdings_get_current("850940548")
             holdings = response.json()["holdings"]
 
@@ -346,22 +354,14 @@ class TestLiveMetadataSession:
             )
             assert response.status_code == 200
             assert (
-                response.request.url
+                response.url
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset?cascadeDelete=True"
             )
             assert response.json()["action"] == "Unset Holdings"
 
     @pytest.mark.holdings
-    def test_holdings_set_unset_marcxml_cascadeDelete_False(
-        self, live_keys, stub_marc_xml
-    ):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_holdings_set_unset_xml_cascadeDelete(self, live_token, stub_marc_xml):
+        with MetadataSession(authorization=live_token) as session:
             response = session.holdings_get_current("850940548")
             holdings = response.json()["holdings"]
 
@@ -389,58 +389,126 @@ class TestLiveMetadataSession:
             )
             assert response.status_code == 200
             assert (
-                response.request.url
+                response.url
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset?cascadeDelete=False"
             )
             assert response.json()["action"] == "Unset Holdings"
 
-    def test_holdings_get_codes(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_codes()
-
+    def test_shared_print_holdings_search(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
+            response = session.shared_print_holdings_search(oclcNumber="41266045")
             assert (
                 response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holding-codes"
+                == "https://metadata.api.oclc.org/worldcat/search/bibs-retained-holdings?oclcNumber=41266045"
             )
             assert response.status_code == 200
-            assert sorted(response.json().keys()) == ["holdingLibraryCodes"]
-            assert {"code": "Print Collection", "name": "NYPC"} in response.json()[
-                "holdingLibraryCodes"
-            ]
+            assert sorted(response.json().keys()) == sorted(
+                ["briefRecords", "numberOfRecords"]
+            )
+            assert sorted(response.json()["briefRecords"][0].keys()) == sorted(
+                [
+                    "oclcNumber",
+                    "title",
+                    "creator",
+                    "date",
+                    "edition",
+                    "institutionHolding",
+                    "mergedOclcNumbers",
+                    "language",
+                    "publisher",
+                    "isbns",
+                    "publicationPlace",
+                    "catalogingInfo",
+                    "specificFormat",
+                    "generalFormat",
+                    "machineReadableDate",
+                ]
+            )
+            assert sorted(
+                response.json()["briefRecords"][0]["catalogingInfo"].keys()
+            ) == sorted(self.CAT_INFO_KEYS)
 
-    def test_summary_holdings_search_oclc(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.summary_holdings_search(oclcNumber="41266045")
-
+    def test_summary_holdings_get(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
+            response = session.summary_holdings_get("41266045")
+            assert (
+                response.url
+                == "https://metadata.api.oclc.org/worldcat/search/summary-holdings?oclcNumber=41266045&unit=M"
+            )
             assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
+            assert sorted(response.json().keys()) == sorted(
+                ["totalEditions", "totalHoldingCount", "totalSharedPrintCount"]
+            )
 
-    def test_summary_holdings_search_isbn(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_summary_holdings_search_isbn(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             response = session.summary_holdings_search(isbn="9781597801744")
-
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
+            assert (
+                endpoint
+                == "worldcat/search/bibs-summary-holdings?isbn=9781597801744&preferredLanguage=eng&unit=M"
+            )
+            assert sorted(response.json().keys()) == sorted(
+                self.BRIEF_BIB_RESPONSE_KEYS
+            )
+            assert sorted(response.json()["briefRecords"][0].keys()) == sorted(
+                [
+                    "oclcNumber",
+                    "title",
+                    "creator",
+                    "date",
+                    "language",
+                    "edition",
+                    "publisher",
+                    "isbns",
+                    "publicationPlace",
+                    "catalogingInfo",
+                    "specificFormat",
+                    "generalFormat",
+                    "machineReadableDate",
+                    "mergedOclcNumbers",
+                    "institutionHolding",
+                ]
+            )
+            assert sorted(
+                response.json()["briefRecords"][0]["catalogingInfo"].keys()
+            ) == sorted(self.CAT_INFO_KEYS)
+
+    def test_summary_holdings_search_oclc(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
+            response = session.summary_holdings_search(oclcNumber="41266045")
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
+            assert response.status_code == 200
+            assert (
+                endpoint
+                == "worldcat/search/bibs-summary-holdings?oclcNumber=41266045&preferredLanguage=eng&unit=M"
+            )
+            assert sorted(response.json().keys()) == sorted(
+                self.BRIEF_BIB_RESPONSE_KEYS
+            )
+            assert sorted(response.json()["briefRecords"][0].keys()) == sorted(
+                [
+                    "oclcNumber",
+                    "title",
+                    "creator",
+                    "date",
+                    "language",
+                    "edition",
+                    "publisher",
+                    "isbns",
+                    "publicationPlace",
+                    "catalogingInfo",
+                    "specificFormat",
+                    "generalFormat",
+                    "machineReadableDate",
+                    "mergedOclcNumbers",
+                    "institutionHolding",
+                ]
+            )
+            assert sorted(
+                response.json()["briefRecords"][0]["catalogingInfo"].keys()
+            ) == sorted(self.CAT_INFO_KEYS)
 
 
 @pytest.mark.webtest
@@ -448,7 +516,7 @@ class TestLiveMetadataSession:
 class TestLiveMetadataSessionErrors:
     """Tests error responses from live Metadata API"""
 
-    def test_400_invalid_query_param(self):
+    def test_errors_invalid_query_param(self):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -462,7 +530,7 @@ class TestLiveMetadataSessionErrors:
                 == str(exc.value)
             )
 
-    def test_401_invalid_token_error(self):
+    def test_errors_invalid_token(self):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -479,7 +547,7 @@ class TestLiveMetadataSessionErrors:
                 == str(exc.value)
             )
 
-    def test_404_failed_resource_not_found(self):
+    def test_errors_resource_not_found(self):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -493,7 +561,7 @@ class TestLiveMetadataSessionErrors:
                 == str(exc.value)
             )
 
-    def test_406_unacceptable_header_error(self, stub_marc21):
+    def test_errors_unacceptable_header(self, stub_marc21):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -509,7 +577,7 @@ class TestLiveMetadataSessionErrors:
             )
             assert session.adapters["https://"].max_retries.total == 0
 
-    def test_retry_error(self, stub_marc21):
+    def test_error_max_retries(self, stub_marc21):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -533,10 +601,8 @@ class TestLiveMetadataSessionErrors:
 
 @pytest.mark.webtest
 @pytest.mark.usefixtures("live_keys")
-class TestLiveMetadataSessionParams:
-    """
-    Runs tests against live Metadata API and tests checks that params in `MetadataSession` methods match expected values from YAML file.
-    """
+class TestAPISpec:
+    """Compares API spec with MetadataSession methods"""
 
     def test_open_api_spec_check(self, metadata_session_open_api_spec):
         """Confirm API spec contains the same endpoints as expected."""
@@ -616,7 +682,7 @@ class TestLiveMetadataSessionParams:
             else:
                 assert sorted(methods) == ["delete", "get", "put"]
 
-    def test_bib_get(self, live_token, endpoint_params, method_params):
+    def test_params_bib_get(self, live_token, endpoint_params, method_params):
         with MetadataSession(authorization=live_token) as session:
             response = session.bib_get(41266045)
             endpoint_args = endpoint_params(
@@ -625,7 +691,9 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.bib_get)
             assert endpoint_args == method_args
 
-    def test_bib_get_classification(self, live_token, endpoint_params, method_params):
+    def test_params_bib_get_classification(
+        self, live_token, endpoint_params, method_params
+    ):
         with MetadataSession(authorization=live_token) as session:
             response = session.bib_get_classification(41266045)
             endpoint_args = endpoint_params(
@@ -634,7 +702,7 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.bib_get_classification)
             assert endpoint_args == method_args
 
-    def test_bib_get_current_oclc_number(
+    def test_params_bib_get_current_oclc_number(
         self, live_token, endpoint_params, method_params
     ):
         with MetadataSession(authorization=live_token) as session:
@@ -645,7 +713,7 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.bib_get_current_oclc_number)
             assert endpoint_args == method_args
 
-    def test_bib_match_marcxml(
+    def test_params_bib_match_marcxml(
         self, live_token, stub_marc_xml, endpoint_params, method_params
     ):
         with MetadataSession(authorization=live_token) as session:
@@ -658,7 +726,7 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.bib_match)
             assert endpoint_args == method_args
 
-    def test_bib_validate(
+    def test_params_bib_validate(
         self, live_token, stub_marc21, endpoint_params, method_params
     ):
         with MetadataSession(authorization=live_token) as session:
@@ -671,7 +739,7 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.bib_validate)
             assert endpoint_args == method_args
 
-    def test_brief_bibs_get(self, live_token, endpoint_params, method_params):
+    def test_params_brief_bibs_get(self, live_token, endpoint_params, method_params):
         with MetadataSession(authorization=live_token) as session:
             response = session.brief_bibs_get(41266045)
             endpoint_args = endpoint_params(
@@ -680,7 +748,7 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.brief_bibs_get)
             assert endpoint_args == method_args
 
-    def test_brief_bibs_search(self, live_token, endpoint_params, method_params):
+    def test_params_brief_bibs_search(self, live_token, endpoint_params, method_params):
         with MetadataSession(authorization=live_token) as session:
             response = session.brief_bibs_search(
                 q="ti:Zendegi", inLanguage="eng", inCatalogLanguage="eng"
@@ -691,7 +759,7 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.brief_bibs_search)
             assert endpoint_args == method_args
 
-    def test_brief_bibs_get_other_editions(
+    def test_params_brief_bibs_get_other_editions(
         self, live_token, endpoint_params, method_params
     ):
         with MetadataSession(authorization=live_token) as session:
@@ -702,7 +770,9 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.brief_bibs_get_other_editions)
             assert endpoint_args == method_args
 
-    def test_holdings_get_codes(self, live_token, endpoint_params, method_params):
+    def test_params_holdings_get_codes(
+        self, live_token, endpoint_params, method_params
+    ):
         with MetadataSession(authorization=live_token) as session:
             response = session.holdings_get_codes()
             endpoint_args = endpoint_params(
@@ -711,7 +781,9 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.holdings_get_codes)
             assert endpoint_args == method_args
 
-    def test_holdings_get_current(self, live_token, endpoint_params, method_params):
+    def test_params_holdings_get_current(
+        self, live_token, endpoint_params, method_params
+    ):
         with MetadataSession(authorization=live_token) as session:
             response = session.holdings_get_current("982651100")
             endpoint_args = endpoint_params(
@@ -721,7 +793,9 @@ class TestLiveMetadataSessionParams:
             assert endpoint_args == method_args
 
     @pytest.mark.holdings
-    def test_holdings_set_unset(self, live_token, endpoint_params, method_params):
+    def test_params_holdings_set_unset(
+        self, live_token, endpoint_params, method_params
+    ):
         with MetadataSession(authorization=live_token) as session:
             get_response = session.holdings_get_current("850940548")
             holdings = get_response.json()["holdings"]
@@ -752,7 +826,7 @@ class TestLiveMetadataSessionParams:
             assert unset_holding_endpoint_args == unset_holding_method_args
 
     @pytest.mark.holdings
-    def test_holdings_set_unset_with_bib(
+    def test_params_holdings_set_unset_with_bib(
         self, live_token, endpoint_params, method_params, stub_marc_xml
     ):
         with MetadataSession(authorization=live_token) as session:
@@ -790,7 +864,7 @@ class TestLiveMetadataSessionParams:
             unset_holding_method_args = method_params(session.holdings_unset_with_bib)
             assert unset_holding_endpoint_args == unset_holding_method_args
 
-    def test_shared_print_holdings_search(
+    def test_params_shared_print_holdings_search(
         self, live_token, endpoint_params, method_params
     ):
         with MetadataSession(authorization=live_token) as session:
@@ -801,7 +875,9 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.shared_print_holdings_search)
             assert endpoint_args == method_args
 
-    def test_summary_holdings_get(self, live_token, endpoint_params, method_params):
+    def test_params_summary_holdings_get(
+        self, live_token, endpoint_params, method_params
+    ):
         with MetadataSession(authorization=live_token) as session:
             response = session.summary_holdings_get("41266045")
             endpoint_args = endpoint_params(
@@ -810,7 +886,7 @@ class TestLiveMetadataSessionParams:
             method_args = method_params(session.summary_holdings_get)
             assert endpoint_args == method_args
 
-    def test_summary_holdings_search_oclc(
+    def test_params_summary_holdings_search_oclc(
         self, live_token, endpoint_params, method_params
     ):
         with MetadataSession(authorization=live_token) as session:
