@@ -518,6 +518,9 @@ six==1.16.0 ; python_version >= "3.8" and python_version < "4.0" \
 tomli==2.0.1 ; python_version >= "3.8" and python_full_version <= "3.11.0a6" \
     --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
     --hash=sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f
+types-pyyaml==6.0.12.20240917 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:392b267f1c0fe6022952462bf5d6523f31e37f6cea49b14cee7ad634b6301570 \
+    --hash=sha256:d1405a86f9576682234ef83bcb4e6fff7c9305c8b1fbad5e0bcd4f7dbdc9c587
 types-requests==2.31.0.20240125 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:03a28ce1d7cd54199148e043b2079cdded22d6795d19a2c2a6791a4b2b5e2eb5 \
     --hash=sha256:9592a9a4cb92d6d75d9b491a41477272b710e021011a2a3061157e2fb1f1a5d1
