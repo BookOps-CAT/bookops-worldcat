@@ -380,3 +380,14 @@ class TestWorldcatAccessToken:
         assert response["scopes"] == response["scope"]
         assert token.is_expired() is False
         assert isinstance(token.token_expires_at, datetime.datetime)
+
+    @pytest.mark.webtest
+    def test_post_token_request_auth_error(self, live_keys):
+        with pytest.raises(WorldcatAuthorizationError) as exp:
+            token = WorldcatAccessToken(
+                key=os.environ["WCKey"],
+                secret="secret",
+                scopes=os.environ["WCScopes"],
+            )
+            assert token.server_response.status_code == 401
+        assert "No valid authentication credentials found in request" in str(exp.value)
