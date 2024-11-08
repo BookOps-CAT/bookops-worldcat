@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections.abc import Callable
 import inspect
+import json
 import os
 from typing import Generator
 import yaml
@@ -8,6 +9,17 @@ import pytest
 import requests
 
 from bookops_worldcat import WorldcatAccessToken
+
+
+@pytest.fixture
+def live_keys() -> None:
+    if not os.getenv("GITHUB_ACTIONS"):
+        fh = os.path.expanduser("~/.oclc/nyp_wc_test.json")
+        with open(fh, "r") as file:
+            data = json.load(file)
+            os.environ["WCKey"] = data["key"]
+            os.environ["WCSecret"] = data["secret"]
+            os.environ["WCScopes"] = data["scopes"]
 
 
 @pytest.fixture
