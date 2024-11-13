@@ -4,8 +4,6 @@ on:
     branches:
       - main
       - "releases/**"
-    types:
-      - closed
   schedule: 
     - cron: '0 5 15 * *'
 env:
@@ -15,23 +13,32 @@ env:
   WCSecret: ${{ secrets.WC_SECRET }}
   WCScopes: "WorldCatMetadataAPI"
 jobs:
-  monthly-run:
-    name: Run monthly API response check
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'pull_request' && github.event.pull_request.merged == 'true' }}
+  webtests:
+    name: Run live webtests
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - name: Check if PR is from fork
+        uses: actions/checkout@v4
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.event.pull_request.base.repo.full_name }}" ]; then
+            echo "is_fork=true" >> $GITHUB_ENV
+          else
+            echo "is_fork=false" >> $GITHUB_ENV
+          fi
       - name: Set up Python ${{ matrix.python-version}}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version}}
       - name: Install dependencies
+        if: {{ env.is_fork == 'false' || github.event_name == 'schedule' }}
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r dev-requirements.txt
       - name: Run monthly live tests
+        if: {{ env.is_fork == 'false' || github.event_name == 'schedule' }}
         run: |
-          pytest -m "webtest"
+          pytest -m "webtest"     
