@@ -9,7 +9,6 @@ from bookops_worldcat.errors import WorldcatRequestError
 
 
 @pytest.mark.webtest
-@pytest.mark.usefixtures("live_keys")
 class TestLiveMetadataSession:
     """Runs tests against live Metadata API"""
 
@@ -275,7 +274,13 @@ class TestLiveMetadataSession:
 
     @pytest.mark.holdings
     def test_holdings_set_unset(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(
+            authorization=live_token,
+            totalRetries=3,
+            backoffFactor=0.5,
+            statusForcelist=[408, 500, 502, 503, 504],
+            allowedMethods=["GET", "POST"],
+        ) as session:
             get_resp = session.holdings_get_current("850940548")
             holdings = get_resp.json()["holdings"]
 
@@ -302,7 +307,13 @@ class TestLiveMetadataSession:
 
     @pytest.mark.holdings
     def test_holdings_set_unset_cascadeDelete(self, live_token, stub_marc_xml):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(
+            authorization=live_token,
+            totalRetries=3,
+            backoffFactor=0.5,
+            statusForcelist=[408, 500, 502, 503, 504],
+            allowedMethods=["GET", "POST"],
+        ) as session:
             get_resp = session.holdings_get_current("850940548")
             holdings = get_resp.json()["holdings"]
 
@@ -329,7 +340,13 @@ class TestLiveMetadataSession:
 
     @pytest.mark.holdings
     def test_holdings_set_unset_xml(self, live_token, stub_marc_xml):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(
+            authorization=live_token,
+            totalRetries=3,
+            backoffFactor=0.5,
+            statusForcelist=[408, 500, 502, 503, 504],
+            allowedMethods=["GET", "POST"],
+        ) as session:
             response = session.holdings_get_current("850940548")
             holdings = response.json()["holdings"]
 
@@ -361,7 +378,13 @@ class TestLiveMetadataSession:
 
     @pytest.mark.holdings
     def test_holdings_set_unset_xml_cascadeDelete(self, live_token, stub_marc_xml):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(
+            authorization=live_token,
+            totalRetries=3,
+            backoffFactor=0.5,
+            statusForcelist=[408, 500, 502, 503, 504],
+            allowedMethods=["GET", "POST"],
+        ) as session:
             response = session.holdings_get_current("850940548")
             holdings = response.json()["holdings"]
 
@@ -600,7 +623,6 @@ class TestLiveMetadataSessionErrors:
 
 
 @pytest.mark.webtest
-@pytest.mark.usefixtures("live_keys")
 class TestAPISpec:
     """Compares API spec with MetadataSession methods"""
 
@@ -796,7 +818,13 @@ class TestAPISpec:
     def test_params_holdings_set_unset(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(
+            authorization=live_token,
+            totalRetries=3,
+            backoffFactor=0.5,
+            statusForcelist=[408, 500, 502, 503, 504],
+            allowedMethods=["GET", "POST"],
+        ) as session:
             get_response = session.holdings_get_current("850940548")
             holdings = get_response.json()["holdings"]
             current_holding_endpoint_args = endpoint_params(
@@ -829,7 +857,13 @@ class TestAPISpec:
     def test_params_holdings_set_unset_with_bib(
         self, live_token, endpoint_params, method_params, stub_marc_xml
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(
+            authorization=live_token,
+            totalRetries=3,
+            backoffFactor=0.5,
+            statusForcelist=[408, 500, 502, 503, 504],
+            allowedMethods=["GET", "POST"],
+        ) as session:
             get_response = session.holdings_get_current("850940548")
             holdings = get_response.json()["holdings"]
             current_holding_endpoint_args = endpoint_params(
