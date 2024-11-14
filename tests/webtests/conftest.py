@@ -22,7 +22,8 @@ def live_keys() -> None:
             os.environ["WCScopes"] = data["scopes"]
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
+@pytest.mark.usefixtures("live_keys")
 def live_token() -> Generator[WorldcatAccessToken, None, None]:
     """
     Gets live token from environment variables. For use with live tests so that
