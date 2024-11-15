@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.1.0] - (11/7/2024)
+## [1.1.0] - (11/15/2024)
 ### Added
 + Support for new Metadata API functionality:
   + `bib_search` method within `MetadataSession` class allows users to retrieve full MARC records in JSON format with the new `/worldcat/search/bibs/{oclcNumber}`
