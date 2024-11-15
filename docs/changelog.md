@@ -1,14 +1,34 @@
 # Changelog
 
-## [1.0.2] - (7/25/2024)
+## [1.1.0] - (11/7/2024)
+### Added
++ Support for new Metadata API functionality:
+  + `bib_search` method within `MetadataSession` class allows users to retrieve full MARC records in JSON format with the new `/worldcat/search/bibs/{oclcNumber}`
+  + `cascadeDelete` arg added to `holdings_unset` and `holdings_unset_with_bib` methods. LHR and LBD records will be deleted when unsetting holdings on a record in WorldCat. This default functionality can be changed by setting `cascadeDelete` to `False`
++ Monthly live tests running via GitHub Actions
+  + Tests will check whether changes have been made to the Metadata API
++ Python 3.13 added to unit tests
++ Type annotations added to fixtures in `conftest.py`
++ `scope` added as a return value in `WorldcatAccessToken` tests and documentation
+  + OCLC's Authorization Server now accepts and returns `scope` as a parameter but it appears to be interchangeable with `scopes`. It is listed in the tests and documentation for `WorldcatAccessToken` but is not included as an attribute for the class.
++ Dev dependencies:
+  + `types-pyyaml` (6.0.12)
 ### Changed
++ Moved live tests to separate files within `tests/webtests` directory
++ Moved fixtures for live tests to `tests/webtests/conftest.py`
++ Minor edits to tests due to changes in responses from Metadata API
 + Updated dependencies:
-  + certifi (2024.7.4)
-  + jinja2 (3.1.4)
-  + requests (2.32.3)
-  + urllib3 (2.2.2)
-  + zipp (3.19.2)
-+ Documentation and tests to account for `scope` as available parameter for OCLC Authorization Server
+  + `certifi` (2024.7.4)
+  + `jinja2` (3.1.4)
+  + `requests` (2.32.3)
+  + `urllib3` (2.2.2)
+  + `zipp` (3.19.2)
+### Fixed
++ Return type for all `MetadataSession` methods is now `requests.Response` not `Optional[requests.Response]`
++ Typos and incorrect import statements
+### Removed
++ Redundant/unused fixtures for mock 400 and 409 responses from `conftest.py`
++ Changed `stub_marc21` fixture to return `bytes` and removed `test.mrc` file
 
 ## [1.0.1] - (5/1/2024)
 ### Fixed
