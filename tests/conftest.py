@@ -1,24 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import json
-import os
 from typing import Dict, Generator, Union
 import pytest
 import requests
 
 from bookops_worldcat import WorldcatAccessToken, MetadataSession
-
-
-@pytest.fixture
-def live_keys():
-    if os.name == "nt" and not os.getenv("GITHUB_ACTIONS"):
-        fh = os.path.join(os.environ["USERPROFILE"], ".oclc/nyp_wc_test.json")
-        with open(fh, "r") as file:
-            data = json.load(file)
-            os.environ["WCKey"] = data["key"]
-            os.environ["WCSecret"] = data["secret"]
-            os.environ["WCScopes"] = data["scopes"]
 
 
 @pytest.fixture
@@ -40,12 +27,12 @@ def stub_marc21() -> bytes:
 
 class FakeUtcNow(datetime.datetime):
     @classmethod
-    def now(cls, tzinfo=datetime.timezone.utc):
+    def now(cls, tzinfo=datetime.timezone.utc) -> "FakeUtcNow":
         return cls(2020, 1, 1, 17, 0, 0, 0, tzinfo=datetime.timezone.utc)
 
 
 @pytest.fixture
-def mock_now(monkeypatch):
+def mock_now(monkeypatch) -> None:
     monkeypatch.setattr(datetime, "datetime", FakeUtcNow)
 
 
@@ -130,7 +117,7 @@ class MockHTTPSessionResponse(requests.Response):
 
 
 @pytest.fixture
-def mock_session_response(request, monkeypatch):
+def mock_session_response(request, monkeypatch) -> None:
     """
     Use together with `pytest.mark.http_code` marker to pass
     specific HTTP code to be returned to simulate various
@@ -165,7 +152,7 @@ def mock_oauth_server_response(
 
 
 @pytest.fixture
-def mock_successful_post_token_response(mock_now, monkeypatch):
+def mock_successful_post_token_response(mock_now, monkeypatch) -> None:
     def mock_oauth_server_response(*args, **kwargs):
         return MockAuthServerResponseSuccess()
 
@@ -173,7 +160,7 @@ def mock_successful_post_token_response(mock_now, monkeypatch):
 
 
 @pytest.fixture
-def mock_failed_post_token_response(monkeypatch):
+def mock_failed_post_token_response(monkeypatch) -> None:
     def mock_oauth_server_response(*args, **kwargs):
         return MockAuthServerResponseFailure()
 
@@ -181,28 +168,28 @@ def mock_failed_post_token_response(monkeypatch):
 
 
 @pytest.fixture
-def mock_unexpected_error(monkeypatch):
+def mock_unexpected_error(monkeypatch) -> None:
     monkeypatch.setattr("requests.post", MockUnexpectedException)
     monkeypatch.setattr("requests.get", MockUnexpectedException)
     monkeypatch.setattr("requests.Session.send", MockUnexpectedException)
 
 
 @pytest.fixture
-def mock_timeout(monkeypatch):
+def mock_timeout(monkeypatch) -> None:
     monkeypatch.setattr("requests.post", MockTimeout)
     monkeypatch.setattr("requests.get", MockTimeout)
     monkeypatch.setattr("requests.Session.send", MockTimeout)
 
 
 @pytest.fixture
-def mock_connection_error(monkeypatch):
+def mock_connection_error(monkeypatch) -> None:
     monkeypatch.setattr("requests.post", MockConnectionError)
     monkeypatch.setattr("requests.get", MockConnectionError)
     monkeypatch.setattr("requests.Session.send", MockConnectionError)
 
 
 @pytest.fixture
-def mock_retry_error(monkeypatch):
+def mock_retry_error(monkeypatch) -> None:
     monkeypatch.setattr("requests.post", MockRetryError)
     monkeypatch.setattr("requests.get", MockRetryError)
     monkeypatch.setattr("requests.Session.send", MockRetryError)

@@ -76,9 +76,9 @@ poetry install
 ```
 
 #### Run tests
-Run tests before making changes on your fork.
+Run tests before making changes on your fork. Live tests will be run on a monthly basis using credentials saved in the repository's secrets.
 ??? info
-    Our live tests are designed to look for API credentials in a specific file/directory in a Windows environment. We will need to refactor the live tests to allow contributors to run live tests with their own API credentials and run live tests in a macOS environment.
+    Our live tests are designed to look for API credentials in a specific file/directory in a Windows environment. We will need to refactor the `live_keys` fixture to allow contributors to run live tests locally with their own API credentials and to run live tests in a macOS environment.
 
 ```py
 # basic usage without webtests
