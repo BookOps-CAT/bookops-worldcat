@@ -75,7 +75,7 @@ class TestLiveMetadataSession:
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert endpoint == "worldcat/manage/bibs/match"
             assert response.status_code == 200
-            assert response.headers["Content-Type"] == "application/json;charset=UTF-8"
+            assert response.headers["Content-Type"] == "application/json"
             assert sorted(response.json().keys()) == sorted(
                 self.BRIEF_BIB_RESPONSE_KEYS
             )
@@ -138,7 +138,7 @@ class TestLiveMetadataSession:
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
             assert endpoint == "worldcat/manage/bibs/validate/validateFull"
-            assert response.headers["Content-Type"] == "application/json;charset=UTF-8"
+            assert response.headers["Content-Type"] == "application/json"
             assert sorted(response.json().keys()) == sorted(["status", "httpStatus"])
             assert sorted(response.json()["status"].keys()) == sorted(
                 ["description", "summary"]
