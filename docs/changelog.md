@@ -276,6 +276,7 @@
 ### Fixed
 + fixed hooks info in docstrings in `SearchSession` and `MetadataSession`
 
+[1.1.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.5.0...v1.0.0
 [0.5.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.4.1...v0.5.0
