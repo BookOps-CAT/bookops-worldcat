@@ -1,14 +1,71 @@
 # Changelog
 
-## [1.0.2] - (7/25/2024)
+## [1.1.0] - (11/15/2024)
+### Added
++ Support for new Metadata API functionality:
+  + `bib_search` method within `MetadataSession` class allows users to retrieve full MARC records in JSON format with the new `/worldcat/search/bibs/{oclcNumber}`
+  + `cascadeDelete` arg added to `holdings_unset` and `holdings_unset_with_bib` methods. LHR and LBD records will be deleted when unsetting holdings on a record in WorldCat. This default functionality can be changed by setting `cascadeDelete` to `False`
++ Monthly live tests running via GitHub Actions
+  + Tests will check whether changes have been made to the Metadata API
++ Python 3.13 added to unit tests
++ Type annotations added to fixtures in `conftest.py`
++ `scope` added as a return value in `WorldcatAccessToken` tests and documentation
+  + OCLC's Authorization Server now accepts and returns `scope` as a parameter but it appears to be interchangeable with `scopes`. It is listed in the tests and documentation for `WorldcatAccessToken` but is not included as an attribute for the class.
++ Dev dependencies:
+  + `types-pyyaml` (6.0.12)
 ### Changed
++ Moved live tests to separate files within `tests/webtests` directory
++ Moved fixtures for live tests to `tests/webtests/conftest.py`
++ Minor edits to tests due to changes in responses from Metadata API
 + Updated dependencies:
-  + certifi (2024.7.4)
-  + jinja2 (3.1.4)
-  + requests (2.32.3)
-  + urllib3 (2.2.2)
-  + zipp (3.19.2)
-+ Documentation and tests to account for `scope` as available parameter for OCLC Authorization Server
+  + `certifi` (2024.8.30)
+  + `charset-normalizer` (3.4.0)
+  + `idna` (3.10)
+  + `requests` (2.32.3)
+  + `urllib3` (2.2.3)
++ Updated dev dependencies:
+  + `babel` (2.16.0)
+  + `black` (24.8.0)
+  + `coverage` (7.6.1)
+  + `exceptiongroup` (1.2.2)
+  + `griffe` (1.4.0)
+  + `importlib-metadata` (8.5.0)
+  + `importlib-resources` (6.4.5)
+  + `jinja2` (3.1.4)
+  + `markdown` (3.7)
+  + `mike` (2.1.3)
+  + `mkdocs-autorefs` (1.2.0)
+  + `mkdocs-get-deps` (0.2.0)
+  + `mkdocs-material` (9.5.44)
+  + `mkdocs` (1.6.1)
+  + `mkdocstrings-python` (1.10.0)
+  + `mkdocstrings` (0.24.3)
+  + `mypy` (1.13.0)
+  + `packaging` (24.2)
+  + `paginate` (0.5.7)
+  + `platformdirs` (4.3.6)
+  + `pluggy` (1.5.0)
+  + `pygments` (2.18.0)
+  + `pymdown-extensions` (10.12)
+  + `pyparsing` (3.1.4)
+  + `pytest-mock` (3.14.0)
+  + `python-dateutil` (2.9.0.post0)
+  + `pytz` (2024.2)
+  + `pyyaml` (6.0.2)
+  + `regex` (2024.11.6)
+  + `tomli` (2.1.0)
+  + `types-requests` (2.32.0.20241016)
+  + `typing-extensions` (4.12.2)
+  + `urllib3` (2.2.3)
+  + `watchdog` (4.0.2)
+  + `wheel` (0.45.0)
+  + `zipp` (3.20.2)
+### Fixed
++ Return type for all `MetadataSession` methods is now `requests.Response` not `Optional[requests.Response]`
++ Typos and incorrect import statements
+### Removed
++ Redundant/unused fixtures for mock 400 and 409 responses from `conftest.py`
++ Changed `stub_marc21` fixture to return `bytes` and removed `test.mrc` file
 
 ## [1.0.1] - (5/1/2024)
 ### Fixed
@@ -219,6 +276,7 @@
 ### Fixed
 + fixed hooks info in docstrings in `SearchSession` and `MetadataSession`
 
+[1.1.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.5.0...v1.0.0
 [0.5.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.4.1...v0.5.0
