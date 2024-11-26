@@ -36,10 +36,10 @@
   + `mike` (2.1.3)
   + `mkdocs-autorefs` (1.2.0)
   + `mkdocs-get-deps` (0.2.0)
-  + `mkdocs-material` (9.5.44)
+  + `mkdocs-material` (9.5.46)
   + `mkdocs` (1.6.1)
-  + `mkdocstrings-python` (1.10.0)
-  + `mkdocstrings` (0.24.3)
+  + `mkdocstrings-python` (1.11.1)
+  + `mkdocstrings` (0.26.1)
   + `mypy` (1.13.0)
   + `packaging` (24.2)
   + `paginate` (0.5.7)
@@ -58,7 +58,7 @@
   + `typing-extensions` (4.12.2)
   + `urllib3` (2.2.3)
   + `watchdog` (4.0.2)
-  + `wheel` (0.45.0)
+  + `wheel` (0.45.1)
   + `zipp` (3.20.2)
 ### Fixed
 + Return type for all `MetadataSession` methods is now `requests.Response` not `Optional[requests.Response]`
