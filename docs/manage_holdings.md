@@ -60,6 +60,8 @@ Version 2.0 of the Metadata API provides new functionality to set and unset hold
 
 Bookops-Worldcat supports this functionality with the `holdings_set_with_bib` and `holdings_unset_with_bib` methods which can be passed a MARC record in the body of the request in the same way that one would pass a record to a method that uses any of the `/manage/bibs/` endpoints.
 
+Beginning in September 2024 users are able to remove associated Local Bibliographic Data and/or Local Holdings Records when unsetting holdings on a record in OCLC. This functionality is supported by both the `/worldcat/manage/institution/holdings/unset` and `/worldcat/manage/institution/holdings/{oclcNumber}/unset` endpoints using the `cascadeDelete` arg. If `cascadeDelete` is `True`, local records will be removed from WorldCat when unsetting a holding. If `False`, the associated local records will remain in WorldCat. The default value within `bookops-worldcat` and the Metadata API is `True` 
+
 === "holdings_set"
 
     ```python title="holdings_set Request"

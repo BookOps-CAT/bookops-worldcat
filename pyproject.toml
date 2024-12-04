@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bookops-worldcat"
-version = "1.0.0"
+version = "1.1.0"
 description = "OCLC WorldCat Metadata APIs wrapper"
 authors = ["Tomasz Kalata <klingaroo@gmail.com>", "Charlotte Kostelic <charlottekostelic@gmail.com>"]
 license = "MIT"
@@ -30,6 +30,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",    
     "Topic :: Software Development :: Build Tools",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
@@ -50,9 +51,10 @@ black = "^24.3.0"
 mike = "^2.0.0"
 mypy = "^1.8"
 types-requests = "^2.31.0.20240125"
-mkdocs-material = "^9.5.13"
-mkdocstrings = "^0.24.1"
-mkdocstrings-python = "^1.9.0"
+mkdocs-material = "^9.5.46"
+mkdocstrings = "^0.26.0"
+mkdocstrings-python = "^1.11.0"
+types-pyyaml = "^6.0.12.20240917"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -68,7 +70,7 @@ source = ["."]
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312', 'py313']
 include = '\.pyi?$'
 exclude = '''
 (

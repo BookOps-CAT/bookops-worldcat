@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import Union, Tuple, TYPE_CHECKING
 import sys
 
-from requests.models import PreparedRequest
+from requests import PreparedRequest
 from requests.exceptions import ConnectionError, HTTPError, Timeout, RetryError
 from .errors import WorldcatRequestError
 

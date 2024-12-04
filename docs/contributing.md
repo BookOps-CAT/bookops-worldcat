@@ -78,7 +78,7 @@ poetry install
 #### Run tests
 Run tests before making changes on your fork.
 ??? info
-    Our live tests are designed to look for API credentials in a specific file/directory in a Windows environment. We will need to refactor the live tests to allow contributors to run live tests with their own API credentials and run live tests in a macOS environment.
+    Our live tests are designed to look for API credentials in a specific file/directory when running webtests locally. Live tests are also run on a monthly basis in GitHub Actions using credentials saved in the repository's secrets. Pull requests from public forks will not run live webtests and we will need to refactor the `live_keys` fixture if a contributor wishes to run live webtests locally using their own API credentials.
 
 ```py
 # basic usage without webtests
@@ -91,7 +91,7 @@ python -m pytest "not webtest" --cov=bookops_worldcat/
 Any major or minor updates should get a new release in GitHub. Use the following checklist when getting a new update ready for release. For patch updates/bug fixes, follow steps 1-4.
 
 1. Verify `poetry.lock`, `pyproject.toml`, `requirements.txt`, and `dev-requirements.txt` files are up-to-date
-     * **`poetry check`** to check that `poetry.lock` and `pyproject.toml` files are synced with 
+     * **`poetry check`** to check that `poetry.lock` and `pyproject.toml` files are in sync 
      * **`poetry update`** to update all packages 
      * or **`poetry update [package1] [ package2]`** to update packages individually
      * **`poetry install`** to install all versions of packages listed in the `pyproject.toml` file
@@ -109,6 +109,6 @@ Any major or minor updates should get a new release in GitHub. Use the following
 5. Create a new github release
     * At minimum, include information from changelog in release. Include additional details about changes as appropriate.
 6. Build package in poetry
-    * `poetry build`
+    * **`poetry build`**
 7. Publish to PyPI
-    * `poetry publish`
+    * **`poetry publish`**

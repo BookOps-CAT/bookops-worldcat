@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from contextlib import contextmanager
+from contextlib import nullcontext as does_not_raise
 import datetime
-import os
 
 import pytest
 
 
-from bookops_worldcat import MetadataSession, WorldcatAccessToken
+from bookops_worldcat import MetadataSession
 from bookops_worldcat.errors import (
     WorldcatRequestError,
     WorldcatAuthorizationError,
     InvalidOclcNumber,
 )
-
-
-@contextmanager
-def does_not_raise():
-    yield
 
 
 class TestMockedMetadataSession:
@@ -183,6 +177,16 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/search/summary-holdings"
         )
 
+    @pytest.mark.parametrize(
+        "argm",
+        ["12345", 12345],
+    )
+    def test_url_search_bibs(self, argm, stub_session):
+        assert (
+            stub_session._url_search_bibs(oclcNumber=argm)
+            == "https://metadata.api.oclc.org/worldcat/search/bibs/12345"
+        )
+
     def test_url_search_brief_bibs(self, stub_session):
         assert (
             stub_session._url_search_brief_bibs()
@@ -337,6 +341,18 @@ class TestMockedMetadataSession:
         )
 
     @pytest.mark.http_code(200)
+    def test_bib_search(self, stub_session, mock_session_response):
+        assert stub_session.bib_search(12345).status_code == 200
+
+    def test_bib_search_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.bib_search()
+
+    def test_bib_search_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.bib_search(oclcNumber=None)
+
+    @pytest.mark.http_code(200)
     def test_bib_validate(self, stub_session, mock_session_response, stub_marc_xml):
         assert (
             stub_session.bib_validate(
@@ -460,6 +476,15 @@ class TestMockedMetadataSession:
     @pytest.mark.http_code(200)
     def test_holdings_unset(self, stub_session, mock_session_response):
         assert stub_session.holdings_unset(850940548).status_code == 200
+
+    @pytest.mark.http_code(200)
+    def test_holdings_unset_cascadeDelete_false(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.holdings_unset(850940548, cascadeDelete=False).status_code
+            == 200
+        )
 
     def test_holdings_unset_no_oclcNumber_passed(self, stub_session):
         with pytest.raises(TypeError):
@@ -669,381 +694,3 @@ class TestMockedMetadataSession:
         with pytest.raises(InvalidOclcNumber) as exc:
             stub_session.shared_print_holdings_search(oclcNumber="odn12345")
         assert msg in str(exc.value)
-
-
-@pytest.mark.webtest
-class TestLiveMetadataSession:
-    """Runs rudimentary tests against live Metadata API"""
-
-    def test_bib_get(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.bib_get(41266045)
-
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/41266045"
-            )
-            assert response.status_code == 200
-
-    def test_bib_get_classification(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.bib_get_classification(41266045)
-
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/search/classification-bibs/41266045"
-            )
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == [
-                "dewey",
-                "lc",
-            ]
-
-    def test_bib_get_current_oclc_number(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.bib_get_current_oclc_number([41266045, 519740398])
-
-            assert response.status_code == 200
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/current?oclcNumbers=41266045%2C519740398"
-            )
-            jres = response.json()
-            assert sorted(jres.keys()) == ["controlNumbers"]
-            assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
-
-    def test_bib_get_current_oclc_number_str(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.bib_get_current_oclc_number("41266045")
-
-            assert response.status_code == 200
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/current?oclcNumbers=41266045"
-            )
-            jres = response.json()
-            assert sorted(jres.keys()) == ["controlNumbers"]
-            assert sorted(jres["controlNumbers"][0].keys()) == ["current", "requested"]
-
-    def test_bib_match_marcxml(self, live_keys, stub_marc_xml):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.bib_match(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == sorted(
-                ["numberOfRecords", "briefRecords"]
-            )
-
-    def test_bib_validate(self, live_keys, stub_marc21):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.bib_validate(
-                stub_marc21, recordFormat="application/marc"
-            )
-            assert response.status_code == 200
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull"
-            )
-            assert sorted(response.json().keys()) == sorted(["httpStatus", "status"])
-
-    def test_brief_bibs_get(self, live_keys):
-        fields = sorted(
-            [
-                "catalogingInfo",
-                "creator",
-                "date",
-                "edition",
-                "generalFormat",
-                "isbns",
-                "language",
-                "machineReadableDate",
-                "mergedOclcNumbers",
-                "oclcNumber",
-                "publicationPlace",
-                "publisher",
-                "specificFormat",
-                "title",
-            ]
-        )
-
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.brief_bibs_get(41266045)
-
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-
-    def test_brief_bibs_get_401_error(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-        token.token_str = "invalid-token"
-        err_msg = "401 Client Error: Unauthorized for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045"
-        with MetadataSession(authorization=token) as session:
-            session.headers.update({"Authorization": "Bearer invalid-token"})
-            with pytest.raises(WorldcatRequestError) as exc:
-                session.brief_bibs_get(41266045)
-
-            assert err_msg in str(exc.value)
-
-    def test_brief_bibs_search(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.brief_bibs_search(
-                "ti:zendegi AND au:egan",
-                inLanguage="eng",
-                inCatalogLanguage="eng",
-                itemType="book",
-                itemSubType=["book-printbook", "book-digital"],
-                catalogSource="dlc",
-                orderBy="mostWidelyHeld",
-                limit=5,
-            )
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/search/brief-bibs?q=ti%3Azendegi+AND+au%3Aegan&inLanguage=eng&inCatalogLanguage=eng&catalogSource=dlc&itemType=book&itemSubType=book-printbook&itemSubType=book-digital&retentionCommitments=False&groupRelatedEditions=False&groupVariantRecords=False&preferredLanguage=eng&showHoldingsIndicators=False&unit=M&orderBy=mostWidelyHeld&offset=1&limit=5"
-            )
-
-    def test_brief_bibs_get_other_editions(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.brief_bibs_get_other_editions(41266045)
-
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-
-    def test_holdings_get_current(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("982651100")
-
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current?oclcNumbers=982651100"
-            )
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == ["holdings"]
-            assert sorted(response.json()["holdings"][0].keys()) == sorted(
-                [
-                    "requestedControlNumber",
-                    "currentControlNumber",
-                    "institutionSymbol",
-                    "holdingSet",
-                ]
-            )
-
-    @pytest.mark.holdings
-    def test_holdings_set_unset(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("850940548")
-            holdings = response.json()["holdings"]
-
-            # make sure no holdings are set initially
-            if len(holdings) > 0:
-                response = session.holdings_unset(850940548)
-
-            response = session.holdings_set(850940548)
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/set"
-            )
-            assert response.status_code == 200
-            assert response.json()["action"] == "Set Holdings"
-
-            # test deleting holdings
-            response = session.holdings_unset(850940548)
-            assert response.status_code == 200
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/unset"
-            )
-            assert response.json()["action"] == "Unset Holdings"
-
-    @pytest.mark.holdings
-    def test_holdings_set_unset_marcxml(self, live_keys, stub_marc_xml):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_current("850940548")
-            holdings = response.json()["holdings"]
-
-            # make sure no holdings are set initially
-            if len(holdings) > 0:
-                response = session.holdings_unset_with_bib(
-                    stub_marc_xml, recordFormat="application/marcxml+xml"
-                )
-
-            response = session.holdings_set_with_bib(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/set"
-            )
-            assert response.status_code == 200
-            assert response.json()["action"] == "Set Holdings"
-
-            response = session.holdings_unset_with_bib(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            assert response.status_code == 200
-            assert (
-                response.request.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/unset"
-            )
-            assert response.json()["action"] == "Unset Holdings"
-
-    def test_holdings_get_codes(self, live_keys):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.holdings_get_codes()
-
-            assert (
-                response.url
-                == "https://metadata.api.oclc.org/worldcat/manage/institution/holding-codes"
-            )
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == ["holdingLibraryCodes"]
-            assert {"code": "Print Collection", "name": "NYPC"} in response.json()[
-                "holdingLibraryCodes"
-            ]
-
-    def test_summary_holdings_search_oclc(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.summary_holdings_search(oclcNumber="41266045")
-
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-
-    def test_summary_holdings_search_isbn(self, live_keys):
-        fields = sorted(["briefRecords", "numberOfRecords"])
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            response = session.summary_holdings_search(isbn="9781597801744")
-
-            assert response.status_code == 200
-            assert sorted(response.json().keys()) == fields
-
-    def test_default_retries(self, live_keys, stub_marc21):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
-            with pytest.raises(WorldcatRequestError) as exc:
-                session.bib_validate(stub_marc21, recordFormat="foo/bar")
-            assert "406 Client Error: Not Acceptable for url: " in (str(exc.value))
-            assert session.adapters["https://"].max_retries.total == 0
-
-    def test_custom_retries(self, live_keys, stub_marc21):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(
-            authorization=token,
-            totalRetries=3,
-            backoffFactor=0.5,
-            statusForcelist=[406],
-            allowedMethods=["GET", "POST"],
-        ) as session:
-            with pytest.raises(WorldcatRequestError) as exc:
-                session.bib_validate(stub_marc21, recordFormat="foo/bar")
-            assert "Connection Error: <class 'requests.exceptions.RetryError'>" in (
-                str(exc.value)
-            )
-            assert session.adapters["https://"].max_retries.total == 3
