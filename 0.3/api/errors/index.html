@@ -10,28 +10,28 @@
       
       
       
-        <link rel="canonical" href="https://bookops-cat.github.io/bookops-worldcat/0.3/changelog/">
+        <link rel="canonical" href="https://bookops-cat.github.io/bookops-worldcat/0.3/api/errors/">
       
       
-        <link rel="prev" href="../about/">
+        <link rel="prev" href="../authorize/">
       
       
-        <link rel="next" href="../api/authorize/">
+        <link rel="next" href="../metadata_api/">
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.46">
     
     
       
-        <title>Changelog - BookOps-Worldcat Documentation</title>
+        <title>bookops_worldcat.errors - BookOps-Worldcat Documentation</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f8fc17f.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -50,11 +50,11 @@
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#changelog" class="md-skip">
+        <a href="#bookops_worldcat.errors" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="BookOps-Worldcat Documentation" class="md-header__button md-logo" aria-label="BookOps-Worldcat Documentation" data-md-component="logo">
+    <a href="../.." title="BookOps-Worldcat Documentation" class="md-header__button md-logo" aria-label="BookOps-Worldcat Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Changelog
+              bookops_worldcat.errors
             
           </span>
         </div>
@@ -191,13 +191,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href=".." class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../.." class="md-tabs__link">
           
   
   BookOps-WorldCat
@@ -211,17 +209,21 @@
         
   
   
+    
+  
   
     
     
       
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../api/authorize/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../authorize/" class="md-tabs__link">
           
   
   API Documentation
@@ -263,7 +265,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="BookOps-Worldcat Documentation" class="md-nav__button md-logo" aria-label="BookOps-Worldcat Documentation" data-md-component="logo">
+    <a href="../.." title="BookOps-Worldcat Documentation" class="md-nav__button md-logo" aria-label="BookOps-Worldcat Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -290,30 +292,27 @@
       
   
   
-    
   
   
-  
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
         
           
-          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -324,7 +323,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_1">
             <span class="md-nav__icon md-icon"></span>
             BookOps-WorldCat
@@ -338,7 +337,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -356,6 +355,150 @@
                 
   
   
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_2" id="__nav_1_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    About
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            About
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About BookOps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    API Documentation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            API Documentation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
     
   
   
@@ -376,24 +519,24 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
         
           
-          <label class="md-nav__link" for="__nav_1_2" id="__nav_1_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
             
   
   <span class="md-ellipsis">
-    About
+    bookops_worldcat
   </span>
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_1_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
             <span class="md-nav__icon md-icon"></span>
-            About
+            bookops_worldcat
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -404,11 +547,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../about/" class="md-nav__link">
+      <a href="../authorize/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    About BookOps
+    bookops_worldcat.authorize
   </span>
   
 
@@ -431,14 +574,12 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
-      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
   <span class="md-ellipsis">
-    Changelog
+    bookops_worldcat.errors
   </span>
   
 
@@ -449,7 +590,7 @@
         
   
   <span class="md-ellipsis">
-    Changelog
+    bookops_worldcat.errors
   </span>
   
 
@@ -461,8 +602,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -471,72 +610,54 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#035-622021" class="md-nav__link">
+  <a href="#bookops_worldcat.errors" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.5 (6/2/2021)
+      errors
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#034-3222021" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.BookopsWorldcatError" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.4 (3/22/2021)
+      BookopsWorldcatError
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#033-12282020" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.InvalidOclcNumber" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.3 (12/28/2020)
+      InvalidOclcNumber
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#032-11252020" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.WorldcatAuthorizationError" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.2 (11/25/2020)
+      WorldcatAuthorizationError
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#031-11242020" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.WorldcatRequestError" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.1 (11/24/2020)
+      WorldcatRequestError
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#030-10032020" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.WorldcatSessionError" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.0 (10/03/2020)
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#021-9282020" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.2.1 (9/28/2020)
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#020-04302020" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.2.0 (04/30/2020)
+      WorldcatSessionError
     </span>
   </a>
   
@@ -551,105 +672,6 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    API Documentation
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            API Documentation
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    bookops_worldcat
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_1">
-            <span class="md-nav__icon md-icon"></span>
-            bookops_worldcat
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
               
                 
   
@@ -657,49 +679,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/authorize/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    bookops_worldcat.authorize
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/errors/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    bookops_worldcat.errors
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/metadata_api/" class="md-nav__link">
+      <a href="../metadata_api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -720,7 +700,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/utils/" class="md-nav__link">
+      <a href="../utils/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -766,8 +746,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -776,72 +754,54 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#035-622021" class="md-nav__link">
+  <a href="#bookops_worldcat.errors" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.5 (6/2/2021)
+      errors
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#034-3222021" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.BookopsWorldcatError" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.4 (3/22/2021)
+      BookopsWorldcatError
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#033-12282020" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.InvalidOclcNumber" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.3 (12/28/2020)
+      InvalidOclcNumber
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#032-11252020" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.WorldcatAuthorizationError" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.2 (11/25/2020)
+      WorldcatAuthorizationError
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#031-11242020" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.WorldcatRequestError" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.1 (11/24/2020)
+      WorldcatRequestError
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#030-10032020" class="md-nav__link">
+  <a href="#bookops_worldcat.errors.WorldcatSessionError" class="md-nav__link">
     <span class="md-ellipsis">
-      0.3.0 (10/03/2020)
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#021-9282020" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.2.1 (9/28/2020)
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#020-04302020" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.2.0 (04/30/2020)
+      WorldcatSessionError
     </span>
   </a>
   
@@ -865,96 +825,151 @@
   
 
 
-<h1 id="changelog">Changelog</h1>
-<h2 id="035-622021">0.3.5 (6/2/2021)</h2>
-<ul>
-<li>Dependencies update<ul>
-<li>urllib3 from 1.26.4 to 1.26.5</li>
-</ul>
-</li>
-</ul>
-<h2 id="034-3222021">0.3.4 (3/22/2021)</h2>
-<ul>
-<li>Dependencies update<ul>
-<li>certifi to 2020.12.5</li>
-<li>chardet to 4.0.0</li>
-<li>requests to 2.25.1</li>
-<li>urllib3 to 1.26.4</li>
-</ul>
-</li>
-</ul>
-<h2 id="033-12282020">0.3.3 (12/28/2020)</h2>
-<ul>
-<li>Type hints added</li>
-<li>
-<p>Default timeout in the MetadataSesssion extended to 5 seconds</p>
-</li>
-<li>
-<p>Dependencies:</p>
-<ul>
-<li>pytest bump to 6.1.2</li>
-<li>mypy 0.7.8</li>
-</ul>
-</li>
-</ul>
-<h2 id="032-11252020">0.3.2 (11/25/2020)</h2>
-<ul>
-<li>Bug fixes:<ul>
-<li>MetadataSession timeout paramerter correctly passed into every session request</li>
-</ul>
-</li>
-</ul>
-<h2 id="031-11242020">0.3.1 (11/24/2020)</h2>
-<ul>
-<li>
-<p>Bug fixes:</p>
-<ul>
-<li>Fixed auto refreshing of the access token when expired</li>
-<li>testing: fixed testing for error messages on exceptions &amp; testing of stale tokens</li>
-</ul>
-</li>
-<li>
-<p>Dependencies bump</p>
-<ul>
-<li>certifi from 2020.6.20 to 2020.11.8</li>
-<li>requests from 2.24.0 to 2.25.0</li>
-<li>urlib3 from 1.25.10 to 1.26.2</li>
-</ul>
-</li>
-<li>Added Python 3.9 testing to CI</li>
-</ul>
-<h2 id="030-10032020">0.3.0 (10/03/2020)</h2>
-<ul>
-<li>Introduces multiple breaking changes compared to the previous version!</li>
-<li>Dropped features related to the WorldCat Search API</li>
-<li>Support for Worldcat Metadata API v.1.1 introduced in May 2020</li>
-<li>Supported Metdata API endpoints:<ul>
-<li>/bibs-retained-holdings</li>
-<li>/bibs-summary-holdings</li>
-<li>/brief-bibs</li>
-<li>/brief-bibs/{oclcNumber}</li>
-<li>/brief-bibs/{oclcNumber}/other-editions</li>
-<li>/bib/data/{oclcNumber}</li>
-<li>/bib/checkcontrolnumbers</li>
-<li>/ih/data (POST|DELETE)</li>
-<li>/ih/checkholdings</li>
-<li>/ih/datalist (POST|DELETE)</li>
-</ul>
-</li>
-<li>API reference added to docs with mkapi</li>
-</ul>
-<h2 id="021-9282020">0.2.1 (9/28/2020)</h2>
-<ul>
-<li>added functionality for docs versioning with mike</li>
-</ul>
-<h2 id="020-04302020">0.2.0 (04/30/2020)</h2>
-<ul>
-<li>Expanded and improved documentation</li>
-<li>Customizable "user-agent" in session header and token request</li>
-<li>SRU/CQL query syntax aligned with OCLC specifications</li>
-<li><code>TokenRequestError</code> exception added on failed access token request</li>
-<li>fixed hooks info in docstrings in <code>SearchSession</code> and <code>MetadataSession</code></li>
-</ul>
+  <h1>bookops_worldcat.errors</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="bookops_worldcat.errors"></a>
+    <div class="doc doc-contents first">
+
+        <p>This module contains the set of bookops_worldcat exceptions.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bookops_worldcat.errors.BookopsWorldcatError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">BookopsWorldcatError</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
+
+
+        <p>Base class for exceptions in this module.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bookops_worldcat.errors.InvalidOclcNumber" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">InvalidOclcNumber</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="bookops_worldcat.errors.BookopsWorldcatError" href="#bookops_worldcat.errors.BookopsWorldcatError">BookopsWorldcatError</a></code></p>
+
+
+        <p>Exception raised when an invalid OCLC record number is encountered</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bookops_worldcat.errors.WorldcatAuthorizationError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">WorldcatAuthorizationError</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="bookops_worldcat.errors.BookopsWorldcatError" href="#bookops_worldcat.errors.BookopsWorldcatError">BookopsWorldcatError</a></code></p>
+
+
+        <p>Exception raised when WorldCat access token is not obtained</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bookops_worldcat.errors.WorldcatRequestError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">WorldcatRequestError</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="bookops_worldcat.errors.WorldcatSessionError" href="#bookops_worldcat.errors.WorldcatSessionError">WorldcatSessionError</a></code></p>
+
+
+        <p>Exceptions raised on HTTP errors returned by web service</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bookops_worldcat.errors.WorldcatSessionError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">WorldcatSessionError</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="bookops_worldcat.errors.BookopsWorldcatError" href="#bookops_worldcat.errors.BookopsWorldcatError">BookopsWorldcatError</a></code></p>
+
+
+        <p>Exception raised during WorlCat session</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 
@@ -986,7 +1001,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../about/" class="md-footer__link md-footer__link--prev" aria-label="Previous: About BookOps">
+          <a href="../authorize/" class="md-footer__link md-footer__link--prev" aria-label="Previous: bookops_worldcat.authorize">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -996,20 +1011,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                About BookOps
+                bookops_worldcat.authorize
               </div>
             </div>
           </a>
         
         
           
-          <a href="../api/authorize/" class="md-footer__link md-footer__link--next" aria-label="Next: bookops_worldcat.authorize">
+          <a href="../metadata_api/" class="md-footer__link md-footer__link--next" aria-label="Next: bookops_worldcat.metadata_api">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                bookops_worldcat.authorize
+                bookops_worldcat.metadata_api
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1043,10 +1058,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "content.code.copy", "content.code.annotate", "navigation.tabs", "navigation.tabs.sticky", "navigation.footer", "navigation.sections", "navigation.expand"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tabs.link", "content.code.copy", "content.code.annotate", "navigation.tabs", "navigation.tabs.sticky", "navigation.footer", "navigation.sections", "navigation.expand"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>

@@ -12,4 +12,20 @@
          <loc>https://bookops-cat.github.io/bookops-worldcat/0.3/changelog/</loc>
          <lastmod>2024-12-04</lastmod>
     </url>
+    <url>
+         <loc>https://bookops-cat.github.io/bookops-worldcat/0.3/api/authorize/</loc>
+         <lastmod>2024-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://bookops-cat.github.io/bookops-worldcat/0.3/api/errors/</loc>
+         <lastmod>2024-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://bookops-cat.github.io/bookops-worldcat/0.3/api/metadata_api/</loc>
+         <lastmod>2024-12-04</lastmod>
+    </url>
+    <url>
+         <loc>https://bookops-cat.github.io/bookops-worldcat/0.3/api/utils/</loc>
+         <lastmod>2024-12-04</lastmod>
+    </url>
 </urlset>
