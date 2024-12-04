@@ -1149,7 +1149,7 @@
             </td>
             <td class="doc-raises-details">
               <div class="doc-md-description">
-                <p>If <code>oclcNumber</code> argument does not match</p>
+                <p>If <code>oclcNumber</code> argument does not match OCLC number formatting rules.</p>
               </div>
             </td>
           </tr>
@@ -1199,8 +1199,8 @@
 <span class="sd">        `oclcNumber` as str</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        InvalidOclcNumber: If `oclcNumber` argument does not match</span>
-<span class="sd">        OCLC number formatting rules.</span>
+<span class="sd">        InvalidOclcNumber:</span>
+<span class="sd">            If `oclcNumber` argument does not match OCLC number formatting rules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^ocm[0-9]{,8}$&quot;</span><span class="p">,</span> <span class="n">oclcNumber</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
