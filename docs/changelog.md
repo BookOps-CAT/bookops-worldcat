@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.1] - (2/18/2025)
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [1.1.0] - (11/15/2024)
 ### Added
 + Support for new Metadata API functionality:
