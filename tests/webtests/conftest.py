@@ -57,7 +57,13 @@ def method_params() -> Callable:
     return get_params
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
+def metadata_api_endpoints(metadata_session_open_api_spec) -> dict:
+    """Retrieves endpoints from Metadata API Open API spec"""
+    return metadata_session_open_api_spec["paths"]
+
+
+@pytest.fixture(scope="module")
 def metadata_session_open_api_spec() -> dict:
     """Retrieves OpenAPI spec from Metadata API documentation"""
     yaml_response = requests.get(

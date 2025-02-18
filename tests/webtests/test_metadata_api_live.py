@@ -626,11 +626,9 @@ class TestLiveMetadataSessionErrors:
 class TestAPISpec:
     """Compares API spec with MetadataSession methods"""
 
-    def test_open_api_spec_check(self, metadata_session_open_api_spec):
+    def test_check_endpoint_list(self, metadata_api_endpoints):
         """Confirm API spec contains the same endpoints as expected."""
-        endpoints = metadata_session_open_api_spec["paths"]
-        assert len(endpoints) == 30
-        assert sorted(endpoints) == sorted(
+        assert sorted(metadata_api_endpoints) == sorted(
             [
                 "/worldcat/manage/bibs/validate/{validationLevel}",
                 "/worldcat/manage/bibs/current",
@@ -664,47 +662,89 @@ class TestAPISpec:
                 "/worldcat/browse/my-holdings",
             ]
         )
-        post_endpoints = [
-            "/worldcat/manage/bibs/validate/{validationLevel}",
-            "/worldcat/manage/bibs",
-            "/worldcat/manage/bibs/match",
-            "/worldcat/manage/institution/holdings/{oclcNumber}/set",
-            "/worldcat/manage/institution/holdings/{oclcNumber}/unset",
-            "/worldcat/manage/institution/holdings/set",
-            "/worldcat/manage/institution/holdings/unset",
-            "/worldcat/manage/lbds",
-            "/worldcat/manage/lhrs",
+
+    def test_check_endpoint_methods_delete(self, metadata_api_endpoints):
+        """Confirm expected endpoints allow for DELETE method."""
+        delete_endpoints = [
+            i
+            for i in metadata_api_endpoints
+            if "delete" in list(metadata_api_endpoints[i].keys())
         ]
+        assert sorted(delete_endpoints) == sorted(
+            [
+                "/worldcat/manage/lbds/{controlNumber}",
+                "/worldcat/manage/lhrs/{controlNumber}",
+            ]
+        )
+
+    def test_check_endpoint_methods_get(self, metadata_api_endpoints):
+        """Confirm expected endpoints allow for GET method."""
         get_endpoints = [
-            "/worldcat/manage/bibs/current",
-            "/worldcat/manage/institution/holdings/current",
-            "/worldcat/manage/institution/holding-codes",
-            "/worldcat/manage/institution-config/branch-shelving-locations",
-            "/worldcat/search/brief-bibs",
-            "/worldcat/search/brief-bibs/{oclcNumber}",
-            "/worldcat/search/classification-bibs/{oclcNumber}",
-            "/worldcat/search/brief-bibs/{oclcNumber}/other-editions",
-            "/worldcat/search/bibs-retained-holdings",
-            "/worldcat/search/bibs-summary-holdings",
-            "/worldcat/search/bibs/{oclcNumber}",
-            "/worldcat/search/summary-holdings",
-            "/worldcat/search/retained-holdings",
-            "/worldcat/search/my-local-bib-data/{controlNumber}",
-            "/worldcat/search/my-local-bib-data",
-            "/worldcat/search/my-holdings/{controlNumber}",
-            "/worldcat/search/my-holdings",
-            "/worldcat/browse/my-holdings",
+            i
+            for i in metadata_api_endpoints
+            if "get" in list(metadata_api_endpoints[i].keys())
         ]
-        for endpoint in endpoints:
-            methods = list(endpoints[endpoint].keys())
-            if endpoint in post_endpoints:
-                assert methods == ["post"]
-            elif endpoint in get_endpoints:
-                assert methods == ["get"]
-            elif endpoint == "/worldcat/manage/bibs/{oclcNumber}":
-                assert sorted(methods) == ["get", "put"]
-            else:
-                assert sorted(methods) == ["delete", "get", "put"]
+        assert sorted(get_endpoints) == sorted(
+            [
+                "/worldcat/manage/bibs/{oclcNumber}",
+                "/worldcat/manage/bibs/current",
+                "/worldcat/manage/institution/holdings/current",
+                "/worldcat/manage/institution/holding-codes",
+                "/worldcat/manage/institution-config/branch-shelving-locations",
+                "/worldcat/manage/lbds/{controlNumber}",
+                "/worldcat/manage/lhrs/{controlNumber}",
+                "/worldcat/search/brief-bibs",
+                "/worldcat/search/brief-bibs/{oclcNumber}",
+                "/worldcat/search/classification-bibs/{oclcNumber}",
+                "/worldcat/search/brief-bibs/{oclcNumber}/other-editions",
+                "/worldcat/search/bibs-retained-holdings",
+                "/worldcat/search/bibs-summary-holdings",
+                "/worldcat/search/bibs/{oclcNumber}",
+                "/worldcat/search/summary-holdings",
+                "/worldcat/search/retained-holdings",
+                "/worldcat/search/my-local-bib-data/{controlNumber}",
+                "/worldcat/search/my-local-bib-data",
+                "/worldcat/search/my-holdings/{controlNumber}",
+                "/worldcat/search/my-holdings",
+                "/worldcat/browse/my-holdings",
+            ]
+        )
+
+    def test_check_endpoint_methods_post(self, metadata_api_endpoints):
+        """Confirm expected endpoints allow for POST method."""
+        post_endpoints = [
+            i
+            for i in metadata_api_endpoints
+            if "post" in list(metadata_api_endpoints[i].keys())
+        ]
+        assert sorted(post_endpoints) == sorted(
+            [
+                "/worldcat/manage/bibs/validate/{validationLevel}",
+                "/worldcat/manage/bibs",
+                "/worldcat/manage/bibs/match",
+                "/worldcat/manage/institution/holdings/{oclcNumber}/set",
+                "/worldcat/manage/institution/holdings/{oclcNumber}/unset",
+                "/worldcat/manage/institution/holdings/set",
+                "/worldcat/manage/institution/holdings/unset",
+                "/worldcat/manage/lbds",
+                "/worldcat/manage/lhrs",
+            ]
+        )
+
+    def test_check_endpoint_methods_put(self, metadata_api_endpoints):
+        """Confirm expected endpoints allow for PUT method."""
+        put_endpoints = [
+            i
+            for i in metadata_api_endpoints
+            if "put" in list(metadata_api_endpoints[i].keys())
+        ]
+        assert sorted(put_endpoints) == sorted(
+            [
+                "/worldcat/manage/bibs/{oclcNumber}",
+                "/worldcat/manage/lbds/{controlNumber}",
+                "/worldcat/manage/lhrs/{controlNumber}",
+            ]
+        )
 
     def test_params_bib_get(self, live_token, endpoint_params, method_params):
         with MetadataSession(authorization=live_token, totalRetries=2) as session:
