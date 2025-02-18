@@ -21,7 +21,7 @@ class TestLiveMetadataSession:
     ]
 
     def test_bib_get(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_get(850940461)
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             headers = response.headers
@@ -32,7 +32,7 @@ class TestLiveMetadataSession:
             assert response.content.decode().startswith("<?xml version=")
 
     def test_bib_get_classification(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_get_classification(850940461)
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert endpoint == "worldcat/search/classification-bibs/850940461"
@@ -43,7 +43,7 @@ class TestLiveMetadataSession:
             assert sorted(response.json()["lc"].keys()) == ["mostPopular"]
 
     def test_bib_get_current_oclc_number(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_get_current_oclc_number([41266045, 519740398])
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
@@ -57,7 +57,7 @@ class TestLiveMetadataSession:
             )
 
     def test_bib_get_current_oclc_number_str(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_get_current_oclc_number("41266045")
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
@@ -68,7 +68,7 @@ class TestLiveMetadataSession:
             )
 
     def test_bib_match(self, live_token, stub_marc_xml):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_match(
                 stub_marc_xml, recordFormat="application/marcxml+xml"
             )
@@ -103,7 +103,7 @@ class TestLiveMetadataSession:
             ) == sorted(self.CAT_INFO_KEYS)
 
     def test_bib_search(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_search(41266045)
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert endpoint == "worldcat/search/bibs/41266045"
@@ -131,7 +131,7 @@ class TestLiveMetadataSession:
             )
 
     def test_bib_validate(self, live_token, stub_marc21):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_validate(
                 stub_marc21, recordFormat="application/marc"
             )
@@ -145,7 +145,7 @@ class TestLiveMetadataSession:
             )
 
     def test_brief_bibs_get(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.brief_bibs_get(41266045)
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert endpoint == "worldcat/search/brief-bibs/41266045"
@@ -174,7 +174,7 @@ class TestLiveMetadataSession:
             )
 
     def test_brief_bibs_search(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.brief_bibs_search(
                 q="ti:Zendegi", inLanguage="eng", inCatalogLanguage="eng"
             )
@@ -207,7 +207,7 @@ class TestLiveMetadataSession:
             ) == sorted(self.CAT_INFO_KEYS)
 
     def test_brief_bibs_get_other_editions(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.brief_bibs_get_other_editions(41266045)
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert (
@@ -239,7 +239,7 @@ class TestLiveMetadataSession:
             ) == sorted(self.CAT_INFO_KEYS)
 
     def test_holdings_get_codes(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.holdings_get_codes()
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert endpoint == "worldcat/manage/institution/holding-codes"
@@ -254,7 +254,7 @@ class TestLiveMetadataSession:
             ]
 
     def test_holdings_get_current(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.holdings_get_current("982651100")
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert (
@@ -418,7 +418,7 @@ class TestLiveMetadataSession:
             assert response.json()["action"] == "Unset Holdings"
 
     def test_shared_print_holdings_search(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.shared_print_holdings_search(oclcNumber="41266045")
             assert (
                 response.url
@@ -452,7 +452,7 @@ class TestLiveMetadataSession:
             ) == sorted(self.CAT_INFO_KEYS)
 
     def test_summary_holdings_get(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.summary_holdings_get("41266045")
             assert (
                 response.url
@@ -464,7 +464,7 @@ class TestLiveMetadataSession:
             )
 
     def test_summary_holdings_search_isbn(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.summary_holdings_search(isbn="9781597801744")
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
@@ -499,7 +499,7 @@ class TestLiveMetadataSession:
             ) == sorted(self.CAT_INFO_KEYS)
 
     def test_summary_holdings_search_oclc(self, live_token):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.summary_holdings_search(oclcNumber="41266045")
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert response.status_code == 200
@@ -629,7 +629,7 @@ class TestAPISpec:
     def test_open_api_spec_check(self, metadata_session_open_api_spec):
         """Confirm API spec contains the same endpoints as expected."""
         endpoints = metadata_session_open_api_spec["paths"]
-        assert len(endpoints) == 29
+        assert len(endpoints) == 30
         assert sorted(endpoints) == sorted(
             [
                 "/worldcat/manage/bibs/validate/{validationLevel}",
@@ -643,6 +643,7 @@ class TestAPISpec:
                 "/worldcat/manage/institution/holdings/set",
                 "/worldcat/manage/institution/holdings/unset",
                 "/worldcat/manage/institution/holding-codes",
+                "/worldcat/manage/institution-config/branch-shelving-locations",
                 "/worldcat/manage/lbds/{controlNumber}",
                 "/worldcat/manage/lbds",
                 "/worldcat/manage/lhrs/{controlNumber}",
@@ -678,6 +679,7 @@ class TestAPISpec:
             "/worldcat/manage/bibs/current",
             "/worldcat/manage/institution/holdings/current",
             "/worldcat/manage/institution/holding-codes",
+            "/worldcat/manage/institution-config/branch-shelving-locations",
             "/worldcat/search/brief-bibs",
             "/worldcat/search/brief-bibs/{oclcNumber}",
             "/worldcat/search/classification-bibs/{oclcNumber}",
@@ -705,7 +707,7 @@ class TestAPISpec:
                 assert sorted(methods) == ["delete", "get", "put"]
 
     def test_params_bib_get(self, live_token, endpoint_params, method_params):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_get(41266045)
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -716,7 +718,7 @@ class TestAPISpec:
     def test_params_bib_get_classification(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_get_classification(41266045)
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -727,7 +729,7 @@ class TestAPISpec:
     def test_params_bib_get_current_oclc_number(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_get_current_oclc_number([41266045, 519740398])
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -738,7 +740,7 @@ class TestAPISpec:
     def test_params_bib_match_marcxml(
         self, live_token, stub_marc_xml, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_match(
                 stub_marc_xml, recordFormat="application/marcxml+xml"
             )
@@ -751,7 +753,7 @@ class TestAPISpec:
     def test_params_bib_validate(
         self, live_token, stub_marc21, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.bib_validate(
                 stub_marc21, recordFormat="application/marc"
             )
@@ -762,7 +764,7 @@ class TestAPISpec:
             assert endpoint_args == method_args
 
     def test_params_brief_bibs_get(self, live_token, endpoint_params, method_params):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.brief_bibs_get(41266045)
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -771,7 +773,7 @@ class TestAPISpec:
             assert endpoint_args == method_args
 
     def test_params_brief_bibs_search(self, live_token, endpoint_params, method_params):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.brief_bibs_search(
                 q="ti:Zendegi", inLanguage="eng", inCatalogLanguage="eng"
             )
@@ -784,7 +786,7 @@ class TestAPISpec:
     def test_params_brief_bibs_get_other_editions(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.brief_bibs_get_other_editions(41266045)
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -795,7 +797,7 @@ class TestAPISpec:
     def test_params_holdings_get_codes(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.holdings_get_codes()
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -806,7 +808,7 @@ class TestAPISpec:
     def test_params_holdings_get_current(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.holdings_get_current("982651100")
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -901,7 +903,7 @@ class TestAPISpec:
     def test_params_shared_print_holdings_search(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.shared_print_holdings_search(oclcNumber="41266045")
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -912,7 +914,7 @@ class TestAPISpec:
     def test_params_summary_holdings_get(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.summary_holdings_get("41266045")
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
@@ -923,7 +925,7 @@ class TestAPISpec:
     def test_params_summary_holdings_search_oclc(
         self, live_token, endpoint_params, method_params
     ):
-        with MetadataSession(authorization=live_token) as session:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.summary_holdings_search(oclcNumber="41266045")
             endpoint_args = endpoint_params(
                 response.request.url, response.request.method
