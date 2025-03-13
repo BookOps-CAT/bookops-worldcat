@@ -6,7 +6,10 @@
 ### Changed
 
 ### Fixed
-
+ - Live tests that were failing or making multiple api requests:
+   - Fixed error due to new, unannounced endpoint 
+   - Changed scope of `metadata_session_open_api_spec` so that multiple requests are not sent 
+   - Added automatic retries to monthly automated live tests
 ### Removed
 
 ## [1.1.0] - (11/15/2024)
