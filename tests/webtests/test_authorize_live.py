@@ -5,11 +5,11 @@ import os
 
 import pytest
 
-
 from bookops_worldcat.authorize import WorldcatAccessToken
 from bookops_worldcat.errors import WorldcatAuthorizationError
 
 
+@pytest.mark.usefixtures("live_keys")
 class TestWorldcatAccessToken:
     """Tests WorldcatAccessToken object"""
 
