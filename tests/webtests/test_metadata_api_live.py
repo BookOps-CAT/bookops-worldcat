@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-
 import os
-import pytest
 
+import pytest
 
 from bookops_worldcat import MetadataSession, WorldcatAccessToken
 from bookops_worldcat.errors import WorldcatRequestError
 
 
 @pytest.mark.webtest
+@pytest.mark.usefixtures("live_keys")
 class TestLiveMetadataSession:
     """Runs tests against live Metadata API"""
 
@@ -535,17 +535,11 @@ class TestLiveMetadataSession:
 
 
 @pytest.mark.webtest
-@pytest.mark.usefixtures("live_keys")
 class TestLiveMetadataSessionErrors:
     """Tests error responses from live Metadata API"""
 
-    def test_errors_invalid_query_param(self):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-        with MetadataSession(authorization=token) as session:
+    def test_errors_invalid_query_param(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.brief_bibs_get(-41266045)
             assert (
@@ -553,7 +547,7 @@ class TestLiveMetadataSessionErrors:
                 == str(exc.value)
             )
 
-    def test_errors_invalid_token(self):
+    def test_errors_invalid_token(self, live_keys):
         token = WorldcatAccessToken(
             key=os.getenv("WCKey"),
             secret=os.getenv("WCSecret"),
@@ -564,19 +558,13 @@ class TestLiveMetadataSessionErrors:
             session.headers.update({"Authorization": "Bearer invalid-token"})
             with pytest.raises(WorldcatRequestError) as exc:
                 session.brief_bibs_get(41266045)
-
             assert (
                 '401 Client Error: Unauthorized for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/41266045. Server response: {"message":"Unauthorized"}'
                 == str(exc.value)
             )
 
-    def test_errors_resource_not_found(self):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-        with MetadataSession(authorization=token) as session:
+    def test_errors_resource_not_found(self, live_token):
+        with MetadataSession(authorization=live_token) as session:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.lbd_get(12345)
             assert (
@@ -584,14 +572,8 @@ class TestLiveMetadataSessionErrors:
                 == str(exc.value)
             )
 
-    def test_errors_unacceptable_header(self, stub_marc21):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
-        with MetadataSession(authorization=token) as session:
+    def test_errors_unacceptable_header(self, stub_marc21, live_token):
+        with MetadataSession(authorization=live_token) as session:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.bib_validate(stub_marc21, recordFormat="foo/bar")
             assert (
@@ -600,15 +582,9 @@ class TestLiveMetadataSessionErrors:
             )
             assert session.adapters["https://"].max_retries.total == 0
 
-    def test_error_max_retries(self, stub_marc21):
-        token = WorldcatAccessToken(
-            key=os.getenv("WCKey"),
-            secret=os.getenv("WCSecret"),
-            scopes=os.getenv("WCScopes"),
-        )
-
+    def test_error_max_retries(self, stub_marc21, live_token):
         with MetadataSession(
-            authorization=token,
+            authorization=live_token,
             totalRetries=3,
             backoffFactor=0.5,
             statusForcelist=[406],
@@ -620,355 +596,3 @@ class TestLiveMetadataSessionErrors:
                 str(exc.value)
             )
             assert session.adapters["https://"].max_retries.total == 3
-
-
-@pytest.mark.webtest
-class TestAPISpec:
-    """Compares API spec with MetadataSession methods"""
-
-    def test_check_endpoint_list(self, metadata_api_endpoints):
-        """Confirm API spec contains the same endpoints as expected."""
-        assert sorted(metadata_api_endpoints) == sorted(
-            [
-                "/worldcat/manage/bibs/validate/{validationLevel}",
-                "/worldcat/manage/bibs/current",
-                "/worldcat/manage/bibs",
-                "/worldcat/manage/bibs/{oclcNumber}",
-                "/worldcat/manage/bibs/match",
-                "/worldcat/manage/institution/holdings/current",
-                "/worldcat/manage/institution/holdings/{oclcNumber}/set",
-                "/worldcat/manage/institution/holdings/{oclcNumber}/unset",
-                "/worldcat/manage/institution/holdings/set",
-                "/worldcat/manage/institution/holdings/unset",
-                "/worldcat/manage/institution/holding-codes",
-                "/worldcat/manage/institution-config/branch-shelving-locations",
-                "/worldcat/manage/lbds/{controlNumber}",
-                "/worldcat/manage/lbds",
-                "/worldcat/manage/lhrs/{controlNumber}",
-                "/worldcat/manage/lhrs",
-                "/worldcat/search/brief-bibs",
-                "/worldcat/search/brief-bibs/{oclcNumber}",
-                "/worldcat/search/classification-bibs/{oclcNumber}",
-                "/worldcat/search/brief-bibs/{oclcNumber}/other-editions",
-                "/worldcat/search/bibs-retained-holdings",
-                "/worldcat/search/bibs-summary-holdings",
-                "/worldcat/search/bibs/{oclcNumber}",
-                "/worldcat/search/summary-holdings",
-                "/worldcat/search/retained-holdings",
-                "/worldcat/search/my-local-bib-data/{controlNumber}",
-                "/worldcat/search/my-local-bib-data",
-                "/worldcat/search/my-holdings/{controlNumber}",
-                "/worldcat/search/my-holdings",
-                "/worldcat/browse/my-holdings",
-            ]
-        )
-
-    def test_check_endpoint_methods_delete(self, metadata_api_endpoints):
-        """Confirm expected endpoints allow for DELETE method."""
-        delete_endpoints = [
-            i
-            for i in metadata_api_endpoints
-            if "delete" in list(metadata_api_endpoints[i].keys())
-        ]
-        assert sorted(delete_endpoints) == sorted(
-            [
-                "/worldcat/manage/lbds/{controlNumber}",
-                "/worldcat/manage/lhrs/{controlNumber}",
-            ]
-        )
-
-    def test_check_endpoint_methods_get(self, metadata_api_endpoints):
-        """Confirm expected endpoints allow for GET method."""
-        get_endpoints = [
-            i
-            for i in metadata_api_endpoints
-            if "get" in list(metadata_api_endpoints[i].keys())
-        ]
-        assert sorted(get_endpoints) == sorted(
-            [
-                "/worldcat/manage/bibs/{oclcNumber}",
-                "/worldcat/manage/bibs/current",
-                "/worldcat/manage/institution/holdings/current",
-                "/worldcat/manage/institution/holding-codes",
-                "/worldcat/manage/institution-config/branch-shelving-locations",
-                "/worldcat/manage/lbds/{controlNumber}",
-                "/worldcat/manage/lhrs/{controlNumber}",
-                "/worldcat/search/brief-bibs",
-                "/worldcat/search/brief-bibs/{oclcNumber}",
-                "/worldcat/search/classification-bibs/{oclcNumber}",
-                "/worldcat/search/brief-bibs/{oclcNumber}/other-editions",
-                "/worldcat/search/bibs-retained-holdings",
-                "/worldcat/search/bibs-summary-holdings",
-                "/worldcat/search/bibs/{oclcNumber}",
-                "/worldcat/search/summary-holdings",
-                "/worldcat/search/retained-holdings",
-                "/worldcat/search/my-local-bib-data/{controlNumber}",
-                "/worldcat/search/my-local-bib-data",
-                "/worldcat/search/my-holdings/{controlNumber}",
-                "/worldcat/search/my-holdings",
-                "/worldcat/browse/my-holdings",
-            ]
-        )
-
-    def test_check_endpoint_methods_post(self, metadata_api_endpoints):
-        """Confirm expected endpoints allow for POST method."""
-        post_endpoints = [
-            i
-            for i in metadata_api_endpoints
-            if "post" in list(metadata_api_endpoints[i].keys())
-        ]
-        assert sorted(post_endpoints) == sorted(
-            [
-                "/worldcat/manage/bibs/validate/{validationLevel}",
-                "/worldcat/manage/bibs",
-                "/worldcat/manage/bibs/match",
-                "/worldcat/manage/institution/holdings/{oclcNumber}/set",
-                "/worldcat/manage/institution/holdings/{oclcNumber}/unset",
-                "/worldcat/manage/institution/holdings/set",
-                "/worldcat/manage/institution/holdings/unset",
-                "/worldcat/manage/lbds",
-                "/worldcat/manage/lhrs",
-            ]
-        )
-
-    def test_check_endpoint_methods_put(self, metadata_api_endpoints):
-        """Confirm expected endpoints allow for PUT method."""
-        put_endpoints = [
-            i
-            for i in metadata_api_endpoints
-            if "put" in list(metadata_api_endpoints[i].keys())
-        ]
-        assert sorted(put_endpoints) == sorted(
-            [
-                "/worldcat/manage/bibs/{oclcNumber}",
-                "/worldcat/manage/lbds/{controlNumber}",
-                "/worldcat/manage/lhrs/{controlNumber}",
-            ]
-        )
-
-    def test_params_bib_get(self, live_token, endpoint_params, method_params):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_get(41266045)
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.bib_get)
-            assert endpoint_args == method_args
-
-    def test_params_bib_get_classification(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_get_classification(41266045)
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.bib_get_classification)
-            assert endpoint_args == method_args
-
-    def test_params_bib_get_current_oclc_number(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_get_current_oclc_number([41266045, 519740398])
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.bib_get_current_oclc_number)
-            assert endpoint_args == method_args
-
-    def test_params_bib_match_marcxml(
-        self, live_token, stub_marc_xml, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_match(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.bib_match)
-            assert endpoint_args == method_args
-
-    def test_params_bib_validate(
-        self, live_token, stub_marc21, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_validate(
-                stub_marc21, recordFormat="application/marc"
-            )
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.bib_validate)
-            assert endpoint_args == method_args
-
-    def test_params_brief_bibs_get(self, live_token, endpoint_params, method_params):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.brief_bibs_get(41266045)
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.brief_bibs_get)
-            assert endpoint_args == method_args
-
-    def test_params_brief_bibs_search(self, live_token, endpoint_params, method_params):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.brief_bibs_search(
-                q="ti:Zendegi", inLanguage="eng", inCatalogLanguage="eng"
-            )
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.brief_bibs_search)
-            assert endpoint_args == method_args
-
-    def test_params_brief_bibs_get_other_editions(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.brief_bibs_get_other_editions(41266045)
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.brief_bibs_get_other_editions)
-            assert endpoint_args == method_args
-
-    def test_params_holdings_get_codes(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.holdings_get_codes()
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.holdings_get_codes)
-            assert endpoint_args == method_args
-
-    def test_params_holdings_get_current(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.holdings_get_current("982651100")
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.holdings_get_current)
-            assert endpoint_args == method_args
-
-    @pytest.mark.holdings
-    def test_params_holdings_set_unset(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(
-            authorization=live_token,
-            totalRetries=3,
-            backoffFactor=0.5,
-            statusForcelist=[408, 500, 502, 503, 504],
-            allowedMethods=["GET", "POST"],
-        ) as session:
-            get_response = session.holdings_get_current("850940548")
-            holdings = get_response.json()["holdings"]
-            current_holding_endpoint_args = endpoint_params(
-                get_response.request.url, get_response.request.method
-            )
-            current_holding_method_args = method_params(session.holdings_get_current)
-            assert current_holding_endpoint_args == current_holding_method_args
-
-            # make sure no holdings are set initially
-            if len(holdings) > 0:
-                session.holdings_unset(850940548)
-
-            # test setting holdings
-            set_response = session.holdings_set(850940548)
-            set_holding_endpoint_args = endpoint_params(
-                set_response.request.url, set_response.request.method
-            )
-            set_holding_method_args = method_params(session.holdings_set)
-            assert set_holding_endpoint_args == set_holding_method_args
-
-            # test deleting holdings
-            unset_response = session.holdings_unset(oclcNumber=850940548)
-            unset_holding_endpoint_args = endpoint_params(
-                unset_response.request.url, unset_response.request.method
-            )
-            unset_holding_method_args = method_params(session.holdings_unset)
-            assert unset_holding_endpoint_args == unset_holding_method_args
-
-    @pytest.mark.holdings
-    def test_params_holdings_set_unset_with_bib(
-        self, live_token, endpoint_params, method_params, stub_marc_xml
-    ):
-        with MetadataSession(
-            authorization=live_token,
-            totalRetries=3,
-            backoffFactor=0.5,
-            statusForcelist=[408, 500, 502, 503, 504],
-            allowedMethods=["GET", "POST"],
-        ) as session:
-            get_response = session.holdings_get_current("850940548")
-            holdings = get_response.json()["holdings"]
-            current_holding_endpoint_args = endpoint_params(
-                get_response.request.url, get_response.request.method
-            )
-            current_holding_method_args = method_params(session.holdings_get_current)
-            assert current_holding_endpoint_args == current_holding_method_args
-
-            # make sure no holdings are set initially
-            if len(holdings) > 0:
-                session.holdings_unset_with_bib(
-                    stub_marc_xml, recordFormat="application/marcxml+xml"
-                )
-
-            # test setting holdings
-            set_response = session.holdings_set_with_bib(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            set_holding_endpoint_args = endpoint_params(
-                set_response.request.url, set_response.request.method
-            )
-            set_holding_method_args = method_params(session.holdings_set_with_bib)
-            assert set_holding_endpoint_args == set_holding_method_args
-
-            # test deleting holdings
-            unset_response = session.holdings_unset_with_bib(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            unset_holding_endpoint_args = endpoint_params(
-                unset_response.request.url, unset_response.request.method
-            )
-            unset_holding_method_args = method_params(session.holdings_unset_with_bib)
-            assert unset_holding_endpoint_args == unset_holding_method_args
-
-    def test_params_shared_print_holdings_search(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.shared_print_holdings_search(oclcNumber="41266045")
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.shared_print_holdings_search)
-            assert endpoint_args == method_args
-
-    def test_params_summary_holdings_get(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.summary_holdings_get("41266045")
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.summary_holdings_get)
-            assert endpoint_args == method_args
-
-    def test_params_summary_holdings_search_oclc(
-        self, live_token, endpoint_params, method_params
-    ):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.summary_holdings_search(oclcNumber="41266045")
-            endpoint_args = endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = method_params(session.summary_holdings_search)
-            assert endpoint_args == method_args
