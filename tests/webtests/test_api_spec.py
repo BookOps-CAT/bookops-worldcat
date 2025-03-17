@@ -57,7 +57,7 @@ class TestAPISpec:
         url = url.split("https://metadata.api.oclc.org")[1].split("?")[0]
         pattern = r"\d+"
         if "validate" in url:
-            endpoint = f"{url.rsplit("/", 1)[0]}/{{validationLevel}}"
+            endpoint = f"{url.rsplit('/', 1)[0]}/{{validationLevel}}"
         elif any(i in ["lbds", "lhrs", "my-"] for i in url):
             endpoint = re.sub(pattern, "{controlNumber}", url)
         else:
