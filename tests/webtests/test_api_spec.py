@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+import ast
 import inspect
-import re
 from functools import cached_property
-from typing import Callable, List
+from typing import Callable
 
 import pytest
 import requests
@@ -33,7 +33,7 @@ class TestAPISpec:
         """Retrieves endpoints from Metadata API Open API spec"""
         return self.api_spec_dict["paths"]
 
-    def endpoint_params(self, url: str, method: str) -> List[str]:
+    def params_from_yaml(self, method: Callable) -> list:
         """
         Reads yaml file from OCLC API documentation (available here:
         https://developer.api.oclc.org/wc-metadata-v2) and returns list of
@@ -44,25 +44,37 @@ class TestAPISpec:
         during the monthly API tests. Function removes "Accept" param as it is not
         part of the API and any deprecated params.
 
-        Takes url and method from `requests.Request` object and returns list of parameters
-        as listed in the OCLC Metadata API documentation.
+        Reads source code to get http method and endpoint used in API call made by the
+        method.
 
         Args:
-            url: a url as a string (from `url` attribute of `requests.Request` object)
-            method: an http method as a string
+            method: method within `MetadataSession` class
 
         Returns:
             a list of parameters for the endpoint as defined in the API spec
         """
-        url = url.split("https://metadata.api.oclc.org")[1].split("?")[0]
-        pattern = r"\d+"
-        if "validate" in url:
-            endpoint = f"{url.rsplit('/', 1)[0]}/{{validationLevel}}"
-        elif any(i in ["lbds", "lhrs", "my-"] for i in url):
-            endpoint = re.sub(pattern, "{controlNumber}", url)
-        else:
-            endpoint = re.sub(pattern, "{oclcNumber}", url)
-        params = self.endpoints[endpoint][method.lower()].get("parameters")
+        http_method = ""
+        url_source = ""
+        for node in ast.walk(ast.parse(inspect.getsource(method).removeprefix("    "))):
+            if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
+                args = node.value.args
+                func = node.value.func
+                if isinstance(func, ast.Name) and func.id == "Request":
+                    http_method = [i.value for i in args if hasattr(i, "value")][0]
+                elif isinstance(func, ast.Attribute) and func.attr.startswith("_"):
+                    url_source = inspect.getsource(getattr(MetadataSession, func.attr))
+
+        endpoint = ""
+        for node in ast.walk(ast.parse(url_source.removeprefix("    "))):
+            if isinstance(node, ast.Return) and isinstance(node.value, ast.JoinedStr):
+                values = [i.value for i in node.value.values if hasattr(i, "value")]
+                endpoint_parts = [i for i in values if isinstance(i, (ast.Name, str))]
+                out = []
+                for part in endpoint_parts:
+                    out_part = f"{{{part.id}}}" if isinstance(part, ast.Name) else part
+                    out.append(out_part)
+                endpoint = "/worldcat" + "".join(out)
+        params = self.endpoints[endpoint][http_method.lower()].get("parameters")
         if not params:
             return []
         if any("name" not in i.keys() for i in params):
@@ -71,7 +83,7 @@ class TestAPISpec:
             params = [lookup[i] for i in refs if "deprecated" not in lookup[i]]
         return [i["name"] for i in params if i["name"] != "Accept"]
 
-    def method_params(self, method: Callable) -> list:
+    def params_from_method(self, method: Callable) -> list:
         """
         Inspects signature of `MetadataSession` method and and returns list
         of parameters to compare to parameters included in OpenAPI spec. Filters
@@ -89,7 +101,15 @@ class TestAPISpec:
         return [
             i
             for i in list(inspect.signature(method).parameters.keys())
-            if i not in ["Accept", "hooks", "record", "responseFormat", "recordFormat"]
+            if i
+            not in [
+                "Accept",
+                "hooks",
+                "record",
+                "responseFormat",
+                "recordFormat",
+                "self",
+            ]
         ]
 
     def test_check_endpoint_list(self):
@@ -204,211 +224,103 @@ class TestAPISpec:
             ]
         )
 
-    def test_params_bib_get(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_get(41266045)
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.bib_get)
-            assert endpoint_args == method_args
+    def test_params_bib_get(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.bib_get)
+        method_args = self.params_from_method(MetadataSession.bib_get)
+        assert endpoint_args == method_args
 
-    def test_params_bib_get_classification(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_get_classification(41266045)
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.bib_get_classification)
-            assert endpoint_args == method_args
+    def test_params_bib_get_classification(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.bib_get_classification)
+        method_args = self.params_from_method(MetadataSession.bib_get_classification)
+        assert endpoint_args == method_args
 
-    def test_params_bib_get_current_oclc_number(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_get_current_oclc_number([41266045, 519740398])
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.bib_get_current_oclc_number)
-            assert endpoint_args == method_args
+    def test_params_bib_get_current_oclc_number(self):
+        endpoint_args = self.params_from_yaml(
+            MetadataSession.bib_get_current_oclc_number
+        )
+        method_args = self.params_from_method(
+            MetadataSession.bib_get_current_oclc_number
+        )
+        assert endpoint_args == method_args
 
-    def test_params_bib_match_marcxml(self, live_token, stub_marc_xml):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_match(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.bib_match)
-            assert endpoint_args == method_args
+    def test_params_bib_match(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.bib_match)
+        method_args = self.params_from_method(MetadataSession.bib_match)
+        assert endpoint_args == method_args
 
-    def test_params_bib_validate(self, live_token, stub_marc21):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.bib_validate(
-                stub_marc21, recordFormat="application/marc"
-            )
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.bib_validate)
-            assert endpoint_args == method_args
+    def test_params_bib_validate(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.bib_validate)
+        method_args = self.params_from_method(MetadataSession.bib_validate)
+        assert endpoint_args == method_args
 
-    def test_params_brief_bibs_get(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.brief_bibs_get(41266045)
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.brief_bibs_get)
-            assert endpoint_args == method_args
+    def test_params_brief_bibs_get(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.brief_bibs_get)
+        method_args = self.params_from_method(MetadataSession.brief_bibs_get)
+        assert endpoint_args == method_args
 
-    def test_params_brief_bibs_search(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.brief_bibs_search(
-                q="ti:Zendegi", inLanguage="eng", inCatalogLanguage="eng"
-            )
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.brief_bibs_search)
-            assert endpoint_args == method_args
+    def test_params_brief_bibs_search(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.brief_bibs_search)
+        method_args = self.params_from_method(MetadataSession.brief_bibs_search)
+        assert endpoint_args == method_args
 
-    def test_params_brief_bibs_get_other_editions(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.brief_bibs_get_other_editions(41266045)
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.brief_bibs_get_other_editions)
-            assert endpoint_args == method_args
+    def test_params_brief_bibs_get_other_editions(self):
+        endpoint_args = self.params_from_yaml(
+            MetadataSession.brief_bibs_get_other_editions
+        )
+        method_args = self.params_from_method(
+            MetadataSession.brief_bibs_get_other_editions
+        )
+        assert endpoint_args == method_args
 
-    def test_params_holdings_get_codes(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.holdings_get_codes()
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.holdings_get_codes)
-            assert endpoint_args == method_args
+    def test_params_holdings_get_codes(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.holdings_get_codes)
+        method_args = self.params_from_method(MetadataSession.holdings_get_codes)
+        assert endpoint_args == method_args
 
-    def test_params_holdings_get_current(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.holdings_get_current("982651100")
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.holdings_get_current)
-            assert endpoint_args == method_args
+    def test_params_holdings_get_current(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.holdings_get_current)
+        method_args = self.params_from_method(MetadataSession.holdings_get_current)
+        assert endpoint_args == method_args
 
     @pytest.mark.holdings
-    def test_params_holdings_set_unset(self, live_token):
-        with MetadataSession(
-            authorization=live_token,
-            totalRetries=3,
-            backoffFactor=0.5,
-            statusForcelist=[408, 500, 502, 503, 504],
-            allowedMethods=["GET", "POST"],
-        ) as session:
-            get_response = session.holdings_get_current("850940548")
-            holdings = get_response.json()["holdings"]
-            current_holding_endpoint_args = self.endpoint_params(
-                get_response.request.url, get_response.request.method
-            )
-            current_holding_method_args = self.method_params(
-                session.holdings_get_current
-            )
-            assert current_holding_endpoint_args == current_holding_method_args
-
-            # make sure no holdings are set initially
-            if len(holdings) > 0:
-                session.holdings_unset(850940548)
-
-            # test setting holdings
-            set_response = session.holdings_set(850940548)
-            set_holding_endpoint_args = self.endpoint_params(
-                set_response.request.url, set_response.request.method
-            )
-            set_holding_method_args = self.method_params(session.holdings_set)
-            assert set_holding_endpoint_args == set_holding_method_args
-
-            # test deleting holdings
-            unset_response = session.holdings_unset(oclcNumber=850940548)
-            unset_holding_endpoint_args = self.endpoint_params(
-                unset_response.request.url, unset_response.request.method
-            )
-            unset_holding_method_args = self.method_params(session.holdings_unset)
-            assert unset_holding_endpoint_args == unset_holding_method_args
+    def test_params_holdings_set(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.holdings_set)
+        method_args = self.params_from_method(MetadataSession.holdings_set)
+        assert endpoint_args == method_args
 
     @pytest.mark.holdings
-    def test_params_holdings_set_unset_with_bib(self, live_token, stub_marc_xml):
-        with MetadataSession(
-            authorization=live_token,
-            totalRetries=3,
-            backoffFactor=0.5,
-            statusForcelist=[408, 500, 502, 503, 504],
-            allowedMethods=["GET", "POST"],
-        ) as session:
-            get_response = session.holdings_get_current("850940548")
-            holdings = get_response.json()["holdings"]
-            current_holding_endpoint_args = self.endpoint_params(
-                get_response.request.url, get_response.request.method
-            )
-            current_holding_method_args = self.method_params(
-                session.holdings_get_current
-            )
-            assert current_holding_endpoint_args == current_holding_method_args
+    def test_params_holdings_unset(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.holdings_unset)
+        method_args = self.params_from_method(MetadataSession.holdings_unset)
+        assert endpoint_args == method_args
 
-            # make sure no holdings are set initially
-            if len(holdings) > 0:
-                session.holdings_unset_with_bib(
-                    stub_marc_xml, recordFormat="application/marcxml+xml"
-                )
+    @pytest.mark.holdings
+    def test_params_holdings_set_with_bib(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.holdings_set_with_bib)
+        method_args = self.params_from_method(MetadataSession.holdings_set_with_bib)
+        assert endpoint_args == method_args
 
-            # test setting holdings
-            set_response = session.holdings_set_with_bib(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            set_holding_endpoint_args = self.endpoint_params(
-                set_response.request.url, set_response.request.method
-            )
-            set_holding_method_args = self.method_params(session.holdings_set_with_bib)
-            assert set_holding_endpoint_args == set_holding_method_args
+    @pytest.mark.holdings
+    def test_params_holdings_unset_with_bib(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.holdings_unset_with_bib)
+        method_args = self.params_from_method(MetadataSession.holdings_unset_with_bib)
+        assert endpoint_args == method_args
 
-            # test deleting holdings
-            unset_response = session.holdings_unset_with_bib(
-                stub_marc_xml, recordFormat="application/marcxml+xml"
-            )
-            unset_holding_endpoint_args = self.endpoint_params(
-                unset_response.request.url, unset_response.request.method
-            )
-            unset_holding_method_args = self.method_params(
-                session.holdings_unset_with_bib
-            )
-            assert unset_holding_endpoint_args == unset_holding_method_args
+    def test_params_shared_print_holdings_search(self):
+        endpoint_args = self.params_from_yaml(
+            MetadataSession.shared_print_holdings_search
+        )
+        method_args = self.params_from_method(
+            MetadataSession.shared_print_holdings_search
+        )
+        assert endpoint_args == method_args
 
-    def test_params_shared_print_holdings_search(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.shared_print_holdings_search(oclcNumber="41266045")
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.shared_print_holdings_search)
-            assert endpoint_args == method_args
+    def test_params_summary_holdings_get(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.summary_holdings_get)
+        method_args = self.params_from_method(MetadataSession.summary_holdings_get)
+        assert endpoint_args == method_args
 
-    def test_params_summary_holdings_get(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.summary_holdings_get("41266045")
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.summary_holdings_get)
-            assert endpoint_args == method_args
-
-    def test_params_summary_holdings_search_oclc(self, live_token):
-        with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.summary_holdings_search(oclcNumber="41266045")
-            endpoint_args = self.endpoint_params(
-                response.request.url, response.request.method
-            )
-            method_args = self.method_params(session.summary_holdings_search)
-            assert endpoint_args == method_args
+    def test_params_summary_holdings_search_oclc(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.summary_holdings_search)
+        method_args = self.params_from_method(MetadataSession.summary_holdings_search)
+        assert endpoint_args == method_args
