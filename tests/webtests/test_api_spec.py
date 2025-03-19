@@ -55,7 +55,7 @@ class TestAPISpec:
         """
         http_method = ""
         url_source = ""
-        for node in ast.walk(ast.parse(inspect.getsource(method).removeprefix("    "))):
+        for node in ast.walk(ast.parse(inspect.getsource(method).lstrip("    "))):
             if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
                 args = node.value.args
                 func = node.value.func
@@ -65,7 +65,7 @@ class TestAPISpec:
                     url_source = inspect.getsource(getattr(MetadataSession, func.attr))
 
         endpoint = ""
-        for node in ast.walk(ast.parse(url_source.removeprefix("    "))):
+        for node in ast.walk(ast.parse(url_source.lstrip("    "))):
             if isinstance(node, ast.Return) and isinstance(node.value, ast.JoinedStr):
                 values = [i.value for i in node.value.values if hasattr(i, "value")]
                 endpoint_parts = [i for i in values if isinstance(i, (ast.Name, str))]
