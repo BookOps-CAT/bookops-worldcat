@@ -40,11 +40,11 @@ class TestAPISpec:
         .yaml file with up-to-date information about the API endpoints, parameters
         and responses. This fixture does not account for endpoints that retrieve
         data related to local holdings or bib records as these are not tested
-        during the monthly API tests. Function removes "Accept" param as it is not
-        part of the API and any deprecated params.
+        during the monthly API tests. Function removes any deprecated params and
+        the "Accept" param as it is not specific to the API.
 
-        Reads source code to get http method and endpoint used in API call made by the
-        method.
+        Reads source code of `MetadataSession` method passed to `method` arg to get
+        HTTP request method and endpoint used in API call made by the method.
 
         Args:
             method: method within `MetadataSession` class
@@ -52,14 +52,14 @@ class TestAPISpec:
         Returns:
             a list of parameters for the endpoint as defined in the API spec
         """
-        http_method = ""
+        http_req_method = ""
         url_source = ""
         for node in ast.walk(ast.parse(inspect.getsource(method).lstrip("    "))):
             if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
                 args = node.value.args
                 func = node.value.func
                 if isinstance(func, ast.Name) and func.id == "Request":
-                    http_method = [i.value for i in args if hasattr(i, "value")][0]
+                    http_req_method = [i.value for i in args if hasattr(i, "value")][0]
                 elif isinstance(func, ast.Attribute) and func.attr.startswith("_"):
                     url_source = inspect.getsource(getattr(MetadataSession, func.attr))
 
@@ -73,7 +73,7 @@ class TestAPISpec:
                     out_part = f"{{{part.id}}}" if isinstance(part, ast.Name) else part
                     out.append(out_part)
                 endpoint = "/worldcat" + "".join(out)
-        params = self.endpoints[endpoint][http_method.lower()].get("parameters")
+        params = self.endpoints[endpoint][http_req_method.lower()].get("parameters")
         if not params:
             return []
         if any("name" not in i.keys() for i in params):
@@ -86,7 +86,7 @@ class TestAPISpec:
         """
         Inspects signature of `MetadataSession` method and and returns list
         of parameters to compare to parameters included in OpenAPI spec. Filters
-        "responseFormat", "hooks", and "Accept" parameters as they are specific
+        "responseFormat", "hooks", "self", and "Accept" parameters as they are specific
         to bookops-worldcat or the `requests` library and not part of the OCLC API.
         Filters "record" and "recordFormat" parameters as they are passed to the API
         in the request body and not as query parameters.
