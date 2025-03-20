@@ -12,7 +12,6 @@ from bookops_worldcat import MetadataSession
 
 
 @pytest.mark.webtest
-@pytest.mark.usefixtures("live_keys")
 class TestAPISpec:
     """Compares API spec with MetadataSession methods"""
 
