@@ -38,23 +38,30 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 requests = "^2.31"
+types-requests = { version = "^2.31.0.20240125", optional = true }
 
-[tool.poetry.urls]
-"Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
+[tool.poetry.extras]
+type-checking = ["types-requests"]
 
 [tool.poetry.group.dev.dependencies]
+black = "^24.3.0"
+mypy = "^1.8"
+types-pyyaml = "^6.0.12.20240917"
+
+[tool.poetry.group.test.dependencies]
 pytest = "^7.0"
 pytest-cov = "^3.0"
 pytest-mock = "^3.7"
+
+[tool.poetry.group.docs.dependencies]
 mkdocs = "^1.4"
-black = "^24.3.0"
 mike = "^2.0.0"
-mypy = "^1.8"
-types-requests = "^2.31.0.20240125"
 mkdocs-material = "^9.5.46"
 mkdocstrings = "^0.26.0"
 mkdocstrings-python = "^1.11.0"
-types-pyyaml = "^6.0.12.20240917"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
