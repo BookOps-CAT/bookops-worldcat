@@ -24,7 +24,7 @@ jobs:
       - name: Install Poetry with pipx
         run: pipx install poetry
       - name: Install dependencies with poetry
-        run: poetry install --no-root --with test
+        run: poetry install --with test
       - name: Run tests
         run: pytest -m "not webtest" --cov=bookops_worldcat/
       - name: Send report to Coveralls
