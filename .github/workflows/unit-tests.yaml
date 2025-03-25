@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies with poetry
         run: poetry install --no-root --without docs
       - name: Run tests
-        run: pytest -m "not webtest" --cov=bookops_worldcat/
+        run: poetry run pytest -m "not webtest" --cov=bookops_worldcat/
       - name: Send report to Coveralls
         uses: AndreMiras/coveralls-python-action@develop
         with:
