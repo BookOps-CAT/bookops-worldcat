@@ -1,13 +1,18 @@
 # Changelog
 
 ## [1.1.1] - (2/18/2025)
-### Added
-
 ### Changed
-
+ - Changed process for retrieving Open API yaml file from OCLC documentation so that multiple requests are not sent
+ - Changed fixtures that were only used to test API spec from `webtests/conftest.py` to `TestAPISpec` class
+   - `method_params` is now `TestAPISpec.params_from_method`
+   - `endpoint_params` is now `TestAPISpec.params_from_yaml`
+   - `metadata_session_open_api_spec` is now `api_spec_dict` property
+ - Changed tests in `webtests/test_metadata_api_live.py` to use `live_token` fixture rather than requesting a new token for each test
+ 
 ### Fixed
-
-### Removed
+ - Live tests that were failing or making multiple api requests:
+   - Fixed error due to new, unannounced endpoint 
+   - Added automatic retries to monthly automated live tests
 
 ## [1.1.0] - (11/15/2024)
 ### Added
