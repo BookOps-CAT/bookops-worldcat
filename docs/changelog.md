@@ -1,6 +1,8 @@
 # Changelog
 
-## [1.1.1] - (2/18/2025)
+## [1.1.1] - (4/15/2025)
+### Added
+ - `types-requests` as an extra dependency for type-checking purposes. Previously `types-requests` was just a dev dependency since `bookops-worldcat` is fully typed. Adding `types-requests` as an extra dependency will allow users to have the `requests` stubs needed to work with any `requests` objects. Without this any returned `requests` objects are typed as `Any`. This will not change anything for most users but it gives people the option to install the stubs for `requests`
 ### Changed
  - Changed process for retrieving Open API yaml file from OCLC documentation so that multiple requests are not sent
  - Changed fixtures that were only used to test API spec from `webtests/conftest.py` to `TestAPISpec` class
@@ -8,7 +10,10 @@
    - `endpoint_params` is now `TestAPISpec.params_from_yaml`
    - `metadata_session_open_api_spec` is now `api_spec_dict` property
  - Changed tests in `webtests/test_metadata_api_live.py` to use `live_token` fixture rather than requesting a new token for each test
- 
+ - github actions now use `pipx` and `poetry` to install dependencies rather than `pip`
+ - separated `dev` and `docs` dependencies within pyproject.toml  
+ - Updated dependencies for docs:
+ - `jinja2` (3.1.6)
 ### Fixed
  - Live tests that were failing or making multiple api requests:
    - Fixed error due to new, unannounced endpoint 
