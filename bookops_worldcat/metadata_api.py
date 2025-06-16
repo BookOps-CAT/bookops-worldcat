@@ -115,6 +115,9 @@ class MetadataSession(WorldcatSession):
     def _url_manage_ih_codes(self) -> str:
         return f"{self.BASE_URL}/manage/institution/holding-codes"
 
+    def _url_manage_institution_config(self) -> str:
+        return f"{self.BASE_URL}/manage/institution-config/branch-shelving-locations"
+
     def _url_manage_lbd_create(self) -> str:
         return f"{self.BASE_URL}/manage/lbds"
 
@@ -521,6 +524,50 @@ class MetadataSession(WorldcatSession):
             headers=header,
             hooks=hooks,
         )
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def branch_holding_codes_get(
+        self,
+        includeShelvingLocations: bool = False,
+        branchLocationLimit: Optional[int] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Response:
+        """
+        Retrieve branch holding codes or shelving locations for the authenticated
+        institution.
+
+        Uses /manage/institution-config/branch-shelving-locations endpoint.
+
+        Args:
+            branchLocationLimit:
+                Limits response to branch locations associated with a specific
+                registryId.
+            includeShelvingLocations:
+                Whether or not to include shelving location information in response.
+            hooks:
+                Requests library hook system that can be used for signal event
+                handling. For more information see the [Requests docs](https://requests.
+                readthedocs.io/en/master/user/advanced/#event-hooks)
+
+        Returns:
+            `requests.Response` instance
+        """
+
+        url = self._url_manage_institution_config()
+        header = {"Accept": "application/json"}
+
+        payload = {
+            "branchLocationLimit": branchLocationLimit,
+            "includeShelvingLocations": includeShelvingLocations,
+        }
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request
