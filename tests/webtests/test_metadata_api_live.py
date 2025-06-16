@@ -144,6 +144,18 @@ class TestLiveMetadataSession:
                 ["description", "summary"]
             )
 
+    def test_branch_holding_codes_get(self, live_token):
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
+            response = session.branch_holding_codes_get()
+            endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
+            assert response.status_code == 200
+            assert (
+                endpoint
+                == "worldcat/manage/institution-config/branch-shelving-locations?includeShelvingLocations=False"
+            )
+            assert response.headers["Content-Type"] == "application/json"
+            assert response.json() == {"id": "58122", "hasProblems": False}
+
     def test_brief_bibs_get(self, live_token):
         with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.brief_bibs_get(41266045)
