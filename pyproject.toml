@@ -46,8 +46,8 @@ classifiers = [
 ]
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.0"
-pytest-cov = "^3.0"
+pytest = "^8.0"
+pytest-cov = "^6.0"
 black = "^24.3.0"
 mypy = "^1.8"
 types-pyyaml = "^6.0.12.20240917"
