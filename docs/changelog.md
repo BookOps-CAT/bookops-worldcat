@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - (6/16/2025)
+### Added
+ - Added `branch_holding_codes_get()` method to support `/worldcat/manage/institution-config/branch-shelving-locations` endpoint
+
+### Fixed
+ - Tests in `webtests/test_api_spec.py` that were failing due to new endpoints that were added in June 2025. 
+
 ## [1.1.1] - (4/15/2025)
 ### Added
  - `types-requests` as an extra dependency for type-checking purposes. Previously `types-requests` was just a dev dependency since `bookops-worldcat` is fully typed. Adding `types-requests` as an extra dependency will allow users to have the `requests` stubs needed to work with any `requests` objects. Without this any returned `requests` objects are typed as `Any`. This will not change anything for most users but it gives people the option to install the stubs for `requests`
@@ -295,6 +302,8 @@
 ### Fixed
 + fixed hooks info in docstrings in `SearchSession` and `MetadataSession`
 
+[1.2.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.1.1...v1.2.0
+[1.1.1]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/BookOps-CAT/bookops-worldcat/compare/v0.5.0...v1.0.0
