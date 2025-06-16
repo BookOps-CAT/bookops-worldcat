@@ -126,6 +126,12 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holding-codes"
         )
 
+    def test_url_manage_institution_config(self, stub_session):
+        assert (
+            stub_session._url_manage_institution_config()
+            == "https://metadata.api.oclc.org/worldcat/manage/institution-config/branch-shelving-locations"
+        )
+
     def test_url_manage_lbd_create(self, stub_session):
         assert (
             stub_session._url_manage_lbd_create()
@@ -384,6 +390,10 @@ class TestMockedMetadataSession:
                 validationLevel="validateFoo",
             )
         assert "Invalid argument 'validationLevel'." in str(exc.value)
+
+    @pytest.mark.http_code(200)
+    def test_branch_holding_codes_get(self, stub_session, mock_session_response):
+        assert stub_session.branch_holding_codes_get().status_code == 200
 
     @pytest.mark.http_code(200)
     def test_brief_bibs_get(self, stub_session, mock_session_response):
