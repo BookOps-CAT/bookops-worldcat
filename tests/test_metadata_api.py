@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from contextlib import nullcontext as does_not_raise
 import datetime
+from contextlib import nullcontext as does_not_raise
 
 import pytest
 
-
 from bookops_worldcat import MetadataSession
 from bookops_worldcat.errors import (
-    WorldcatRequestError,
-    WorldcatAuthorizationError,
     InvalidOclcNumber,
+    WorldcatAuthorizationError,
+    WorldcatRequestError,
 )
 
 
