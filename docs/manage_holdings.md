@@ -28,6 +28,34 @@ with MetadataSession(authorization=token) as session:
 }
 ```
 
+### Get Branch Holding Codes or Shelving Locations
+
+The `branch_holding_codes_get` method retrieves an institution's branch holding codes or shelving locations. The web service identifies the institution based on the data passed to the `WorldcatAccessToken` and this can be further narrowed by passing a specific branch location code to the `branchLocationLimit` arg.
+
+```python title="branch_holding_codes_get Request"
+from bookops_worldcat import MetadataSession
+
+with MetadataSession(authorization=token) as session:
+    response = session.branch_holding_codes_get()
+    print(response.json())
+```
+```{ .json title="branch_holding_codes_get Response" .no-copy}
+{
+  "hasProblems": False,
+  "id": "91475", 
+  "institutionNumber": "59357",
+  "institutionName": "OCLC Library",
+  "oclcSymbol": "OCWMS",
+  "branchLocations": [
+    {
+      "branchLocationId": "125571",
+      "branchLocationNumber": "33482",
+      "branchLocationName": "OCLC Library West Branch",
+    },   
+    ]
+}
+```
+
 ## Get Current Holdings
 The `holdings_get_current` method retrieves the holding status of a requested record for the authenticated institution.
 
