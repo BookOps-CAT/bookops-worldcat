@@ -1,22 +1,33 @@
-[tool.poetry]
+[project]
 name = "bookops-worldcat"
-version = "1.1.1"
+version = "1.2.0"
 description = "OCLC WorldCat Metadata APIs wrapper"
-authors = ["Tomasz Kalata <klingaroo@gmail.com>", "Charlotte Kostelic <charlottekostelic@gmail.com>"]
+authors = [
+    {name = "Tomasz Kalata", email = "klingaroo@gmail.com"}, 
+    {name = "Charlotte Kostelic", email = "charlottekostelic@bookops.org"}
+]
 license = "MIT"
-exclude = ["bookops_worldcat/temp.py", "bookops_worldcat/temp/*"]
+keywords = ["api", "api-wrapper", "oclc", "worldcat", "cataloging", "bibliographic records", "marcxml", "holdings", "library metadata", "marc21"]
+dynamic = ["classifiers"]
+dependencies = [
+    "requests (>=2.31, <3.0)",
+    "types-requests (>=2.31.0.20240125,<3.0.0.0)",
+]
+requires-python = ">=3.8"
+readme = "README.md"
 
+[project.urls]
+repository = "https://github.com/BookOps-CAT/bookops-worldcat"
+homepage = "https://bookops-cat.github.io/bookops-worldcat/"
+"Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
+
+[tool.poetry]
+package-mode = true
+exclude = ["bookops_worldcat/temp.py", "bookops_worldcat/temp/*"]
 packages = [
     {include = "bookops_worldcat"},
     {include = "bookops_worldcat/py.typed"},
 ]
-
-readme = "README.md"
-repository = "https://github.com/BookOps-CAT/bookops-worldcat"
-homepage = "https://bookops-cat.github.io/bookops-worldcat/"
-
-keywords = ["api", "api-wrapper", "oclc", "worldcat", "cataloging", "bibliographic records", "marcxml", "holdings", "library metadata", "marc21"]
-
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Education",
@@ -35,14 +46,6 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-requests = "^2.31"
-types-requests = { version = "^2.31.0.20240125", optional = true }
-
-[tool.poetry.extras]
-type-checking = ["types-requests"]
-
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0"
 pytest-cov = "^3.0"
@@ -58,9 +61,6 @@ mike = "^2.0.0"
 mkdocs-material = "^9.5.46"
 mkdocstrings = "^0.26.0"
 mkdocstrings-python = "^1.11.0"
-
-[tool.poetry.urls]
-"Bug Tracker" = "https://github.com/BookOps-CAT/bookops-worldcat/issues"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
