@@ -256,6 +256,11 @@ class TestAPISpec:
         method_args = self.params_from_method(MetadataSession.bib_validate)
         assert endpoint_args == method_args
 
+    def test_params_branch_holding_codes_get(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.branch_holding_codes_get)
+        method_args = self.params_from_method(MetadataSession.branch_holding_codes_get)
+        assert endpoint_args == method_args
+
     def test_params_brief_bibs_get(self):
         endpoint_args = self.params_from_yaml(MetadataSession.brief_bibs_get)
         method_args = self.params_from_method(MetadataSession.brief_bibs_get)
