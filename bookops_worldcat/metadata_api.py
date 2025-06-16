@@ -2,7 +2,7 @@
 
 """WorldCat Metadata API wrapper session."""
 
-from typing import Callable, Dict, List, Optional, Tuple, Union, BinaryIO
+from typing import BinaryIO, Callable, Dict, List, Optional, Tuple, Union
 
 from requests import Request, Response
 
