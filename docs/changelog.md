@@ -4,8 +4,28 @@
 ### Added
  - Added `branch_holding_codes_get()` method to support `/worldcat/manage/institution-config/branch-shelving-locations` endpoint
 
+### Changed
+ - restructured `pyproject.toml` following the changes implemented with poetry 2.0. Several sections of the `pyproject.toml` file have been moved from the `tool.poetry` section to the `project` section. 
+   - The `project` section now includes `name`, `version`, `description`, `authors`, `license`, `keywords`, `dynamic` (a list of sections with dynamic metadata), `dependencies`, `requires-python`, and `readme`.
+     - dev dependencies are still in the `tool.poetry.group.dev.dependencies` section
+   - The `tool.poetry` section now includes:, `package-mode`, `exclude`, `packages`, and `classifiers`
+     - `classifiers` is defined as having dynamic metadata in the `project` section   
+   - The `tool.poetry.urls` section is now the `project.urls` section and includes other urls previously included in the `tool.poetry` section (ie. `repository` and `homepage`).
+ - updated dependencies:
+   - `requests` (2.32.4)
+   - `coverage` (7.9.1)
+   - `pytest` (8.4.0)
+   - `pytest-cov` (6.2.1)
+   - made `types-requests` a required dependency
+ - updated `tool.pytest.ini_options` section to include coverage options
+ - updated `tool.coverage.run` to omit `tests` and `docs` paths from coverage report 
+
 ### Fixed
  - Tests in `webtests/test_api_spec.py` that were failing due to new endpoints that were added in June 2025. 
+
+### Removed
+ - Support for python 3.8
+ - `pytest-mock` as a dev dependency as it was unused.
 
 ## [1.1.1] - (4/15/2025)
 ### Added
