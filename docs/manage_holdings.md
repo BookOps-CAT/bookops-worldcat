@@ -212,3 +212,39 @@ Beginning in September 2024 users are able to remove associated Local Bibliograp
       "action": "Unset Holdings"
     }
     ```
+
+## Move Holdings
+Users can move holdings from one bibliographic record to another using the `holdings_move` method. This method takes two OCLC numbers: one for the source record on which the holdings are currently set, and one for the target record to which the holdings should be moved. Using the `holdings_move` method will also move all associated Local Bibliographic Data and Local Holdings Records from the source record to the target.
+
+```python title="holdings_move Request"
+from bookops_worldcat import MetadataSession
+
+with MetadataSession(authorization=token) as session:
+    response = session.holdings_move(sourceOclcNumber=12345, targetOclcNumber=67890)
+    print(response.json())
+```
+```{ .json title="holdings_move Response" .no-copy}
+[
+  {
+    "sourceControlNumber": "12345"
+  },
+  {
+    "requestedSourceControlNumber": "12345"
+  },
+  {
+    "targetControlNumber": "67890"
+  },
+  {
+    "requestedTargetControlNumber": "67890"
+  },
+  {
+    "success": true
+  },
+  {
+    "message": "Successfully set holding and moved local bibliographic data (LBD) and local holdings records (LHRs) to bibliographic record 67890."
+  },
+  {
+    "action": "Move Holdings"
+  }
+]
+```

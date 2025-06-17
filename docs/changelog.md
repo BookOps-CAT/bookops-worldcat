@@ -5,6 +5,7 @@
  - Added support for new new Metadata API functionality:
    - `MetadataSession.branch_holding_codes_get()` allows users to retrieve branch holding codes and shelving locations using the `/worldcat/manage/institution-config/branch-shelving-locations` endpoint
    - `MetadataSession.institution_identifiers_get()` allows users to retrieve retrieve the Registry ID and OCLC Symbols for one or more institutions using the `/worldcat/search/institution` endpoint
+   - `MetadataSession.holdings_move()` allows users to move holdings and all associated LHR and LBD records from one bib record to another using the `/worldcat/manage/institution/holdings/move` endpoint
  - Added `verify_ids` function in `utils.py` to check OCLC Symbols and Registry IDs before passing values to API
 
 ### Changed
