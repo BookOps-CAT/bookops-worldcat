@@ -96,6 +96,12 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current"
         )
 
+    def test_url_manage_ih_move(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_move()
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/move"
+        )
+
     def test_url_manage_ih_set(self, stub_session):
         assert (
             stub_session._url_manage_ih_set(oclcNumber="12345")
@@ -475,6 +481,25 @@ class TestMockedMetadataSession:
         assert "Too many OCLC Numbers passed to 'oclcNumbers' argument." in str(
             exc.value
         )
+
+    @pytest.mark.http_code(200)
+    def test_holdings_move(self, stub_session, mock_session_response):
+        assert (
+            stub_session.holdings_move(
+                sourceOclcNumber=850940548, targetOclcNumber=850933140
+            ).status_code
+            == 200
+        )
+
+    def test_holdings_move_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_move()
+
+    def test_holdings_move_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.holdings_move(
+                sourceOclcNumber=850940548, targetOclcNumber=None
+            )
 
     @pytest.mark.http_code(201)
     def test_holdings_set(self, stub_session, mock_session_response):

@@ -100,6 +100,9 @@ class MetadataSession(WorldcatSession):
     def _url_manage_ih_current(self) -> str:
         return f"{self.BASE_URL}/manage/institution/holdings/current"
 
+    def _url_manage_ih_move(self) -> str:
+        return f"{self.BASE_URL}/manage/institution/holdings/move"
+
     def _url_manage_ih_set(self, oclcNumber: str) -> str:
         return f"{self.BASE_URL}/manage/institution/holdings/{oclcNumber}/set"
 
@@ -1103,6 +1106,51 @@ class MetadataSession(WorldcatSession):
 
         # prep request
         req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
+        return query.response
+
+    def holdings_move(
+        self,
+        sourceOclcNumber: Union[int, str],
+        targetOclcNumber: Union[int, str],
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Response:
+        """
+        Moves institution's WorldCat holdings from one record to another
+
+        Uses /manage/institution/holdings/move endpoint.
+
+        Args:
+            sourceOclcNumber:
+                OCLC bibliographic record number for record that holdings
+                should be moved from. Can be an integer or string with or
+                without OCLC Number prefix.
+            targetOclcNumber:
+                OCLC bibliographic record number for record that holdings
+                should be moved to. Can be an integer or string with or
+                without OCLC Number prefix.
+            hooks:
+                Requests library hook system that can be used for signal event
+                handling. For more information see the [Requests docs](https://requests.
+                readthedocs.io/en/master/user/advanced/#event-hooks)
+
+        Returns:
+            `requests.Response` instance
+        """
+        source = verify_oclc_number(sourceOclcNumber)
+        target = verify_oclc_number(targetOclcNumber)
+
+        url = self._url_manage_ih_move()
+        header = {"Accept": "application/json"}
+
+        payload = {"sourceOclcNumber": source, "targetOclcNumber": target}
+
+        # prep request
+        req = Request("POST", url, json=payload, headers=header, hooks=hooks)
         prepared_request = self.prepare_request(req)
 
         # send request
