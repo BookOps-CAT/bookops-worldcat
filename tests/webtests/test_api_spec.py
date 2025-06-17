@@ -315,12 +315,12 @@ class TestAPISpec:
         assert endpoint_args == method_args
 
     @pytest.mark.holdings
-    def test_params_institution_indentifiers_get(self):
+    def test_params_institution_identifiers_get(self):
         endpoint_args = self.params_from_yaml(
-            MetadataSession.institution_indentifiers_get
+            MetadataSession.institution_identifiers_get
         )
         method_args = self.params_from_method(
-            MetadataSession.institution_indentifiers_get
+            MetadataSession.institution_identifiers_get
         )
         assert endpoint_args == method_args
 

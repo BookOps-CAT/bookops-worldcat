@@ -1291,14 +1291,14 @@ class MetadataSession(WorldcatSession):
         query = Query(self, prepared_request, timeout=self.timeout)
         return query.response
 
-    def institution_indentifiers_get(
+    def institution_identifiers_get(
         self,
         registryIds: Optional[Union[str, int, List[str], List[int]]] = None,
         oclcSymbols: Optional[Union[str, List[str]]] = None,
         hooks: Optional[Dict[str, Callable]] = None,
     ) -> Response:
         """
-        Retrieve identifiers for an institution based on registry IDs or OCLC symbol.
+        Retrieve identifiers for an institution based on registry IDs or OCLC symbols.
         Query must contain either `registryIds` or `oclcSymbols` but not both.
 
         Uses /search/institution endpoint.

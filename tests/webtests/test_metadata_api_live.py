@@ -442,11 +442,11 @@ class TestLiveMetadataSession:
             ([58122], [58122], [["NYP"]]),
         ],
     )
-    def test_institution_indentifiers_get_registry_ids(
+    def test_institution_identifiers_get_registry_ids(
         self, live_token, argm, ids, symbols
     ):
         with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.institution_indentifiers_get(registryIds=argm)
+            response = session.institution_identifiers_get(registryIds=argm)
             assert (
                 "https://metadata.api.oclc.org/worldcat/search/institution?registryIds="
                 in response.url
@@ -476,11 +476,11 @@ class TestLiveMetadataSession:
             (["BKL"], [13437], [["BKL"]]),
         ],
     )
-    def test_institution_indentifiers_get_oclc_symbols(
+    def test_institution_identifiers_get_oclc_symbols(
         self, live_token, argm, ids, symbols
     ):
         with MetadataSession(authorization=live_token, totalRetries=2) as session:
-            response = session.institution_indentifiers_get(oclcSymbols=argm)
+            response = session.institution_identifiers_get(oclcSymbols=argm)
             assert (
                 "https://metadata.api.oclc.org/worldcat/search/institution?oclcSymbols="
                 in response.url

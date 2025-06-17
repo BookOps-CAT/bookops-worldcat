@@ -532,20 +532,20 @@ class TestMockedMetadataSession:
         )
 
     @pytest.mark.http_code(200)
-    def test_institution_indentifiers_get_oclc_symbols(
+    def test_institution_identifiers_get_oclc_symbols(
         self, stub_session, mock_session_response
     ):
         assert (
-            stub_session.institution_indentifiers_get(oclcSymbols="FOO").status_code
+            stub_session.institution_identifiers_get(oclcSymbols="FOO").status_code
             == 200
         )
 
     @pytest.mark.http_code(200)
-    def test_institution_indentifiers_get_registry_id(
+    def test_institution_identifiers_get_registry_id(
         self, stub_session, mock_session_response
     ):
         assert (
-            stub_session.institution_indentifiers_get(registryIds="12345").status_code
+            stub_session.institution_identifiers_get(registryIds="12345").status_code
             == 200
         )
 
