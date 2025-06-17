@@ -1118,7 +1118,7 @@ class MetadataSession(WorldcatSession):
         """
         Sets institution's WorldCat holdings on an individual record.
 
-        Uses /manage/institions/holdings/{oclcNumber}/set endpoint.
+        Uses /manage/institution/holdings/{oclcNumber}/set endpoint.
 
         Args:
             oclcNumber:
@@ -1155,7 +1155,7 @@ class MetadataSession(WorldcatSession):
         """
         Unsets institution's WorldCat holdings on an individual record.
 
-        Uses /manage/institions/holdings/{oclcNumber}/unset endpoint.
+        Uses /manage/institution/holdings/{oclcNumber}/unset endpoint.
 
         Args:
             oclcNumber:
