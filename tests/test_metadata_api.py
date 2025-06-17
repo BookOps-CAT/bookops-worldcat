@@ -732,6 +732,10 @@ class TestMockedMetadataSession:
     def test_summary_holdings_search(self, stub_session, mock_session_response):
         assert stub_session.summary_holdings_search(oclcNumber=12345).status_code == 200
 
+    @pytest.mark.http_code(200)
+    def test_summary_holdings_search_isbn(self, stub_session, mock_session_response):
+        assert stub_session.summary_holdings_search(isbn=12345).status_code == 200
+
     def test_summary_holdings_search_invalid_oclc_number(self, stub_session):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
         with pytest.raises(InvalidOclcNumber) as exc:
@@ -744,6 +748,12 @@ class TestMockedMetadataSession:
             stub_session.shared_print_holdings_search(oclcNumber=12345).status_code
             == 200
         )
+
+    @pytest.mark.http_code(200)
+    def test_shared_print_holdings_search_isbn(
+        self, stub_session, mock_session_response
+    ):
+        assert stub_session.shared_print_holdings_search(isbn=12345).status_code == 200
 
     def test_shared_print_holdings_search_with_invalid_oclc_number_passed(
         self, stub_session
