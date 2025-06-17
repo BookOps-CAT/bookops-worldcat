@@ -1,6 +1,6 @@
 # Manage Institution Holdings
 
-Server responses are returned in JSON format for requests made to any `/manage/holdings/` endpoints. These responses can be accessed and parsed with the `.json()` method.
+Server responses are returned in JSON format for requests made to any `/manage/holdings/` or `/search/institution/` endpoints. These responses can be accessed and parsed with the `.json()` method.
 
 ## Get Institution Holdings Codes
 
@@ -56,6 +56,31 @@ with MetadataSession(authorization=token) as session:
 }
 ```
 
+### Get Identifiers for an Institution
+
+Users can retrieve the Registry ID and OCLC Symbol(s) for an institution by passing one or more Registry IDs or OCLC Symbols to the `institution_identifiers_get` method. Users can pass more than one value to the web service but should only pass Registry IDs or OCLC Symbols but not both. 
+
+```python title="institution_identifiers_get Request"
+from bookops_worldcat import MetadataSession
+
+with MetadataSession(authorization=token) as session:
+    response = session.institution_identifiers_get(oclcSymbols='NYP,BKL')
+    print(response.json())
+```
+```{ .json title="holdings_get_codes Response" .no-copy}
+{
+  "entries": [
+    {
+      "oclcSymbols": ["NYP"],
+      "registryId": 58122
+    },
+    {
+      "oclcSymbols": ["BKL"],
+      "registryId": 13437
+    },    
+  ]
+}
+```
 ## Get Current Holdings
 The `holdings_get_current` method retrieves the holding status of a requested record for the authenticated institution.
 

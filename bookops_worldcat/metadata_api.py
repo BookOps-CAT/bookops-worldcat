@@ -9,7 +9,7 @@ from requests import Request, Response
 from ._session import WorldcatSession
 from .authorize import WorldcatAccessToken
 from .query import Query
-from .utils import verify_oclc_number, verify_oclc_numbers
+from .utils import verify_ids, verify_oclc_number, verify_oclc_numbers
 
 
 class MetadataSession(WorldcatSession):
@@ -153,6 +153,9 @@ class MetadataSession(WorldcatSession):
 
     def _url_search_classification_bibs(self, oclcNumber: str) -> str:
         return f"{self.BASE_URL}/search/classification-bibs/{oclcNumber}"
+
+    def _url_search_institution(self) -> str:
+        return f"{self.BASE_URL}/search/institution"
 
     def _url_search_lhr_shared_print(self) -> str:
         return f"{self.BASE_URL}/search/retained-holdings"
@@ -1115,7 +1118,7 @@ class MetadataSession(WorldcatSession):
         """
         Sets institution's WorldCat holdings on an individual record.
 
-        Uses /manage/institions/holdings/{oclcNumber}/set endpoint.
+        Uses /manage/institution/holdings/{oclcNumber}/set endpoint.
 
         Args:
             oclcNumber:
@@ -1152,7 +1155,7 @@ class MetadataSession(WorldcatSession):
         """
         Unsets institution's WorldCat holdings on an individual record.
 
-        Uses /manage/institions/holdings/{oclcNumber}/unset endpoint.
+        Uses /manage/institution/holdings/{oclcNumber}/unset endpoint.
 
         Args:
             oclcNumber:
@@ -1286,6 +1289,65 @@ class MetadataSession(WorldcatSession):
 
         # send request
         query = Query(self, prepared_request, timeout=self.timeout)
+        return query.response
+
+    def institution_identifiers_get(
+        self,
+        registryIds: Optional[Union[str, int, List[str], List[int]]] = None,
+        oclcSymbols: Optional[Union[str, List[str]]] = None,
+        hooks: Optional[Dict[str, Callable]] = None,
+    ) -> Response:
+        """
+        Retrieve identifiers for an institution based on registry IDs or OCLC symbols.
+        Query must contain either `registryIds` or `oclcSymbols` but not both.
+
+        Uses /search/institution endpoint.
+
+        Args:
+            registryIds:
+                One or more registry IDs to retrieve identifiers for.
+                May be a string, integer, or list of strings and/or integers.
+                If a string, multiple IDs must be separated by a comma.
+
+                **EXAMPLES:**
+
+                - `58122`
+                - `58122,12337`
+                - `58122, 12337`
+                - `['58122', '12337']`
+            oclcSymbols:
+                One or more OCLC symbols to retrieve identifiers for.
+                May be a string or a list of strings. If a string, multiple
+                symbols must be separated by a comma.
+
+                **EXAMPLES:**
+
+                - `NYP`
+                - `NYP,BKL`
+                - `NYP, BKL`
+                - `['NYP', 'BKL']
+            hooks:
+                Requests library hook system that can be used for signal event
+                handling. For more information see the [Requests docs](https://requests.
+                readthedocs.io/en/master/user/advanced/#event-hooks)
+
+        Returns:
+            `requests.Response` instance
+        """
+        url = self._url_search_institution()
+        header = {"Accept": "application/json"}
+
+        registry_ids = verify_ids(registryIds)
+        oclc_symbols = verify_ids(oclcSymbols)
+        payload = {"registryIds": registry_ids, "oclcSymbols": oclc_symbols}
+
+        # prep request
+        req = Request("GET", url, params=payload, headers=header, hooks=hooks)
+        prepared_request = self.prepare_request(req)
+
+        # send request
+        query = Query(self, prepared_request, timeout=self.timeout)
+
         return query.response
 
     def lbd_create(

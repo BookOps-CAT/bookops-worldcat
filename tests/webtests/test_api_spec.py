@@ -314,6 +314,16 @@ class TestAPISpec:
         method_args = self.params_from_method(MetadataSession.holdings_unset_with_bib)
         assert endpoint_args == method_args
 
+    @pytest.mark.holdings
+    def test_params_institution_identifiers_get(self):
+        endpoint_args = self.params_from_yaml(
+            MetadataSession.institution_identifiers_get
+        )
+        method_args = self.params_from_method(
+            MetadataSession.institution_identifiers_get
+        )
+        assert endpoint_args == method_args
+
     def test_params_shared_print_holdings_search(self):
         endpoint_args = self.params_from_yaml(
             MetadataSession.shared_print_holdings_search

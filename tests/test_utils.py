@@ -2,13 +2,14 @@
 
 import pytest
 
+from bookops_worldcat.errors import InvalidOclcNumber
 from bookops_worldcat.utils import (
     _str2list,
     prep_oclc_number_str,
+    verify_ids,
     verify_oclc_number,
     verify_oclc_numbers,
 )
-from bookops_worldcat.errors import InvalidOclcNumber
 
 
 class TestUtils:
@@ -51,6 +52,28 @@ class TestUtils:
     )
     def test_str2list(self, argm, expectation):
         assert _str2list(argm) == expectation
+
+    @pytest.mark.parametrize(
+        "argm,expectation",
+        [
+            ("58122,13437", "58122,13437"),
+            ("58122, 13437", "58122,13437"),
+            (["58122", 13437], "58122,13437"),
+            (["58122", "13437"], "58122,13437"),
+            ([58122, 13437], "58122,13437"),
+            (58122, "58122"),
+            ("58122", "58122"),
+            ([58122], "58122"),
+            (["58122"], "58122"),
+            ("BKL,NYP", "BKL,NYP"),
+            ("BKL, NYP", "BKL,NYP"),
+            (["BKL", "NYP"], "BKL,NYP"),
+            ("BKL", "BKL"),
+            (["BKL"], "BKL"),
+        ],
+    )
+    def test_verify_ids(self, argm, expectation):
+        assert verify_ids(argm) == expectation
 
     @pytest.mark.parametrize(
         "argm,expectation,msg",

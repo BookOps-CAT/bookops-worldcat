@@ -2,7 +2,10 @@
 
 ## [1.2.0] - (6/16/2025)
 ### Added
- - Added `branch_holding_codes_get()` method to support `/worldcat/manage/institution-config/branch-shelving-locations` endpoint
+ - Added support for new new Metadata API functionality:
+   - `MetadataSession.branch_holding_codes_get()` allows users to retrieve branch holding codes and shelving locations using the `/worldcat/manage/institution-config/branch-shelving-locations` endpoint
+   - `MetadataSession.institution_identifiers_get()` allows users to retrieve retrieve the Registry ID and OCLC Symbols for one or more institutions using the `/worldcat/search/institution` endpoint
+ - Added `verify_ids` function in `utils.py` to check OCLC Symbols and Registry IDs before passing values to API
 
 ### Changed
  - restructured `pyproject.toml` following the changes implemented with poetry 2.0. Several sections of the `pyproject.toml` file have been moved from the `tool.poetry` section to the `project` section. 

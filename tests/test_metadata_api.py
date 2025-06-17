@@ -164,6 +164,12 @@ class TestMockedMetadataSession:
             == f"https://metadata.api.oclc.org/worldcat/manage/lhrs/{controlNumber}"
         )
 
+    def test_url_search_institution(self, stub_session):
+        assert (
+            stub_session._url_search_institution()
+            == "https://metadata.api.oclc.org/worldcat/search/institution"
+        )
+
     def test_url_search_shared_print_holdings(self, stub_session):
         assert (
             stub_session._url_search_shared_print_holdings()
@@ -522,6 +528,24 @@ class TestMockedMetadataSession:
             stub_session.holdings_unset_with_bib(
                 record=stub_marc_xml, recordFormat="application/marcxml+xml"
             ).status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_institution_identifiers_get_oclc_symbols(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.institution_identifiers_get(oclcSymbols="FOO").status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_institution_identifiers_get_registry_id(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.institution_identifiers_get(registryIds="12345").status_code
             == 200
         )
 
