@@ -429,6 +429,77 @@ class TestLiveMetadataSession:
             )
             assert response.json()["action"] == "Unset Holdings"
 
+    @pytest.mark.parametrize(
+        "argm,ids,symbols",
+        [
+            ("58122,13437", [58122, 13437], [["BKL"], ["NYP"]]),
+            ("58122, 13437", [58122, 13437], [["BKL"], ["NYP"]]),
+            (["58122", 13437], [58122, 13437], [["BKL"], ["NYP"]]),
+            (["58122", "13437"], [58122, 13437], [["BKL"], ["NYP"]]),
+            ([58122, 13437], [58122, 13437], [["BKL"], ["NYP"]]),
+            (58122, [58122], [["NYP"]]),
+            ("58122", [58122], [["NYP"]]),
+            ([58122], [58122], [["NYP"]]),
+        ],
+    )
+    def test_institution_indentifiers_get_registry_ids(
+        self, live_token, argm, ids, symbols
+    ):
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
+            response = session.institution_indentifiers_get(registryIds=argm)
+            assert (
+                "https://metadata.api.oclc.org/worldcat/search/institution?registryIds="
+                in response.url
+            )
+            assert response.status_code == 200
+            assert list(response.json().keys()) == ["entries"]
+            assert sorted(list(response.json()["entries"][0].keys())) == sorted(
+                [
+                    "oclcSymbols",
+                    "registryId",
+                ]
+            )
+            assert sorted(
+                [i["registryId"] for i in response.json()["entries"]]
+            ) == sorted(ids)
+            assert sorted(
+                [i["oclcSymbols"] for i in response.json()["entries"]]
+            ) == sorted(symbols)
+
+    @pytest.mark.parametrize(
+        "argm,ids,symbols",
+        [
+            ("BKL,NYP", [58122, 13437], [["BKL"], ["NYP"]]),
+            ("BKL, NYP", [58122, 13437], [["BKL"], ["NYP"]]),
+            (["BKL", "NYP"], [58122, 13437], [["BKL"], ["NYP"]]),
+            ("BKL", [13437], [["BKL"]]),
+            (["BKL"], [13437], [["BKL"]]),
+        ],
+    )
+    def test_institution_indentifiers_get_oclc_symbols(
+        self, live_token, argm, ids, symbols
+    ):
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
+            response = session.institution_indentifiers_get(oclcSymbols=argm)
+            assert (
+                "https://metadata.api.oclc.org/worldcat/search/institution?oclcSymbols="
+                in response.url
+            )
+            assert response.status_code == 200
+            assert list(response.json().keys()) == ["entries"]
+            assert sorted(list(response.json()["entries"][0].keys())) == sorted(
+                [
+                    "oclcSymbols",
+                    "registryId",
+                ]
+            )
+            assert sorted(
+                [i["registryId"] for i in response.json()["entries"]]
+            ) == sorted(ids)
+            assert sorted(
+                [i["oclcSymbols"] for i in response.json()["entries"]]
+            ) == sorted(symbols)
+
     def test_shared_print_holdings_search(self, live_token):
         with MetadataSession(authorization=live_token, totalRetries=2) as session:
             response = session.shared_print_holdings_search(oclcNumber="41266045")
