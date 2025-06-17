@@ -1304,7 +1304,7 @@ class MetadataSession(WorldcatSession):
         Uses /search/institution endpoint.
 
         Args:
-            registryId:
+            registryIds:
                 One or more registry IDs to retrieve identifiers for.
                 May be a string, integer, or list of strings and/or integers.
                 If a string, multiple IDs must be separated by a comma.
