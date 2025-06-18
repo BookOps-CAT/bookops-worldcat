@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+from typing import Generator
 
 import pytest
 
@@ -19,6 +20,22 @@ class TestLiveMetadataSession:
         "catalogingLanguage",
         "levelOfCataloging",
     ]
+    SOURCE_OCLC_NUM = "850940548"
+
+    @pytest.fixture
+    def live_session(self, live_token) -> Generator[MetadataSession, None, None]:
+        with MetadataSession(authorization=live_token, totalRetries=2) as session:
+            yield session
+
+    @pytest.fixture
+    def stub_holdings_set(self, live_session) -> Generator[bool, None, None]:
+        """Sets holdings on"""
+        set_resp = live_session.holdings_set(self.SOURCE_OCLC_NUM)
+        yield set_resp.ok
+        unset_resp = live_session.holdings_unset(
+            self.SOURCE_OCLC_NUM, cascadeDelete=True
+        )
+        assert unset_resp.json()["action"] == "Unset Holdings"
 
     def test_bib_get(self, live_token):
         with MetadataSession(authorization=live_token, totalRetries=2) as session:
@@ -316,6 +333,29 @@ class TestLiveMetadataSession:
                 == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/850940548/unset?cascadeDelete=True"
             )
             assert unset_resp.json()["action"] == "Unset Holdings"
+
+    @pytest.mark.holdings
+    def test_holdings_set_move_unset(self, live_session, stub_holdings_set):
+        # check holdings are set on source record
+        check_holdings_resp = live_session.holdings_get_current(self.SOURCE_OCLC_NUM)
+        assert check_holdings_resp.json()["holdings"][0] == {
+            "requestedControlNumber": self.SOURCE_OCLC_NUM,
+            "currentControlNumber": self.SOURCE_OCLC_NUM,
+            "institutionSymbol": "NYP",
+            "holdingSet": True,
+        }
+
+        # test moving holdings to target record
+        # move will fail due to lack of LBDs/LHRs
+        with pytest.raises(WorldcatRequestError) as exc:
+            live_session.holdings_move(
+                sourceOclcNumber=self.SOURCE_OCLC_NUM,
+                targetOclcNumber="850933159",
+            )
+        assert (
+            '409 Client Error:  for url: https://metadata.api.oclc.org/worldcat/manage/institution/holdings/move. Server response: {"type":"CONFLICT","title":"No local bibliographic data (LBD) or local holdings records (LHRs).","detail":"Move Holdings Failed. No local bibliographic data (LBD) or local holdings records (LHRs) are attached to bibliographic record 850940548."}'
+            == str(exc.value)
+        )
 
     @pytest.mark.holdings
     def test_holdings_set_unset_cascadeDelete(self, live_token, stub_marc_xml):
