@@ -1,11 +1,8 @@
 name: publish
 
 on:
-  push:
-    branches: 
-      - publish-workflows
   release:
-    types: [published, created, edited]
+    types: [published]
 
 jobs:
   test:
