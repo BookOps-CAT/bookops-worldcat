@@ -52,7 +52,7 @@ For new code contributions, please use the tools and standards in place for Book
 ### Install and Setup
 To get started contributing code to Bookops-Worldcat you will need: 
 
- + Python 3.8 or newer
+ + Python 3.9 or newer
  + `git`
  + [`poetry`](https://python-poetry.org/docs/#installation)
 
@@ -91,24 +91,24 @@ python -m pytest "not webtest" --cov=bookops_worldcat/
 Any major or minor updates should get a new release in GitHub. Use the following checklist when getting a new update ready for release. For patch updates/bug fixes, follow steps 1-4.
 
 1. Verify `poetry.lock`, `pyproject.toml`, `requirements.txt`, and `dev-requirements.txt` files are up-to-date
-     * **`poetry check`** to check that `poetry.lock` and `pyproject.toml` files are in sync 
-     * **`poetry update`** to update all packages 
-     * or **`poetry update [package1] [ package2]`** to update packages individually
-     * **`poetry install`** to install all versions of packages listed in the `pyproject.toml` file
+     * **`poetry check`** to check that the contents of the `poetry.lock` and `pyproject.toml` files are consistent
+     * **`poetry sync`** will update your local virtual environment to ensure if is in sync with the poetry.lock file and install/uninstall packages as necessary.
      * Export `requirements.txt` files with [poetry-plugin-export](https://github.com/python-poetry/poetry-plugin-export)
-2. Update documentation
-    * Update changelog: include version, date, and descriptions of changes
-    * Update links within docs if OCLC has made any changes
+       * **`poetry export -f requirements.txt --output requirements.txt`**
+       * **`poetry export -f requirements.txt --with dev --output dev-requirements.txt`**       
+2. Review documentation to ensure it has been updated with recent changes
+    * Review changelog to ensure version, date, and descriptions of changes are correct
+    * Review pertinent documentation for GitHub pages site to confirm it has been updated with any changes from this release. 
+    * Update links within docs if OCLC has made any changes to their documentation. 
+    * Check that the package version has been updated in `__version__.py`, `tests/test_version.py` and `pyproject.toml`
 3. Commit changes to repo
-    * Merge all changes into `release/v[version]` branch
-    * Ensure tests have run and passed within GitHub Actions
-4. Rebuild docs using mike:
-    * **`mike --rebase`** to fetch remote version of docs to your local branch (optional)
-    * **`mike deploy [version] [alias] --push`** to deploy docs
-    * **`mike set-default [version]`** to set new version to default
-5. Create a new github release
-    * At minimum, include information from changelog in release. Include additional details about changes as appropriate.
-6. Build package in poetry
-    * **`poetry build`**
-7. Publish to PyPI
-    * **`poetry publish`**
+    * Merge all changes from `releases/v[version]` into main 
+4. Create a new github release
+    * At minimum, include information from changelog in release. Include additional details about changes as appropriate.   
+    * On publish, the `publish.yaml` workflow will run which will:
+      * Build a new version of the docs and deploy them to the GitHub pages site
+        * **`mike deploy [version] [alias] --push`** to deploy docs
+        * **`mike set-default [version]`** to set new version to default
+      * Build the source and wheels archive using `poetry`
+        * **`poetry build`**
+      * Publish the new version of the package to PyPI using trusted publishing
