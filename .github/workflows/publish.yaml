@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies with poetry
         run: poetry install --no-root --without dev
       - name: Get version number          
-      - run: echo "version=$(poetry version -s)" >> $GITHUB_ENV          
+        run: echo "version=$(poetry version -s)" >> $GITHUB_ENV          
       - name: Deploy docs to GitHub pages site
         env:
           github-token: ${{ secrets.GITHUB_TOKEN}}
