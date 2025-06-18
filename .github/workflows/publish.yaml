@@ -1,0 +1,91 @@
+name: publish
+
+on:
+  push:
+    branches: 
+      - publish-workflows
+  release:
+    types: [published, created, edited]
+
+jobs:
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install Poetry with pipx
+        run: pipx install poetry
+      - name: Install dependencies with poetry
+        run: poetry install --no-root --without docs
+      - name: Run tests
+        run: poetry run pytest -m "not webtest" --cov=bookops_worldcat/
+  deploy-docs:
+    name: Deploy docs to GitHub Pages
+    runs-on: ubuntu-latest
+    # permissions:
+    #   contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install Poetry with pipx
+        run: pipx install poetry
+      - name: Install dependencies with poetry
+        run: poetry install --no-root --without dev
+      - name: Get version number          
+      - run: echo "version=$(poetry version -s)" >> $GITHUB_ENV          
+      - name: Deploy docs to GitHub pages site
+        env:
+          github-token: ${{ secrets.GITHUB_TOKEN}}
+        run: |
+          echo "git config --global user.name '${{ github.actor }}'"
+          echo "git config --global user.email '${{ github.actor }}@users.noreply.github.com'"
+          echo "poetry run mike deploy ${{ env.version }} latest --push"
+          echo "poetry run mike set-default ${{ env.version }} --push"
+  build-release:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install Poetry with pipx
+        run: pipx install poetry
+
+      - name: Install dependencies with poetry
+        run: poetry install --no-root --without dev,docs
+      
+      - name: Build package distributions
+        run: poetry build
+
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: bookops-worldcat-distributions-test
+          path: dist/
+          if-no-files-found: error
+
+  pypi-publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: build-release
+    # permissions:
+    #   id-token: write
+    steps:
+      - name: Retrieve distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: bookops-worldcat-distributions-test
+          path: dist/    
+      - name: Confirm files were retrieved
+        run: ls -R dist/
+      # - name: Publish package distributions to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1        
