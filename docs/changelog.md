@@ -7,6 +7,7 @@
    - `MetadataSession.institution_identifiers_get()` allows users to retrieve retrieve the Registry ID and OCLC Symbols for one or more institutions using the `/worldcat/search/institution` endpoint
    - `MetadataSession.holdings_move()` allows users to move holdings and all associated LHR and LBD records from one bib record to another using the `/worldcat/manage/institution/holdings/move` endpoint
  - Added `verify_ids` function in `utils.py` to check OCLC Symbols and Registry IDs before passing values to API
+ - GitHub Actions workflows to publish new versions to PyPI (`publish.yaml`) and deploy docs to [bookops-cat.github.io/bookops-worldcat/](bookops-cat.github.io/bookops-worldcat/) (`deploy-docs.yaml`) when a new release is published
 
 ### Changed
  - restructured `pyproject.toml` following the changes implemented with poetry 2.0. Several sections of the `pyproject.toml` file have been moved from the `tool.poetry` section to the `project` section. 
@@ -20,6 +21,7 @@
    - `coverage` (7.9.1)
    - `pytest` (8.4.0)
    - `pytest-cov` (6.2.1)
+   - `urllib3` (2.5.0)
    - made `types-requests` a required dependency
  - updated `tool.pytest.ini_options` section to include coverage options
  - updated `tool.coverage.run` to omit `tests` and `docs` paths from coverage report 
