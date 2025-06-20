@@ -11,7 +11,7 @@ Bookops-Worldcat version 1.0 supports changes released in version 2.0 (May 2023)
 
 ## Overview
 
-Requires Python 3.8 and up.
+Requires Python 3.9 and up.
 
 Bookops-Worldcat takes advantage of the functionality of the popular [Requests library](https://requests.readthedocs.io/) and interactions with OCLC's services are built around 'Requests' sessions. `MetadataSession` inherits all `requests.Session` properties. Server responses are `requests.Response` objects with [all of their properties and methods](https://requests.readthedocs.io/en/latest/user/quickstart/).
 

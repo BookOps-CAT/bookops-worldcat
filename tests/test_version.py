@@ -2,15 +2,15 @@
 
 
 from bookops_worldcat.__version__ import (
-    __version__,
-    __title__,
     __author__,
     __author_email__,
+    __title__,
+    __version__,
 )
 
 
 def test_version():
-    assert __version__ == "1.1.1"
+    assert __version__ == "1.2.0"
 
 
 def test_title():
