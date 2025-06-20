@@ -7,28 +7,19 @@ on:
   schedule: 
     - cron: '0 5 15 * *'
 env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_REPO: ${{ github.repository }}
   WCKey: ${{ secrets.WC_KEY }}
   WCSecret: ${{ secrets.WC_SECRET }}
   WCScopes: "WorldCatMetadataAPI"
 jobs:
   webtests:
     name: Run live webtests
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'pull_request' && contains(fromJSON(vars.MAINTAINERS), github.actor) }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
-      - name: Check if PR is from fork
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.event.pull_request.base.repo.full_name }}" ]; then
-            echo "is_fork=true" >> $GITHUB_ENV
-          else
-            echo "is_fork=false" >> $GITHUB_ENV
-          fi
       - name: Set up Python ${{ matrix.python-version}}
         uses: actions/setup-python@v5
         with:
@@ -36,10 +27,6 @@ jobs:
       - name: Install Poetry with pipx
         run: pipx install poetry          
       - name: Install dependencies
-        if: ${{ env.is_fork == 'false' || github.event_name == 'schedule' }}
-        run: |
-          poetry install --no-root --without docs
+        run: poetry install --no-root --without docs
       - name: Run monthly live tests
-        if: ${{ env.is_fork == 'false' || github.event_name == 'schedule' }}
-        run: |
-          poetry run pytest -m "webtest"     
+        run: poetry run pytest -m "webtest"     
