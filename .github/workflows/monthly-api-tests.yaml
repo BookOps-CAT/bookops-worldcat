@@ -15,15 +15,12 @@ jobs:
     name: Run live webtests
     if: ${{ github.event_name == 'schedule' || github.event_name == 'pull_request' && contains(fromJSON(vars.MAINTAINERS), github.actor) }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version}}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version}}
+          python-version: "3.13"
       - name: Install Poetry with pipx
         run: pipx install poetry          
       - name: Install dependencies
