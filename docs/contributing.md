@@ -88,7 +88,7 @@ python -m pytest "not webtest" --cov=bookops_worldcat/
 ```
 
 ### Release Checklist
-Any major or minor updates should get a new release in GitHub. Use the following checklist when getting a new update ready for release. For patch updates/bug fixes, follow steps 1-4.
+Any updates should get a new release in GitHub. Use the following checklist when getting a new update ready for release. For patch updates/bug fixes, follow steps 1-4.
 
 1. Verify `poetry.lock`, `pyproject.toml`, `requirements.txt`, and `dev-requirements.txt` files are up-to-date
      * **`poetry check`** to check that the contents of the `poetry.lock` and `pyproject.toml` files are consistent
@@ -105,10 +105,12 @@ Any major or minor updates should get a new release in GitHub. Use the following
     * Merge all changes from `releases/v[version]` into main 
 4. Create a new github release
     * At minimum, include information from changelog in release. Include additional details about changes as appropriate.   
-    * On publish, the `publish.yaml` workflow will run which will:
-      * Build a new version of the docs and deploy them to the GitHub pages site
-        * **`mike deploy [version] [alias] --push`** to deploy docs
-        * **`mike set-default [version]`** to set new version to default
-      * Build the source and wheels archive using `poetry`
-        * **`poetry build`**
-      * Publish the new version of the package to PyPI using trusted publishing
+    * On publish, the `publish.yaml` and `deploy-docs.yaml` workflows will run. These workflows will publish the latest version of the pack to PyPI and deploy the latest version of the GitHub pages docs.
+      * `deploy-docs.yaml`
+        * Builds a new version of the docs and deploys them to the GitHub pages site.
+            * **`mike deploy [version] [alias] --push`** to deploy docs
+            * **`mike set-default [version]`** to set new version to default
+      * `publish.yaml`
+        * Builds the source and wheels archive using `poetry`.
+            * **`poetry build`**
+        * Publishes the new version of the package to PyPI using trusted publishing.
