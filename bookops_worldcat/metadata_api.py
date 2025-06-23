@@ -29,7 +29,9 @@ class MetadataSession(WorldcatSession):
         self,
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
-        timeout: Union[int, float, tuple[int, int], tuple[float, float], None] = (5, 5),
+        timeout: Union[
+            int, float, tuple[Union[int, float], Union[int, float]], None
+        ] = (5, 5),
         totalRetries: int = 0,
         backoffFactor: float = 0,
         statusForcelist: Optional[list[int]] = None,
