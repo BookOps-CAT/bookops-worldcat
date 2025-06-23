@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.0] - (6/16/2025)
+## [1.2.0] - (6/24/2025)
 ### Added
  - Added support for new new Metadata API functionality:
    - `MetadataSession.branch_holding_codes_get()` allows users to retrieve branch holding codes and shelving locations using the `/worldcat/manage/institution-config/branch-shelving-locations` endpoint
