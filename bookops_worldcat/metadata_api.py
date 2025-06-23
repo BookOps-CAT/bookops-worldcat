@@ -1237,7 +1237,7 @@ class MetadataSession(WorldcatSession):
 
     def holdings_set_with_bib(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
@@ -1280,7 +1280,7 @@ class MetadataSession(WorldcatSession):
 
     def holdings_unset_with_bib(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         cascadeDelete: bool = True,
         hooks: Optional[dict[str, Callable]] = None,
@@ -1397,7 +1397,7 @@ class MetadataSession(WorldcatSession):
 
     def lbd_create(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
         hooks: Optional[dict[str, Callable]] = None,
@@ -1522,7 +1522,7 @@ class MetadataSession(WorldcatSession):
     def lbd_replace(
         self,
         controlNumber: Union[int, str],
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
         hooks: Optional[dict[str, Callable]] = None,
@@ -1573,7 +1573,7 @@ class MetadataSession(WorldcatSession):
 
     def lhr_create(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
         hooks: Optional[dict[str, Callable]] = None,
@@ -1698,7 +1698,7 @@ class MetadataSession(WorldcatSession):
     def lhr_replace(
         self,
         controlNumber: Union[int, str],
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
         hooks: Optional[dict[str, Callable]] = None,
