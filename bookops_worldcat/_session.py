@@ -4,7 +4,7 @@
 Base session class to be subclassed for use with individual OCLC APIs.
 """
 
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import requests
 from urllib3.util import Retry
@@ -20,10 +20,7 @@ class WorldcatSession(requests.Session):
         self,
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
-        timeout: Union[int, float, tuple[int, int], tuple[float, float], None] = (
-            5,
-            5,
-        ),
+        timeout: Union[int, float, tuple[int, int], tuple[float, float], None] = (5, 5),
         totalRetries: int = 0,
         backoffFactor: float = 0,
         statusForcelist: Optional[list[int]] = None,
@@ -88,7 +85,7 @@ class WorldcatSession(requests.Session):
                     allowed_methods=allowedMethods,
                 )
             elif (
-                isinstance(statusForcelist, List)
+                isinstance(statusForcelist, list)
                 and all(isinstance(x, int) for x in statusForcelist)
                 and len(statusForcelist) > 0
             ):
