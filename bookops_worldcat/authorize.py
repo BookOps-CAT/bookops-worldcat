@@ -67,10 +67,9 @@ class WorldcatAccessToken:
         secret: str,
         scopes: str,
         agent: str = "",
-        timeout: Union[int, float, tuple[int, int], tuple[float, float], None] = (
-            5,
-            5,
-        ),
+        timeout: Union[
+            int, float, tuple[Union[int, float], Union[int, float]], None
+        ] = (5, 5),
     ) -> None:
         """Initializes WorldcatAccessToken object.
 
