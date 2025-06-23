@@ -6,7 +6,7 @@ Provides means to authenticate and authorize interactions with OCLC web services
 
 import datetime
 import sys
-from typing import Dict, Optional, Tuple, Union
+from typing import Optional, Union
 
 import requests
 
@@ -67,7 +67,7 @@ class WorldcatAccessToken:
         secret: str,
         scopes: str,
         agent: str = "",
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
+        timeout: Union[int, float, tuple[int, int], tuple[float, float], None] = (
             5,
             5,
         ),
@@ -156,7 +156,7 @@ class WorldcatAccessToken:
         # initiate request
         self._request_token()
 
-    def _auth(self) -> Tuple[str, str]:
+    def _auth(self) -> tuple[str, str]:
         return (self.key, self.secret)
 
     def _hasten_expiration_time(self, utc_stamp_str: str) -> datetime.datetime:
@@ -193,7 +193,7 @@ class WorldcatAccessToken:
         else:
             raise WorldcatAuthorizationError(response.content)
 
-    def _payload(self) -> Dict[str, str]:
+    def _payload(self) -> dict[str, str]:
         """Preps requests params"""
         return {
             "grant_type": self.grant_type,
@@ -238,7 +238,7 @@ class WorldcatAccessToken:
         response = self._post_token_request()
         self._parse_server_response(response)
 
-    def _token_headers(self) -> Dict[str, str]:
+    def _token_headers(self) -> dict[str, str]:
         return {"User-Agent": self.agent, "Accept": "application/json"}
 
     def _token_url(self) -> str:
