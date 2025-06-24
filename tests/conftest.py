@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from typing import Dict, Generator, Union
+from typing import Generator, Union
+
 import pytest
 import requests
 
-from bookops_worldcat import WorldcatAccessToken, MetadataSession
+from bookops_worldcat import MetadataSession, WorldcatAccessToken
 
 
 @pytest.fixture
@@ -42,7 +43,7 @@ class MockAuthServerResponseSuccess:
     def __init__(self) -> None:
         self.status_code = 200
 
-    def json(self) -> Dict[str, str]:
+    def json(self) -> dict[str, str]:
         expires_at = datetime.datetime.strftime(
             datetime.datetime.now() + datetime.timedelta(0, 1199),
             "%Y-%m-%d %H:%M:%SZ",
@@ -68,7 +69,7 @@ class MockAuthServerResponseFailure:
         self.status_code = 403
         self.content = b""
 
-    def json(self) -> Dict[str, Union[str, int]]:
+    def json(self) -> dict[str, Union[str, int]]:
         return {
             "code": 403,
             "message": "Invalid scope(s): invalid (invalid) [Invalid service specified, Not on key]",
@@ -84,7 +85,7 @@ class MockServiceErrorResponse:
         self.url = url
         self.text = f"{json_response}"
 
-    def json(self) -> Dict[str, str]:
+    def json(self) -> dict[str, str]:
         return self.msg
 
 
@@ -136,7 +137,7 @@ def mock_session_response(request, monkeypatch) -> None:
 
 
 @pytest.fixture
-def mock_credentials() -> Dict[str, str]:
+def mock_credentials() -> dict[str, str]:
     return {
         "key": "my_WSkey",
         "secret": "my_WSsecret",

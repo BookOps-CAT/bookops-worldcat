@@ -5,12 +5,12 @@ Shared utilities module.
 """
 
 import re
-from typing import List, Union
+from typing import Union
 
 from .errors import InvalidOclcNumber
 
 
-def _str2list(s: str) -> List[str]:
+def _str2list(s: str) -> list[str]:
     """Converts str into list - use for list of OCLC numbers"""
     return [n.strip() for n in s.split(",") if n.strip()]
 
@@ -48,7 +48,7 @@ def prep_oclc_number_str(oclcNumber: str) -> str:
 
 
 def verify_ids(
-    ids: Union[str, int, List[str], List[int], None],
+    ids: Union[str, int, list[str], list[int], None],
 ) -> Union[str, None]:
     """
     Parses list of registry IDs or OCLC symbols. IDs will be joined
@@ -111,8 +111,8 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
 
 
 def verify_oclc_numbers(
-    oclcNumbers: Union[int, str, List[Union[str, int]]],
-) -> List[str]:
+    oclcNumbers: Union[int, str, list[Union[str, int]]],
+) -> list[str]:
     """
     Parses and verifies list of oclcNumbers
 

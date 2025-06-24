@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.0] - (6/16/2025)
+## [1.2.0] - (6/24/2025)
 ### Added
  - Added support for new new Metadata API functionality:
    - `MetadataSession.branch_holding_codes_get()` allows users to retrieve branch holding codes and shelving locations using the `/worldcat/manage/institution-config/branch-shelving-locations` endpoint
@@ -28,9 +28,12 @@
 
 ### Fixed
  - Tests in `webtests/test_api_spec.py` that were failing due to new endpoints that were added in June 2025. 
+ - type annotations for `timeout` arg in`MetadataSession`,  `Query`, `WorldcatAccessToken` and `WorldcatSession` classes. The `timeout` arg now takes `None`, an `int`, a `float`, or a `tuple` containing a combination of `int` and `float` objects
+ - type annotations for `record` arg in `holdings_set_with_bib`, `holdings_unset_with_bib`, `lbd_create`, `lbd_replace`, `lhr_create`, and `lhr_replace`. The `record` arg now takes a `str`, a `bytes` object, or a `BinaryIO` object like other methods that take a MARC record as an arg.
 
 ### Removed
- - Support for python 3.8
+ - Support for python 3.8.
+   - Removed all `Dict`, `List`, and `Tuple` imports from `typing` module as they are no longer necessary as of python 3.9
  - `pytest-mock` as a dev dependency as it was unused.
 
 ## [1.1.1] - (4/15/2025)

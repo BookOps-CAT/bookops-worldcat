@@ -2,7 +2,7 @@
 
 """WorldCat Metadata API wrapper session."""
 
-from typing import BinaryIO, Callable, Dict, List, Optional, Tuple, Union
+from typing import BinaryIO, Callable, Optional, Union
 
 from requests import Request, Response
 
@@ -29,14 +29,13 @@ class MetadataSession(WorldcatSession):
         self,
         authorization: WorldcatAccessToken,
         agent: Optional[str] = None,
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
-            5,
-            5,
-        ),
+        timeout: Union[
+            int, float, tuple[Union[int, float], Union[int, float]], None
+        ] = (5, 5),
         totalRetries: int = 0,
         backoffFactor: float = 0,
-        statusForcelist: Optional[List[int]] = None,
-        allowedMethods: Optional[List[str]] = None,
+        statusForcelist: Optional[list[int]] = None,
+        allowedMethods: Optional[list[str]] = None,
     ) -> None:
         """Initializes MetadataSession.
 
@@ -183,7 +182,7 @@ class MetadataSession(WorldcatSession):
         record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Create a bib record in OCLC if it does not already exist.
@@ -228,7 +227,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumber: Union[int, str],
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Send a GET request for a full bib record.
@@ -268,7 +267,7 @@ class MetadataSession(WorldcatSession):
     def bib_get_classification(
         self,
         oclcNumber: Union[int, str],
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given an OCLC number, retrieve classification recommendations for the bib
@@ -304,8 +303,8 @@ class MetadataSession(WorldcatSession):
 
     def bib_get_current_oclc_number(
         self,
-        oclcNumbers: Union[int, str, List[Union[str, int]]],
-        hooks: Optional[Dict[str, Callable]] = None,
+        oclcNumbers: Union[int, str, list[Union[str, int]]],
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given one or more OCLC Numbers, retrieve current OCLC numbers.
@@ -349,7 +348,7 @@ class MetadataSession(WorldcatSession):
         self,
         record: Union[str, bytes, BinaryIO],
         recordFormat: str,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a bib record in MARC21 or MARCXML identify the best match in WorldCat.
@@ -394,7 +393,7 @@ class MetadataSession(WorldcatSession):
         record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given an OCLC number and MARC record, find record in WorldCat and replace it.
@@ -441,7 +440,7 @@ class MetadataSession(WorldcatSession):
     def bib_search(
         self,
         oclcNumber: Union[int, str],
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Send a GET request for a full bib record in JSON format.
@@ -479,7 +478,7 @@ class MetadataSession(WorldcatSession):
         record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         validationLevel: str = "validateFull",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a bib record, validate that record conforms to MARC standards.
@@ -541,7 +540,7 @@ class MetadataSession(WorldcatSession):
         self,
         includeShelvingLocations: bool = False,
         branchLocationLimit: Optional[int] = None,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Retrieve branch holding codes or shelving locations for the authenticated
@@ -582,7 +581,7 @@ class MetadataSession(WorldcatSession):
         return query.response
 
     def brief_bibs_get(
-        self, oclcNumber: Union[int, str], hooks: Optional[Dict[str, Callable]] = None
+        self, oclcNumber: Union[int, str], hooks: Optional[dict[str, Callable]] = None
     ) -> Response:
         """
         Retrieve specific brief bibliographic resource.
@@ -618,27 +617,27 @@ class MetadataSession(WorldcatSession):
     def brief_bibs_search(
         self,
         q: str,
-        deweyNumber: Optional[Union[str, List[str]]] = None,
-        datePublished: Optional[Union[str, List[str]]] = None,
+        deweyNumber: Optional[Union[str, list[str]]] = None,
+        datePublished: Optional[Union[str, list[str]]] = None,
         heldByGroup: Optional[str] = None,
-        heldBySymbol: Optional[Union[str, List[str]]] = None,
-        heldByInstitutionID: Optional[Union[str, int, List[str], List[int]]] = None,
-        inLanguage: Optional[Union[str, List[str]]] = None,
+        heldBySymbol: Optional[Union[str, list[str]]] = None,
+        heldByInstitutionID: Optional[Union[str, int, list[str], list[int]]] = None,
+        inLanguage: Optional[Union[str, list[str]]] = None,
         inCatalogLanguage: Optional[str] = "eng",
         materialType: Optional[str] = None,
         catalogSource: Optional[str] = None,
-        itemType: Optional[Union[str, List[str]]] = None,
-        itemSubType: Optional[Union[str, List[str]]] = None,
+        itemType: Optional[Union[str, list[str]]] = None,
+        itemSubType: Optional[Union[str, list[str]]] = None,
         retentionCommitments: bool = False,
         spProgram: Optional[str] = None,
         genre: Optional[str] = None,
         topic: Optional[str] = None,
         subtopic: Optional[str] = None,
         audience: Optional[str] = None,
-        content: Optional[Union[str, List[str]]] = None,
+        content: Optional[Union[str, list[str]]] = None,
         openAccess: Optional[bool] = None,
         peerReviewed: Optional[bool] = None,
-        facets: Optional[Union[str, List[str]]] = None,
+        facets: Optional[Union[str, list[str]]] = None,
         groupRelatedEditions: bool = False,
         groupVariantRecords: bool = False,
         preferredLanguage: str = "eng",
@@ -650,7 +649,7 @@ class MetadataSession(WorldcatSession):
         orderBy: str = "bestMatch",
         offset: int = 1,
         limit: int = 10,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Search for brief bibliographic resources using WorldCat query syntax.
@@ -847,34 +846,34 @@ class MetadataSession(WorldcatSession):
     def brief_bibs_get_other_editions(
         self,
         oclcNumber: Union[int, str],
-        deweyNumber: Optional[Union[str, List[str]]] = None,
-        datePublished: Optional[Union[str, List[str]]] = None,
+        deweyNumber: Optional[Union[str, list[str]]] = None,
+        datePublished: Optional[Union[str, list[str]]] = None,
         heldByGroup: Optional[str] = None,
-        heldBySymbol: Optional[Union[str, List[str]]] = None,
-        heldByInstitutionID: Optional[Union[str, int, List[Union[str, int]]]] = None,
-        inLanguage: Optional[Union[str, List[str]]] = None,
+        heldBySymbol: Optional[Union[str, list[str]]] = None,
+        heldByInstitutionID: Optional[Union[str, int, list[Union[str, int]]]] = None,
+        inLanguage: Optional[Union[str, list[str]]] = None,
         inCatalogLanguage: Optional[str] = "eng",
         materialType: Optional[str] = None,
         catalogSource: Optional[str] = None,
-        itemType: Optional[Union[str, List[str]]] = None,
-        itemSubType: Optional[Union[str, List[str]]] = None,
+        itemType: Optional[Union[str, list[str]]] = None,
+        itemSubType: Optional[Union[str, list[str]]] = None,
         retentionCommitments: bool = False,
         spProgram: Optional[str] = None,
         genre: Optional[str] = None,
         topic: Optional[str] = None,
         subtopic: Optional[str] = None,
         audience: Optional[str] = None,
-        content: Optional[Union[str, List[str]]] = None,
+        content: Optional[Union[str, list[str]]] = None,
         openAccess: Optional[bool] = None,
         peerReviewed: Optional[bool] = None,
-        facets: Optional[Union[str, List[str]]] = None,
+        facets: Optional[Union[str, list[str]]] = None,
         groupVariantRecords: bool = False,
         preferredLanguage: str = "eng",
         showHoldingsIndicators: bool = False,
         offset: int = 1,
         limit: int = 10,
         orderBy: str = "publicationDateDesc",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Retrieve other editions related to bibliographic resource with provided
@@ -1036,7 +1035,7 @@ class MetadataSession(WorldcatSession):
 
     def holdings_get_codes(
         self,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Retrieve the all holding codes for the authenticated institution.
@@ -1066,8 +1065,8 @@ class MetadataSession(WorldcatSession):
 
     def holdings_get_current(
         self,
-        oclcNumbers: Union[int, str, List[Union[str, int]]],
-        hooks: Optional[Dict[str, Callable]] = None,
+        oclcNumbers: Union[int, str, list[Union[str, int]]],
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Retrieves WorldCat holdings status of a record with provided OCLC number.
@@ -1117,7 +1116,7 @@ class MetadataSession(WorldcatSession):
         self,
         sourceOclcNumber: Union[int, str],
         targetOclcNumber: Union[int, str],
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Moves institution's WorldCat holdings from one record to another
@@ -1161,7 +1160,7 @@ class MetadataSession(WorldcatSession):
     def holdings_set(
         self,
         oclcNumber: Union[int, str],
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Sets institution's WorldCat holdings on an individual record.
@@ -1198,7 +1197,7 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumber: Union[int, str],
         cascadeDelete: bool = True,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Unsets institution's WorldCat holdings on an individual record.
@@ -1240,9 +1239,9 @@ class MetadataSession(WorldcatSession):
 
     def holdings_set_with_bib(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a MARC record in MARCXML or MARC21, set institution holdings on the
@@ -1283,10 +1282,10 @@ class MetadataSession(WorldcatSession):
 
     def holdings_unset_with_bib(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         cascadeDelete: bool = True,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a MARC record in MARCXML or MARC21, unset institution holdings on the
@@ -1341,9 +1340,9 @@ class MetadataSession(WorldcatSession):
 
     def institution_identifiers_get(
         self,
-        registryIds: Optional[Union[str, int, List[str], List[int]]] = None,
-        oclcSymbols: Optional[Union[str, List[str]]] = None,
-        hooks: Optional[Dict[str, Callable]] = None,
+        registryIds: Optional[Union[str, int, list[str], list[int]]] = None,
+        oclcSymbols: Optional[Union[str, list[str]]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Retrieve identifiers for an institution based on registry IDs or OCLC symbols.
@@ -1400,10 +1399,10 @@ class MetadataSession(WorldcatSession):
 
     def lbd_create(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a local bibliographic data record, create it in WorldCat.
@@ -1448,7 +1447,7 @@ class MetadataSession(WorldcatSession):
         self,
         controlNumber: Union[int, str],
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a control number, delete the associated Local Bibliographic Data record.
@@ -1487,7 +1486,7 @@ class MetadataSession(WorldcatSession):
         self,
         controlNumber: Union[int, str],
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a Control Number, retrieve a Local Bibliographic Data record.
@@ -1525,10 +1524,10 @@ class MetadataSession(WorldcatSession):
     def lbd_replace(
         self,
         controlNumber: Union[int, str],
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a Control Number, find the associated Local Bibliographic Data
@@ -1576,10 +1575,10 @@ class MetadataSession(WorldcatSession):
 
     def lhr_create(
         self,
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a local holdings record, create it in WorldCat
@@ -1624,7 +1623,7 @@ class MetadataSession(WorldcatSession):
         self,
         controlNumber: Union[int, str],
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a control number, delete a Local Holdings record.
@@ -1663,7 +1662,7 @@ class MetadataSession(WorldcatSession):
         self,
         controlNumber: Union[int, str],
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Send a GET request for a local holdings record
@@ -1701,10 +1700,10 @@ class MetadataSession(WorldcatSession):
     def lhr_replace(
         self,
         controlNumber: Union[int, str],
-        record: str,
+        record: Union[str, bytes, BinaryIO],
         recordFormat: str,
         responseFormat: str = "application/marcxml+xml",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a Control Number, find the associated Local Holdings
@@ -1753,7 +1752,7 @@ class MetadataSession(WorldcatSession):
     def local_bibs_get(
         self,
         controlNumber: Union[int, str],
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Retrieve LBD Resource.
@@ -1789,7 +1788,7 @@ class MetadataSession(WorldcatSession):
         q: str,
         offset: int = 1,
         limit: int = 10,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Search LBD Resources using WorldCat query syntax. See OCLC
@@ -1845,7 +1844,7 @@ class MetadataSession(WorldcatSession):
         oclcNumber: Optional[Union[int, str]] = None,
         browsePosition: int = 0,
         limit: int = 10,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Browse local holdings.
@@ -1902,7 +1901,7 @@ class MetadataSession(WorldcatSession):
     def local_holdings_get(
         self,
         controlNumber: Union[int, str],
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Retrieve LHR Resource.
@@ -1940,7 +1939,7 @@ class MetadataSession(WorldcatSession):
         orderBy: str = "oclcSymbol",
         offset: int = 1,
         limit: int = 10,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Search LHR Resources. Query must contain, at minimum, either an
@@ -1998,13 +1997,13 @@ class MetadataSession(WorldcatSession):
         self,
         oclcNumber: Optional[Union[int, str]] = None,
         barcode: Optional[str] = None,
-        heldBySymbol: Optional[List[str]] = None,
-        heldByInstitutionID: Optional[List[int]] = None,
-        spProgram: Optional[List[str]] = None,
+        heldBySymbol: Optional[list[str]] = None,
+        heldByInstitutionID: Optional[list[int]] = None,
+        spProgram: Optional[list[str]] = None,
         orderBy: str = "oclcSymbol",
         offset: int = 1,
         limit: int = 10,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Search for shared print LHR Resources. Query must contain, at minimum,
@@ -2076,9 +2075,9 @@ class MetadataSession(WorldcatSession):
         issn: Optional[str] = None,
         heldByGroup: Optional[str] = None,
         heldInState: Optional[str] = None,
-        itemType: Optional[List[str]] = None,
-        itemSubType: Optional[List[str]] = None,
-        hooks: Optional[Dict[str, Callable]] = None,
+        itemType: Optional[list[str]] = None,
+        itemSubType: Optional[list[str]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Finds member shared print holdings for specified item. Query must
@@ -2152,18 +2151,18 @@ class MetadataSession(WorldcatSession):
         holdingsAllEditions: Optional[bool] = None,
         holdingsAllVariantRecords: Optional[bool] = None,
         preferredLanguage: str = "eng",
-        holdingsFilterFormat: Optional[List[str]] = None,
+        holdingsFilterFormat: Optional[list[str]] = None,
         heldInCountry: Optional[str] = None,
         heldInState: Optional[str] = None,
         heldByGroup: Optional[str] = None,
-        heldBySymbol: Optional[List[str]] = None,
-        heldByInstitutionID: Optional[List[int]] = None,
-        heldByLibraryType: Optional[List[str]] = None,
+        heldBySymbol: Optional[list[str]] = None,
+        heldByInstitutionID: Optional[list[int]] = None,
+        heldByLibraryType: Optional[list[str]] = None,
         lat: Optional[float] = None,
         lon: Optional[float] = None,
         distance: Optional[int] = None,
         unit: str = "M",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given a known item, get summary of holdings and brief bib record. Query must
@@ -2282,18 +2281,18 @@ class MetadataSession(WorldcatSession):
         oclcNumber: Union[int, str],
         holdingsAllEditions: Optional[bool] = None,
         holdingsAllVariantRecords: Optional[bool] = None,
-        holdingsFilterFormat: Optional[List[str]] = None,
+        holdingsFilterFormat: Optional[list[str]] = None,
         heldInCountry: Optional[str] = None,
         heldInState: Optional[str] = None,
         heldByGroup: Optional[str] = None,
-        heldBySymbol: Optional[List[str]] = None,
-        heldByInstitutionID: Optional[List[int]] = None,
-        heldByLibraryType: Optional[List[str]] = None,
+        heldBySymbol: Optional[list[str]] = None,
+        heldByInstitutionID: Optional[list[int]] = None,
+        heldByLibraryType: Optional[list[str]] = None,
         lat: Optional[float] = None,
         lon: Optional[float] = None,
         distance: Optional[int] = None,
         unit: str = "M",
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[dict[str, Callable]] = None,
     ) -> Response:
         """
         Given an OCLC number, get summary of holdings. Query may contain
