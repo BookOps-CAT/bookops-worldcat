@@ -1,0 +1,32 @@
+name: deploy-docs
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-docs:
+    name: Deploy docs to GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install Poetry with pipx
+        run: pipx install poetry
+      - name: Install dependencies with poetry
+        run: poetry install --no-root --without dev
+      - name: Get version number          
+        run: echo "version=$(poetry version -s | cut -d. -f1,2)" >> $GITHUB_ENV          
+      - name: Deploy docs to GitHub pages site
+        env:
+          github-token: ${{ secrets.GITHUB_TOKEN}}
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          poetry run mike deploy ${{ env.version }} latest --push
+          poetry run mike set-default ${{ env.version }} --push

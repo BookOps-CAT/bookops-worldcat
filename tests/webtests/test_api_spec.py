@@ -121,6 +121,7 @@ class TestAPISpec:
                 "/worldcat/manage/bibs/{oclcNumber}",
                 "/worldcat/manage/bibs/match",
                 "/worldcat/manage/institution/holdings/current",
+                "/worldcat/manage/institution/holdings/move",
                 "/worldcat/manage/institution/holdings/{oclcNumber}/set",
                 "/worldcat/manage/institution/holdings/{oclcNumber}/unset",
                 "/worldcat/manage/institution/holdings/set",
@@ -138,6 +139,7 @@ class TestAPISpec:
                 "/worldcat/search/bibs-retained-holdings",
                 "/worldcat/search/bibs-summary-holdings",
                 "/worldcat/search/bibs/{oclcNumber}",
+                "/worldcat/search/institution",
                 "/worldcat/search/summary-holdings",
                 "/worldcat/search/retained-holdings",
                 "/worldcat/search/my-local-bib-data/{controlNumber}",
@@ -181,6 +183,7 @@ class TestAPISpec:
                 "/worldcat/search/bibs-retained-holdings",
                 "/worldcat/search/bibs-summary-holdings",
                 "/worldcat/search/bibs/{oclcNumber}",
+                "/worldcat/search/institution",
                 "/worldcat/search/summary-holdings",
                 "/worldcat/search/retained-holdings",
                 "/worldcat/search/my-local-bib-data/{controlNumber}",
@@ -201,6 +204,7 @@ class TestAPISpec:
                 "/worldcat/manage/bibs/validate/{validationLevel}",
                 "/worldcat/manage/bibs",
                 "/worldcat/manage/bibs/match",
+                "/worldcat/manage/institution/holdings/move",
                 "/worldcat/manage/institution/holdings/{oclcNumber}/set",
                 "/worldcat/manage/institution/holdings/{oclcNumber}/unset",
                 "/worldcat/manage/institution/holdings/set",
@@ -250,6 +254,11 @@ class TestAPISpec:
     def test_params_bib_validate(self):
         endpoint_args = self.params_from_yaml(MetadataSession.bib_validate)
         method_args = self.params_from_method(MetadataSession.bib_validate)
+        assert endpoint_args == method_args
+
+    def test_params_branch_holding_codes_get(self):
+        endpoint_args = self.params_from_yaml(MetadataSession.branch_holding_codes_get)
+        method_args = self.params_from_method(MetadataSession.branch_holding_codes_get)
         assert endpoint_args == method_args
 
     def test_params_brief_bibs_get(self):
@@ -303,6 +312,16 @@ class TestAPISpec:
     def test_params_holdings_unset_with_bib(self):
         endpoint_args = self.params_from_yaml(MetadataSession.holdings_unset_with_bib)
         method_args = self.params_from_method(MetadataSession.holdings_unset_with_bib)
+        assert endpoint_args == method_args
+
+    @pytest.mark.holdings
+    def test_params_institution_identifiers_get(self):
+        endpoint_args = self.params_from_yaml(
+            MetadataSession.institution_identifiers_get
+        )
+        method_args = self.params_from_method(
+            MetadataSession.institution_identifiers_get
+        )
         assert endpoint_args == method_args
 
     def test_params_shared_print_holdings_search(self):

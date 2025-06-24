@@ -1,6 +1,6 @@
 # Manage Institution Holdings
 
-Server responses are returned in JSON format for requests made to any `/manage/holdings/` endpoints. These responses can be accessed and parsed with the `.json()` method.
+Server responses are returned in JSON format for requests made to any `/manage/holdings/` or `/search/institution/` endpoints. These responses can be accessed and parsed with the `.json()` method.
 
 ## Get Institution Holdings Codes
 
@@ -28,6 +28,59 @@ with MetadataSession(authorization=token) as session:
 }
 ```
 
+### Get Branch Holding Codes or Shelving Locations
+
+The `branch_holding_codes_get` method retrieves an institution's branch holding codes or shelving locations. The web service identifies the institution based on the data passed to the `WorldcatAccessToken` and this can be further narrowed by passing a specific branch location code to the `branchLocationLimit` arg.
+
+```python title="branch_holding_codes_get Request"
+from bookops_worldcat import MetadataSession
+
+with MetadataSession(authorization=token) as session:
+    response = session.branch_holding_codes_get()
+    print(response.json())
+```
+```{ .json title="branch_holding_codes_get Response" .no-copy}
+{
+  "hasProblems": False,
+  "id": "91475", 
+  "institutionNumber": "59357",
+  "institutionName": "OCLC Library",
+  "oclcSymbol": "OCWMS",
+  "branchLocations": [
+    {
+      "branchLocationId": "125571",
+      "branchLocationNumber": "33482",
+      "branchLocationName": "OCLC Library West Branch",
+    },   
+    ]
+}
+```
+
+### Get Identifiers for an Institution
+
+Users can retrieve the Registry ID and OCLC Symbol(s) for an institution by passing one or more Registry IDs or OCLC Symbols to the `institution_identifiers_get` method. Users can pass more than one value to the web service but should only pass Registry IDs or OCLC Symbols but not both. 
+
+```python title="institution_identifiers_get Request"
+from bookops_worldcat import MetadataSession
+
+with MetadataSession(authorization=token) as session:
+    response = session.institution_identifiers_get(oclcSymbols='NYP,BKL')
+    print(response.json())
+```
+```{ .json title="holdings_get_codes Response" .no-copy}
+{
+  "entries": [
+    {
+      "oclcSymbols": ["NYP"],
+      "registryId": 58122
+    },
+    {
+      "oclcSymbols": ["BKL"],
+      "registryId": 13437
+    },    
+  ]
+}
+```
 ## Get Current Holdings
 The `holdings_get_current` method retrieves the holding status of a requested record for the authenticated institution.
 
@@ -159,3 +212,39 @@ Beginning in September 2024 users are able to remove associated Local Bibliograp
       "action": "Unset Holdings"
     }
     ```
+
+## Move Holdings
+Users can move holdings from one bibliographic record to another using the `holdings_move` method. This method takes two OCLC numbers: one for the source record on which the holdings are currently set, and one for the target record to which the holdings should be moved. Using the `holdings_move` method will also move all associated Local Bibliographic Data and Local Holdings Records from the source record to the target.
+
+```python title="holdings_move Request"
+from bookops_worldcat import MetadataSession
+
+with MetadataSession(authorization=token) as session:
+    response = session.holdings_move(sourceOclcNumber=12345, targetOclcNumber=67890)
+    print(response.json())
+```
+```{ .json title="holdings_move Response" .no-copy}
+[
+  {
+    "sourceControlNumber": "12345"
+  },
+  {
+    "requestedSourceControlNumber": "12345"
+  },
+  {
+    "targetControlNumber": "67890"
+  },
+  {
+    "requestedTargetControlNumber": "67890"
+  },
+  {
+    "success": true
+  },
+  {
+    "message": "Successfully set holding and moved local bibliographic data (LBD) and local holdings records (LHRs) to bibliographic record 67890."
+  },
+  {
+    "action": "Move Holdings"
+  }
+]
+```

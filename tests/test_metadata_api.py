@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from contextlib import nullcontext as does_not_raise
 import datetime
+from contextlib import nullcontext as does_not_raise
 
 import pytest
 
-
 from bookops_worldcat import MetadataSession
 from bookops_worldcat.errors import (
-    WorldcatRequestError,
-    WorldcatAuthorizationError,
     InvalidOclcNumber,
+    WorldcatAuthorizationError,
+    WorldcatRequestError,
 )
 
 
@@ -97,6 +96,12 @@ class TestMockedMetadataSession:
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/current"
         )
 
+    def test_url_manage_ih_move(self, stub_session):
+        assert (
+            stub_session._url_manage_ih_move()
+            == "https://metadata.api.oclc.org/worldcat/manage/institution/holdings/move"
+        )
+
     def test_url_manage_ih_set(self, stub_session):
         assert (
             stub_session._url_manage_ih_set(oclcNumber="12345")
@@ -125,6 +130,12 @@ class TestMockedMetadataSession:
         assert (
             stub_session._url_manage_ih_codes()
             == "https://metadata.api.oclc.org/worldcat/manage/institution/holding-codes"
+        )
+
+    def test_url_manage_institution_config(self, stub_session):
+        assert (
+            stub_session._url_manage_institution_config()
+            == "https://metadata.api.oclc.org/worldcat/manage/institution-config/branch-shelving-locations"
         )
 
     def test_url_manage_lbd_create(self, stub_session):
@@ -157,6 +168,12 @@ class TestMockedMetadataSession:
         assert (
             stub_session._url_manage_lhr(controlNumber)
             == f"https://metadata.api.oclc.org/worldcat/manage/lhrs/{controlNumber}"
+        )
+
+    def test_url_search_institution(self, stub_session):
+        assert (
+            stub_session._url_search_institution()
+            == "https://metadata.api.oclc.org/worldcat/search/institution"
         )
 
     def test_url_search_shared_print_holdings(self, stub_session):
@@ -387,6 +404,10 @@ class TestMockedMetadataSession:
         assert "Invalid argument 'validationLevel'." in str(exc.value)
 
     @pytest.mark.http_code(200)
+    def test_branch_holding_codes_get(self, stub_session, mock_session_response):
+        assert stub_session.branch_holding_codes_get().status_code == 200
+
+    @pytest.mark.http_code(200)
     def test_brief_bibs_get(self, stub_session, mock_session_response):
         assert stub_session.brief_bibs_get(12345).status_code == 200
 
@@ -461,6 +482,25 @@ class TestMockedMetadataSession:
             exc.value
         )
 
+    @pytest.mark.http_code(200)
+    def test_holdings_move(self, stub_session, mock_session_response):
+        assert (
+            stub_session.holdings_move(
+                sourceOclcNumber=850940548, targetOclcNumber=850933140
+            ).status_code
+            == 200
+        )
+
+    def test_holdings_move_no_oclcNumber_passed(self, stub_session):
+        with pytest.raises(TypeError):
+            stub_session.holdings_move()
+
+    def test_holdings_move_None_oclcNumber_passed(self, stub_session):
+        with pytest.raises(InvalidOclcNumber):
+            stub_session.holdings_move(
+                sourceOclcNumber=850940548, targetOclcNumber=None
+            )
+
     @pytest.mark.http_code(201)
     def test_holdings_set(self, stub_session, mock_session_response):
         assert stub_session.holdings_set(850940548).status_code == 201
@@ -513,6 +553,24 @@ class TestMockedMetadataSession:
             stub_session.holdings_unset_with_bib(
                 record=stub_marc_xml, recordFormat="application/marcxml+xml"
             ).status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_institution_identifiers_get_oclc_symbols(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.institution_identifiers_get(oclcSymbols="FOO").status_code
+            == 200
+        )
+
+    @pytest.mark.http_code(200)
+    def test_institution_identifiers_get_registry_id(
+        self, stub_session, mock_session_response
+    ):
+        assert (
+            stub_session.institution_identifiers_get(registryIds="12345").status_code
             == 200
         )
 
@@ -674,6 +732,10 @@ class TestMockedMetadataSession:
     def test_summary_holdings_search(self, stub_session, mock_session_response):
         assert stub_session.summary_holdings_search(oclcNumber=12345).status_code == 200
 
+    @pytest.mark.http_code(200)
+    def test_summary_holdings_search_isbn(self, stub_session, mock_session_response):
+        assert stub_session.summary_holdings_search(isbn=12345).status_code == 200
+
     def test_summary_holdings_search_invalid_oclc_number(self, stub_session):
         msg = "Argument 'oclcNumber' does not look like real OCLC #."
         with pytest.raises(InvalidOclcNumber) as exc:
@@ -686,6 +748,12 @@ class TestMockedMetadataSession:
             stub_session.shared_print_holdings_search(oclcNumber=12345).status_code
             == 200
         )
+
+    @pytest.mark.http_code(200)
+    def test_shared_print_holdings_search_isbn(
+        self, stub_session, mock_session_response
+    ):
+        assert stub_session.shared_print_holdings_search(isbn=12345).status_code == 200
 
     def test_shared_print_holdings_search_with_invalid_oclc_number_passed(
         self, stub_session

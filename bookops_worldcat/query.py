@@ -3,13 +3,14 @@
 """Handles requests to OCLC web services."""
 
 from __future__ import annotations
-from typing import Union, Tuple, TYPE_CHECKING
+
 import sys
+from typing import TYPE_CHECKING, Union
 
 from requests import PreparedRequest
-from requests.exceptions import ConnectionError, HTTPError, Timeout, RetryError
-from .errors import WorldcatRequestError
+from requests.exceptions import ConnectionError, HTTPError, RetryError, Timeout
 
+from .errors import WorldcatRequestError
 
 if TYPE_CHECKING:
     from .metadata_api import MetadataSession  # pragma: no cover
@@ -28,10 +29,9 @@ class Query:
         self,
         session: MetadataSession,
         prepared_request: PreparedRequest,
-        timeout: Union[int, float, Tuple[int, int], Tuple[float, float], None] = (
-            5,
-            5,
-        ),
+        timeout: Union[
+            int, float, tuple[Union[int, float], Union[int, float]], None
+        ] = (5, 5),
     ) -> None:
         """Initializes Query object.
 

@@ -3,13 +3,14 @@
 """
 Shared utilities module.
 """
+
 import re
-from typing import List, Union
+from typing import Union
 
 from .errors import InvalidOclcNumber
 
 
-def _str2list(s: str) -> List[str]:
+def _str2list(s: str) -> list[str]:
     """Converts str into list - use for list of OCLC numbers"""
     return [n.strip() for n in s.split(",") if n.strip()]
 
@@ -46,6 +47,42 @@ def prep_oclc_number_str(oclcNumber: str) -> str:
         raise InvalidOclcNumber("Argument 'oclcNumber' does not look like real OCLC #.")
 
 
+def verify_ids(
+    ids: Union[str, int, list[str], list[int], None],
+) -> Union[str, None]:
+    """
+    Parses list of registry IDs or OCLC symbols. IDs will be joined
+    and returned as a comma-separated string if more than one id
+    is passed.
+
+    Args:
+        ids:
+            one or more institution registry ID(s) or OCLC symbol(s)
+
+            **EXAMPLES:**
+
+            - "58122"
+            - "58122,13437"
+            - "58122, 13437"
+            - ["58122", 13437]
+            - "BKL"
+            - "BKL,NYP"
+            - ["BKL"]
+            - ["BKL", "NYP"]
+
+    Returns:
+        ids as a string or None
+    """
+    if isinstance(ids, int):
+        return str(ids)
+    elif isinstance(ids, str):
+        return ",".join([str(i.strip()) for i in ids.split(",")])
+    elif isinstance(ids, list):
+        return ",".join([str(i) for i in ids])
+    else:
+        return ids
+
+
 def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
     """
     Verifies a valid looking OCLC number is passed and normalize it as integer.
@@ -74,8 +111,8 @@ def verify_oclc_number(oclcNumber: Union[int, str]) -> str:
 
 
 def verify_oclc_numbers(
-    oclcNumbers: Union[int, str, List[Union[str, int]]]
-) -> List[str]:
+    oclcNumbers: Union[int, str, list[Union[str, int]]],
+) -> list[str]:
     """
     Parses and verifies list of oclcNumbers
 
