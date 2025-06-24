@@ -3,6 +3,7 @@ name: deploy-docs
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   deploy-docs:
@@ -19,7 +20,7 @@ jobs:
       - name: Install Poetry with pipx
         run: pipx install poetry
       - name: Install dependencies with poetry
-        run: poetry install --no-root --without dev
+        run: poetry install --no-root
       - name: Get version number          
         run: echo "version=$(poetry version -s | cut -d. -f1,2)" >> $GITHUB_ENV          
       - name: Deploy docs to GitHub pages site
@@ -28,5 +29,6 @@ jobs:
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          poetry run git fetch origin gh-pages --depth=1
           poetry run mike deploy ${{ env.version }} latest --push
           poetry run mike set-default ${{ env.version }} --push
