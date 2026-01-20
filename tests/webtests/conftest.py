@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import os
 from typing import Generator
@@ -8,8 +7,8 @@ import pytest
 from bookops_worldcat import WorldcatAccessToken
 
 
-@pytest.fixture
-def live_keys() -> None:
+@pytest.fixture(scope="package")
+def live_keys() -> Generator[None, None, None]:
     if not os.getenv("GITHUB_ACTIONS"):
         fh = os.path.expanduser("~/.oclc/nyp_wc_test.json")
         with open(fh, "r") as file:
@@ -17,10 +16,13 @@ def live_keys() -> None:
             os.environ["WCKey"] = data["key"]
             os.environ["WCSecret"] = data["secret"]
             os.environ["WCScopes"] = data["scopes"]
+            yield
+    os.environ.pop("WCKey")
+    os.environ.pop("WCSecret")
+    os.environ.pop("WCScopes")
 
 
-@pytest.fixture(scope="class")
-@pytest.mark.usefixtures("live_keys")
+@pytest.fixture(scope="module")
 def live_token() -> Generator[WorldcatAccessToken, None, None]:
     """
     Gets live token from environment variables. For use with live tests so that

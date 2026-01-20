@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from typing import Generator
 
@@ -213,7 +212,11 @@ class TestLiveMetadataSession:
             assert sorted(response.json().keys()) == sorted(
                 ["briefRecords", "numberOfRecords"]
             )
-            assert sorted(response.json()["briefRecords"][0].keys()) == sorted(
+            assert sorted(
+                list(
+                    dict.fromkeys(k for d in response.json()["briefRecords"] for k in d)
+                )
+            ) == sorted(
                 [
                     "oclcNumber",
                     "title",
