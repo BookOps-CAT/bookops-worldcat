@@ -17,6 +17,8 @@ def live_keys() -> Generator[None, None, None]:
             os.environ["WCSecret"] = data["secret"]
             os.environ["WCScopes"] = data["scopes"]
             yield
+    else:
+        yield
     os.environ.pop("WCKey")
     os.environ.pop("WCSecret")
     os.environ.pop("WCScopes")
