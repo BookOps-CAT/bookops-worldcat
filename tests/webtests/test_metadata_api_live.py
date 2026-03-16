@@ -143,6 +143,7 @@ class TestLiveMetadataSession:
                     "editionCluster",
                     "database",
                     "digitalAccessAndLocations",
+                    "isOpenAccess",
                 ]
             )
 
@@ -353,8 +354,7 @@ class TestLiveMetadataSession:
             # move will fail due to lack of LBDs/LHRs
             with pytest.raises(WorldcatRequestError) as exc:
                 session.holdings_move(
-                    sourceOclcNumber=self.SOURCE_OCLC_NUM,
-                    targetOclcNumber="850933159",
+                    sourceOclcNumber=self.SOURCE_OCLC_NUM, targetOclcNumber="850933159"
                 )
         assert (
             '409 Client Error:  for url: https://metadata.api.oclc.org/worldcat/manage/institution/holdings/move. Server response: {"type":"CONFLICT","title":"No local bibliographic data (LBD) or local holdings records (LHRs).","detail":"Move Holdings Failed. No local bibliographic data (LBD) or local holdings records (LHRs) are attached to bibliographic record 850940548."}'
@@ -498,10 +498,7 @@ class TestLiveMetadataSession:
             assert response.status_code == 200
             assert list(response.json().keys()) == ["entries"]
             assert sorted(list(response.json()["entries"][0].keys())) == sorted(
-                [
-                    "oclcSymbols",
-                    "registryId",
-                ]
+                ["oclcSymbols", "registryId"]
             )
             assert sorted(
                 [i["registryId"] for i in response.json()["entries"]]
@@ -532,10 +529,7 @@ class TestLiveMetadataSession:
             assert response.status_code == 200
             assert list(response.json().keys()) == ["entries"]
             assert sorted(list(response.json()["entries"][0].keys())) == sorted(
-                [
-                    "oclcSymbols",
-                    "registryId",
-                ]
+                ["oclcSymbols", "registryId"]
             )
             assert sorted(
                 [i["registryId"] for i in response.json()["entries"]]
