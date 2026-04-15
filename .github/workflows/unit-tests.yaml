@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version}}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version}}
       - name: Install Poetry with pipx
@@ -32,6 +32,7 @@ jobs:
           parallel: true
           github-token: ${{ secrets.GITHUB_TOKEN}}
           flag-name: ${{ matrix.python-version}}
+          fail-on-error: false
 
   finish:
     needs: test
@@ -41,3 +42,4 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
+          fail-on-error: false
