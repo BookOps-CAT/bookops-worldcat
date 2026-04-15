@@ -16,11 +16,11 @@ jobs:
     if: ${{ github.event_name == 'schedule' || github.event_name == 'pull_request' && contains(fromJSON(vars.MAINTAINERS), github.actor) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.14"
       - name: Install Poetry with pipx
         run: pipx install poetry          
       - name: Install dependencies
