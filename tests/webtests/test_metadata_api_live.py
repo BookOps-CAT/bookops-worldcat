@@ -357,7 +357,7 @@ class TestLiveMetadataSession:
                     sourceOclcNumber=self.SOURCE_OCLC_NUM, targetOclcNumber="850933159"
                 )
         assert (
-            '409 Client Error:  for url: https://metadata.api.oclc.org/worldcat/manage/institution/holdings/move. Server response: {"type":"CONFLICT","title":"No local bibliographic data (LBD) or local holdings records (LHRs).","detail":"Move Holdings Failed. No local bibliographic data (LBD) or local holdings records (LHRs) are attached to bibliographic record 850940548."}'
+            '409 Client Error: Conflict for url: https://metadata.api.oclc.org/worldcat/manage/institution/holdings/move. Server response: {"type":"CONFLICT","title":"No local bibliographic data (LBD) or local holdings records (LHRs).","detail":"Move Holdings Failed. No local bibliographic data (LBD) or local holdings records (LHRs) are attached to bibliographic record 850940548."}'
             == str(exc.value)
         )
 
@@ -664,7 +664,7 @@ class TestLiveMetadataSessionErrors:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.brief_bibs_get(-41266045)
             assert (
-                '400 Client Error:  for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/-41266045. Server response: {"type":"INVALID_QUERY_PARAMETER_VALUE","title":"Validation Failure","detail":"oclcNumber must be a positive whole number","invalid-params":[{"reason":"Invalid Value: -41266045"}]}'
+                '400 Client Error: Bad Request for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/-41266045. Server response: {"type":"INVALID_QUERY_PARAMETER_VALUE","title":"Validation Failure","detail":"oclcNumber must be a positive whole number","invalid-params":[{"reason":"Invalid Value: -41266045"}]}'
                 == str(exc.value)
             )
 
@@ -689,7 +689,7 @@ class TestLiveMetadataSessionErrors:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.lbd_get(12345)
             assert (
-                '404 Client Error:  for url: https://metadata.api.oclc.org/worldcat/manage/lbds/12345. Server response: {"type":"NOT_FOUND","title":"Unable to perform the lbd read operation.","detail":{"summary":"NOT_FOUND","description":"Not able to find the requested LBD"}}'
+                '404 Client Error: Not Found for url: https://metadata.api.oclc.org/worldcat/manage/lbds/12345. Server response: {"type":"NOT_FOUND","title":"Unable to perform the lbd read operation.","detail":{"summary":"NOT_FOUND","description":"Not able to find the requested LBD"}}'
                 == str(exc.value)
             )
 
@@ -697,10 +697,7 @@ class TestLiveMetadataSessionErrors:
         with MetadataSession(authorization=live_token) as session:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.bib_validate(stub_marc21, recordFormat="foo/bar")
-            assert (
-                '406 Client Error:  for url: https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull. Server response: {"type":"NOT_ACCEPTABLE","title":"Invalid \'Content-Type\' header.","detail":"A request with an invalid \'Content-Type\' header was attempted: foo/bar"}'
-                == (str(exc.value))
-            )
+            assert str(exc.value) == """406 Client Error: Not Acceptable for url: https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull. Server response: {"type":"NOT_ACCEPTABLE","title":"Invalid \'Content-Type\' header.","detail":"A request with an invalid \'Content-Type\' header was attempted: foo/bar"}"""
             assert session.adapters["https://"].max_retries.total == 0
 
     def test_error_max_retries(self, stub_marc21, live_token):

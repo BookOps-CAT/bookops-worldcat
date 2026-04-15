@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import ast
 import inspect
 from functools import cached_property

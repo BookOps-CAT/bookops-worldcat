@@ -25,7 +25,7 @@ def live_keys() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope="module")
-def live_token() -> Generator[WorldcatAccessToken, None, None]:
+def live_token(live_keys) -> Generator[WorldcatAccessToken, None, None]:
     """
     Gets live token from environment variables. For use with live tests so that
     the service does not need to request a new token for each test.
