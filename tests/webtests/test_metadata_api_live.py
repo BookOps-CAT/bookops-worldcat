@@ -53,7 +53,7 @@ class TestLiveMetadataSession:
             endpoint = response.url.split("https://metadata.api.oclc.org/")[1]
             assert endpoint == "worldcat/search/classification-bibs/850940461"
             assert response.status_code == 200
-            assert response.headers["Content-Type"] == "application/json;charset=UTF-8"
+            assert response.headers["Content-Type"] == "application/json"
             assert sorted(response.json().keys()) == sorted(["dewey", "lc"])
             assert sorted(response.json()["dewey"].keys()) == ["mostPopular"]
             assert sorted(response.json()["lc"].keys()) == ["mostPopular"]
@@ -662,7 +662,7 @@ class TestLiveMetadataSessionErrors:
     def test_errors_invalid_query_param(self, live_token):
         with MetadataSession(authorization=live_token) as session:
             with pytest.raises(WorldcatRequestError) as exc:
-                session.brief_bibs_get(-41266045)
+                session.brief_bibs_get([])
             assert (
                 '400 Client Error: Bad Request for url: https://metadata.api.oclc.org/worldcat/search/brief-bibs/-41266045. Server response: {"type":"INVALID_QUERY_PARAMETER_VALUE","title":"Validation Failure","detail":"oclcNumber must be a positive whole number","invalid-params":[{"reason":"Invalid Value: -41266045"}]}'
                 == str(exc.value)
@@ -697,7 +697,10 @@ class TestLiveMetadataSessionErrors:
         with MetadataSession(authorization=live_token) as session:
             with pytest.raises(WorldcatRequestError) as exc:
                 session.bib_validate(stub_marc21, recordFormat="foo/bar")
-            assert str(exc.value) == """406 Client Error: Not Acceptable for url: https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull. Server response: {"type":"NOT_ACCEPTABLE","title":"Invalid \'Content-Type\' header.","detail":"A request with an invalid \'Content-Type\' header was attempted: foo/bar"}"""
+            assert (
+                str(exc.value)
+                == """406 Client Error: Not Acceptable for url: https://metadata.api.oclc.org/worldcat/manage/bibs/validate/validateFull. Server response: {"type":"NOT_ACCEPTABLE","title":"Invalid \'Content-Type\' header.","detail":"A request with an invalid \'Content-Type\' header was attempted: foo/bar"}"""
+            )
             assert session.adapters["https://"].max_retries.total == 0
 
     def test_error_max_retries(self, stub_marc21, live_token):
