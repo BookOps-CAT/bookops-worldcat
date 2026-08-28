@@ -1,6 +1,6 @@
 import ast
 import inspect
-from functools import cached_property
+from functools import lru_cache
 from typing import Callable
 
 import pytest
@@ -10,23 +10,29 @@ import yaml
 from bookops_worldcat import MetadataSession
 
 
+@lru_cache(maxsize=1)
+def get_api_spec() -> dict:
+    """
+    Retrieves OpenAPI spec from Metadata API documentation. Caches response
+    so it can be reused in multiple tests without additional API requests.
+    Returns API spec as a dictionary.
+    """
+    yaml_response = requests.get(
+        "https://developer.api.oclc.org/docs/wc-metadata/openapi-external-prod.yaml"
+    )
+    return yaml.safe_load(yaml_response.text)
+
+
 @pytest.mark.webtest
 class TestAPISpec:
     """Compares API spec with MetadataSession methods"""
 
-    @cached_property
+    @property
     def api_spec_dict(self) -> dict:
-        """
-        Retrieves OpenAPI spec from Metadata API documentation. Caches response
-        so it can be reused in multiple tests without additional API requests.
-        Returns API spec as a dictionary.
-        """
-        yaml_response = requests.get(
-            "https://developer.api.oclc.org/docs/wc-metadata/openapi-external-prod.yaml"
-        )
-        return yaml.safe_load(yaml_response.text)
+        """Returns API spec as a dictionary from cached `get_api_spec()` func."""
+        return get_api_spec()
 
-    @cached_property
+    @property
     def endpoints(self) -> dict:
         """Retrieves endpoints from Metadata API Open API spec"""
         return self.api_spec_dict["paths"]
