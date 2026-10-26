@@ -252,8 +252,8 @@ docs = [
 
 [package.metadata]
 requires-dist = [
-    { name = "requests", specifier = ">=2.31,<3.0" },
-    { name = "types-requests", specifier = ">=2.31.0.20240125,<3.0.0.0" },
+    { name = "requests", specifier = ">=2.31" },
+    { name = "types-requests", specifier = ">=2.31.0.20240125" },
 ]
 
 [package.metadata.requires-dev]

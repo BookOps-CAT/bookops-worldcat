@@ -10,8 +10,8 @@ license = "MIT"
 keywords = ["api", "api-wrapper", "oclc", "worldcat", "cataloging", "bibliographic records", "marcxml", "holdings", "library metadata", "marc21"]
 dynamic = ["classifiers"]
 dependencies = [
-    "requests (>=2.31, <3.0)",
-    "types-requests (>=2.31.0.20240125,<3.0.0.0)",
+    "requests>=2.31",
+    "types-requests>=2.31.0.20240125",
 ]
 requires-python = ">=3.9"
 readme = "README.md"
