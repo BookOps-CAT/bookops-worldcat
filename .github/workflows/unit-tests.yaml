@@ -1,13 +1,14 @@
 name: build
 on:
   push:
-    branches: 
+    branches:
       - main
       - "releases/**"
   pull_request:
     branches:
       - main
       - "releases/**"
+permissions: {}
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,15 +16,17 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
-      - uses: actions/checkout@v6
-      - name: Install uv and set python version
-        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         with:
-          python-version: ${{ matrix.python-version }}  
+          persist-credentials: false
+      - name: Install uv and set python version
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 #v10.3.3
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Run tests
         run: uv run --frozen pytest -m "not webtest" --cov=bookops_worldcat/
       - name: Send report to Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 #v2.3.8
         with:
           parallel: true
           github-token: ${{ secrets.GITHUB_TOKEN}}
@@ -35,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls finished
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 #v2.3.8
         with:
           parallel-finished: true
           fail-on-error: false
