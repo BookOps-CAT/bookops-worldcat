@@ -4,17 +4,17 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-
+permissions: {}
 jobs:
   build-release:
     name: Build distributions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 #v7.1.0
         with:
           python-version: "3.14"
       - name: Install Poetry with pipx
@@ -22,12 +22,12 @@ jobs:
 
       - name: Install dependencies with poetry
         run: poetry install --no-root --without dev,docs
-      
+
       - name: Build package distributions
         run: poetry build
 
       - name: Store the distribution packages
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  #v8.0.2
         with:
           name: bookops-worldcat-distributions
           path: dist/
@@ -36,17 +36,17 @@ jobs:
   publish-to-pypi:
     name: Publish to PyPI
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: pypi
-      url: https://pypi.org/project/bookops-worldcat    
+      url: https://pypi.org/project/bookops-worldcat
     needs: build-release
     permissions:
       id-token: write
     steps:
       - name: Retrieve distributions
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 #v8.0.2
         with:
           name: bookops-worldcat-distributions
-          path: dist/    
+          path: dist/
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
