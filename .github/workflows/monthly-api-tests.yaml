@@ -6,7 +6,8 @@ on:
       - "releases/**"
   schedule:
     - cron: '0 5 15 * *'
-permissions: {}
+permissions:
+  contents: read
 env:
   WCKey: ${{ secrets.WC_KEY }}
   WCSecret: ${{ secrets.WC_SECRET }}
